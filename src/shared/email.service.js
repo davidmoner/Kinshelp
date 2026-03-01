@@ -2,9 +2,10 @@
 const { EMAIL_PROVIDER, SENDGRID_API_KEY, MAIL_FROM, PUBLIC_BASE_URL } = require('../config/env');
 
 function isConfigured() {
-  if (!EMAIL_PROVIDER) return false;
+  const provider = String(EMAIL_PROVIDER || '').trim().toLowerCase();
+  if (!provider) return false;
   if (!MAIL_FROM) return false;
-  if (EMAIL_PROVIDER === 'sendgrid') return !!SENDGRID_API_KEY;
+  if (provider === 'sendgrid') return !!SENDGRID_API_KEY;
   return false;
 }
 
@@ -17,7 +18,8 @@ async function send({ to, subject, text }) {
     return { ok: false, implemented: false, message: 'Email provider not configured', preview: { to, subject, text } };
   }
 
-  if (EMAIL_PROVIDER === 'sendgrid') {
+  const provider = String(EMAIL_PROVIDER || '').trim().toLowerCase();
+  if (provider === 'sendgrid') {
     // Lazy require to avoid forcing install if unused.
     // eslint-disable-next-line global-require
     const sg = require('@sendgrid/mail');

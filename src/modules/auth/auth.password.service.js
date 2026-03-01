@@ -20,8 +20,13 @@ async function forgotPassword({ email }) {
     : db.prepare('SELECT id, email FROM users WHERE email = ?').get(email);
 
   // Do not leak whether email exists.
-  if (!isEnabled() || !u) {
+  // Return a neutral response always.
+  if (!u) {
     return { implemented: false, email_sent: false, message: 'If the email exists, you will receive instructions.' };
+  }
+
+  if (!isEnabled()) {
+    return { implemented: false, email_sent: false, message: 'Email sending is not configured yet.' };
   }
 
   const t = await tokens.createToken({ userId: u.id, type: 'reset_password', ttlMinutes: 30 });
