@@ -6,6 +6,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import MatchesScreen from './src/screens/MatchesScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
+import MatchDetailScreen from './src/screens/MatchDetailScreen';
 import { AuthProvider, useAuth } from './src/state/auth';
 import { theme } from './src/ui/theme';
 
@@ -28,6 +29,7 @@ function AppNav() {
       {token ? (
         <>
           <Stack.Screen name="Matches" component={MatchesScreen} options={{ title: 'KingsHelp' }} />
+          <Stack.Screen name="Match" component={MatchDetailScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
         </>

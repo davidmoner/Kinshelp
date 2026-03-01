@@ -4,6 +4,7 @@ import { Screen } from '../ui/Screen';
 import { theme } from '../ui/theme';
 import { listMessages, postMessage } from '../api/khApi';
 import { useAuth } from '../state/auth';
+import { usePoll } from '../ui/usePoll';
 
 function Bubble({ item, meId }) {
   const isSystem = item.kind === 'system';
@@ -37,7 +38,7 @@ export default function ChatScreen({ route, navigation }) {
 
   async function load() {
     if (!token || !matchId) return;
-    setLoading(true);
+    setLoading(items.length === 0);
     try {
       const out = await listMessages(token, matchId, { limit: 80, offset: 0 });
       const data = (out && out.data) || [];
@@ -53,6 +54,8 @@ export default function ChatScreen({ route, navigation }) {
   React.useEffect(() => {
     load();
   }, [token, matchId]);
+
+  usePoll(load, { enabled: !!token && !!matchId && !loading, intervalMs: 3500 });
 
   async function onSend() {
     const msg = text.trim();

@@ -33,6 +33,13 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Orden MVP: matches inbox + chat primero.
 - Push/email: se implementan despues de tener app movil; por ahora `notifications` es la fuente de verdad.
 
+## Auth (Pendiente)
+
+- Email real: verificacion de email + reset password.
+- Google login real: OAuth (mobile) + callback backend.
+- Facebook login real: OAuth (mobile) + callback backend.
+- Objetivo UX mobile: auth simplificado (1-2 pantallas), mantener mismo look&feel que web pero adaptado a touch.
+
 ## Backlog (Prioridad Media)
 
 - Discovery de requests para providers (search, category, geo opcional).

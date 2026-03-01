@@ -80,7 +80,7 @@ export default function MatchesScreen({ navigation }) {
           renderItem={({ item }) => (
             <MatchRow
               item={item}
-              onPress={() => navigation.navigate('Chat', { matchId: item.id, title: item.request_title || item.offer_title || 'Chat' })}
+              onPress={() => navigation.navigate('Match', { matchId: item.id, title: item.request_title || item.offer_title || 'Match' })}
             />
           )}
           ListEmptyComponent={<Text style={styles.empty}>No hay matches aun.</Text>}

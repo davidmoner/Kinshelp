@@ -33,6 +33,21 @@ export default function LoginScreen() {
       </View>
 
       <View style={styles.card}>
+        <View style={styles.socialRow}>
+          <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={() => Alert.alert('Proximamente', 'Login con Google (real)')}>
+            <Text style={styles.socialText}>Continuar con Google</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={() => Alert.alert('Proximamente', 'Login con Facebook (real)')}>
+            <Text style={styles.socialText}>Continuar con Facebook</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.divider}>
+          <View style={styles.line} />
+          <Text style={styles.or}>o</Text>
+          <View style={styles.line} />
+        </View>
+
         <Text style={styles.label}>Email</Text>
         <TextInput
           value={email}
@@ -76,6 +91,19 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     padding: 16,
   },
+  socialRow: { gap: 10 },
+  socialBtn: {
+    borderWidth: 1,
+    borderRadius: theme.radius.md,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  socialText: { color: theme.colors.text, fontWeight: '800' },
+  divider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 },
+  line: { flex: 1, height: 1, backgroundColor: theme.colors.border },
+  or: { color: theme.colors.muted, fontSize: 12 },
   label: { color: theme.colors.muted, marginTop: 10, marginBottom: 6 },
   input: {
     color: theme.colors.text,
