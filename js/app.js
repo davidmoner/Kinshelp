@@ -1057,6 +1057,9 @@
         $('user-avatar').textContent = (user.display_name || '?')[0].toUpperCase();
         $('user-tier').style.color = (user.premium_tier && user.premium_tier !== 'free') ? 'var(--gold-light)' : 'var(--kh-brand-500)';
 
+        const v = document.getElementById('user-verified');
+        if (v) v.classList.toggle('hidden', !(user.is_verified === true || user.is_verified === 1));
+
         // Hide/Show premium CTAs depending on status
         const premium = isPremiumActive(user);
         const btnLanding = document.getElementById('btn-premium-landing');
@@ -1319,8 +1322,15 @@
         if (btn) setLoading(btn, true);
         try {
             const out = await KHApi.requestVerifyEmail();
-            if (out && out.email_sent) toast('Email de verificación reenviado. Revisa tu correo.', 'success');
-            else toast('No se pudo enviar el email de verificación (config pendiente).', 'warn');
+            if (out && out.already_verified) {
+                toast('Tu email ya está verificado ✓', 'success');
+            } else if (out && out.email_sent) {
+                toast('Email de verificación reenviado. Revisa tu correo.', 'success');
+            } else if (out && out.implemented === false) {
+                toast('No se pudo enviar el email de verificación (config pendiente).', 'warn');
+            } else {
+                toast('No se pudo enviar el email de verificación. Inténtalo más tarde.', 'warn');
+            }
         } catch (err) {
             toast((err && err.message) || 'No se pudo enviar el email de verificación', 'error');
         } finally {
