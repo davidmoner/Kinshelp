@@ -14,6 +14,9 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Premium Stripe (checkout + webhook) con persistencia en tabla `payments`.
 - Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` (WIP triggers).
 - Postgres hardening: transacciones disponibles via `db.tx()` y points transfer atomico en PG.
+- Auth: tokens persistidos en `auth_tokens` + endpoints `forgot-password`, `reset-password`, `verify-email`.
+- Email: servicio `src/shared/email.service.js` (SendGrid si esta configurado) + `PUBLIC_BASE_URL` para links.
+- Mobile (Expo): MVP con login, matches inbox, match detail, chat (polling), notificaciones, forgot/reset password.
 
 ## Estado Actual
 
@@ -22,10 +25,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta)
 
-- Premium real (Stripe): implementar checkout + webhook y persistir pagos (WIP).
+- Email: validar entrega end-to-end en produccion (SendGrid Single Sender ahora; luego dominio `kingshelp.es`).
+- Auth: agregar endpoint para enviar/verificar email de forma clickeable (resend verify) y UX en mobile/web.
+- OAuth: implementar verificacion real de Google/Facebook cuando existan credenciales.
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
-- Matches inbox: listar matches por usuario, estado y paginacion.
-- App movil (Expo / React Native) (MVP): Login, Matches inbox, Chat, Notificaciones.
 
 ## Mobile (Decidido)
 
@@ -35,7 +38,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Auth (Pendiente)
 
-- Email real: verificacion de email + reset password.
+- Email real: entregabilidad + templates/UX (links y pantallas).
 - Google login real: OAuth (mobile) + callback backend.
 - Facebook login real: OAuth (mobile) + callback backend.
 - Objetivo UX mobile: auth simplificado (1-2 pantallas), mantener mismo look&feel que web pero adaptado a touch.
@@ -52,16 +55,16 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Email (En Progreso)
 
-- SendGrid: DKIM/DMARC records agregados en Hostinger para `kingshelp.es` (em6569, s1/s2._domainkey, _dmarc).
-- Bloqueo actual: esperar propagacion DNS publica para que SendGrid valide (puede tardar hasta 24h).
-- Siguiente cuando valide: crear API key en SendGrid y setear env vars en Render (EMAIL_PROVIDER, SENDGRID_API_KEY, MAIL_FROM, PUBLIC_BASE_URL).
+- SendGrid: para no bloquear MVP, usar "Single Sender Verification" con `MAIL_FROM` temporal.
+- Dominio `kingshelp.es`: en el momento del setup devolvia NXDOMAIN publicamente; hasta resolver delegacion DNS, SendGrid domain authentication no valida.
+- Cuando el dominio resuelva: reintentar domain authentication (SPF/DKIM/DMARC) y pasar `MAIL_FROM` a `no-reply@kingshelp.es`.
 
 ## Render (Checklist)
 
 - Env vars para email:
   - EMAIL_PROVIDER=sendgrid
   - SENDGRID_API_KEY=...
-  - MAIL_FROM=no-reply@kingshelp.es
+  - MAIL_FROM=davidmoner90@gmail.com (temporal; luego `no-reply@kingshelp.es`)
   - PUBLIC_BASE_URL=https://kingshelp.onrender.com
 
 ## Backlog (Prioridad Media)

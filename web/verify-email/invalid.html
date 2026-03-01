@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KingsHelp - Enlace invalido</title>
+    <meta name="robots" content="noindex" />
+    <style>
+      :root {
+        --bg1: #fff8ef;
+        --bg2: #f3f7ff;
+        --card: rgba(255, 255, 255, 0.78);
+        --text: #1b1f2a;
+        --muted: rgba(27, 31, 42, 0.68);
+        --warn: #b45309;
+        --line: rgba(27, 31, 42, 0.12);
+        --shadow: 0 18px 40px rgba(17, 24, 39, 0.14);
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        color: var(--text);
+        background: radial-gradient(1100px 520px at 18% 12%, rgba(255, 209, 163, 0.55), transparent 60%),
+                    radial-gradient(900px 480px at 80% 18%, rgba(165, 196, 255, 0.55), transparent 62%),
+                    linear-gradient(180deg, var(--bg1), var(--bg2));
+      }
+      .wrap { min-height: 100%; display: grid; place-items: center; padding: 24px; }
+      .card {
+        width: min(560px, 100%);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 22px 20px;
+        backdrop-filter: blur(10px);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(180, 83, 9, 0.25);
+        background: rgba(180, 83, 9, 0.10);
+        color: var(--warn);
+        font-weight: 800;
+      }
+      h1 { margin: 14px 0 6px; font-size: 26px; line-height: 1.12; }
+      p { margin: 0 0 16px; color: var(--muted); line-height: 1.55; }
+      .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+      .btn {
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.84);
+        color: var(--text);
+        padding: 11px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .btn.primary { border-color: rgba(180, 83, 9, 0.25); background: rgba(180, 83, 9, 0.12); color: #7c2d12; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="card" role="main">
+        <div class="badge">Enlace no valido</div>
+        <h1>Este enlace ya no sirve.</h1>
+        <p>Puede haber expirado o ya fue usado. Vuelve a KingsHelp y solicita un nuevo email de verificacion.</p>
+        <div class="actions">
+          <a class="btn primary" href="/">Ir a KingsHelp</a>
+          <a class="btn" href="/web/index.html">Abrir app web</a>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

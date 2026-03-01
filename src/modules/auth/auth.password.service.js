@@ -22,7 +22,7 @@ async function forgotPassword({ email }) {
   // Do not leak whether email exists.
   // Return a neutral response always.
   if (!u) {
-    return { implemented: false, email_sent: false, message: 'If the email exists, you will receive instructions.' };
+    return { implemented: isEnabled(), email_sent: false, message: 'If the email exists, you will receive instructions.' };
   }
 
   if (!isEnabled()) {
@@ -43,9 +43,6 @@ async function forgotPassword({ email }) {
 async function resetPassword({ token, newPassword }) {
   if (!token) throw httpError(422, 'Token is required');
   if (!newPassword) throw httpError(422, 'new_password is required');
-  if (!isEnabled()) {
-    return { implemented: false, message: 'Password reset not configured yet.', ok: false };
-  }
 
   const used = await tokens.consumeToken({ type: 'reset_password', token });
   if (!used) throw httpError(422, 'Invalid or expired token');
@@ -60,11 +57,27 @@ async function resetPassword({ token, newPassword }) {
   return { implemented: true, ok: true };
 }
 
+async function requestVerifyEmail({ userId, email, isVerified }) {
+  if (!userId) throw httpError(422, 'userId is required');
+  if (!email) throw httpError(422, 'email is required');
+
+  if (isVerified) return { implemented: isEnabled(), email_sent: false, already_verified: true };
+
+  if (!isEnabled()) return { implemented: false, email_sent: false, message: 'Email sending is not configured yet.' };
+
+  const t = await tokens.createToken({ userId, type: 'verify_email', ttlMinutes: 24 * 60 });
+  const link = emailSvc.buildLink(`/api/v1/auth/verify-email?token=${encodeURIComponent(t.token)}`);
+  const out = await emailSvc.send({
+    to: email,
+    subject: 'KingsHelp - Verify your email',
+    text: `Para verificar tu email, abre este enlace (valido 24h):\n\n${link}`,
+  });
+
+  return { implemented: !!out.implemented, email_sent: !!out.ok };
+}
+
 async function verifyEmail({ token }) {
   if (!token) throw httpError(422, 'Token is required');
-  if (!isEnabled()) {
-    return { implemented: false, message: 'Email verification not configured yet.', ok: false };
-  }
 
   const used = await tokens.consumeToken({ type: 'verify_email', token });
   if (!used) throw httpError(422, 'Invalid or expired token');
@@ -79,4 +92,4 @@ async function verifyEmail({ token }) {
   return { implemented: true, ok: true };
 }
 
-module.exports = { forgotPassword, resetPassword, verifyEmail };
+module.exports = { forgotPassword, resetPassword, requestVerifyEmail, verifyEmail };
