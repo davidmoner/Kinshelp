@@ -4,6 +4,7 @@ import { Screen } from '../ui/Screen';
 import { theme } from '../ui/theme';
 import { login } from '../api/khApi';
 import { useAuth } from '../state/auth';
+import { signInWithGoogle, signInWithFacebook } from '../auth/oauth';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -24,6 +25,26 @@ export default function LoginScreen() {
     }
   }
 
+  async function onGoogle() {
+    try {
+      const out = await signInWithGoogle();
+      if (out && out.token) await signIn(out.token);
+      else if (out && out.message) Alert.alert('Google', out.message);
+    } catch (e) {
+      Alert.alert('Google', e.message);
+    }
+  }
+
+  async function onFacebook() {
+    try {
+      const out = await signInWithFacebook();
+      if (out && out.token) await signIn(out.token);
+      else if (out && out.message) Alert.alert('Facebook', out.message);
+    } catch (e) {
+      Alert.alert('Facebook', e.message);
+    }
+  }
+
   return (
     <Screen>
       <View style={styles.header}>
@@ -34,10 +55,10 @@ export default function LoginScreen() {
 
       <View style={styles.card}>
         <View style={styles.socialRow}>
-          <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={() => Alert.alert('Proximamente', 'Login con Google (real)')}>
+          <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={onGoogle}>
             <Text style={styles.socialText}>Continuar con Google</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={() => Alert.alert('Proximamente', 'Login con Facebook (real)')}>
+          <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={onFacebook}>
             <Text style={styles.socialText}>Continuar con Facebook</Text>
           </TouchableOpacity>
         </View>

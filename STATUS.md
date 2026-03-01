@@ -43,6 +43,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 ## Auth (En Progreso)
 
 - Endpoints OAuth (stub): `POST /api/v1/auth/google`, `POST /api/v1/auth/facebook` (501 si no hay credenciales).
+- Mobile: botones Google/Facebook usan Expo AuthSession (requiere setear `GOOGLE_CLIENT_ID` / `FACEBOOK_APP_ID` en `mobile/src/config.js`).
 
 ## Backlog (Prioridad Media)
 
