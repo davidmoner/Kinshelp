@@ -20,5 +20,3 @@ services:
         value: /var/data
       - key: DB_PATH
         value: kingshelp.db
-
-disks: []
