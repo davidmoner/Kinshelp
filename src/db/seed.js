@@ -72,6 +72,14 @@ const insertUser = db.prepare(`
 users.forEach(u => insertUser.run(u));
 console.log(`  ✔  ${users.length} users seeded`);
 
+// Ensure demo passwords are exactly as expected (avoid stale hashes)
+try {
+    const demoHash = bcrypt.hashSync('password123', 10);
+    db.prepare('UPDATE users SET password_hash = ? WHERE email IN (?,?,?)')
+        .run(demoHash, 'alice@example.com', 'bob@example.com', 'carol@example.com');
+    console.log('  ✔  demo passwords refreshed');
+} catch { }
+
 // ── AutoMatch settings (Premium users) ─────────────────────────────────────
 try {
     const insAM = db.prepare(`
