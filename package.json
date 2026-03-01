@@ -7,7 +7,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node src/db/migrate.js",
+    "migrate:pg": "node src/db/migrate.pg.js",
     "seed": "node src/db/seed.js",
+    "seed:pg": "node src/db/seed.pg.js",
     "setup": "npm run migrate && npm run seed",
     "prune": "npm prune --omit=dev",
     "test": "node src/tests/smoke.test.js"
@@ -21,6 +23,7 @@
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "pg": "^8.14.1",
     "multer": "^2.0.0"
   },
   "devDependencies": {

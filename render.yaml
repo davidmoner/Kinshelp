@@ -21,4 +21,8 @@ services:
       - key: DB_PATH
         value: kingshelp.db
 
-    preDeployCommand: node src/db/migrate.js && node src/db/seed.js
+    preDeployCommand: >-
+      node -e "process.exit(process.env.DATABASE_URL ? 0 : 1)" &&
+      node src/db/migrate.pg.js &&
+      node src/db/seed.pg.js ||
+      (node src/db/migrate.js && node src/db/seed.js)
