@@ -36,3 +36,8 @@ Este proyecto se despliega desde GitHub a Render.
 
 - No subir secretos: `.env`, keys, credenciales.
 - Si aparece un archivo raro sin trackear (ej. `nul`), no lo subas.
+
+## Ultimos cambios (referencia rapida)
+
+- Si arreglas un bug en produccion: confirma en Network/DevTools que los `api/v1/*` dejan de dar 500.
+- Si cambias email verify: comprueba `POST /api/v1/auth/request-verify-email` (Response) y el redirect de `GET /api/v1/auth/verify-email?token=...`.

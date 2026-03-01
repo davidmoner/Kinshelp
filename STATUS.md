@@ -110,6 +110,23 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Dashboard cards: headers unificados con icono + subtitulo (clases `.card-title`, `.card-ico`, `.card-sub`).
 - Halo calido sutil al hover de `.glass-card` (sin cambiar el layout).
 
+## UI (progreso reciente)
+
+- Verificado:
+  - Tick verde en header del dashboard (`#user-verified`) cuando `user.is_verified`.
+  - Tick verde en carnet de usuario (`#usercard-verified`).
+- Carnet KingsHelp (perfil de vecino):
+  - Modal `#modal-usercard` estilo "KingsHelp ID" con sello y chips (verificado, zona/km, rep, rating, insignias, nivel).
+  - Se abre desde: ranking, sugeridos (providers), y matches (carga `/users/:id`).
+- Movil dashboard:
+  - Header usa hamburguesa `#dash-burger` en <=560px y oculta botones que no caben.
+
+## Produccion (Render)
+
+- Fix critico: Offers/Requests usan Postgres via `src/config/db.js` cuando hay `DATABASE_URL` (evita SQLite en `/tmp`).
+- Verify email:
+  - `POST /api/v1/auth/request-verify-email` responde `already_verified:true` para cuentas ya verificadas.
+
 ## Deploy
 
 - Pasos para publicar cambios: ver `DEPLOY.md`
