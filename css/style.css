@@ -2127,7 +2127,7 @@ html[data-theme="light"] .site-footer {
   letter-spacing: -0.5px;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 820px) {
   /* Mobile header: keep it calm; move account into burger */
   .dash-user .kh-pill { display: none; }
   .dash-user .dash-menu { display: none; }
