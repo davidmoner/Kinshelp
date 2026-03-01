@@ -3,7 +3,7 @@
  * matches.service.js — business logic only (~120 LOC).
  * DB access via repo; input validation via validators.
  */
-const db = require('../../config/database');
+const db = require('../../config/db');
 const httpError = require('../../shared/http-error');
 const cooldown = require('../../shared/cooldown.service');
 const notifications = require('../notifications/notifications.service');
@@ -74,14 +74,20 @@ function ensureAntiFraudForDone(match) {
 }
 
 function requireOffer(id) {
-    const row = db.prepare('SELECT id, status FROM service_offers WHERE id = ?').get(id);
+    const row = db.isPg
+        ? null
+        : db.prepare('SELECT id, status FROM service_offers WHERE id = ?').get(id);
+    if (db.isPg) throw httpError(501, 'Offer checks not implemented for Postgres yet');
     if (!row) throw httpError(404, 'Offer not found');
     if (row.status !== 'active') throw httpError(422, 'Offer is not active');
     return row;
 }
 
 function requireRequest(id) {
-    const row = db.prepare('SELECT id, status FROM help_requests WHERE id = ?').get(id);
+    const row = db.isPg
+        ? null
+        : db.prepare('SELECT id, status FROM help_requests WHERE id = ?').get(id);
+    if (db.isPg) throw httpError(501, 'Request checks not implemented for Postgres yet');
     if (!row) throw httpError(404, 'Request not found');
     if (row.status !== 'open') throw httpError(422, 'Request is not open');
     return row;
@@ -89,8 +95,10 @@ function requireRequest(id) {
 
 function updateUserRating(userId) {
     const { avg, cnt } = repo.calcUserRatingAvg(userId);
-    db.prepare('UPDATE users SET rating_avg = ?, rating_count = ?, updated_at = ? WHERE id = ?')
-        .run(avg || 0, cnt || 0, new Date().toISOString(), userId);
+    if (db.isPg) {
+        return db.exec('UPDATE users SET rating_avg = $1, rating_count = $2, updated_at = $3 WHERE id = $4', [avg || 0, cnt || 0, new Date().toISOString(), userId]);
+    }
+    db.prepare('UPDATE users SET rating_avg = ?, rating_count = ?, updated_at = ? WHERE id = ?').run(avg || 0, cnt || 0, new Date().toISOString(), userId);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -107,6 +115,16 @@ function create(data) {
 
     if (offer_id) requireOffer(offer_id);
     if (request_id) requireRequest(request_id);
+
+    if (db.isPg) {
+        return db.tx(async (tx) => {
+            const id = await repo.insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type }, tx);
+            const now = new Date().toISOString();
+            if (offer_id) await tx.exec("UPDATE service_offers SET status='matched', updated_at=$1 WHERE id=$2", [now, offer_id]);
+            if (request_id) await tx.exec("UPDATE help_requests SET status='matched', updated_at=$1 WHERE id=$2", [now, request_id]);
+            return id;
+        }).then(matchId => repo.findById(matchId));
+    }
 
     const matchId = db.transaction(() => {
         const id = repo.insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type });

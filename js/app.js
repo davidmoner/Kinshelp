@@ -2735,6 +2735,7 @@
             hide($('req-suggestions'));
             $('req-suggestions-list').innerHTML = '';
             toast('Solicitud creada ✓', 'success');
+            try { loadFeed(); } catch { }
 
             renderListingPhotos('req-photos-grid', req.media_urls, 'deleteRequestPhoto', req.id);
 
@@ -2786,6 +2787,7 @@
             show($('off-created'));
             hide($('off-form-wrap'));
             toast('Oferta publicada ✓', 'success');
+            try { loadFeed(); } catch { }
 
             renderListingPhotos('off-photos-grid', offer.media_urls, 'deleteOfferPhoto', offer.id);
 

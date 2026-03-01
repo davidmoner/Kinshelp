@@ -11,6 +11,16 @@ const { LISTING_MAX_PHOTOS } = require('../../config/constants');
 const EDITABLE = ['title', 'description', 'location_text', 'media_urls'];
 
 function isPremiumUser(userId) {
+  if (db.isPg) {
+    return db.one('SELECT premium_tier, premium_until FROM users WHERE id = $1', [userId]).then(u => {
+      if (!u) return false;
+      if (u.premium_tier && u.premium_tier !== 'free') {
+        if (!u.premium_until) return true;
+        return new Date(u.premium_until).getTime() > Date.now();
+      }
+      return false;
+    });
+  }
   const u = db.prepare('SELECT premium_tier, premium_until FROM users WHERE id = ?').get(userId);
   if (!u) return false;
   if (u.premium_tier && u.premium_tier !== 'free') {
@@ -21,6 +31,12 @@ function isPremiumUser(userId) {
 }
 
 function computeExpiresAt(userId) {
+  if (db.isPg) {
+    return Promise.resolve(isPremiumUser(userId)).then(p => {
+      const days = p ? 60 : 7;
+      return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+    });
+  }
   const days = isPremiumUser(userId) ? 60 : 7;
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }
@@ -35,8 +51,7 @@ function list(filters) { return repo.list(filters); }
 async function getById(id) { return requireRequest(id); }
 
 function create(data) {
-  const expires_at = computeExpiresAt(data.seeker_id);
-  return Promise.resolve(repo.insert({ ...data, expires_at }))
+  return Promise.resolve(computeExpiresAt(data.seeker_id)).then(expires_at => repo.insert({ ...data, expires_at }))
     .then(id => requireRequest(id))
     .then(row => {
       try { automatchSvc.onRequestCreated(row); } catch { /* don't block request creation */ }

@@ -42,19 +42,20 @@ function listForUser(userId, { status, limit = 20, offset = 0 }) {
     return db.prepare(sql).all(...params);
 }
 
-function insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type }) {
+function insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type }, tx = null) {
     const id = randomUUID();
     const now = new Date().toISOString();
     if (db.isPg) {
+        const runner = tx || db;
         return (async () => {
-            await db.exec(
-                `INSERT INTO matches
-                  (id, offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, created_at, updated_at, compensation_type)
-                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-                [id, offer_id || null, request_id || null, provider_id, seeker_id, points_agreed, initiated_by, now, now, compensation_type || 'cash']
-            );
-            return id;
-        })();
+            await runner.exec(
+                 `INSERT INTO matches
+                   (id, offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, created_at, updated_at, compensation_type)
+                  VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+                 [id, offer_id || null, request_id || null, provider_id, seeker_id, points_agreed, initiated_by, now, now, compensation_type || 'cash']
+             );
+             return id;
+         })();
     }
     try {
         db.prepare(`
