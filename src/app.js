@@ -79,7 +79,10 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      'script-src': ["'self'", "'unsafe-inline'"],
+      // The static landing uses inline bootstraps and some libs may use blob: URLs.
+      // Allow both to keep the no-build frontend working.
+      'script-src': ["'self'", "'unsafe-inline'", 'blob:'],
+      'script-src-elem': ["'self'", "'unsafe-inline'", 'blob:'],
     },
   },
 }));
