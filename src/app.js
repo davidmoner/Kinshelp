@@ -83,6 +83,8 @@ app.use(helmet({
       // Allow both to keep the no-build frontend working.
       'script-src': ["'self'", "'unsafe-inline'", 'blob:'],
       'script-src-elem': ["'self'", "'unsafe-inline'", 'blob:'],
+      // The landing uses inline onclick handlers in HTML.
+      'script-src-attr': ["'self'", "'unsafe-inline'"]
     },
   },
 }));
