@@ -48,21 +48,21 @@
   rightFeed.parentElement.style.opacity = '';
   rightFeed.parentElement.style.pointerEvents = '';
 
-  function pickPanelImage(side) {
+  function pickPanelImages(side) {
     // Convention: numbered images with side in filename, e.g. "1izquierda.png", "12derecha.png".
-    // We prefer the highest number available so updates are drop-in by adding a new file.
-    // NOTE: In-browser we can't list a folder, so this probes candidates until one loads.
+    // NOTE: In-browser we can't list a folder, so this probes candidates until they load.
     var exts = ['png', 'jpg', 'jpeg', 'webp'];
 
-    function probeBest(cb) {
+    function probeTop2(cb) {
       var done = false;
       var n = 99;
+      var found = [];
 
       function tryOne() {
         if (done) return;
         if (n <= 0) {
           done = true;
-          cb(null);
+          cb(found);
           return;
         }
 
@@ -78,8 +78,16 @@
           var img = new Image();
           img.onload = function () {
             if (done) return;
-            done = true;
-            cb(cand);
+            // Avoid duplicates by path
+            if (found.indexOf(cand) === -1) found.push(cand);
+            if (found.length >= 2) {
+              done = true;
+              cb(found);
+              return;
+            }
+            // keep scanning down for 2nd
+            n--;
+            tryOne();
           };
           img.onerror = function () {
             tryExt();
@@ -94,18 +102,32 @@
     }
 
     return {
-      initial: 'img/1' + side + '.png',
-      probeBest: probeBest
+      initial: ['img/1' + side + '.png'],
+      probeTop2: probeTop2
     };
   }
 
-  var leftPick = pickPanelImage('izquierda');
-  var rightPick = pickPanelImage('derecha');
+  var leftPick = pickPanelImages('izquierda');
+  var rightPick = pickPanelImages('derecha');
 
-  // Using numbered assets from /img (auto-picks latest by number)
+  function scene(side, who, pick) {
+    return {
+      side: side,
+      img: pick.initial[0],
+      alt: 'Panel ' + side,
+      pill: who,
+      kind: 'scene',
+      _picker: pick
+    };
+  }
+
+  // Two images per side (no repeats within the same side)
+  // Order: L1, L2, R1, R2
   var SCENES = [
-    { img: leftPick.initial, alt: 'Panel izquierdo', pill: 'Vecina', kind: 'scene', _picker: leftPick },
-    { img: rightPick.initial, alt: 'Panel derecho', pill: 'Vecino', kind: 'scene', _picker: rightPick }
+    Object.assign(scene('izquierda', 'Vecina', leftPick), { _slot: 0 }),
+    Object.assign(scene('izquierda', 'Vecina', leftPick), { _slot: 1 }),
+    Object.assign(scene('derecha', 'Vecino', rightPick), { _slot: 0 }),
+    Object.assign(scene('derecha', 'Vecino', rightPick), { _slot: 1 })
   ];
 
   function el(tag, cls) {
@@ -131,13 +153,15 @@
         this.style.opacity = '0';
       };
 
-      // Upgrade to best numbered match when found.
-      if (scene._picker && typeof scene._picker.probeBest === 'function') {
-        scene._picker.probeBest(function (best) {
-          if (!best) return;
-          if (img.src && img.src.indexOf(best) !== -1) return;
+      // Upgrade to top-2 matches when found (per side).
+      if (scene._picker && typeof scene._picker.probeTop2 === 'function') {
+        scene._picker.probeTop2(function (list) {
+          if (!list || !list.length) return;
+          var pick = list[Math.max(0, Math.min(list.length - 1, scene._slot || 0))];
+          if (!pick) return;
+          if (img.src && img.src.indexOf(pick) !== -1) return;
           img.style.opacity = '';
-          img.src = best;
+          img.src = pick;
         });
       }
 
@@ -187,10 +211,11 @@
     });
   }
 
+  // Ensure each side alternates between its 2 slots (0/1) and never repeats back-to-back.
   var idxL = 0;
-  var idxR = 1;
-  fillFeed(leftFeed, idxL);
-  fillFeed(rightFeed, idxR);
+  var idxR = 0;
+  fillFeed(leftFeed, 0);
+  fillFeed(rightFeed, 2);
 
   updatePanelVisibility();
 
@@ -229,10 +254,11 @@
     if (!inHero) return;
     if (now - lastSwapAt < SWAP_MS) return;
     lastSwapAt = now;
-    idxL++;
-    idxR++;
+    idxL = (idxL + 1) % 2;
+    idxR = (idxR + 1) % 2;
+    // Left uses scenes 0/1, right uses scenes 2/3
     swapOne(leftFeed, idxL);
-    swapOne(rightFeed, idxR);
+    swapOne(rightFeed, 2 + idxR);
   }
 
   function onScroll() {

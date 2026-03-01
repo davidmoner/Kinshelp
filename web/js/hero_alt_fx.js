@@ -30,9 +30,9 @@
     var host = t.querySelector('.kh-ios-stack');
     if (!host) return;
     host.innerHTML = '';
-    host.appendChild(mkNotif('Nuevo vecino cerca', 'Disponible en 8 min'));
-    host.appendChild(mkNotif('Match propuesto', 'Limpieza · 12€'));
-    host.appendChild(mkNotif('Reputacion +12', 'Gracias por ayudar'));
+    host.appendChild(mkNotif('Nuevo vecino cerca · disponible en 8 min'));
+    host.appendChild(mkNotif('Match propuesto · limpieza · 12€'));
+    host.appendChild(mkNotif('Reputacion +12 · gracias por ayudar'));
   });
 
   function updateFor(target) {

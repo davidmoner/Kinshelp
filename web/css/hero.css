@@ -56,6 +56,9 @@ html[data-theme="dark"] .kh-ios-notif {
     font-weight: 800;
     letter-spacing: -0.2px;
     color: rgba(15, 23, 42, 0.90);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .kh-ios-sub {
