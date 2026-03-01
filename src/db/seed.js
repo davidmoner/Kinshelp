@@ -4,7 +4,10 @@
  * Run: npm run seed  (run AFTER npm run migrate)
  */
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+// Load local .env if present; do not override Render env vars.
+try {
+    require('dotenv').config({ path: path.resolve(__dirname, '../../.env'), override: false });
+} catch { }
 const { randomUUID } = require('crypto');
 const bcrypt = require('bcryptjs');
 const db = require('../config/database');
