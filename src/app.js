@@ -40,6 +40,9 @@ const defaultCors = [
   // Backend-served frontend (this app)
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  // Production
+  'https://kingshelp.es',
+  'https://www.kingshelp.es',
 ];
 
 const corsOriginsEnv = process.env.CORS_ORIGINS;
