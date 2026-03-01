@@ -74,13 +74,15 @@
       var n = 99;
       var found = [];
 
+      function finish() {
+        if (done) return;
+        done = true;
+        cb(found);
+      }
+
       function tryOne() {
         if (done) return;
-        if (n <= 0) {
-          done = true;
-          cb(found);
-          return;
-        }
+        if (n <= 0) return finish();
 
         var i = 0;
         function tryExt() {
@@ -94,9 +96,7 @@
           var img = new Image();
           img.onload = function () {
             if (done) return;
-            // Avoid duplicates by path
             if (found.indexOf(cand) === -1) found.push(cand);
-            // keep scanning down
             n--;
             tryOne();
           };
@@ -111,12 +111,7 @@
 
       tryOne();
 
-      // Safety: stop probing after a bit
-      setTimeout(function () {
-        if (done) return;
-        done = true;
-        cb(found);
-      }, 900);
+      // No timeout: we need full pool so nothing gets skipped.
     }
 
     return {
@@ -296,69 +291,27 @@
     });
   }
 
-  var VISIBLE_PER_SIDE = 3;
+  function visiblePerSide() {
+    return isDarkTheme() ? 1 : 3;
+  }
 
   ensurePoolsReady(function () {
-    renderSide(leftFeed, 'izquierda', VISIBLE_PER_SIDE);
-    renderSide(rightFeed, 'derecha', VISIBLE_PER_SIDE);
+    var n = visiblePerSide();
+    renderSide(leftFeed, 'izquierda', n);
+    renderSide(rightFeed, 'derecha', n);
     updatePanelVisibility();
   });
 
-  var inHero = false;
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      inHero = entries[0] && entries[0].isIntersecting;
-    }, { threshold: 0.18 });
-    io.observe(hero);
-  } else {
-    inHero = true;
-  }
-
-  var ticking = false;
-  var lastSwapAt = 0;
-  var SWAP_MS = 1200;
-
-  function swapOne(feed, side) {
-    var first = feed.firstElementChild;
-    if (!first) return;
-    first.classList.remove('is-in');
-    // animate out using same transition; remove after
-    setTimeout(function () {
-      try { first.remove(); } catch { }
-      var imgPath = takeNext(side) || (side === 'izquierda' ? leftPick.initial[0] : rightPick.initial[0]);
-      var item = makeItem(mkScene(side, imgPath));
-      feed.appendChild(item);
-      // animate in
-      requestAnimationFrame(function () {
-        item.classList.add('is-in');
-      });
-    }, 240);
-  }
-
-  function onFrame(now) {
-    ticking = false;
-    if (!inHero) return;
-    if (now - lastSwapAt < SWAP_MS) return;
-    lastSwapAt = now;
-    swapOne(leftFeed, 'izquierda');
-    swapOne(rightFeed, 'derecha');
-  }
-
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(onFrame);
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
+  // Static panels: no scroll-driven swapping/movement.
 
   // React to theme changes (dataset.theme) and swap images accordingly.
   if ('MutationObserver' in window) {
     var themeObs = new MutationObserver(function () {
       try {
         ensurePoolsReady(function () {
-          renderSide(leftFeed, 'izquierda', VISIBLE_PER_SIDE);
-          renderSide(rightFeed, 'derecha', VISIBLE_PER_SIDE);
+          var n = visiblePerSide();
+          renderSide(leftFeed, 'izquierda', n);
+          renderSide(rightFeed, 'derecha', n);
         });
       } catch (e) { }
     });
