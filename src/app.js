@@ -108,8 +108,9 @@ api.use('/notifications', require('./modules/notifications/notifications.routes'
 
 app.use('/api/v1', api);
 
-// Serve the frontend (single-page) from /web
-const webDir = path.resolve(__dirname, '../web');
+// Serve the frontend (single-page) from repo root
+// (Render runs the service from /opt/render/project/src)
+const webDir = path.resolve(__dirname, '..');
 app.use('/', express.static(webDir));
 app.get('/', (req, res) => res.sendFile(path.join(webDir, 'index.html')));
 
