@@ -4,7 +4,7 @@ const path = require('path');
 const { randomUUID } = require('crypto');
 const httpError = require('../../shared/http-error');
 const repo = require('./requests.repo');
-const db = require('../../config/database');
+const db = require('../../config/db');
 const automatchSvc = require('../automatch/automatch.service');
 const { LISTING_MAX_PHOTOS } = require('../../config/constants');
 
@@ -25,25 +25,27 @@ function computeExpiresAt(userId) {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
 }
 
-function requireRequest(id) {
-  const req = repo.findById(id);
+async function requireRequest(id) {
+  const req = await repo.findById(id);
   if (!req) throw httpError(404, 'Request not found');
   return req;
 }
 
 function list(filters) { return repo.list(filters); }
-function getById(id) { return requireRequest(id); }
+async function getById(id) { return requireRequest(id); }
 
 function create(data) {
   const expires_at = computeExpiresAt(data.seeker_id);
-  const id = repo.insert({ ...data, expires_at });
-  const row = requireRequest(id);
-  try { automatchSvc.onRequestCreated(row); } catch { /* don't block request creation */ }
-  return row;
+  return Promise.resolve(repo.insert({ ...data, expires_at }))
+    .then(id => requireRequest(id))
+    .then(row => {
+      try { automatchSvc.onRequestCreated(row); } catch { /* don't block request creation */ }
+      return row;
+    });
 }
 
-function update(id, userId, fields) {
-  const req = requireRequest(id);
+async function update(id, userId, fields) {
+  const req = await requireRequest(id);
   if (req.seeker_id !== userId) throw httpError(403, 'Forbidden');
   if (req.status !== 'open') throw httpError(422, 'Only open requests can be edited');
 
@@ -55,20 +57,21 @@ function update(id, userId, fields) {
     }
   }
   if (!sets.length) return requireRequest(id);
+  if (db.isPg) throw httpError(501, 'Editing requests not supported on Postgres yet');
   repo.patch(id, sets.join(', '), vals);
   return requireRequest(id);
 }
 
-function remove(id, userId) {
-  const req = requireRequest(id);
+async function remove(id, userId) {
+  const req = await requireRequest(id);
   if (req.seeker_id !== userId) throw httpError(403, 'Forbidden');
-  repo.setStatus(id, 'closed');
+  await Promise.resolve(repo.setStatus(id, 'closed'));
   return { message: 'Request closed' };
 }
 
-function suggestedProviders(requestId) {
-  const helpReq = requireRequest(requestId);
-  const providers = repo.suggestedProviders(helpReq.category, helpReq.seeker_id);
+async function suggestedProviders(requestId) {
+  const helpReq = await requireRequest(requestId);
+  const providers = await Promise.resolve(repo.suggestedProviders(helpReq.category, helpReq.seeker_id));
   return { request: helpReq, suggested_providers: providers };
 }
 
@@ -85,7 +88,10 @@ function parseMedia(raw) {
 
 function addPhoto(id, userId, file, baseUrl) {
   if (!file) throw httpError(400, 'Photo is required');
-  const req = requireRequest(id);
+  // Photos not yet supported for Postgres path
+  if (db.isPg) throw httpError(501, 'Photos not supported on Postgres yet');
+  const req = repo.findById(id);
+  if (!req) throw httpError(404, 'Request not found');
   if (req.seeker_id !== userId) {
     try { fs.unlinkSync(file.path); } catch { }
     throw httpError(403, 'Forbidden');
@@ -110,7 +116,9 @@ function addPhoto(id, userId, file, baseUrl) {
 }
 
 function deletePhoto(id, userId, photoId) {
-  const req = requireRequest(id);
+  if (db.isPg) throw httpError(501, 'Photos not supported on Postgres yet');
+  const req = repo.findById(id);
+  if (!req) throw httpError(404, 'Request not found');
   if (req.seeker_id !== userId) throw httpError(403, 'Forbidden');
   const media = parseMedia(req.media_urls);
   const idx = media.findIndex(p => String(p && p.id) === String(photoId));
@@ -127,7 +135,9 @@ function deletePhoto(id, userId, photoId) {
 }
 
 function boost48h(id, userId) {
-  const req = requireRequest(id);
+  if (db.isPg) throw httpError(501, 'Boost not supported on Postgres yet');
+  const req = repo.findById(id);
+  if (!req) throw httpError(404, 'Request not found');
   if (req.seeker_id !== userId) throw httpError(403, 'Forbidden');
   if (req.status !== 'open') throw httpError(422, 'Solo se pueden boostear solicitudes activas');
   if (Number(req.boost_48h_used || 0) === 1) throw httpError(409, 'Este anuncio ya uso su boost 48h');

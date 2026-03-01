@@ -3,27 +3,30 @@ const svc = require('./requests.service');
 const validators = require('./requests.validators');
 
 const list = (req, res, next) => {
-  try {
+  (async () => {
     const { category, status, seeker_id, limit = 20, offset = 0 } = req.query;
-    res.json({
-      data: svc.list({ category, status, seeker_id, limit: +limit, offset: +offset }),
-    });
-  } catch (e) {
-    next(e);
-  }
+    const data = await svc.list({ category, status, seeker_id, limit: +limit, offset: +offset });
+    res.json({ data });
+  })().catch(next);
 };
-const getOne = (req, res, next) => { try { res.json(svc.getById(req.params.id)); } catch (e) { next(e); } };
+
+const getOne = (req, res, next) => {
+  (async () => {
+    res.json(await svc.getById(req.params.id));
+  })().catch(next);
+};
 
 const create = (req, res, next) => {
-    try {
-        const data = validators.validateCreate(req.body);
-        res.status(201).json(svc.create({ ...data, seeker_id: req.user.id }));
-    } catch (e) { next(e); }
+  (async () => {
+    const data = validators.validateCreate(req.body);
+    const out = await svc.create({ ...data, seeker_id: req.user.id });
+    res.status(201).json(out);
+  })().catch(next);
 };
 
-const update = (req, res, next) => { try { res.json(svc.update(req.params.id, req.user.id, req.body)); } catch (e) { next(e); } };
-const remove = (req, res, next) => { try { res.json(svc.remove(req.params.id, req.user.id)); } catch (e) { next(e); } };
-const suggestedProviders = (req, res, next) => { try { res.json(svc.suggestedProviders(req.params.id)); } catch (e) { next(e); } };
+const update = (req, res, next) => { (async () => res.json(await svc.update(req.params.id, req.user.id, req.body)))().catch(next); };
+const remove = (req, res, next) => { (async () => res.json(await svc.remove(req.params.id, req.user.id)))().catch(next); };
+const suggestedProviders = (req, res, next) => { (async () => res.json(await svc.suggestedProviders(req.params.id)))().catch(next); };
 
 const addPhoto = (req, res, next) => {
   try {

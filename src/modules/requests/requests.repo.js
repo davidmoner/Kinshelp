@@ -1,5 +1,5 @@
 'use strict';
-const db = require('../../config/database');
+const db = require('../../config/db');
 const { randomUUID } = require('crypto');
 
 const WITH_SEEKER = `
@@ -10,6 +10,14 @@ const WITH_SEEKER = `
 
 function findById(id) {
     expireStale();
+    if (db.isPg) {
+        return db.one(`${WITH_SEEKER} WHERE r.id = $1`, [id]).then(row => {
+            if (row) {
+                try { row.media_urls = JSON.parse(row.media_urls || '[]'); } catch { row.media_urls = []; }
+            }
+            return row;
+        });
+    }
     const row = db.prepare(`${WITH_SEEKER} WHERE r.id = ?`).get(id);
     if (row) row.media_urls = JSON.parse(row.media_urls || '[]');
     return row;
@@ -17,6 +25,22 @@ function findById(id) {
 
 function list({ category, status = 'open', seeker_id, limit = 20, offset = 0 }) {
     expireStale();
+    if (db.isPg) {
+        let i = 1;
+        let sql = `${WITH_SEEKER} WHERE r.status = $${i++}`;
+        const params = [status];
+        if (category) { sql += ` AND r.category = $${i++}`; params.push(category); }
+        if (seeker_id) { sql += ` AND r.seeker_id = $${i++}`; params.push(seeker_id); }
+        sql += ` ORDER BY r.created_at DESC LIMIT $${i++} OFFSET $${i++}`;
+        params.push(limit, offset);
+        return db.many(sql, params).then(rows => {
+            rows.forEach(r => {
+                try { r.media_urls = JSON.parse(r.media_urls || '[]'); } catch { r.media_urls = []; }
+            });
+            return rows;
+        });
+    }
+
     let sql = `${WITH_SEEKER} WHERE r.status = ?`;
     const params = [status];
     if (category) { sql += ' AND r.category = ?'; params.push(category); }
@@ -32,6 +56,9 @@ function list({ category, status = 'open', seeker_id, limit = 20, offset = 0 }) 
 
 function expireStale() {
     const now = new Date().toISOString();
+
+    // Postgres: expiry/renewal runs in pg migration/cron later; skip here.
+    if (db.isPg) return;
 
     // Premium auto-renew: keep open and extend 60 days
     db.prepare(`
@@ -57,6 +84,27 @@ function expireStale() {
 
 function insert({ seeker_id, title, description, category, points_offered, expires_at, media_urls, location_text, compensation_type }) {
     const id = randomUUID(), now = new Date().toISOString();
+    if (db.isPg) {
+        return db.exec(
+            `INSERT INTO help_requests
+              (id, seeker_id, title, description, category, points_offered, media_urls, location_text, expires_at, status, created_at, updated_at, compensation_type)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'open',$10,$11,$12)`,
+            [
+                id,
+                seeker_id,
+                title,
+                description || null,
+                category,
+                points_offered,
+                JSON.stringify(media_urls || []),
+                location_text || null,
+                expires_at,
+                now,
+                now,
+                compensation_type || 'cash',
+            ]
+        ).then(() => id);
+    }
     try {
         db.prepare(`
       INSERT INTO help_requests
@@ -77,17 +125,42 @@ function insert({ seeker_id, title, description, category, points_offered, expir
 }
 
 function patch(id, sets, vals) {
-    db.prepare(`UPDATE help_requests SET ${sets}, updated_at = ? WHERE id = ?`)
-        .run(...vals, new Date().toISOString(), id);
+    if (db.isPg) {
+        // NOTE: this function is only used by SQLite pathways today.
+        // For PG edits, implement a dedicated updater when needed.
+        throw new Error('help_requests patch not implemented for Postgres yet');
+    }
+    db.prepare(`UPDATE help_requests SET ${sets}, updated_at = ? WHERE id = ?`).run(...vals, new Date().toISOString(), id);
 }
 
 function setStatus(id, status) {
-    db.prepare("UPDATE help_requests SET status = ?, updated_at = ? WHERE id = ?")
-        .run(status, new Date().toISOString(), id);
+    if (db.isPg) {
+        return db.exec('UPDATE help_requests SET status = $1, updated_at = $2 WHERE id = $3', [status, new Date().toISOString(), id]);
+    }
+    db.prepare("UPDATE help_requests SET status = ?, updated_at = ? WHERE id = ?").run(status, new Date().toISOString(), id);
 }
 
 function suggestedProviders(category, excludeUserId) {
     expireStale();
+    if (db.isPg) {
+        return db.many(`
+    SELECT DISTINCT u.id, u.display_name, u.avatar_url, u.rating_avg, u.rating_count,
+                    u.premium_tier, u.location_text,
+                    COUNT(o.id) AS active_offer_count
+    FROM users u
+    JOIN service_offers o ON o.provider_id = u.id
+    WHERE o.category = $1 AND o.status = 'active' AND o.expires_at > NOW() AND u.id != $2
+    GROUP BY u.id
+    ORDER BY
+      CASE
+        WHEN u.premium_tier != 'free' AND (u.premium_until IS NULL OR u.premium_until > NOW()) THEN 2
+        ELSE 1
+      END DESC,
+      u.rating_avg DESC
+    LIMIT 20
+  `, [category, excludeUserId]);
+    }
+
     return db.prepare(`
     SELECT DISTINCT u.id, u.display_name, u.avatar_url, u.rating_avg, u.rating_count,
                     u.premium_tier, u.location_text,

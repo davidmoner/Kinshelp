@@ -5,7 +5,7 @@ const { randomUUID } = require('crypto');
 const httpError = require('../../shared/http-error');
 const repo = require('./offers.repo');
 const { OFFER_STATUS } = require('../../config/constants');
-const db = require('../../config/database');
+const db = require('../../config/db');
 const automatchSvc = require('../automatch/automatch.service');
 const { LISTING_MAX_PHOTOS } = require('../../config/constants');
 
@@ -27,9 +27,10 @@ function computeExpiresAt(userId) {
 }
 
 function requireOffer(id) {
-    const offer = repo.findById(id);
-    if (!offer) throw httpError(404, 'Offer not found');
-    return offer;
+    return Promise.resolve(repo.findById(id)).then(offer => {
+        if (!offer) throw httpError(404, 'Offer not found');
+        return offer;
+    });
 }
 
 function list(filters) {
@@ -42,16 +43,18 @@ function getById(id) {
 
 function create(data) {
   const expires_at = computeExpiresAt(data.provider_id);
-  const id = repo.insert({ ...data, expires_at });
-  const row = requireOffer(id);
-  try { automatchSvc.onOfferCreated(row); } catch { /* don't block offer creation */ }
-  return row;
+  return Promise.resolve(repo.insert({ ...data, expires_at }))
+    .then(id => requireOffer(id))
+    .then(row => {
+      try { automatchSvc.onOfferCreated(row); } catch { /* don't block offer creation */ }
+      return row;
+    });
 }
 
 function update(id, userId, fields) {
-    const offer = requireOffer(id);
-    if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
-    if (offer.status !== OFFER_STATUS.ACTIVE) throw httpError(422, 'Only active offers can be edited');
+    return Promise.resolve(requireOffer(id)).then(offer => {
+        if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
+        if (offer.status !== OFFER_STATUS.ACTIVE) throw httpError(422, 'Only active offers can be edited');
 
     const sets = [], vals = [];
     for (const key of EDITABLE) {
@@ -60,16 +63,19 @@ function update(id, userId, fields) {
             vals.push(key === 'media_urls' ? JSON.stringify(fields[key]) : fields[key]);
         }
     }
-    if (!sets.length) return requireOffer(id);
-    repo.patch(id, sets.join(', '), vals);
-    return requireOffer(id);
+        if (!sets.length) return requireOffer(id);
+        if (db.isPg) throw httpError(501, 'Editing offers not supported on Postgres yet');
+        repo.patch(id, sets.join(', '), vals);
+        return requireOffer(id);
+    });
 }
 
 function remove(id, userId) {
-    const offer = requireOffer(id);
-    if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
-    repo.setStatus(id, 'closed');
-    return { message: 'Offer closed' };
+    return Promise.resolve(requireOffer(id)).then(async offer => {
+        if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
+        await Promise.resolve(repo.setStatus(id, 'closed'));
+        return { message: 'Offer closed' };
+    });
 }
 
 function parseMedia(raw) {
