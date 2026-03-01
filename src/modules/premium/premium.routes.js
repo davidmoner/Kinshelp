@@ -7,6 +7,7 @@ const router = Router();
 
 router.get('/plans', ctrl.getPlans);
 router.post('/checkout', authenticate, ctrl.checkout);
+router.post('/webhook', ctrl.webhook);
 router.get('/eligibility', authenticate, ctrl.eligibility);
 router.post('/unlock', authenticate, ctrl.unlockByReputation);
 

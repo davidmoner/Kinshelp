@@ -129,6 +129,24 @@ db.exec(`
     UNIQUE(user_id, category)
   );
 
+  -- ── Payments / Subscriptions (Stripe) ─────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS payments (
+    id                 TEXT PRIMARY KEY,
+    user_id            TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    provider           TEXT NOT NULL,
+    provider_session_id TEXT,
+    provider_event_id  TEXT,
+    plan_id            TEXT,
+    interval           TEXT,
+    amount_cents       INTEGER,
+    currency           TEXT,
+    status             TEXT NOT NULL,
+    created_at         TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at         TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(provider, provider_event_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_payments_user ON payments(user_id, created_at);
+
   -- ── Indexes ───────────────────────────────────────────────────────────────
   -- Offers: composite for the two most common feed queries
   CREATE INDEX IF NOT EXISTS idx_offers_provider       ON service_offers(provider_id);

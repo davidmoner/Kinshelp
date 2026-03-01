@@ -11,7 +11,13 @@ const { errorHandler, notFound } = require('./middleware/error.middleware');
 
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '64kb' }));
+
+// Stripe webhooks require raw body for signature verification.
+app.use((req, res, next) => {
+  const url = String(req.originalUrl || req.url || '');
+  if (url.startsWith('/api/v1/premium/webhook')) return next();
+  return express.json({ limit: '64kb' })(req, res, next);
+});
 
 // Static uploads (photos). Stored locally for MVP.
 // In production, mount a persistent disk and set DATA_DIR so uploads survive deploys.
@@ -76,6 +82,16 @@ app.get('/health', (req, res) => {
 
 const api = express.Router();
 api.get('/', (req, res) => res.json({ ok: true, service: 'KingsHelp API', version: 'v1' }));
+
+// Raw body route (Stripe webhook)
+api.use('/premium/webhook', express.raw({ type: '*/*', limit: '2mb' }), (req, res, next) => {
+  req.rawBody = req.body;
+  // express.raw sets req.body to Buffer; leave it for stripe.
+  next();
+});
+
+// JSON for all other API routes
+api.use(express.json({ limit: '64kb' }));
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
 api.use('/auth', authLimiter, require('./modules/auth/auth.routes'));

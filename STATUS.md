@@ -10,6 +10,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Leaderboard/ranking funcionando con SQLite y Postgres: `GET /api/v1/points/leaderboard`.
 - Smoke tests cubren el flujo MVP (request -> match -> mensajes -> done -> ratings -> ledger).
 - Repo sincronizado con GitHub: `main` incluye commit `feat: db facade and pg-compatible points`.
+- Tracker de estado agregado: `STATUS.md`.
 
 ## Estado Actual
 
@@ -18,7 +19,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta)
 
-- Premium real (Stripe): implementar checkout + webhook y persistir subscripciones.
+- Premium real (Stripe): implementar checkout + webhook y persistir pagos (WIP).
 - Notificaciones in-app: tabla + endpoints + triggers desde eventos (match, mensajes, invites).
 - Matches inbox: listar matches por usuario, estado y paginacion.
 - Hardening Postgres: transaccion para `points.transfer()` y indices/constraints.

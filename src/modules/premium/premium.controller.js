@@ -11,30 +11,30 @@ const getPlans = (req, res, next) => {
 };
 
 const checkout = (req, res, next) => {
-  try {
+  (async () => {
     const data = validators.validateCheckout(req.body);
-    const out = svc.createCheckoutSession(req.user.id, data);
-    // 501 signals "not implemented" but endpoint exists
-    res.status(501).json(out);
-  } catch (e) {
-    next(e);
-  }
+    const out = await svc.createCheckoutSession(req.user, data);
+    res.status(out && out.implemented ? 200 : 501).json(out);
+  })().catch(next);
+};
+
+const webhook = (req, res, next) => {
+  (async () => {
+    const out = await svc.handleWebhook(req);
+    res.status(200).json(out);
+  })().catch(next);
 };
 
 const eligibility = (req, res, next) => {
-  try {
-    res.json(svc.eligibility(req.user.id));
-  } catch (e) {
-    next(e);
-  }
+  (async () => {
+    res.json(await svc.eligibility(req.user.id));
+  })().catch(next);
 };
 
 const unlockByReputation = (req, res, next) => {
-  try {
-    res.json(svc.unlockByReputation(req.user.id));
-  } catch (e) {
-    next(e);
-  }
+  (async () => {
+    res.json(await svc.unlockByReputation(req.user.id));
+  })().catch(next);
 };
 
-module.exports = { getPlans, checkout, eligibility, unlockByReputation };
+module.exports = { getPlans, checkout, webhook, eligibility, unlockByReputation };

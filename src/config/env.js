@@ -7,4 +7,7 @@ module.exports = {
   JWT_SECRET: process.env.JWT_SECRET || 'dev_secret_change_me',
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   DB_PATH: process.env.DB_PATH || './kingshelp.db',
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || null,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET || null,
+  PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL || `http://localhost:${parseInt(process.env.PORT || '3000', 10)}`,
 };
