@@ -111,6 +111,11 @@ api.use('/premium/webhook', express.raw({ type: '*/*', limit: '2mb' }), (req, re
 // JSON for all other API routes
 api.use(express.json({ limit: '64kb' }));
 
+// Convenience: allow API health checks via /api/v1/health
+api.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'KingsHelp API', version: 'v1', ts: new Date().toISOString() });
+});
+
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
 api.use('/auth', authLimiter, require('./modules/auth/auth.routes'));
 api.use('/users', require('./modules/users/users.routes'));

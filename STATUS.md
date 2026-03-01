@@ -30,6 +30,11 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - OAuth: implementar verificacion real de Google/Facebook cuando existan credenciales.
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 
+## Estado (mar 2026)
+
+- API publica (sin login): `GET /api/v1/health`, `GET /api/v1/feed`, `GET /api/v1/requests`, `GET /api/v1/offers`, `GET /api/v1/users/:id` (sanitizado).
+- API privada (con login): crear/cerrar, matches/chat/ratings, badges mine, automatch.
+
 ## Mobile (Decidido)
 
 - Stack: Expo (React Native).

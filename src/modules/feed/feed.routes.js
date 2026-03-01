@@ -1,8 +1,9 @@
 'use strict';
 const { Router } = require('express');
-const { authenticate } = require('../../middleware/auth.middleware');
+const { optionalAuth } = require('../../middleware/auth.middleware');
 const ctrl = require('./feed.controller');
 
 const router = Router();
-router.get('/', authenticate, ctrl.list);
+// Public feed (auth optional). If user is logged in, controller can compute distances.
+router.get('/', optionalAuth, ctrl.list);
 module.exports = router;

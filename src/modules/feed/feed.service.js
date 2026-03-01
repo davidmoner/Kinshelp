@@ -12,9 +12,12 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 async function listFeedForUser(userId, opts) {
-  const me = db.isPg
-    ? await db.one('SELECT lat, lng FROM users WHERE id = $1', [userId])
-    : db.prepare('SELECT lat, lng FROM users WHERE id = ?').get(userId);
+  let me = null;
+  if (userId) {
+    me = db.isPg
+      ? await db.one('SELECT lat, lng FROM users WHERE id = $1', [userId])
+      : db.prepare('SELECT lat, lng FROM users WHERE id = ?').get(userId);
+  }
   const rows = await repo.listFeed(opts);
   const hasMe = me && me.lat != null && me.lng != null;
   return rows.map(r => {

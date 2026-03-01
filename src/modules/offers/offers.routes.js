@@ -1,7 +1,7 @@
 'use strict';
 const { Router } = require('express');
 const ctrl = require('./offers.controller');
-const { authenticate } = require('../../middleware/auth.middleware');
+const { authenticate, optionalAuth } = require('../../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
 const { randomUUID } = require('crypto');
@@ -24,9 +24,10 @@ const upload = multer({
   },
 });
 
-router.get('/', authenticate, ctrl.list);
+// Public list
+router.get('/', optionalAuth, ctrl.list);
 router.post('/', authenticate, ctrl.create);
-router.get('/:id', authenticate, ctrl.getOne);
+router.get('/:id', optionalAuth, ctrl.getOne);
 router.post('/:id/photos', authenticate, upload.single('photo'), ctrl.addPhoto);
 router.delete('/:id/photos/:photoId', authenticate, ctrl.deletePhoto);
 router.post('/:id/boost48h', authenticate, ctrl.boost48h);
