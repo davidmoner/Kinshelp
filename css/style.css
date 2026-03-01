@@ -3660,6 +3660,39 @@ html[data-theme="light"] .dash-menu-sep {
   flex-direction: column;
 }
 
+/* KingsHelp ID style */
+.modal-usercard-box {
+  background: linear-gradient(165deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 40%, rgba(226,184,107,0.06) 100%);
+}
+
+.usercard-head {
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.usercard-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226, 184, 107, 0.35), transparent);
+}
+
+.usercard-stats {
+  margin-top: 12px;
+}
+
+@media (max-width: 520px) {
+  .modal-usercard-box {
+    max-width: calc(100vw - 24px);
+    padding: 18px 16px;
+    max-height: calc(100svh - 24px);
+  }
+  .usercard-name { font-size: 16px; }
+}
+
 .usercard-head {
   display: flex;
   align-items: center;
@@ -5547,6 +5580,28 @@ html[data-theme="light"] .mvp-item {
   font-weight: 800;
   color: #fff;
   flex-shrink: 0;
+}
+
+.mvp-av-btn,
+.mvp-title-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.mvp-title-btn {
+  font-weight: 900;
+}
+
+.mvp-av-btn:focus-visible,
+.mvp-title-btn:focus-visible {
+  outline: 2px solid rgba(226, 184, 107, 0.55);
+  outline-offset: 3px;
+  border-radius: 10px;
 }
 
 .mvp-txt {

@@ -121,6 +121,11 @@
         return apiFetch('/auth/me', { method: 'PATCH', body });
     }
 
+    /** GET /users/:id — requires token */
+    async function getUser(userId) {
+        return apiFetch('/users/' + encodeURIComponent(userId));
+    }
+
     /** Requests */
     async function listRequests(params) {
         const qs = params ? ('?' + new URLSearchParams(params).toString()) : '';
@@ -311,6 +316,7 @@
         getMyPoints,
         getMe,
         updateMe,
+        getUser,
         listRequests,
         createRequest,
         closeRequest,

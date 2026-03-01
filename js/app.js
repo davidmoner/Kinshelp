@@ -2928,9 +2928,9 @@
                 const tier = tierLabel(p.premium_tier);
                 el.innerHTML = `
                   <div class="mvp-item-left">
-                    <span class="mvp-av">${initials(p.display_name)}</span>
+                    <button class="mvp-av mvp-av-btn" type="button" data-user="1" aria-label="Ver perfil de ${escapeHtml(p.display_name)}">${initials(p.display_name)}</button>
                     <div class="mvp-txt">
-                      <div class="mvp-title">${escapeHtml(p.display_name)} <span style="opacity:.6">·</span> ★ ${rating}</div>
+                      <div class="mvp-title"><button class="mvp-title-btn" type="button" data-user="1">${escapeHtml(p.display_name)}</button> <span style="opacity:.6">·</span> ★ ${rating}</div>
                       <div class="mvp-meta">${escapeHtml(tier)} · ${p.active_offer_count || 0} ofertas activas</div>
                     </div>
                   </div>
@@ -2954,6 +2954,10 @@
                     }
                 });
                 list.appendChild(el);
+
+                el.querySelectorAll('button[data-user]').forEach(btnUser => {
+                    btnUser.addEventListener('click', () => openUserCard(p));
+                });
             });
         } catch (err) {
             status.textContent = 'Error';
@@ -3182,9 +3186,9 @@
 
                 el.innerHTML = `
                   <div class="mvp-item-left">
-                    <span class="mvp-av">${initials(otherName)}</span>
+                    <button class="mvp-av mvp-av-btn" type="button" data-user="1" aria-label="Ver perfil de ${escapeHtml(otherName)}">${initials(otherName)}</button>
                     <div class="mvp-txt">
-                       <div class="mvp-title">${escapeHtml(otherName)}</div>
+                       <div class="mvp-title"><button class="mvp-title-btn" type="button" data-user="1">${escapeHtml(otherName)}</button></div>
                       <div class="mvp-meta">${escapeHtml(match.status)} · ${escapeHtml(compMeta)}${subject ? ' · ' + escapeHtml(subject) : ''}${whenTxt ? ' · ' + escapeHtml(whenTxt) : ''}</div>
                     </div>
                   </div>
@@ -3222,6 +3226,19 @@
 
                 const btnChat = el.querySelector('button[data-chat]');
                 if (btnChat) btnChat.addEventListener('click', () => openChat(match.id));
+
+                el.querySelectorAll('button[data-user]').forEach(btnUser => {
+                    btnUser.addEventListener('click', async () => {
+                        try {
+                            const youAreProvider = match.provider_id === (currentUser && currentUser.id);
+                            const otherId = youAreProvider ? match.seeker_id : match.provider_id;
+                            const other = await KHApi.getUser(otherId);
+                            openUserCard(other);
+                        } catch {
+                            toast('No se pudo cargar el perfil', 'error');
+                        }
+                    });
+                });
 
                 el.querySelectorAll('button[data-star]').forEach(bs => {
                     bs.addEventListener('click', async () => {
