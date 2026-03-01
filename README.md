@@ -40,5 +40,5 @@ Para cambiarlo, antes de cargar los scripts:
 
 1. `npm run dev` (backend)
 2. Abrir `web/index.html`
-3. Clic en **Probar demo** → login con `alice@example.com` / `password123`
+3. Clic en **Probar demo** → login con `demo.alice@kingshelp.local` / `password123`
 4. Dashboard: **Ping /health** → verde ✓ · **Cargar /points/me** → animación de puntos ⚡

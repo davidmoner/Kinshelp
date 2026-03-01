@@ -22,7 +22,7 @@ const users = [
     {
         id: randomUUID(),
         display_name: 'Alice Gold',
-        email: 'alice@example.com',
+        email: 'demo.alice@kingshelp.local',
         password_hash: bcrypt.hashSync('password123', 10),
         bio: 'Full-stack dev, love helping with code!',
         location_text: 'London, UK',
@@ -35,7 +35,7 @@ const users = [
     {
         id: randomUUID(),
         display_name: 'Bob Silver',
-        email: 'bob@example.com',
+        email: 'demo.bob@kingshelp.local',
         password_hash: bcrypt.hashSync('password123', 10),
         bio: 'Math tutor and language teacher.',
         location_text: 'Manchester, UK',
@@ -48,7 +48,7 @@ const users = [
     {
         id: randomUUID(),
         display_name: 'Carol Free',
-        email: 'carol@example.com',
+        email: 'demo.carol@kingshelp.local',
         password_hash: bcrypt.hashSync('password123', 10),
         bio: 'Graphic designer, love new projects.',
         location_text: 'Birmingham, UK',
@@ -76,7 +76,7 @@ console.log(`  ✔  ${users.length} users seeded`);
 try {
     const demoHash = bcrypt.hashSync('password123', 10);
     db.prepare('UPDATE users SET password_hash = ? WHERE email IN (?,?,?)')
-        .run(demoHash, 'alice@example.com', 'bob@example.com', 'carol@example.com');
+        .run(demoHash, 'demo.alice@kingshelp.local', 'demo.bob@kingshelp.local', 'demo.carol@kingshelp.local');
     console.log('  ✔  demo passwords refreshed');
 } catch { }
 

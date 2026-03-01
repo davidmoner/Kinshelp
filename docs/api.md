@@ -29,7 +29,7 @@ Login.
 
 Body:
 ```json
-{ "email": "alice@example.com", "password": "password123" }
+{ "email": "demo.alice@kingshelp.local", "password": "password123" }
 ```
 
 Respuesta:

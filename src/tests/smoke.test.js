@@ -93,7 +93,7 @@ async function run() {
   let alice;
   try {
     const { status, body } = await requestJson('POST', '/api/v1/auth/login', {
-      payload: { email: 'alice@example.com', password: 'password123' },
+      payload: { email: 'demo.alice@kingshelp.local', password: 'password123' },
     });
     assert(status === 200, 'POST /api/v1/auth/login → 200');
     assert(!!body.token, 'POST /api/v1/auth/login → token presente');
@@ -110,7 +110,7 @@ async function run() {
   let bob;
   try {
     const { status, body } = await requestJson('POST', '/api/v1/auth/login', {
-      payload: { email: 'bob@example.com', password: 'password123' },
+      payload: { email: 'demo.bob@kingshelp.local', password: 'password123' },
     });
     assert(status === 200, 'POST /api/v1/auth/login (bob) → 200');
     assert(!!body.token, 'POST /api/v1/auth/login (bob) → token presente');
