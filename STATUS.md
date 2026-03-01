@@ -1,0 +1,42 @@
+#!/usr/bin/env false
+# KingsHelp — STATUS
+
+Este archivo es la memoria viva del proyecto: que esta hecho, que falta y que se decidio.
+Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arquitectura.
+
+## Hecho
+
+- DB facade SQLite/Postgres (`src/config/db.js`) y repos adaptados a async cuando `DATABASE_URL` esta presente.
+- Leaderboard/ranking funcionando con SQLite y Postgres: `GET /api/v1/points/leaderboard`.
+- Smoke tests cubren el flujo MVP (request -> match -> mensajes -> done -> ratings -> ledger).
+- Repo sincronizado con GitHub: `main` incluye commit `feat: db facade and pg-compatible points`.
+
+## Estado Actual
+
+- Backend API: Express (`src/app.js`) con rutas v1 para auth, users, offers, requests, matches, points, badges, premium, automatch, feed.
+- Frontend: SPA simple en `web/` consumiendo `http://localhost:3000/api/v1` por defecto.
+
+## Siguiente (Prioridad Alta)
+
+- Premium real (Stripe): implementar checkout + webhook y persistir subscripciones.
+- Notificaciones in-app: tabla + endpoints + triggers desde eventos (match, mensajes, invites).
+- Matches inbox: listar matches por usuario, estado y paginacion.
+- Hardening Postgres: transaccion para `points.transfer()` y indices/constraints.
+
+## Backlog (Prioridad Media)
+
+- Discovery de requests para providers (search, category, geo opcional).
+- Perfil publico seguro por usuario (reputacion, badges, sin PII).
+- Moderacion basica: report/ban y antispam.
+- Observabilidad: logs estructurados, health extendido, y error reporting.
+
+## Decisiones
+
+- Base de datos:
+  - Local/dev: SQLite (better-sqlite3) sobre `./database`.
+  - Produccion: Postgres (Neon/Render) via `DATABASE_URL`.
+  - API intenta mantener compatibilidad de campos entre capas (snake_case/camelCase).
+
+## Notas
+
+- Cuando se complete una epica, moverla de "Siguiente" a "Hecho" y anotar los endpoints/migraciones.

@@ -2,6 +2,8 @@
 
 Interfaz premium de KingsHelp. Puro HTML/CSS/JS — sin build step.
 
+Estado del proyecto: ver `STATUS.md`.
+
 ## Abrir
 
 ```bash
