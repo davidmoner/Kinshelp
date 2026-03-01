@@ -2204,7 +2204,10 @@
       <div class="usercard-stats" id="usercard-stats"></div>
 
       <div class="usercard-badges">
-        <div class="usercard-section-title">Insignias</div>
+        <div class="usercard-badges-head">
+          <div class="usercard-section-title">Insignias</div>
+          <button class="btn btn-ghost btn-sm usercard-more hidden" type="button" id="usercard-more" onclick="KHApp.userCardToggleBadges()">Ver todas</button>
+        </div>
         <div class="usercard-badges-grid" id="usercard-badges">
           <div class="ledger-empty">Cargando…</div>
         </div>

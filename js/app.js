@@ -1819,6 +1819,7 @@
     /* ── User card (mini profile) ───────────────────────────────────────── */
     let userCardLastFocus = null;
     let userCardTrapHandler = null;
+    let userCardBadgesExpanded = false;
 
     function trapFocusInUserCard(modalEl) {
         if (!modalEl) return;
@@ -1857,6 +1858,7 @@
         const m = $('modal-usercard');
         if (!m) return;
         userCardLastFocus = document.activeElement;
+        try { m.__kh_user = u; } catch { }
 
         const name = String((u && u.display_name) || '—');
         const loc = String((u && u.location_text) || '').trim();
@@ -1894,6 +1896,13 @@
         const grid = $('usercard-badges');
         if (grid) grid.innerHTML = '<div class="ledger-empty">Cargando…</div>';
 
+        userCardBadgesExpanded = false;
+        const btnMore = $('usercard-more');
+        if (btnMore) {
+            btnMore.classList.add('hidden');
+            btnMore.textContent = 'Ver todas';
+        }
+
         show(m);
         trapFocusInUserCard(m);
         setTimeout(() => {
@@ -1910,7 +1919,15 @@
                 return;
             }
             grid.innerHTML = '';
-            list.slice(0, 12).forEach(b => {
+
+            const btnMore = $('usercard-more');
+            if (btnMore) {
+                btnMore.classList.toggle('hidden', list.length <= 6);
+                btnMore.textContent = 'Ver todas';
+            }
+
+            const showN = userCardBadgesExpanded ? 24 : 6;
+            list.slice(0, showN).forEach(b => {
                 const item = document.createElement('div');
                 item.className = 'usercard-badge';
                 item.innerHTML = `
@@ -1934,6 +1951,25 @@
         }).catch(() => {
             if (grid) grid.innerHTML = '<div class="ledger-empty" style="color:var(--danger)">No se pudieron cargar las insignias</div>';
         });
+    }
+
+    function userCardToggleBadges() {
+        userCardBadgesExpanded = !userCardBadgesExpanded;
+        const btnMore = $('usercard-more');
+        if (btnMore) btnMore.textContent = userCardBadgesExpanded ? 'Ver menos' : 'Ver todas';
+
+        // Re-open rendering using whatever is currently in the modal (best-effort).
+        // We keep it simple: trigger a refresh by clicking the badge button again isn't available,
+        // so we rebuild by re-fetching with the current user id.
+        try {
+            const name = ($('usercard-name') && $('usercard-name').textContent) || '';
+            // Try to reuse last opened user object if present
+            // (we store it on the modal element to avoid global state).
+            const m = $('modal-usercard');
+            const u = m && m.__kh_user;
+            if (u && u.id) openUserCard(u);
+            else toast(name ? `Actualizado: ${name}` : 'Actualizado', 'info');
+        } catch { }
     }
 
     function closeUserCard(event) {
@@ -3558,6 +3594,7 @@
         useMyLocation,
         setRankingQuery,
         closeUserCard,
+        userCardToggleBadges,
         loadBadgesMine,
         dismissNext,
         runNext,

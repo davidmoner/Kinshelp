@@ -3871,6 +3871,22 @@ html[data-theme="light"] .dash-menu-sep {
   color: var(--text-muted);
 }
 
+.usercard-badges-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.usercard-badges-head .usercard-section-title {
+  margin-top: 0;
+}
+
+.usercard-more {
+  border-radius: 999px;
+}
+
 .usercard-badges-grid {
   margin-top: 10px;
   border: 1px solid var(--border);
