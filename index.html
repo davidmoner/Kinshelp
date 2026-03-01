@@ -2173,6 +2173,11 @@
 
       // Default: same origin (Render / production / node static).
       if (window.location && window.location.origin && String(window.location.origin).startsWith('http')) {
+        // GitHub Pages hosts static only, API lives elsewhere.
+        if (String(window.location.hostname).endsWith('github.io')) {
+          window.KINGSHELP_BASE_URL = 'https://kingshelp.onrender.com/api/v1';
+          return;
+        }
         window.KINGSHELP_BASE_URL = window.location.origin + '/api/v1';
         return;
       }
