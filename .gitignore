@@ -8,3 +8,7 @@ kingshelp.db-wal
 
 # Node
 node_modules/
+
+# Secrets / backups
+.env
+src/app.js.bak
