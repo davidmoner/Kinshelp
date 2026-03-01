@@ -3,7 +3,7 @@ services:
     name: kingshelp
     env: node
     plan: free
-    buildCommand: npm ci
+    buildCommand: npm ci --omit=dev
     startCommand: node src/server.js
     healthCheckPath: /health
     autoDeploy: true
