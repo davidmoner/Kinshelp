@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/demo.css" />
   <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="web/css/sidepanels.css" />
   <!-- Anti-flash: aplica tema antes de que el navegador pinte -->
   <script>
     (function () {
@@ -102,6 +103,26 @@
 
       <!-- ── Banner Stage ─────────────────────────────────────────────── -->
       <div class="hero-stage" id="kh-hero-stage">
+
+        <!-- Sticky Side Panels (only where they fit; hidden on <=1040px) -->
+        <div class="kh-sidepanels" id="kh-sidepanels" aria-hidden="true">
+          <div class="kh-panel kh-panel--left">
+            <div class="kh-panel-inner">
+              <div class="kh-panel-rail"></div>
+              <div class="kh-panel-arrow kh-panel-arrow--up">˄</div>
+              <div class="kh-panel-arrow kh-panel-arrow--down">˅</div>
+              <div class="kh-panel-feed" id="kh-panel-feed-left"></div>
+            </div>
+          </div>
+          <div class="kh-panel kh-panel--right">
+            <div class="kh-panel-inner">
+              <div class="kh-panel-rail"></div>
+              <div class="kh-panel-arrow kh-panel-arrow--up">˄</div>
+              <div class="kh-panel-arrow kh-panel-arrow--down">˅</div>
+              <div class="kh-panel-feed" id="kh-panel-feed-right"></div>
+            </div>
+          </div>
+        </div>
 
         <!-- Progress bar (auto-rotator timing) -->
         <div class="hero-progress" id="kh-hero-progress" role="tablist" aria-label="Seleccionar banner">
@@ -410,9 +431,10 @@
         <!-- /BANNER 1 -->
 
         <!-- ═══ BANNER 2 — Recompensa / Premium scene ═══ -->
-        <div class="hero-banner" data-banner="2" aria-label="Recompensa, trueque o altruista" aria-hidden="true">
+        <div class="hero-banner" data-banner="2" aria-label="Recompensa, trueque o altruista" aria-hidden="true" data-hero-alt="ios-notifs">
           <div class="container">
             <div class="hb3-inner">
+              <div class="kh-ios-stack" aria-hidden="true"></div>
               <p class="hb3-eyebrow">Elige tu tipo de acuerdo</p>
 
               <h2 class="hb3-title">
@@ -2255,6 +2277,8 @@
   <script src="js/fx.js"></script>
   <script src="js/particles.js"></script>
   <script src="js/demo.js"></script>
+  <script src="web/js/sidepanels.js"></script>
+  <script src="web/js/hero_alt_fx.js"></script>
   <script src="js/hero.js"></script>
 </body>
 

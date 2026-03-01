@@ -25,6 +25,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta)
 
+- Hero: paneles laterales sticky con feed infinito (solo banners seleccionados) + modo noche (glow ventana, bokeh, glass oscuro) + alternativa iOS notifs donde no caben.
 - UI Web: tick de verificacion mas minimalista y sutil (sin redonda verde) en dashboard y carnet.
 - UI Web: repaso "pro" de detalles visuales (espaciados, tipografia, consistencia entre dashboard e inicio/reputacion).
 - UI Web: ranking vecinal popup +20% ancho.
