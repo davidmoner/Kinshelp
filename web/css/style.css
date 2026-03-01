@@ -3670,6 +3670,31 @@ html[data-theme="light"] .dash-menu-sep {
   padding-bottom: 10px;
 }
 
+.usercard-stamp {
+  margin-left: auto;
+  text-align: right;
+  padding: 7px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 184, 107, 0.28);
+  background: linear-gradient(135deg, rgba(226, 184, 107, 0.10), rgba(224, 122, 95, 0.06));
+  box-shadow: 0 12px 28px rgba(226, 184, 107, 0.10);
+}
+
+.usercard-stamp-k {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: rgba(237, 240, 248, 0.75);
+}
+
+.usercard-stamp-v {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 950;
+  color: var(--text);
+}
+
 .usercard-head::after {
   content: '';
   position: absolute;
@@ -3691,6 +3716,7 @@ html[data-theme="light"] .dash-menu-sep {
     max-height: calc(100svh - 24px);
   }
   .usercard-name { font-size: 16px; }
+  .usercard-stamp { display: none; }
 }
 
 .usercard-head {
