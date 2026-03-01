@@ -2,7 +2,7 @@ services:
   - type: web
     name: kingshelp
     env: node
-    plan: starter
+    plan: free
     buildCommand: npm ci
     startCommand: node src/db/migrate.js && node src/server.js
     healthCheckPath: /health
