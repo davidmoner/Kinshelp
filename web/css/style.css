@@ -3666,6 +3666,11 @@ html[data-theme="light"] .dash-menu-sep {
   gap: 12px;
 }
 
+.usercard-head .verified-badge {
+  margin-left: -10px;
+  margin-top: 26px;
+}
+
 .usercard-avatar {
   width: 46px;
   height: 46px;

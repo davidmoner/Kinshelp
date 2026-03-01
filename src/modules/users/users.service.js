@@ -9,9 +9,10 @@ const { PROFILE_MAX_PHOTOS } = require('../../config/constants');
 const EDITABLE = ['display_name', 'bio', 'avatar_url', 'location_text', 'lat', 'lng'];
 
 function getById(id) {
-    const user = repo.findById(id);
-    if (!user) throw httpError(404, 'User not found');
-    return user;
+    return Promise.resolve(repo.findById(id)).then(user => {
+        if (!user) throw httpError(404, 'User not found');
+        return user;
+    });
 }
 
 function updateProfile(id, actingUserId, fields) {

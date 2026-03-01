@@ -1869,6 +1869,9 @@
         if ($('usercard-name')) $('usercard-name').textContent = name;
         if ($('usercard-sub')) $('usercard-sub').textContent = loc ? loc : (dist ? `A ${dist}` : '—');
 
+        const v = $('usercard-verified');
+        if (v) v.classList.toggle('hidden', !(u && (u.is_verified === true || u.is_verified === 1)));
+
         const stats = $('usercard-stats');
         if (stats) {
             stats.innerHTML = `

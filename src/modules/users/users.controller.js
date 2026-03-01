@@ -2,7 +2,9 @@
 const svc = require('./users.service');
 
 const getOne = (req, res, next) => {
-    try { res.json(svc.getById(req.params.id)); } catch (e) { next(e); }
+    (async () => {
+        res.json(await svc.getById(req.params.id));
+    })().catch(next);
 };
 
 const updateProfile = (req, res, next) => {
