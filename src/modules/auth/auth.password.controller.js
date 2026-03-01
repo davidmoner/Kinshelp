@@ -38,13 +38,13 @@ const verifyEmailGet = (req, res, next) => {
     const token = (req.query && req.query.token) || null;
     try {
       await svc.verifyEmail({ token });
-      return res.redirect(302, '/verify-email/success.html');
+      return res.redirect(302, '/web/verify-email/success.html');
     } catch (e) {
       const msg = String((e && e.message) || '').toLowerCase();
       if (msg.includes('invalid') || msg.includes('expired') || msg.includes('token')) {
-        return res.redirect(302, '/verify-email/invalid.html');
+        return res.redirect(302, '/web/verify-email/invalid.html');
       }
-      return res.redirect(302, '/verify-email/error.html');
+      return res.redirect(302, '/web/verify-email/error.html');
     }
   })().catch(next);
 };

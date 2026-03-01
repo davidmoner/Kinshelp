@@ -130,8 +130,9 @@ app.use('/api/v1', api);
 // (Render runs the service from /opt/render/project/src)
 const webDir = path.resolve(__dirname, '..');
 
-// Serve static assets (css/js/img + verify-email pages)
+// Serve static assets (css/js/img + web/* pages)
 app.use('/', express.static(webDir));
+app.use('/web', express.static(path.join(webDir, 'web')));
 
 // Best-effort SPA entrypoint: only serve index.html if it exists.
 // In some deployments the frontend may not be bundled; avoid ENOENT.
