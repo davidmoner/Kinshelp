@@ -30,7 +30,7 @@ async function forgotPassword({ email }) {
   }
 
   const t = await tokens.createToken({ userId: u.id, type: 'reset_password', ttlMinutes: 30 });
-  const link = emailSvc.buildLink(`/web/index.html#reset=${encodeURIComponent(t.token)}`);
+  const link = emailSvc.buildLink(`/reset-password?token=${encodeURIComponent(t.token)}`);
   const out = await emailSvc.send({
     to: u.email,
     subject: 'KingsHelp - Reset password',

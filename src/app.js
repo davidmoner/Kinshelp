@@ -111,8 +111,17 @@ app.use('/api/v1', api);
 // Serve the frontend (single-page) from repo root
 // (Render runs the service from /opt/render/project/src)
 const webDir = path.resolve(__dirname, '..');
+
+// Serve static assets (css/js/img + verify-email pages)
 app.use('/', express.static(webDir));
-app.get('/', (req, res) => res.sendFile(path.join(webDir, 'index.html')));
+
+// Best-effort SPA entrypoint: only serve index.html if it exists.
+// In some deployments the frontend may not be bundled; avoid ENOENT.
+app.get('/', (req, res, next) => {
+  const p = path.join(webDir, 'index.html');
+  if (fs.existsSync(p)) return res.sendFile(p);
+  return next();
+});
 
 app.use(notFound);
 app.use(errorHandler);

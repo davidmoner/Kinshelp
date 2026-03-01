@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KingsHelp - Restablecer contrasena</title>
+    <meta name="robots" content="noindex" />
+    <style>
+      :root {
+        --bg1: #fff8ef;
+        --bg2: #f3f7ff;
+        --card: rgba(255, 255, 255, 0.78);
+        --text: #1b1f2a;
+        --muted: rgba(27, 31, 42, 0.68);
+        --line: rgba(27, 31, 42, 0.12);
+        --shadow: 0 18px 40px rgba(17, 24, 39, 0.14);
+        --accent: #0b6b48;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        color: var(--text);
+        background: radial-gradient(1100px 520px at 18% 12%, rgba(255, 209, 163, 0.55), transparent 60%),
+                    radial-gradient(900px 480px at 80% 18%, rgba(165, 196, 255, 0.55), transparent 62%),
+                    linear-gradient(180deg, var(--bg1), var(--bg2));
+      }
+      .wrap { min-height: 100%; display: grid; place-items: center; padding: 24px; }
+      .card {
+        width: min(560px, 100%);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 22px 20px;
+        backdrop-filter: blur(10px);
+      }
+      h1 { margin: 0 0 6px; font-size: 22px; line-height: 1.15; }
+      p { margin: 0 0 14px; color: var(--muted); line-height: 1.55; }
+      label { display: block; font-weight: 700; margin: 10px 0 6px; }
+      input {
+        width: 100%;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+        outline: none;
+      }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+      button {
+        border: 1px solid rgba(11, 107, 72, 0.24);
+        background: rgba(11, 107, 72, 0.12);
+        color: var(--accent);
+        padding: 11px 14px;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .msg { margin-top: 12px; font-size: 14px; }
+      .msg.ok { color: #0b6b48; }
+      .msg.bad { color: #7a271a; }
+      .small { margin-top: 10px; font-size: 13px; color: rgba(27, 31, 42, 0.55); }
+      a { color: inherit; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="card" role="main">
+        <h1>Restablecer contrasena</h1>
+        <p>Introduce una nueva contrasena. Este enlace caduca en 30 minutos.</p>
+
+        <label for="pw">Nueva contrasena</label>
+        <input id="pw" type="password" autocomplete="new-password" placeholder="Min. 8 caracteres" />
+
+        <div class="row">
+          <button id="btn">Cambiar contrasena</button>
+          <span class="small"><a href="/">Volver a KingsHelp</a></span>
+        </div>
+
+        <div id="msg" class="msg" aria-live="polite"></div>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        function qs(name) {
+          var m = new RegExp('[?&]' + name + '=([^&]+)').exec(location.search);
+          return m ? decodeURIComponent(m[1]) : null;
+        }
+
+        var token = qs('token');
+        var btn = document.getElementById('btn');
+        var pw = document.getElementById('pw');
+        var msg = document.getElementById('msg');
+
+        function setMsg(text, ok) {
+          msg.textContent = text;
+          msg.className = 'msg ' + (ok ? 'ok' : 'bad');
+        }
+
+        if (!token) {
+          setMsg('Falta el token. Vuelve a solicitar el email de restablecer contrasena.', false);
+          btn.disabled = true;
+          return;
+        }
+
+        btn.addEventListener('click', function () {
+          var newPassword = String(pw.value || '').trim();
+          if (newPassword.length < 8) return setMsg('La contrasena debe tener al menos 8 caracteres.', false);
+
+          btn.disabled = true;
+          setMsg('Procesando...', true);
+
+          fetch('/api/v1/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token, new_password: newPassword })
+          }).then(function (r) {
+            return r.json().catch(function () { return null; }).then(function (j) { return { ok: r.ok, status: r.status, json: j }; });
+          }).then(function (out) {
+            if (out && out.ok && out.json && out.json.ok) {
+              setMsg('Contrasena cambiada. Ya puedes iniciar sesion.', true);
+              return;
+            }
+            setMsg('No se pudo cambiar la contrasena. Solicita un nuevo email e intentalo otra vez.', false);
+          }).catch(function () {
+            setMsg('Error de red. Intentalo de nuevo.', false);
+          }).finally(function () {
+            btn.disabled = false;
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
