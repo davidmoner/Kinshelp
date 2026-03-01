@@ -110,6 +110,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Dashboard cards: headers unificados con icono + subtitulo (clases `.card-title`, `.card-ico`, `.card-sub`).
 - Halo calido sutil al hover de `.glass-card` (sin cambiar el layout).
 
+## Deploy
+
+- Pasos para publicar cambios: ver `DEPLOY.md`
+
 ## Decisiones
 
 - Base de datos:
