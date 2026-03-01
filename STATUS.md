@@ -38,6 +38,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Email: validar entrega end-to-end en produccion (SendGrid Single Sender ahora; luego dominio `kingshelp.es`).
 - Auth: agregar endpoint para enviar/verificar email de forma clickeable (resend verify) y UX en mobile/web.
 - OAuth: implementar verificacion real de Google/Facebook cuando existan credenciales.
+- Auth/OAuth (objetivo): cerrar login con plataformas (Google/Facebook) end-to-end, con botones profesionales (logos oficiales), UX consistente web/mobile, y flujo 100% funcional (callback backend + manejo de errores + estados).
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 
 ## Estado (mar 2026)
