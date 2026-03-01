@@ -4,7 +4,7 @@ services:
     env: node
     plan: free
     buildCommand: npm ci
-    startCommand: node src/db/migrate.js && node src/server.js
+    startCommand: node src/server.js
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -20,3 +20,5 @@ services:
         value: /var/data
       - key: DB_PATH
         value: kingshelp.db
+
+    preDeployCommand: node src/db/migrate.js
