@@ -1,20 +1,10 @@
-node_modules/
-.env
-*.log
+# Local / OS
+nul
 
-# Local DB
+# SQLite local dev artifacts
 kingshelp.db
-*.db
-*.db-wal
-*.db-shm
-kingshelp.db-*
+kingshelp.db-shm
+kingshelp.db-wal
 
-# Editor/backup
-*.bak
-
-# Uploads
-uploads/
-
-# OS
-.DS_Store
-Thumbs.db
+# Node
+node_modules/
