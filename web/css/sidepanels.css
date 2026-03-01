@@ -185,6 +185,15 @@ html[data-theme="dark"] .kh-scene-img {
   filter: saturate(1.02) contrast(1.04);
 }
 
+/* If the dark theme uses non-PNG-ish assets, soften edges subtly */
+html[data-theme="dark"] .kh-scene-img[data-kh-darkimg="1"] {
+  filter:
+    saturate(1.03)
+    contrast(1.05)
+    blur(0.7px);
+  transform: scale(1.01);
+}
+
 html[data-theme="dark"] .kh-scene-top {
   background:
     radial-gradient(circle at 30% 35%, rgba(201, 168, 76, 0.18), transparent 55%),
