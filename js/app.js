@@ -1880,12 +1880,14 @@
 
         const stats = $('usercard-stats');
         if (stats) {
+            const vOk = (u && (u.is_verified === true || u.is_verified === 1));
             stats.innerHTML = `
-              <span class="lb-stat"><strong>${escapeHtml(lvl)}</strong> nivel</span>
-              <span class="lb-stat"><strong>${rep}</strong> rep</span>
-              <span class="lb-stat"><strong>${badges}</strong> insignias</span>
-              <span class="lb-stat"><strong>${escapeHtml(String(rating))}</strong> ★</span>
-              ${dist ? `<span class="lb-stat"><strong>${escapeHtml(dist)}</strong></span>` : ''}
+              <span class="usercard-chip${vOk ? ' ok' : ''}"><span class="i">${vOk ? '✓' : '!'}</span><strong>${vOk ? 'Verificado' : 'Sin verificar'}</strong></span>
+              <span class="usercard-chip"><span class="i">📍</span><strong>${escapeHtml(loc || (dist ? dist : '—'))}</strong></span>
+              <span class="usercard-chip"><span class="i">⚡</span><strong>${rep}</strong><span class="s">rep</span></span>
+              <span class="usercard-chip"><span class="i">★</span><strong>${escapeHtml(String(rating))}</strong><span class="s">(${Number((u && u.rating_count) || 0)})</span></span>
+              <span class="usercard-chip"><span class="i">🏅</span><strong>${badges}</strong><span class="s">insignias</span></span>
+              <span class="usercard-chip warm"><span class="i">♛</span><strong>${escapeHtml(lvl)}</strong></span>
             `;
         }
 
