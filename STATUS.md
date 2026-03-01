@@ -17,6 +17,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Auth: tokens persistidos en `auth_tokens` + endpoints `forgot-password`, `reset-password`, `verify-email`.
 - Email: servicio `src/shared/email.service.js` (SendGrid si esta configurado) + `PUBLIC_BASE_URL` para links.
 - Mobile (Expo): MVP con login, matches inbox, match detail, chat (polling), notificaciones, forgot/reset password.
+- Hero: paneles laterales sticky en banners 1 y 3 con imagenes laterales desde `img/*{izquierda,derecha}.*` y alineacion ajustada.
 
 ## Estado Actual
 
@@ -25,7 +26,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta)
 
-- Hero: paneles laterales sticky con feed infinito (solo banners seleccionados) + modo noche (glow ventana, bokeh, glass oscuro) + alternativa iOS notifs donde no caben.
+- Hero: modo noche (glow ventana, bokeh, glass oscuro) + alternativa iOS notifs donde no caben.
 - UI Web: tick de verificacion mas minimalista y sutil (sin redonda verde) en dashboard y carnet.
 - UI Web: repaso "pro" de detalles visuales (espaciados, tipografia, consistencia entre dashboard e inicio/reputacion).
 - UI Web: ranking vecinal popup +20% ancho.

@@ -177,6 +177,7 @@ html[data-theme="dark"] .kh-panel-scene {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  display: block;
   filter: saturate(1.02) contrast(1.02);
 }
 

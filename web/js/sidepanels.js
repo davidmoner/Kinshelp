@@ -48,10 +48,64 @@
   rightFeed.parentElement.style.opacity = '';
   rightFeed.parentElement.style.pointerEvents = '';
 
-  // Using provided reference images (swappable later)
+  function pickPanelImage(side) {
+    // Convention: numbered images with side in filename, e.g. "1izquierda.png", "12derecha.png".
+    // We prefer the highest number available so updates are drop-in by adding a new file.
+    // NOTE: In-browser we can't list a folder, so this probes candidates until one loads.
+    var exts = ['png', 'jpg', 'jpeg', 'webp'];
+
+    function probeBest(cb) {
+      var done = false;
+      var n = 99;
+
+      function tryOne() {
+        if (done) return;
+        if (n <= 0) {
+          done = true;
+          cb(null);
+          return;
+        }
+
+        var i = 0;
+        function tryExt() {
+          if (done) return;
+          if (i >= exts.length) {
+            n--;
+            tryOne();
+            return;
+          }
+          var cand = 'img/' + n + side + '.' + exts[i++];
+          var img = new Image();
+          img.onload = function () {
+            if (done) return;
+            done = true;
+            cb(cand);
+          };
+          img.onerror = function () {
+            tryExt();
+          };
+          img.src = cand;
+        }
+
+        tryExt();
+      }
+
+      tryOne();
+    }
+
+    return {
+      initial: 'img/1' + side + '.png',
+      probeBest: probeBest
+    };
+  }
+
+  var leftPick = pickPanelImage('izquierda');
+  var rightPick = pickPanelImage('derecha');
+
+  // Using numbered assets from /img (auto-picks latest by number)
   var SCENES = [
-    { img: 'img/1izquierda.png', alt: 'Vecina en la ventana', pill: 'Vecina', kind: 'scene' },
-    { img: 'img/1derecha.png', alt: 'Vecino en la ventana', pill: 'Vecino', kind: 'scene' }
+    { img: leftPick.initial, alt: 'Panel izquierdo', pill: 'Vecina', kind: 'scene', _picker: leftPick },
+    { img: rightPick.initial, alt: 'Panel derecho', pill: 'Vecino', kind: 'scene', _picker: rightPick }
   ];
 
   function el(tag, cls) {
@@ -71,6 +125,22 @@
       img.alt = scene.alt || '';
       img.loading = 'eager';
       img.decoding = 'async';
+      img.draggable = false;
+      img.onerror = function () {
+        // Keep layout intact even if a file is missing.
+        this.style.opacity = '0';
+      };
+
+      // Upgrade to best numbered match when found.
+      if (scene._picker && typeof scene._picker.probeBest === 'function') {
+        scene._picker.probeBest(function (best) {
+          if (!best) return;
+          if (img.src && img.src.indexOf(best) !== -1) return;
+          img.style.opacity = '';
+          img.src = best;
+        });
+      }
+
       top.appendChild(img);
     } else {
       var person = el('div', 'kh-scene-person');
