@@ -8,6 +8,7 @@ const router = Router();
 router.post('/register', ctrl.register);
 router.post('/login', ctrl.login);
 router.use(require('./auth.password.routes'));
+router.use(require('./auth.oauth.routes'));
 router.get('/me', authenticate, ctrl.me);
 router.patch('/me', authenticate, ctrl.updateMe);
 

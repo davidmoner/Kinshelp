@@ -40,6 +40,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Facebook login real: OAuth (mobile) + callback backend.
 - Objetivo UX mobile: auth simplificado (1-2 pantallas), mantener mismo look&feel que web pero adaptado a touch.
 
+## Auth (En Progreso)
+
+- Endpoints OAuth (stub): `POST /api/v1/auth/google`, `POST /api/v1/auth/facebook` (501 si no hay credenciales).
+
 ## Backlog (Prioridad Media)
 
 - Discovery de requests para providers (search, category, geo opcional).
