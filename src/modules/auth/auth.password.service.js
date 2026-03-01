@@ -1,20 +1,38 @@
 'use strict';
 const httpError = require('../../shared/http-error');
+const db = require('../../config/db');
+const bcrypt = require('bcryptjs');
+const tokens = require('./auth.tokens.repo');
+const emailSvc = require('../../shared/email.service');
 
 // This is a safe stub: endpoints exist for mobile/web flows,
 // but require an email provider and token persistence to be enabled.
 
 function isEnabled() {
-  // Later: require EMAIL_PROVIDER_API_KEY / SMTP config
-  return false;
+  return emailSvc.isConfigured();
 }
 
 async function forgotPassword({ email }) {
   if (!email) throw httpError(422, 'Email is required');
-  if (!isEnabled()) {
-    return { implemented: false, message: 'Email provider not configured yet.', email_sent: false };
+
+  const u = db.isPg
+    ? await db.one('SELECT id, email FROM users WHERE email = $1', [email])
+    : db.prepare('SELECT id, email FROM users WHERE email = ?').get(email);
+
+  // Do not leak whether email exists.
+  if (!isEnabled() || !u) {
+    return { implemented: false, email_sent: false, message: 'If the email exists, you will receive instructions.' };
   }
-  return { implemented: true, email_sent: true };
+
+  const t = await tokens.createToken({ userId: u.id, type: 'reset_password', ttlMinutes: 30 });
+  const link = emailSvc.buildLink(`/web/index.html#reset=${encodeURIComponent(t.token)}`);
+  const out = await emailSvc.send({
+    to: u.email,
+    subject: 'KingsHelp - Reset password',
+    text: `Para restablecer tu password, abre este enlace (valido 30 min):\n\n${link}`,
+  });
+
+  return { implemented: !!out.implemented, email_sent: !!out.ok };
 }
 
 async function resetPassword({ token, newPassword }) {
@@ -23,6 +41,17 @@ async function resetPassword({ token, newPassword }) {
   if (!isEnabled()) {
     return { implemented: false, message: 'Password reset not configured yet.', ok: false };
   }
+
+  const used = await tokens.consumeToken({ type: 'reset_password', token });
+  if (!used) throw httpError(422, 'Invalid or expired token');
+
+  const passHash = bcrypt.hashSync(newPassword, 10);
+  const now = new Date().toISOString();
+  if (db.isPg) {
+    await db.exec('UPDATE users SET password_hash = $1, updated_at = $2 WHERE id = $3', [passHash, now, used.user_id]);
+  } else {
+    db.prepare('UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?').run(passHash, now, used.user_id);
+  }
   return { implemented: true, ok: true };
 }
 
@@ -30,6 +59,17 @@ async function verifyEmail({ token }) {
   if (!token) throw httpError(422, 'Token is required');
   if (!isEnabled()) {
     return { implemented: false, message: 'Email verification not configured yet.', ok: false };
+  }
+
+  const used = await tokens.consumeToken({ type: 'verify_email', token });
+  if (!used) throw httpError(422, 'Invalid or expired token');
+
+  const now = new Date().toISOString();
+  try {
+    if (db.isPg) await db.exec('UPDATE users SET is_verified = true, updated_at = $1 WHERE id = $2', [now, used.user_id]);
+    else db.prepare('UPDATE users SET is_verified = 1, updated_at = ? WHERE id = ?').run(now, used.user_id);
+  } catch {
+    // ignore
   }
   return { implemented: true, ok: true };
 }

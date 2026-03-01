@@ -189,6 +189,20 @@ async function migrate() {
     `);
 
     await client.query(`
+      CREATE TABLE IF NOT EXISTS auth_tokens (
+        id         uuid PRIMARY KEY,
+        user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        type       text NOT NULL,
+        token_hash text NOT NULL,
+        expires_at timestamptz NOT NULL,
+        used_at    timestamptz,
+        created_at timestamptz NOT NULL DEFAULT now(),
+        UNIQUE(type, token_hash)
+      );
+      CREATE INDEX IF NOT EXISTS idx_auth_tokens_user_type ON auth_tokens(user_id, type);
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS automatch_settings (
         user_id             uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         enabled             boolean NOT NULL DEFAULT false,

@@ -45,6 +45,11 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Endpoints OAuth (stub): `POST /api/v1/auth/google`, `POST /api/v1/auth/facebook` (501 si no hay credenciales).
 - Mobile: botones Google/Facebook usan Expo AuthSession (requiere setear `GOOGLE_CLIENT_ID` / `FACEBOOK_APP_ID` en `mobile/src/config.js`).
 
+## Email (Decidido)
+
+- Proveedor recomendado: SendGrid o Mailgun (transaccional) para verify/reset.
+- Dominio: `kingshelp.es` (Hostinger) -> configurar SPF/DKIM/DMARC para entregabilidad.
+
 ## Backlog (Prioridad Media)
 
 - Discovery de requests para providers (search, category, geo opcional).
