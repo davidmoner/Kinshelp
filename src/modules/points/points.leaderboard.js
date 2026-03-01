@@ -1,5 +1,5 @@
 'use strict';
-const db = require('../../config/database');
+const db = require('../../config/db');
 
 function haversineKm(aLat, aLng, bLat, bLng) {
   const toRad = d => (d * Math.PI) / 180;
@@ -37,7 +37,7 @@ function minRepForLevel(level) {
   return null;
 }
 
-function getSortedUsers({
+async function getSortedUsers({
   lat,
   lng,
   radius_km,
@@ -45,7 +45,7 @@ function getSortedUsers({
   min_level,
   q,
 } = {}) {
-  const rows = db.prepare(`
+  const sql = `
     SELECT
       u.id,
       u.display_name,
@@ -61,7 +61,9 @@ function getSortedUsers({
     FROM users u
     LEFT JOIN user_badges ub ON ub.user_id = u.id
     GROUP BY u.id
-  `).all();
+  `;
+
+  const rows = db.isPg ? await db.many(sql) : db.prepare(sql).all();
 
   const hasOrigin = Number.isFinite(+lat) && Number.isFinite(+lng);
   const hasRadius = Number.isFinite(+radius_km);
@@ -141,7 +143,7 @@ function getSortedUsers({
   });
 }
 
-function getLeaderboardResult({
+async function getLeaderboardResult({
   limit = 10,
   offset = 0,
   lat,
@@ -154,7 +156,7 @@ function getLeaderboardResult({
   const lim = clampInt(limit, 1, 50, 10);
   const off = clampInt(offset, 0, 1_000_000, 0);
 
-  const all = getSortedUsers({ lat, lng, radius_km, sort, min_level, q });
+  const all = await getSortedUsers({ lat, lng, radius_km, sort, min_level, q });
   const total = all.length;
   const data = all.slice(off, off + lim).map(sanitizePublicUser);
   return {
@@ -168,7 +170,7 @@ function getLeaderboardResult({
   };
 }
 
-function getLeaderboard({
+async function getLeaderboard({
   limit = 10,
   offset = 0,
   lat,
@@ -176,7 +178,8 @@ function getLeaderboard({
   radius_km,
   sort,
 } = {}) {
-  return getLeaderboardResult({ limit, offset, lat, lng, radius_km, sort }).data;
+  const res = await getLeaderboardResult({ limit, offset, lat, lng, radius_km, sort });
+  return res.data;
 }
 
 module.exports = { getLeaderboard, getLeaderboardResult, getSortedUsers };
