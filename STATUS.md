@@ -25,6 +25,13 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta)
 
+- UI Web: tick de verificacion mas minimalista y sutil (sin redonda verde) en dashboard y carnet.
+- UI Web: repaso "pro" de detalles visuales (espaciados, tipografia, consistencia entre dashboard e inicio/reputacion).
+- UI Web: ranking vecinal popup +20% ancho.
+- UI Web: fondo tipo particulas hipnoticas (estilo antigravity) sutil con paleta KingsHelp.
+- Mobile Web: repaso completo de layout (hamburguesa, logo centrado, menu sin deformar elementos).
+- UX Crear: preparar sistema robusto para crear solicitudes/ofertas (flujo, validaciones, fotos, estado, errores) para contexto KingsHelp.
+- Contenido: rellenar secciones con frases motivadoras con vida (tono KingsHelp).
 - Email: validar entrega end-to-end en produccion (SendGrid Single Sender ahora; luego dominio `kingshelp.es`).
 - Auth: agregar endpoint para enviar/verificar email de forma clickeable (resend verify) y UX en mobile/web.
 - OAuth: implementar verificacion real de Google/Facebook cuando existan credenciales.

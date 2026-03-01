@@ -3399,8 +3399,9 @@
         document.addEventListener('click', (e) => {
             const pop = document.getElementById('dash-menu-pop');
             const btn = document.getElementById('dash-menu-btn');
+            const burger = document.getElementById('dash-burger');
             if (!pop || pop.classList.contains('hidden')) return;
-            if (pop.contains(e.target) || (btn && btn.contains(e.target))) return;
+            if (pop.contains(e.target) || (btn && btn.contains(e.target)) || (burger && burger.contains(e.target))) return;
             closeDashMenu();
         });
     });

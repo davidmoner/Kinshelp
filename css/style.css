@@ -2080,6 +2080,11 @@ html[data-theme="light"] .site-footer {
   .dash-header .nav-brand-lockup {
     margin: 0 auto;
   }
+
+  /* Keep mobile tabs from squashing their shape */
+  .dash-tabs {
+    justify-content: flex-start;
+  }
 }
 
 /* Dashboard tabs (views) */

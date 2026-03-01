@@ -85,7 +85,7 @@
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.55);
   --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --font: 'Manrope', system-ui, -apple-system, sans-serif;
 
   /* Warm neighborhood accents (used subtly) */
   --kh-warm-1: #E2B86B;
@@ -651,6 +651,50 @@ html[data-theme="light"] .btn-auth {
 
   .btn-auth {
     padding: 9px 14px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Landing header: keep logo centered, actions stable */
+  .nav {
+    padding: 0 14px;
+    gap: 10px;
+  }
+
+  .nav-brand {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .nav-actions {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  /* Keep shapes (no squashing). Hide text labels first. */
+  #nav-auth-btn {
+    display: none;
+  }
+
+  #nav-panel-btn,
+  #nav-logout-btn {
+    padding: 9px 12px;
+  }
+
+  .btn-create {
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Ultra-compact: keep only essential CTAs */
+  #nav-panel-btn,
+  #nav-logout-btn {
+    display: none;
+  }
+
+  #nav-ranking-btn {
+    padding: 6px 10px 6px 8px;
   }
 }
 
@@ -2080,6 +2124,27 @@ html[data-theme="light"] .site-footer {
   .dash-header .nav-brand-lockup {
     margin: 0 auto;
   }
+
+  /* Center the lockup properly on mobile */
+  .dash-header .nav-brand {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  .dash-header {
+    gap: 10px;
+  }
+
+  .dash-header .dash-user {
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  /* Keep mobile tabs from squashing their shape */
+  .dash-tabs {
+    justify-content: flex-start;
+  }
 }
 
 /* Dashboard tabs (views) */
@@ -2368,17 +2433,18 @@ html[data-theme="light"] .dash-menu-sep {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
-  margin-left: -8px;
-  margin-top: 20px;
-  border-radius: 999px;
-  background: rgba(34, 197, 94, 0.14);
-  color: rgba(34, 197, 94, 0.95);
-  font-weight: 950;
-  font-size: 11px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(34, 197, 94, 0.22);
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: 18px;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.08);
+  color: rgba(134, 239, 172, 0.92);
+  font-weight: 900;
+  font-size: 10px;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.18);
 }
 
 /* Dashboard layouts by view (reduce "amontonado") */
@@ -2402,6 +2468,34 @@ html[data-theme="light"] .dash-menu-sep {
     radial-gradient(120% 140% at 12% 0%, rgba(82, 49, 148, 0.16) 0%, transparent 60%),
     radial-gradient(120% 140% at 92% 10%, rgba(33, 82, 173, 0.12) 0%, transparent 56%),
     rgba(255, 255, 255, 0.03);
+}
+
+/* Make dashboard cards feel like the "Mi reputacion" panel (crisper, premium glass) */
+.glass-card {
+  background:
+    radial-gradient(120% 140% at 12% 0%, rgba(201, 168, 76, 0.06) 0%, transparent 55%),
+    radial-gradient(120% 140% at 92% 10%, rgba(33, 82, 173, 0.10) 0%, transparent 55%),
+    rgba(255, 255, 255, 0.035);
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.40),
+    0 22px 60px rgba(0, 0, 0, 0.40);
+}
+
+html[data-theme="light"] .glass-card {
+  background:
+    radial-gradient(120% 140% at 12% 0%, rgba(160, 120, 40, 0.05) 0%, transparent 55%),
+    radial-gradient(120% 140% at 92% 10%, rgba(31, 78, 158, 0.06) 0%, transparent 55%),
+    rgba(255, 255, 255, 0.86);
+  border-color: rgba(0, 0, 0, 0.10);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+}
+
+.glass-card:hover {
+  border-color: rgba(33, 82, 173, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(33, 82, 173, 0.10),
+    0 26px 70px rgba(0, 0, 0, 0.46);
 }
 
 .hub-grid {
@@ -3588,7 +3682,7 @@ html[data-theme="light"] .dash-menu-sep {
 
 /* ── Ranking modal controls ───────────────────────────── */
 .modal-ranking-box {
-  max-width: 770px;
+  max-width: 924px;
   padding: 22px 22px;
   display: flex;
   flex-direction: column;

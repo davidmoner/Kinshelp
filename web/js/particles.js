@@ -23,19 +23,20 @@
 
     /* ── Config ───────────────────────────────────────────────── */
     const CFG = {
-        count: 52,        // partículas totales
-        minR: 1.2,       // radio mínimo (px)
-        maxR: 3.2,       // radio máximo
-        speed: 0.18,      // velocidad base (px/frame)
-        wobble: 0.0006,    // amplitud oscilación angular
-        opacityMaxDark: 0.10,   // opacidad máx en tema oscuro
-        opacityMaxLight: 0.055, // ~45% menos visible en tema claro
+        count: 56,
+        minR: 1.0,
+        maxR: 2.6,
+        speed: 0.12,
+        wobble: 0.00045,
+        opacityMaxDark: 0.085,
+        opacityMaxLight: 0.048,
     };
 
     /* Colores para cada tema */
     const PALETTE = {
-        dark: ['201,168,76', '123,92,250', '61,139,255'],   // gold · violeta · azul
-        light: ['160,120,40', '91,63,232', '45,107,228'],
+        // KingsHelp: azul + oro, con toque violeta muy sutil
+        dark: ['41,90,173', '201,168,76', '82,49,148'],
+        light: ['31,78,158', '160,120,40', '74,42,134'],
     };
 
     /* ── Estado ───────────────────────────────────────────────── */
@@ -85,10 +86,13 @@
         const isLight = theme() === 'light';
 
         particles.forEach(p => {
-            /* drift + wobble suave */
-            p.angle += p.wobble + Math.sin(t * 0.0002 + p.phase) * 0.0008;
-            p.x += Math.cos(p.angle) * p.speed;
-            p.y += Math.sin(p.angle) * p.speed;
+            // Drift hipnotico, mas simetrico: mezcla de 2 ondas suaves (Lissajous-ish)
+            const tt = t * 0.001;
+            const a = Math.sin(tt * 0.55 + p.phase);
+            const b = Math.cos(tt * 0.42 + p.phase * 1.7);
+            p.angle += p.wobble + (a * 0.00055) + (b * 0.00040);
+            p.x += (Math.cos(p.angle) * p.speed) + (Math.sin(tt * 0.22 + p.phase) * 0.06);
+            p.y += (Math.sin(p.angle) * p.speed) + (Math.cos(tt * 0.18 + p.phase) * 0.06);
 
             /* wrap (reaparece en el otro lado) */
             if (p.x < -p.r) p.x = W + p.r;
