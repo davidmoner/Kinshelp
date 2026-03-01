@@ -44,17 +44,14 @@
   var rightFeed = document.getElementById('kh-panel-feed-right');
   if (!leftFeed || !rightFeed) return;
 
+  // Both panels visible (banner 1 and 3 only).
+  rightFeed.parentElement.style.opacity = '';
+  rightFeed.parentElement.style.pointerEvents = '';
+
+  // Using provided reference images (swappable later)
   var SCENES = [
-    { emoji: '👵', pill: 'Limpieza', kind: 'offer' },
-    { emoji: '🧑‍🔧', pill: 'Reparaciones', kind: 'offer' },
-    { emoji: '👩‍🏫', pill: 'Clases', kind: 'offer' },
-    { emoji: '🧑‍🍳', pill: 'Cocina', kind: 'offer' },
-    { emoji: '👨‍🌾', pill: 'Jardineria', kind: 'offer' },
-    { emoji: '👩‍🍼', pill: 'Acompanamiento', kind: 'offer' },
-    { emoji: '📦', pill: 'Paquetes', kind: 'request' },
-    { emoji: '🐶', pill: 'Mascotas', kind: 'request' },
-    { emoji: '🚗', pill: 'Transporte', kind: 'request' },
-    { emoji: '🧹', pill: 'Limpieza', kind: 'request' },
+    { img: 'img/1izquierda.png', alt: 'Vecina en la ventana', pill: 'Vecina', kind: 'scene' },
+    { img: 'img/1derecha.png', alt: 'Vecino en la ventana', pill: 'Vecino', kind: 'scene' }
   ];
 
   function el(tag, cls) {
@@ -67,9 +64,19 @@
     var wrap = el('div', 'kh-panel-item');
     var card = el('div', 'kh-panel-scene');
     var top = el('div', 'kh-scene-top');
-    var person = el('div', 'kh-scene-person');
-    person.textContent = scene.emoji;
-    top.appendChild(person);
+    if (scene.img) {
+      var img = document.createElement('img');
+      img.className = 'kh-scene-img';
+      img.src = scene.img;
+      img.alt = scene.alt || '';
+      img.loading = 'eager';
+      img.decoding = 'async';
+      top.appendChild(img);
+    } else {
+      var person = el('div', 'kh-scene-person');
+      person.textContent = scene.emoji || '👤';
+      top.appendChild(person);
+    }
     var body = el('div', 'kh-scene-body');
 
     var mini = el('div', 'kh-mini-card');
@@ -80,7 +87,7 @@
     lines.appendChild(l1);
     lines.appendChild(l2);
     var pill = el('div', 'kh-mini-pill');
-    pill.textContent = scene.pill;
+    pill.textContent = scene.pill || 'Vecino';
     mini.appendChild(ava);
     mini.appendChild(lines);
     mini.appendChild(pill);
@@ -98,7 +105,7 @@
 
   function fillFeed(feed, startIdx) {
     feed.innerHTML = '';
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 1; i++) {
       var item = makeItem(pickScene(startIdx + i));
       feed.appendChild(item);
     }
@@ -111,7 +118,7 @@
   }
 
   var idxL = 0;
-  var idxR = 3;
+  var idxR = 1;
   fillFeed(leftFeed, idxL);
   fillFeed(rightFeed, idxR);
 
@@ -129,7 +136,7 @@
 
   var ticking = false;
   var lastSwapAt = 0;
-  var SWAP_MS = 950;
+  var SWAP_MS = 1200;
 
   function swapOne(feed, nextIdx) {
     var first = feed.firstElementChild;
@@ -154,8 +161,8 @@
     lastSwapAt = now;
     idxL++;
     idxR++;
-    swapOne(leftFeed, idxL + 3);
-    swapOne(rightFeed, idxR + 3);
+    swapOne(leftFeed, idxL);
+    swapOne(rightFeed, idxR);
   }
 
   function onScroll() {
