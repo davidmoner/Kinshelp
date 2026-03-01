@@ -13,6 +13,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Tracker de estado agregado: `STATUS.md`.
 - Premium Stripe (checkout + webhook) con persistencia en tabla `payments`.
 - Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` (WIP triggers).
+- Postgres hardening: transacciones disponibles via `db.tx()` y points transfer atomico en PG.
 
 ## Estado Actual
 
@@ -24,7 +25,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Premium real (Stripe): implementar checkout + webhook y persistir pagos (WIP).
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 - Matches inbox: listar matches por usuario, estado y paginacion.
-- Hardening Postgres: transaccion para `points.transfer()` y indices/constraints.
+- Triggers notificaciones restantes (mensajes, automatch invites) y UI en `web/`.
 
 ## Backlog (Prioridad Media)
 

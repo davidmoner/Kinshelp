@@ -1,5 +1,6 @@
 'use strict';
 const db = require('../../config/db');
+const { randomUUID } = require('crypto');
 const httpError = require('../../shared/http-error');
 const repo = require('./points.repo');
 const lb = require('./points.leaderboard');
@@ -48,12 +49,29 @@ function setCachedLb(key, value) {
 async function transfer({ matchId, fromUserId, toUserId, amount }) {
     if (!amount || amount <= 0) return;
     if (db.isPg) {
-        const balance = await repo.getBalance(fromUserId);
-        if (balance < amount) throw httpError(422, 'Insufficient points balance');
         const now = new Date().toISOString();
-        // Best-effort (phase 1): no explicit tx wrapper yet.
-        await repo.debit(fromUserId, amount, matchId, LEDGER_REASON.MATCH_COMPLETED, now);
-        await repo.credit(toUserId, amount, matchId, LEDGER_REASON.MATCH_COMPLETED, now);
+        // Atomic transfer in a single transaction.
+        await db.tx(async (client) => {
+            const row = await client.one('SELECT points_balance FROM users WHERE id = $1 FOR UPDATE', [fromUserId]);
+            const balance = row ? Number(row.points_balance || 0) : 0;
+            if (balance < amount) throw httpError(422, 'Insufficient points balance');
+
+            const fromBal = balance - amount;
+            await client.exec('UPDATE users SET points_balance = $1, updated_at = $2 WHERE id = $3', [fromBal, now, fromUserId]);
+            await client.exec(
+                'INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+                [randomUUID(), fromUserId, matchId, -amount, LEDGER_REASON.MATCH_COMPLETED, fromBal, now]
+            );
+
+            const toRow = await client.one('SELECT points_balance FROM users WHERE id = $1 FOR UPDATE', [toUserId]);
+            const toBalance = toRow ? Number(toRow.points_balance || 0) : 0;
+            const toBal = toBalance + amount;
+            await client.exec('UPDATE users SET points_balance = $1, updated_at = $2 WHERE id = $3', [toBal, now, toUserId]);
+            await client.exec(
+                'INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+                [randomUUID(), toUserId, matchId, +amount, LEDGER_REASON.MATCH_COMPLETED, toBal, now]
+            );
+        });
         return;
     }
 

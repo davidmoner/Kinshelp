@@ -89,4 +89,35 @@ async function exec(sql, params) {
   await query(sql, params);
 }
 
-module.exports = { one, many, exec, query, isPg: true };
+async function tx(fn) {
+  const pool = getPool();
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const wrapped = {
+      query: (sql, params) => client.query(sql, params),
+      exec: async (sql, params) => { await client.query(sql, params); },
+      one: async (sql, params) => {
+        const res = await client.query(sql, params);
+        const row = res.rows && res.rows[0];
+        return mapRow(row);
+      },
+      many: async (sql, params) => {
+        const res = await client.query(sql, params);
+        const rows = Array.isArray(res.rows) ? res.rows : [];
+        return rows.map(mapRow);
+      },
+      isPg: true,
+    };
+    const out = await fn(wrapped);
+    await client.query('COMMIT');
+    return out;
+  } catch (e) {
+    try { await client.query('ROLLBACK'); } catch { }
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { one, many, exec, query, tx, isPg: true };
