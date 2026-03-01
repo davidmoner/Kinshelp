@@ -2053,15 +2053,17 @@
             const el = document.createElement('div');
             el.className = 'feed-card';
             const dist = (r.distance_km != null) ? `${r.distance_km} km` : (r.location_text ? 'cerca' : '—');
+            const cat = String(r.category || 'other');
+            const ico = inviteIcon(cat);
             el.innerHTML = `
               <div class="feed-media">
                 <span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span>
-                ${img ? `<img src="${escapeHtml(String(img))}" alt="" loading="lazy" />` : ''}
+                ${img ? `<img src="${escapeHtml(String(img))}" alt="" loading="lazy" />` : `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>`}
               </div>
               <div class="feed-body">
                 <div class="feed-title">${escapeHtml(r.title || '—')}</div>
                 <div class="feed-sub">
-                  <span class="feed-pill">${escapeHtml(catLabel(r.category))}</span>
+                  <span class="feed-pill">${escapeHtml(catLabel(cat))}</span>
                   <span class="feed-pill">${escapeHtml(compLabel(r.compensation_type))}</span>
                   <span class="feed-pill">📍 ${escapeHtml(dist)}</span>
                 </div>
