@@ -50,6 +50,20 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Proveedor recomendado: SendGrid o Mailgun (transaccional) para verify/reset.
 - Dominio: `kingshelp.es` (Hostinger) -> configurar SPF/DKIM/DMARC para entregabilidad.
 
+## Email (En Progreso)
+
+- SendGrid: DKIM/DMARC records agregados en Hostinger para `kingshelp.es` (em6569, s1/s2._domainkey, _dmarc).
+- Bloqueo actual: esperar propagacion DNS publica para que SendGrid valide (puede tardar hasta 24h).
+- Siguiente cuando valide: crear API key en SendGrid y setear env vars en Render (EMAIL_PROVIDER, SENDGRID_API_KEY, MAIL_FROM, PUBLIC_BASE_URL).
+
+## Render (Checklist)
+
+- Env vars para email:
+  - EMAIL_PROVIDER=sendgrid
+  - SENDGRID_API_KEY=...
+  - MAIL_FROM=no-reply@kingshelp.es
+  - PUBLIC_BASE_URL=https://kingshelp.onrender.com
+
 ## Backlog (Prioridad Media)
 
 - Discovery de requests para providers (search, category, geo opcional).

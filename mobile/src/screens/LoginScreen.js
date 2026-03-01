@@ -6,7 +6,7 @@ import { login } from '../api/khApi';
 import { useAuth } from '../state/auth';
 import { signInWithGoogle, signInWithFacebook } from '../auth/oauth';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const { signIn } = useAuth();
   const [email, setEmail] = React.useState('demo.alice@kingshelp.local');
   const [password, setPassword] = React.useState('password123');
@@ -93,6 +93,10 @@ export default function LoginScreen() {
         <TouchableOpacity style={[styles.btn, loading && { opacity: 0.7 }]} onPress={onSubmit} disabled={loading}>
           <Text style={styles.btnText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.linkBtn} onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={styles.linkText}>Olvidaste tu password?</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.hint}>Si estas en Android emulator: `BASE_URL` usa 10.0.2.2</Text>
@@ -142,5 +146,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   btnText: { color: '#06120E', fontWeight: '800' },
+  linkBtn: { marginTop: 10, paddingVertical: 10, alignItems: 'center' },
+  linkText: { color: theme.colors.brand, fontWeight: '800' },
   hint: { color: theme.colors.muted, marginTop: 14, fontSize: 12 },
 });

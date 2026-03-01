@@ -50,6 +50,14 @@ export async function login(email, password) {
   return apiFetch('/auth/login', { method: 'POST', body: { email, password } });
 }
 
+export async function forgotPassword(email) {
+  return apiFetch('/auth/forgot-password', { method: 'POST', body: { email } });
+}
+
+export async function resetPassword(token, newPassword) {
+  return apiFetch('/auth/reset-password', { method: 'POST', body: { token, new_password: newPassword } });
+}
+
 export async function me(token) {
   return apiFetch('/auth/me', { token });
 }
