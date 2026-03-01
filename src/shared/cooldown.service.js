@@ -6,7 +6,7 @@
  *
  * Default cooldown: 60 s (override via NOTIFICATION_COOLDOWN_SEC env var).
  */
-const db = require('../config/database');
+const db = require('../config/db');
 const { randomUUID } = require('crypto');
 
 const COOLDOWN_SEC = parseInt(process.env.NOTIFICATION_COOLDOWN_SEC || '60', 10);
@@ -16,6 +16,12 @@ const COOLDOWN_SEC = parseInt(process.env.NOTIFICATION_COOLDOWN_SEC || '60', 10)
  * Always returns true if no prior entry exists.
  */
 function canNotify(userId, category) {
+    if (db.isPg) {
+        // pg: caller will use tryNotify which is async-safe below.
+        // This sync helper is kept for sqlite compatibility.
+        return true;
+    }
+
     const row = db.prepare(
         'SELECT last_notified_at FROM notification_cooldowns WHERE user_id = ? AND category = ?'
     ).get(userId, category);
@@ -32,6 +38,7 @@ function canNotify(userId, category) {
  */
 function markNotified(userId, category) {
     const now = new Date().toISOString();
+    if (db.isPg) return;
     const existing = db.prepare(
         'SELECT id FROM notification_cooldowns WHERE user_id = ? AND category = ?'
     ).get(userId, category);
@@ -52,7 +59,32 @@ function markNotified(userId, category) {
  * Returns true if notification should be sent (and marks it).
  * Returns false if still within cooldown window (no write).
  */
-function tryNotify(userId, category) {
+async function tryNotify(userId, category) {
+    if (!userId || !category) return false;
+    const now = new Date();
+
+    if (db.isPg) {
+        const cooldownMs = COOLDOWN_SEC * 1000;
+        const row = await db.one(
+            'SELECT last_notified_at FROM notification_cooldowns WHERE user_id = $1 AND category = $2',
+            [userId, category]
+        );
+
+        if (row && row.last_notified_at) {
+            const last = new Date(row.last_notified_at).getTime();
+            if ((now.getTime() - last) < cooldownMs) return false;
+        }
+
+        // Upsert
+        await db.exec(
+            `INSERT INTO notification_cooldowns (id, user_id, category, last_notified_at)
+             VALUES ($1,$2,$3,$4)
+             ON CONFLICT (user_id, category) DO UPDATE SET last_notified_at = EXCLUDED.last_notified_at`,
+            [randomUUID(), userId, category, now.toISOString()]
+        );
+        return true;
+    }
+
     if (!canNotify(userId, category)) return false;
     markNotified(userId, category);
     return true;

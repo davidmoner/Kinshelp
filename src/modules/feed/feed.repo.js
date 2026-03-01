@@ -1,8 +1,9 @@
-'use strict';
-const db = require('../../config/database');
 
-function listFeed({ limit = 40, offset = 0 } = {}) {
-  const rows = db.prepare(`
+'use strict';
+const db = require('../../config/db');
+
+async function listFeed({ limit = 40, offset = 0 } = {}) {
+  const sql = `
     SELECT * FROM (
       SELECT
         'request' AS kind,
@@ -22,7 +23,7 @@ function listFeed({ limit = 40, offset = 0 } = {}) {
         u.premium_tier AS user_tier
       FROM help_requests r
       JOIN users u ON u.id = r.seeker_id
-      WHERE r.status = 'open' AND r.expires_at > datetime('now')
+      WHERE r.status = 'open' AND r.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
 
       UNION ALL
 
@@ -44,14 +45,19 @@ function listFeed({ limit = 40, offset = 0 } = {}) {
         u.premium_tier AS user_tier
       FROM service_offers o
       JOIN users u ON u.id = o.provider_id
-      WHERE o.status = 'active' AND o.expires_at > datetime('now')
+      WHERE o.status = 'active' AND o.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
     )
-    ORDER BY datetime(created_at) DESC
-    LIMIT ? OFFSET ?
-  `).all(limit, offset);
+    ORDER BY ${db.isPg ? 'created_at' : 'datetime(created_at)'} DESC
+    LIMIT ${db.isPg ? '$1' : '?'} OFFSET ${db.isPg ? '$2' : '?'}
+  `;
+
+  const rows = db.isPg ? await db.many(sql, [limit, offset]) : db.prepare(sql).all(limit, offset);
 
   rows.forEach(r => {
-    try { r.media_urls = JSON.parse(r.media_urls || '[]'); } catch { r.media_urls = []; }
+    try {
+      if (typeof r.media_urls === 'string') r.media_urls = JSON.parse(r.media_urls || '[]');
+      else if (!r.media_urls) r.media_urls = [];
+    } catch { r.media_urls = []; }
   });
   return rows;
 }

@@ -11,6 +11,8 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Smoke tests cubren el flujo MVP (request -> match -> mensajes -> done -> ratings -> ledger).
 - Repo sincronizado con GitHub: `main` incluye commit `feat: db facade and pg-compatible points`.
 - Tracker de estado agregado: `STATUS.md`.
+- Premium Stripe (checkout + webhook) con persistencia en tabla `payments`.
+- Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` (WIP triggers).
 
 ## Estado Actual
 
@@ -20,7 +22,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 ## Siguiente (Prioridad Alta)
 
 - Premium real (Stripe): implementar checkout + webhook y persistir pagos (WIP).
-- Notificaciones in-app: tabla + endpoints + triggers desde eventos (match, mensajes, invites).
+- Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 - Matches inbox: listar matches por usuario, estado y paginacion.
 - Hardening Postgres: transaccion para `points.transfer()` y indices/constraints.
 

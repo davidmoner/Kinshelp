@@ -28,10 +28,10 @@ const create = (req, res, next) => {
 };
 
 const changeStatus = (req, res, next) => {
-    try {
+    (async () => {
         const action = validators.validateAction(req.body.action);
-        res.json(svc.changeStatus(req.params.id, req.user.id, action));
-    } catch (e) { next(e); }
+        res.json(await svc.changeStatus(req.params.id, req.user.id, action));
+    })().catch(next);
 };
 
 const submitRating = (req, res, next) => {

@@ -147,6 +147,19 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_payments_user ON payments(user_id, created_at);
 
+  -- ── In-app notifications ─────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS notifications (
+    id         TEXT PRIMARY KEY,
+    user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    kind       TEXT NOT NULL,
+    title      TEXT,
+    body       TEXT,
+    payload    TEXT NOT NULL DEFAULT '{}',
+    read_at    TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications(user_id, created_at);
+
   -- ── Indexes ───────────────────────────────────────────────────────────────
   -- Offers: composite for the two most common feed queries
   CREATE INDEX IF NOT EXISTS idx_offers_provider       ON service_offers(provider_id);

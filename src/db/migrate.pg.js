@@ -175,6 +175,20 @@ async function migrate() {
     `);
 
     await client.query(`
+      CREATE TABLE IF NOT EXISTS notifications (
+        id         uuid PRIMARY KEY,
+        user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        kind       text NOT NULL,
+        title      text,
+        body       text,
+        payload    jsonb NOT NULL DEFAULT '{}'::jsonb,
+        read_at    timestamptz,
+        created_at timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications(user_id, created_at);
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS automatch_settings (
         user_id             uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         enabled             boolean NOT NULL DEFAULT false,

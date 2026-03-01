@@ -6,6 +6,7 @@
 const db = require('../../config/database');
 const httpError = require('../../shared/http-error');
 const cooldown = require('../../shared/cooldown.service');
+const notifications = require('../notifications/notifications.service');
 const repo = require('./matches.repo');
 const pointsSvc = require('../points/points.service');
 const badgesSvc = require('../badges/badges.service');
@@ -118,7 +119,7 @@ function create(data) {
     return requireMatch(matchId);
 }
 
-function changeStatus(matchId, actingUserId, action) {
+async function changeStatus(matchId, actingUserId, action) {
     const match = requireMatch(matchId);
 
     const { role: callerRole } = requireParticipant(match, actingUserId);
@@ -193,7 +194,16 @@ function changeStatus(matchId, actingUserId, action) {
 
     // Cooldown-gated notification hook (replace with real push/email later)
     const notifyTarget = newStatus === 'accepted' || newStatus === 'done' ? match.seeker_id : match.provider_id;
-    cooldown.tryNotify(notifyTarget, `match_${newStatus}`);
+    try {
+        const ok = await cooldown.tryNotify(notifyTarget, `match_${newStatus}`);
+        if (ok) {
+            await notifications.notify(notifyTarget, `match_${newStatus}`, {
+                title: 'Actualizacion de match',
+                body: `Tu match cambio a estado: ${newStatus}`,
+                payload: { match_id: matchId, status: newStatus },
+            });
+        }
+    } catch { }
 
     return requireMatch(matchId);
 }

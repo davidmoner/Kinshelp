@@ -1,5 +1,5 @@
 'use strict';
-const db = require('../../config/database');
+const db = require('../../config/db');
 const repo = require('./feed.repo');
 
 function haversineKm(lat1, lon1, lat2, lon2) {
@@ -11,9 +11,11 @@ function haversineKm(lat1, lon1, lat2, lon2) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
-function listFeedForUser(userId, opts) {
-  const me = db.prepare('SELECT lat, lng FROM users WHERE id = ?').get(userId);
-  const rows = repo.listFeed(opts);
+async function listFeedForUser(userId, opts) {
+  const me = db.isPg
+    ? await db.one('SELECT lat, lng FROM users WHERE id = $1', [userId])
+    : db.prepare('SELECT lat, lng FROM users WHERE id = ?').get(userId);
+  const rows = await repo.listFeed(opts);
   const hasMe = me && me.lat != null && me.lng != null;
   return rows.map(r => {
     const hasItem = r.lat != null && r.lng != null;

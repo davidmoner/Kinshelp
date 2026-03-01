@@ -104,6 +104,7 @@ api.use('/badges', require('./modules/badges/badges.routes'));
 api.use('/premium', require('./modules/premium/premium.routes'));
 api.use('/automatch', require('./modules/automatch/automatch.routes'));
 api.use('/feed', require('./modules/feed/feed.routes'));
+api.use('/notifications', require('./modules/notifications/notifications.routes'));
 
 app.use('/api/v1', api);
 
