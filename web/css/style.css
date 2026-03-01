@@ -86,6 +86,12 @@
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.55);
   --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
   --font: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Warm neighborhood accents (used subtly) */
+  --kh-warm-1: #E2B86B;
+  --kh-warm-2: #E07A5F;
+  --kh-warm-3: #F4A261;
+  --kh-warm-soft: rgba(226, 184, 107, 0.12);
 }
 
 /* ════════════════════════════════════════════════════════
@@ -777,9 +783,9 @@ html[data-theme="light"] .btn-auth {
 }
 
 .btn-block {
-  width: 100%;
+  width: fit-content;
   justify-content: center;
-  padding: 13px;
+  padding: 13px 18px;
 }
 
 .btn-arrow {
@@ -2484,9 +2490,72 @@ html[data-theme="light"] .dash-menu-sep {
   justify-content: space-between;
 }
 
+.card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .card-head h3 {
   font-size: 14px;
   font-weight: 600;
+}
+
+/* Warm, neighborhood-like headers */
+.card-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.card-ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(226, 184, 107, 0.18), rgba(224, 122, 95, 0.12));
+  border: 1px solid rgba(226, 184, 107, 0.22);
+  box-shadow: 0 10px 30px rgba(226, 184, 107, 0.08);
+}
+
+.card-ico span {
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+}
+
+.card-title h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+}
+
+.card-sub {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.glass-card {
+  position: relative;
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition);
+  background: radial-gradient(ellipse 70% 60% at 20% 0%, rgba(226, 184, 107, 0.11) 0%, transparent 70%);
+}
+
+.glass-card:hover::after {
+  opacity: 1;
 }
 
 /* Status */

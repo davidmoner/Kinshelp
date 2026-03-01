@@ -13,4 +13,5 @@ module.exports = {
   EMAIL_PROVIDER: process.env.EMAIL_PROVIDER || null,
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || null,
   MAIL_FROM: process.env.MAIL_FROM || null,
+  CORS_ORIGINS: process.env.CORS_ORIGINS || null,
 };

@@ -57,6 +57,7 @@ db.exec(`
     points_offered INTEGER NOT NULL,
     media_urls     TEXT NOT NULL DEFAULT '[]',
     location_text  TEXT,
+    when_text      TEXT NOT NULL DEFAULT 'asap',
     lat            REAL,
     lng            REAL,
     expires_at     TEXT NOT NULL,
@@ -267,6 +268,9 @@ function addColumn(table, ddl) {
 // Compensation context
 if (!hasColumn('help_requests', 'compensation_type')) {
   addColumn('help_requests', "compensation_type TEXT NOT NULL DEFAULT 'cash'");
+}
+if (!hasColumn('help_requests', 'when_text')) {
+  addColumn('help_requests', "when_text TEXT NOT NULL DEFAULT 'asap'");
 }
 if (!hasColumn('service_offers', 'compensation_type')) {
   addColumn('service_offers', "compensation_type TEXT NOT NULL DEFAULT 'cash'");

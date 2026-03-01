@@ -24,7 +24,10 @@ async function send({ to, subject, text }) {
     // eslint-disable-next-line global-require
     const sg = require('@sendgrid/mail');
     sg.setApiKey(SENDGRID_API_KEY);
-    await sg.send({ to, from: MAIL_FROM, subject, text });
+    // Normalize sender: allow passing either "Name <email@domain>" or plain "email@domain".
+    const from = String(MAIL_FROM || '').trim();
+    const fromEmail = from.includes('<') && from.includes('>') ? from : `<${from}>`;
+    await sg.send({ to, from: fromEmail, subject, text });
     return { ok: true, implemented: true };
   }
 

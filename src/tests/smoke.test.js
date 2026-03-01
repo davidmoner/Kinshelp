@@ -259,16 +259,18 @@ async function run() {
       const points = 12;
       const nowMs = Date.now();
 
-      const createdReq = await requestJson('POST', '/api/v1/requests', {
-        token: tokenA,
-        payload: {
-          title: 'Smoke MVP request',
-          category: 'tech',
-          points_offered: 0,
-          compensation_type: 'cash',
-          description: 'created by smoke test',
-        },
-      });
+       const createdReq = await requestJson('POST', '/api/v1/requests', {
+         token: tokenA,
+         payload: {
+           title: 'Smoke MVP request',
+           category: 'tech',
+           points_offered: 0,
+           compensation_type: 'cash',
+           description: 'created by smoke test',
+           location_text: 'Centro',
+           when: 'asap',
+         },
+       });
       assert(createdReq.status === 201, 'POST /api/v1/requests → 201');
       assert(!!createdReq.body.id, 'POST /api/v1/requests → id presente');
       const exp1 = Date.parse(createdReq.body.expires_at);
@@ -361,16 +363,18 @@ async function run() {
       const tokenP2 = regB2.body && regB2.body.token;
       const provider2 = regB2.body && regB2.body.user;
 
-      const createdReq2 = await requestJson('POST', '/api/v1/requests', {
-        token: tokenA2,
-        payload: {
-          title: 'Smoke barter request',
-          category: 'tech',
-          points_offered: 0,
-          compensation_type: 'barter',
-          description: 'barter',
-        },
-      });
+       const createdReq2 = await requestJson('POST', '/api/v1/requests', {
+         token: tokenA2,
+         payload: {
+           title: 'Smoke barter request',
+           category: 'tech',
+           points_offered: 0,
+           compensation_type: 'barter',
+           description: 'barter',
+           location_text: 'Centro',
+           when: 'flexible',
+         },
+       });
       assert(createdReq2.status === 201, 'POST /api/v1/requests (barter) → 201');
 
       const createdMatch2 = await requestJson('POST', '/api/v1/matches', {

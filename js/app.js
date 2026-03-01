@@ -940,6 +940,11 @@
             closeLoginDirect();
             loadUserInfo(user);
 
+            // If the backend tracks email verification, prompt users early.
+            if (user && (user.is_verified === false || user.is_verified === 0)) {
+                toast('Te falta verificar el email. Revisa tu correo o reenvia la verificacion.', 'warn');
+            }
+
             if (postLoginAction === 'quick_match' && quickDraft) {
                 const draft = quickDraft;
                 quickDraft = null;
@@ -1004,6 +1009,15 @@
             toast(`Cuenta creada. Bienvenido, ${user.display_name} 👑`, 'success');
             closeLoginDirect();
             loadUserInfo(user);
+
+            // After signup, send verify email automatically (best effort).
+            try {
+                const out = await KHApi.requestVerifyEmail();
+                if (out && out.email_sent) toast('Email de verificacion enviado. Revisa tu correo.', 'success');
+                else toast('No se pudo enviar el email de verificacion (config pendiente).', 'warn');
+            } catch {
+                toast('No se pudo enviar el email de verificacion (config pendiente).', 'warn');
+            }
 
             if (postLoginAction === 'quick_match' && quickDraft) {
                 const draft = quickDraft;
@@ -1292,6 +1306,25 @@
             toast(err.message || 'No se pudo guardar', 'error');
         } finally {
             setLoading(btn, false);
+        }
+    }
+
+    async function resendVerifyEmail() {
+        if (!KHApi.getToken()) {
+            toast('Inicia sesión primero', 'error');
+            openLogin();
+            return;
+        }
+        const btn = $('btn-verify-resend');
+        if (btn) setLoading(btn, true);
+        try {
+            const out = await KHApi.requestVerifyEmail();
+            if (out && out.email_sent) toast('Email de verificación reenviado. Revisa tu correo.', 'success');
+            else toast('No se pudo enviar el email de verificación (config pendiente).', 'warn');
+        } catch (err) {
+            toast((err && err.message) || 'No se pudo enviar el email de verificación', 'error');
+        } finally {
+            if (btn) setLoading(btn, false);
         }
     }
 
@@ -2579,6 +2612,13 @@
             const title = $('req-title').value.trim();
             const category = $('req-category').value;
             const description = $('req-desc').value.trim();
+            const location_text = ($('req-location') && $('req-location').value || '').trim();
+            const when = ($('req-when') && $('req-when').value || 'asap');
+
+            if (!location_text) {
+                toast('Indica tu zona (ej. barrio)', 'error');
+                return;
+            }
 
             const comp = (document.getElementById('req-comp') && document.getElementById('req-comp').value) || 'cash';
             const points = 0;
@@ -2588,6 +2628,8 @@
                 category,
                 points_offered: points,
                 description: description || undefined,
+                location_text,
+                when,
                 compensation_type: comp,
             };
 
@@ -3433,6 +3475,7 @@
         submitRegister,
         loadProfile,
         submitProfile,
+        resendVerifyEmail,
         pickProfilePhoto,
         uploadProfilePhoto,
         deleteProfilePhoto,
@@ -3487,4 +3530,8 @@
         loadCreations,
         loadMatches,
     };
+
+    // Back-compat: tolerate console checks like `khapp` / `khapi`.
+    // These were used informally during debugging.
+    try { window.khapp = window.KHApp; } catch { }
 })();

@@ -64,8 +64,29 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Env vars para email:
   - EMAIL_PROVIDER=sendgrid
   - SENDGRID_API_KEY=...
-  - MAIL_FROM=davidmoner90@gmail.com (temporal; luego `no-reply@kingshelp.es`)
-  - PUBLIC_BASE_URL=https://kingshelp.onrender.com
+  - MAIL_FROM=KingsHelp <davidmoner90@gmail.com> (temporal; requiere Single Sender verificado)
+  - PUBLIC_BASE_URL=https://kingshelp.es
+  - NODE_ENV=production
+  - (opcional) CORS_ORIGINS=https://kingshelp.es,https://www.kingshelp.es
+
+- Prueba end-to-end (verify email):
+  - En la app: "Reenviar verificacion"
+  - El email debe incluir: https://kingshelp.es/api/v1/auth/verify-email?token=...
+  - Debe redirigir a: /web/verify-email/success.html (o invalid/error)
+
+## Email con dominio (Hostinger) — ruta gratis (anotado)
+
+- Objetivo: tener direcciones tipo `hola@kingshelp.es` sin pagar buzones.
+- Opcion A (si Hostinger lo incluye):
+  - Hostinger -> Email -> Alias/Reenvio (Forwarders)
+  - Crear `hola@kingshelp.es` -> reenviar a `davidmoner90@gmail.com`
+  - Nota: suele ser solo recepcion (responder como @kingshelp.es requiere SMTP/servicio de envio)
+- Opcion B (alternativa si Hostinger no ofrece reenvio gratis):
+  - Pasar DNS a Cloudflare (gratis)
+  - Activar Cloudflare Email Routing (gratis hoy) para reenviar `@kingshelp.es` a Gmail
+- Recomendacion actual (sin coste):
+  - Mantener emails transaccionales (verify/reset) con SendGrid Single Sender usando Gmail
+  - `MAIL_FROM=KingsHelp <davidmoner90@gmail.com>`
 
 ## Backlog (Prioridad Media)
 
@@ -73,6 +94,21 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Perfil publico seguro por usuario (reputacion, badges, sin PII).
 - Moderacion basica: report/ban y antispam.
 - Observabilidad: logs estructurados, health extendido, y error reporting.
+
+## Requests (UX + datos)
+
+- Formulario web (crear solicitud) ahora pide:
+  - `title` (titulo)
+  - `location_text` (zona)
+  - `category`
+  - `compensation_type`
+  - `when` (asap/today/this_week/flexible)
+- Backend valida `location_text` + `when` y persiste `when_text`.
+
+## UI (calido vecinal)
+
+- Dashboard cards: headers unificados con icono + subtitulo (clases `.card-title`, `.card-ico`, `.card-sub`).
+- Halo calido sutil al hover de `.glass-card` (sin cambiar el layout).
 
 ## Decisiones
 

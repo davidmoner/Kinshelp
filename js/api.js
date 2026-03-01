@@ -101,6 +101,11 @@
         return data;
     }
 
+    /** POST /auth/request-verify-email — requires token */
+    async function requestVerifyEmail() {
+        return apiFetch('/auth/request-verify-email', { method: 'POST', body: {} });
+    }
+
     /** GET /points/me — requires token */
     async function getMyPoints() {
         return apiFetch('/points/me');
@@ -302,6 +307,7 @@
         healthCheck,
         register,
         login,
+        requestVerifyEmail,
         getMyPoints,
         getMe,
         updateMe,
@@ -343,4 +349,7 @@
         boostRequest48h,
         boostOffer48h,
     };
+
+    // Back-compat: tolerate console checks like `khapi`.
+    try { window.khapi = window.KHApi; } catch { }
 })();
