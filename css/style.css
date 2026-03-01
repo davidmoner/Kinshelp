@@ -2116,6 +2116,30 @@ html[data-theme="light"] .site-footer {
   position: relative;
 }
 
+.dash-burger {
+  display: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+@media (max-width: 560px) {
+  /* Mobile header: keep it calm; move account into burger */
+  .dash-user .kh-pill { display: none; }
+  .dash-user .dash-menu { display: none; }
+  .dash-burger { display: inline-flex; }
+  .dash-menu-pop {
+    right: 0;
+    left: auto;
+    top: 46px;
+    min-width: min(92vw, 320px);
+  }
+}
+
 .dash-menu-pop {
   position: absolute;
   top: calc(100% + 10px);

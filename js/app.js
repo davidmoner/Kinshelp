@@ -252,21 +252,26 @@
         const pop = document.getElementById('dash-menu-pop');
         const btn = document.getElementById('dash-menu-btn');
         if (!pop || !btn) return;
+        const burger = document.getElementById('dash-burger');
         const open = pop.classList.contains('hidden');
         if (open) {
             pop.classList.remove('hidden');
             btn.setAttribute('aria-expanded', 'true');
+            if (burger) burger.setAttribute('aria-expanded', 'true');
         } else {
             pop.classList.add('hidden');
             btn.setAttribute('aria-expanded', 'false');
+            if (burger) burger.setAttribute('aria-expanded', 'false');
         }
     }
 
     function closeDashMenu() {
         const pop = document.getElementById('dash-menu-pop');
         const btn = document.getElementById('dash-menu-btn');
+        const burger = document.getElementById('dash-burger');
         if (pop) pop.classList.add('hidden');
         if (btn) btn.setAttribute('aria-expanded', 'false');
+        if (burger) burger.setAttribute('aria-expanded', 'false');
     }
 
     function gotoDashFromMenu(view) {
@@ -1912,6 +1917,18 @@
                 `;
                 grid.appendChild(item);
             });
+
+            // Add a compact "virtues" line (top 3 badge names) near header.
+            try {
+                const top = list.slice(0, 3).map(b => b.name || b.slug).filter(Boolean);
+                const sub = $('usercard-sub');
+                if (sub && top.length) {
+                    const base = String((u && u.location_text) || '').trim();
+                    const dist = (u && u.distance_km != null) ? `${Number(u.distance_km).toFixed(1)} km` : null;
+                    const left = base ? base : (dist ? `A ${dist}` : '—');
+                    sub.textContent = `${left} · ${top.join(' · ')}`;
+                }
+            } catch { }
         }).catch(() => {
             if (grid) grid.innerHTML = '<div class="ledger-empty" style="color:var(--danger)">No se pudieron cargar las insignias</div>';
         });
