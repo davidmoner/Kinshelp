@@ -25,7 +25,13 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Premium real (Stripe): implementar checkout + webhook y persistir pagos (WIP).
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 - Matches inbox: listar matches por usuario, estado y paginacion.
-- Triggers notificaciones restantes (mensajes, automatch invites) y UI en `web/`.
+- App movil (Expo / React Native) (MVP): Login, Matches inbox, Chat, Notificaciones.
+
+## Mobile (Decidido)
+
+- Stack: Expo (React Native).
+- Orden MVP: matches inbox + chat primero.
+- Push/email: se implementan despues de tener app movil; por ahora `notifications` es la fuente de verdad.
 
 ## Backlog (Prioridad Media)
 
