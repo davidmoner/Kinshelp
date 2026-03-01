@@ -23,26 +23,34 @@ function validateSettings(body) {
 }
 
 const getSettings = (req, res, next) => {
-  try { res.json(svc.getSettings(req.user.id)); } catch (e) { next(e); }
+  (async () => {
+    res.json(await svc.getSettings(req.user.id));
+  })().catch(next);
 };
 
 const updateSettings = (req, res, next) => {
-  try { res.json(svc.updateSettings(req.user.id, validateSettings(req.body))); } catch (e) { next(e); }
+  (async () => {
+    res.json(await svc.updateSettings(req.user.id, validateSettings(req.body)));
+  })().catch(next);
 };
 
 const listInvites = (req, res, next) => {
-  try {
+  (async () => {
     const { status, limit = 20, offset = 0 } = req.query;
-    res.json({ data: svc.listInvites(req.user.id, { status, limit: +limit, offset: +offset }) });
-  } catch (e) { next(e); }
+    res.json({ data: await svc.listInvites(req.user.id, { status, limit: +limit, offset: +offset }) });
+  })().catch(next);
 };
 
 const acceptInvite = (req, res, next) => {
-  try { res.json(svc.acceptInvite(req.params.id, req.user.id)); } catch (e) { next(e); }
+  (async () => {
+    res.json(await svc.acceptInvite(req.params.id, req.user.id));
+  })().catch(next);
 };
 
 const declineInvite = (req, res, next) => {
-  try { res.json(svc.declineInvite(req.params.id, req.user.id)); } catch (e) { next(e); }
+  (async () => {
+    res.json(await svc.declineInvite(req.params.id, req.user.id));
+  })().catch(next);
 };
 
 module.exports = { getSettings, updateSettings, listInvites, acceptInvite, declineInvite };

@@ -2066,11 +2066,22 @@
                   <span class="feed-pill">📍 ${escapeHtml(dist)}</span>
                 </div>
                 <div class="feed-sub" style="margin-top:8px; opacity:.9;">
-                  <span class="feed-pill">${escapeHtml(r.user_name || '—')} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</span>
+                  <button class="feed-pill feed-user" type="button" data-user="1">${escapeHtml(r.user_name || '—')}${r.user_verified ? ' ✓' : ''} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</button>
                   ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
                 </div>
               </div>
             `;
+            const btnUser = el.querySelector('button[data-user]');
+            if (btnUser) {
+                btnUser.addEventListener('click', async () => {
+                    try {
+                        const u = await KHApi.getUser(r.user_id);
+                        openUserCard(u);
+                    } catch {
+                        toast('No se pudo cargar el perfil', 'error');
+                    }
+                });
+            }
             wrap.appendChild(el);
         });
     }
@@ -2422,7 +2433,7 @@
             const loc = r.location_text || '';
             const comp = compLabel(r.compensation_type);
             const kind = r.kind === 'offer' ? 'offer' : 'request';
-            const who = r.other_name ? `${r.other_name} · ★ ${(Number(r.other_rating || 0)).toFixed(1)}` : '';
+            const who = r.other_name ? `${r.other_name}${r.other_verified ? ' ✓' : ''} · ★ ${(Number(r.other_rating || 0)).toFixed(1)}` : '';
             const st = String(r.status || 'pending');
             const stLabel = st === 'accepted' ? 'Aceptada' : (st === 'expired' ? 'Caducada' : (st === 'declined' ? 'Rechazada' : null));
             const showActions = st === 'pending';
@@ -2440,7 +2451,7 @@
                   ${loc ? `<span class="am-chip">📍 ${escapeHtml(loc)}</span>` : ''}
                   ${st === 'pending' ? `<span class="am-chip ttl" data-am-expires="${exp}">—</span>` : (stLabel ? `<span class="am-chip am-status-chip ${st === 'accepted' ? 'ok' : 'bad'}">${stLabel}</span>` : '')}
                 </div>
-                ${who ? `<div class="am-invite-meta" style="margin-top:8px;"><span class="am-chip">${escapeHtml(who)}</span></div>` : ''}
+                ${who ? `<div class="am-invite-meta" style="margin-top:8px;"><button class="am-chip am-chip-user" type="button" data-user="1">${escapeHtml(who)}</button></div>` : ''}
                 ${showActions ? `
                   <div class="am-invite-actions">
                     <button class="btn btn-primary btn-sm" type="button" onclick="KHApp.acceptAutoMatch('${escapeHtml(r.id)}')">Aceptar</button>
@@ -2454,6 +2465,20 @@
               </div>
             `;
             wrap.appendChild(el);
+
+            const btnUser = el.querySelector('button[data-user]');
+            if (btnUser) {
+                btnUser.addEventListener('click', async () => {
+                    try {
+                        const otherId = (r.kind === 'offer') ? r.provider_id : r.seeker_id;
+                        if (!otherId) throw new Error('missing user id');
+                        const u = await KHApi.getUser(otherId);
+                        openUserCard(u);
+                    } catch {
+                        toast('No se pudo cargar el perfil', 'error');
+                    }
+                });
+            }
             i += 1;
         });
     }

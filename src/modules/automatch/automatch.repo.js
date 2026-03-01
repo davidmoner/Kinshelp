@@ -1,10 +1,11 @@
 'use strict';
-const db = require('../../config/database');
+const db = require('../../config/db');
 const { randomUUID } = require('crypto');
 
 function nowIso() { return new Date().toISOString(); }
 
 function expireStale() {
+  if (db.isPg) return;
   const now = nowIso();
   db.prepare(`
     UPDATE automatch_invites
@@ -22,6 +23,7 @@ function expireStale() {
 }
 
 function getSettings(userId) {
+  if (db.isPg) return null;
   const row = db.prepare('SELECT * FROM automatch_settings WHERE user_id = ?').get(userId);
   if (!row) return null;
   try { row.categories = JSON.parse(row.categories_json || '[]'); } catch { row.categories = []; }
@@ -32,6 +34,7 @@ function getSettings(userId) {
 }
 
 function upsertSettings(userId, fields) {
+  if (db.isPg) throw new Error('AutoMatch settings not supported on Postgres yet');
   const existing = getSettings(userId);
   const now = nowIso();
 
@@ -63,6 +66,7 @@ function upsertSettings(userId, fields) {
 }
 
 function countPendingOfferInvitesForSeeker(seekerId) {
+  if (db.isPg) return 0;
   expireStale();
   const row = db.prepare("SELECT COUNT(*) AS n FROM automatch_offer_invites WHERE seeker_id = ? AND status = 'pending'").get(seekerId);
   return (row && row.n) || 0;
@@ -79,11 +83,13 @@ function countInvitesTodayForSeeker(seekerId) {
 }
 
 function listOfferInvitesForSeeker(seekerId, { status, limit = 20, offset = 0 } = {}) {
+  if (db.isPg) return [];
   expireStale();
   let sql = `
     SELECT ai.*, o.title AS offer_title, o.category AS offer_category, o.location_text AS offer_location,
            o.compensation_type AS offer_compensation, o.media_urls AS offer_media,
-           u.display_name AS provider_name, u.rating_avg AS provider_rating, u.premium_tier AS provider_tier
+           u.display_name AS provider_name, u.rating_avg AS provider_rating, u.premium_tier AS provider_tier,
+           u.is_verified AS provider_verified
     FROM automatch_offer_invites ai
     JOIN service_offers o ON o.id = ai.offer_id
     JOIN users u ON u.id = ai.provider_id
@@ -181,11 +187,13 @@ function countInvitesToday(providerId) {
 }
 
 function listInvitesForProvider(providerId, { status, limit = 20, offset = 0 } = {}) {
+  if (db.isPg) return [];
   expireStale();
   let sql = `
     SELECT ai.*, r.title AS request_title, r.category AS request_category, r.location_text AS request_location,
            r.compensation_type AS request_compensation, r.media_urls AS request_media,
-           u.display_name AS seeker_name, u.rating_avg AS seeker_rating, u.premium_tier AS seeker_tier
+           u.display_name AS seeker_name, u.rating_avg AS seeker_rating, u.premium_tier AS seeker_tier,
+           u.is_verified AS seeker_verified
     FROM automatch_invites ai
     JOIN help_requests r ON r.id = ai.request_id
     JOIN users u ON u.id = ai.seeker_id

@@ -3256,6 +3256,14 @@ html[data-theme="light"] .dash-menu-sep {
   color: rgba(237, 240, 248, 0.70);
 }
 
+.am-chip-user {
+  cursor: pointer;
+}
+
+.am-chip-user:hover {
+  border-color: rgba(226, 184, 107, 0.22);
+}
+
 .am-chip.req { border-color: rgba(82, 49, 148, 0.20); }
 .am-chip.offer { border-color: rgba(33, 82, 173, 0.20); }
 .am-chip.ttl { border-color: rgba(201, 168, 76, 0.22); color: var(--gold-light); }
@@ -3360,6 +3368,14 @@ html[data-theme="light"] .dash-menu-sep {
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.03);
   font-size: 11px;
+}
+
+.feed-user {
+  cursor: pointer;
+}
+
+.feed-user:hover {
+  border-color: rgba(226, 184, 107, 0.22);
 }
 
 @media (max-width: 980px) {

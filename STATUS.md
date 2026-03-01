@@ -121,6 +121,13 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Movil dashboard:
   - Header usa hamburguesa `#dash-burger` en <=560px y oculta botones que no caben.
 
+## Perfiles publicos (vecinos)
+
+- `GET /api/v1/users/:id` ahora es publico con auth opcional (no expone email/coords exactas).
+- `users.findById` incluye `badge_count`.
+- Feed incluye `user_verified` y se puede abrir carnet desde el nombre.
+- AutoMatch invita/mostrar "quien" muestra ✓ y permite abrir carnet (cuando esta disponible).
+
 ## Produccion (Render)
 
 - Fix critico: Offers/Requests usan Postgres via `src/config/db.js` cuando hay `DATABASE_URL` (evita SQLite en `/tmp`).

@@ -20,7 +20,8 @@ async function listFeed({ limit = 40, offset = 0 } = {}) {
         u.id AS user_id,
         u.display_name AS user_name,
         u.rating_avg AS user_rating,
-        u.premium_tier AS user_tier
+        u.premium_tier AS user_tier,
+        u.is_verified AS user_verified
       FROM help_requests r
       JOIN users u ON u.id = r.seeker_id
       WHERE r.status = 'open' AND r.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
@@ -42,7 +43,8 @@ async function listFeed({ limit = 40, offset = 0 } = {}) {
         u.id AS user_id,
         u.display_name AS user_name,
         u.rating_avg AS user_rating,
-        u.premium_tier AS user_tier
+        u.premium_tier AS user_tier,
+        u.is_verified AS user_verified
       FROM service_offers o
       JOIN users u ON u.id = o.provider_id
       WHERE o.status = 'active' AND o.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}

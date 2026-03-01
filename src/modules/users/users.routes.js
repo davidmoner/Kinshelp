@@ -1,7 +1,7 @@
 'use strict';
 const { Router } = require('express');
 const ctrl = require('./users.controller');
-const { authenticate } = require('../../middleware/auth.middleware');
+const { authenticate, optionalAuth } = require('../../middleware/auth.middleware');
 const multer = require('multer');
 const path = require('path');
 const { randomUUID } = require('crypto');
@@ -28,7 +28,8 @@ const upload = multer({
 router.post('/me/photos', authenticate, upload.single('photo'), ctrl.addMyPhoto);
 router.delete('/me/photos/:photoId', authenticate, ctrl.deleteMyPhoto);
 
-router.get('/:id', authenticate, ctrl.getOne);
+// Public profile (limited); if token exists, can include extra fields.
+router.get('/:id', optionalAuth, ctrl.getOne);
 router.put('/:id', authenticate, ctrl.updateProfile);
 
 module.exports = router;

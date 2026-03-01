@@ -1,5 +1,5 @@
 'use strict';
-const db = require('../../config/database');
+const db = require('../../config/db');
 const httpError = require('../../shared/http-error');
 const repo = require('./automatch.repo');
 const matchesSvc = require('../matches/matches.service');
@@ -12,6 +12,14 @@ const {
 } = require('../../config/constants');
 
 function isPremiumActive(userId) {
+  if (db.isPg) {
+    return db.one('SELECT premium_tier, premium_until FROM users WHERE id = $1', [userId]).then(u => {
+      if (!u) return false;
+      if (!u.premium_tier || u.premium_tier === 'free') return false;
+      if (!u.premium_until) return true;
+      return new Date(u.premium_until).getTime() > Date.now();
+    });
+  }
   const u = db.prepare('SELECT premium_tier, premium_until FROM users WHERE id = ?').get(userId);
   if (!u) return false;
   if (!u.premium_tier || u.premium_tier === 'free') return false;
@@ -20,25 +28,28 @@ function isPremiumActive(userId) {
 }
 
 function getSettings(userId) {
-  if (!isPremiumActive(userId)) throw httpError(403, 'AutoMatch es una funcion Premium');
-  const s = repo.getSettings(userId);
-  if (s) return s;
-  // default settings row not created yet
-  return {
-    user_id: userId,
-    enabled: 0,
-    seeker_enabled: 0,
-    categories: [],
-    seeker_categories: [],
-    radius_km: 5,
-    max_invites_per_day: 25,
-    quiet_start: null,
-    quiet_end: null,
-  };
+  return Promise.resolve(isPremiumActive(userId)).then(ok => {
+    if (!ok) throw httpError(403, 'AutoMatch es una funcion Premium');
+    return Promise.resolve(repo.getSettings(userId)).then(s => {
+      if (s) return s;
+      return {
+        user_id: userId,
+        enabled: 0,
+        seeker_enabled: 0,
+        categories: [],
+        seeker_categories: [],
+        radius_km: 5,
+        max_invites_per_day: 25,
+        quiet_start: null,
+        quiet_end: null,
+      };
+    });
+  });
 }
 
 function updateSettings(userId, fields) {
-  if (!isPremiumActive(userId)) throw httpError(403, 'AutoMatch es una funcion Premium');
+  return Promise.resolve(isPremiumActive(userId)).then(ok => {
+    if (!ok) throw httpError(403, 'AutoMatch es una funcion Premium');
   const cats = Array.isArray(fields.categories) ? fields.categories : undefined;
   const scats = Array.isArray(fields.seeker_categories) ? fields.seeker_categories : undefined;
   for (const list of [cats, scats]) {
@@ -47,7 +58,8 @@ function updateSettings(userId, fields) {
       if (!CATEGORIES.includes(c)) throw httpError(400, `Categoria invalida: ${c}`);
     }
   }
-  return repo.upsertSettings(userId, fields);
+    return repo.upsertSettings(userId, fields);
+  });
 }
 
 function onRequestCreated(requestRow) {
@@ -81,7 +93,9 @@ function onRequestCreated(requestRow) {
   // Also: if seeker is Premium and enabled "Necesito", propose existing offers automatically.
   // This is a premium shortcut to avoid browsing.
   try {
-    if (isPremiumActive(seekerId)) {
+    if (db.isPg) {
+      // Best-effort only; PG invite pipeline will be implemented later.
+    } else if (isPremiumActive(seekerId)) {
       const s = repo.getSettings(seekerId);
       const seekerEnabled = s ? !!s.seeker_enabled : false;
       const allow = s && Array.isArray(s.seeker_categories) && s.seeker_categories.length
@@ -147,9 +161,10 @@ function onOfferCreated(offerRow) {
 }
 
 function listInvites(userId, opts) {
-  if (!isPremiumActive(userId)) throw httpError(403, 'AutoMatch es una funcion Premium');
-  const asProvider = repo.listInvitesForProvider(userId, opts);
-  const asSeeker = repo.listOfferInvitesForSeeker(userId, opts);
+  return Promise.resolve(isPremiumActive(userId)).then(ok => {
+    if (!ok) throw httpError(403, 'AutoMatch es una funcion Premium');
+    const asProvider = repo.listInvitesForProvider(userId, opts);
+    const asSeeker = repo.listOfferInvitesForSeeker(userId, opts);
 
   const mappedProvider = asProvider.map(r => ({
     id: r.id,
@@ -165,6 +180,8 @@ function listInvites(userId, opts) {
     media_urls: r.request_media,
     other_name: r.seeker_name,
     other_rating: r.seeker_rating,
+    other_verified: r.seeker_verified,
+    seeker_id: r.seeker_id,
   }));
 
   const mappedSeeker = asSeeker.map(r => ({
@@ -181,14 +198,18 @@ function listInvites(userId, opts) {
     media_urls: r.offer_media,
     other_name: r.provider_name,
     other_rating: r.provider_rating,
+    other_verified: r.provider_verified,
+    provider_id: r.provider_id,
   }));
 
-  const all = [...mappedProvider, ...mappedSeeker];
-  all.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
-  return all;
+    const all = [...mappedProvider, ...mappedSeeker];
+    all.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    return all;
+  });
 }
 
 function acceptInvite(inviteId, actingProviderId) {
+  if (db.isPg) throw httpError(501, 'AutoMatch no disponible en Postgres aun');
   if (!isPremiumActive(actingProviderId)) throw httpError(403, 'AutoMatch es una funcion Premium');
 
   const invReq = repo.getInvite(inviteId);
@@ -243,6 +264,7 @@ function acceptInvite(inviteId, actingProviderId) {
 }
 
 function declineInvite(inviteId, actingProviderId) {
+  if (db.isPg) throw httpError(501, 'AutoMatch no disponible en Postgres aun');
   if (!isPremiumActive(actingProviderId)) throw httpError(403, 'AutoMatch es una funcion Premium');
   const invReq = repo.getInvite(inviteId);
   if (invReq) {

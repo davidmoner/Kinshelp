@@ -8,10 +8,30 @@ const { PROFILE_MAX_PHOTOS } = require('../../config/constants');
 
 const EDITABLE = ['display_name', 'bio', 'avatar_url', 'location_text', 'lat', 'lng'];
 
-function getById(id) {
+function sanitizePublic(user, { viewerId } = {}) {
+    if (!user) return user;
+    const out = { ...user };
+    // Do not expose precise coords.
+    delete out.lat;
+    delete out.lng;
+    // Hide internal auth / sensitive fields.
+    delete out.password_hash;
+    delete out.email;
+    delete out.email_verified_at;
+    // Only expose verification boolean.
+    out.is_verified = !!(user.is_verified || user.email_verified_at);
+
+    // If viewing someone else, do not expose their balance.
+    if (viewerId && String(viewerId) !== String(user.id)) {
+        delete out.points_balance;
+    }
+    return out;
+}
+
+function getById(id, viewerId = null) {
     return Promise.resolve(repo.findById(id)).then(user => {
         if (!user) throw httpError(404, 'User not found');
-        return user;
+        return sanitizePublic(user, { viewerId });
     });
 }
 

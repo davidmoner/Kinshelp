@@ -121,7 +121,7 @@
         return apiFetch('/auth/me', { method: 'PATCH', body });
     }
 
-    /** GET /users/:id — requires token */
+    /** GET /users/:id — public (token optional) */
     async function getUser(userId) {
         return apiFetch('/users/' + encodeURIComponent(userId));
     }

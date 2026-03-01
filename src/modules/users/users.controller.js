@@ -3,7 +3,8 @@ const svc = require('./users.service');
 
 const getOne = (req, res, next) => {
     (async () => {
-        res.json(await svc.getById(req.params.id));
+        const viewerId = req.user ? req.user.id : null;
+        res.json(await svc.getById(req.params.id, viewerId));
     })().catch(next);
 };
 

@@ -23,4 +23,20 @@ function authenticate(req, res, next) {
     });
 }
 
-module.exports = { authenticate };
+// Optional auth: attach req.user when token is valid, otherwise continue unauthenticated.
+function optionalAuth(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return next();
+
+    const token = authHeader.slice(7);
+    (async () => {
+        const payload = jwt.verify(token, JWT_SECRET);
+        const user = db.isPg
+            ? await db.one('SELECT * FROM users WHERE id = $1', [payload.sub])
+            : db.prepare('SELECT * FROM users WHERE id = ?').get(payload.sub);
+        if (user) req.user = user;
+        next();
+    })().catch(() => next());
+}
+
+module.exports = { authenticate, optionalAuth };
