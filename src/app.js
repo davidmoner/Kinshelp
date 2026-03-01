@@ -72,7 +72,17 @@ app.use(cors({
 }));
 app.options('*', cors());
 
-app.use(helmet());
+// Allow inline scripts used by the static landing (no build step).
+// Without this, CSP blocks the KINGSHELP_BASE_URL bootstrap and breaks KHApp.
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'script-src': ["'self'", "'unsafe-inline'"],
+    },
+  },
+}));
 app.set('trust proxy', 1);
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
 
