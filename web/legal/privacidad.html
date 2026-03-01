@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KingsHelp — Politica de Privacidad</title>
+  <meta name="description" content="Politica de privacidad de KingsHelp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="legal.css" />
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem('kh_theme'); } catch (e) { }
+      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="fx-aurora" aria-hidden="true"></div>
+  <div class="fx-grain" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="nav-brand">
+      <a href="../index.html" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
+        <img class="nav-brand-crown" src="../img/CORONAKH.png" alt="" aria-hidden="true" draggable="false"
+          onerror="this.style.display='none'" />
+        <img class="nav-brand-word" src="../img/KINGSHELP.png" alt="KingsHelp" draggable="false"
+          onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=nav-brand-fallback>KingsHelp</span>')" />
+      </a>
+      <span class="brand-badge">Legal</span>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm" href="../index.html#premium">Volver</a>
+    </div>
+  </nav>
+
+  <main class="legal-wrap">
+    <div class="container">
+      <article class="legal-card">
+        <h1>Politica de Privacidad</h1>
+        <div class="legal-meta">Ultima actualizacion: 28/02/2026</div>
+
+        <p>KingsHelp es una plataforma de match entre vecinos. Esta pagina explica que datos tratamos y con que fines.
+          Texto orientativo para MVP: revisalo con un profesional antes de publicar.</p>
+
+        <h2>1. Responsable</h2>
+        <p><strong>Responsable del tratamiento:</strong> KingsHelp (pendiente de datos legales).<br />
+          <strong>Contacto:</strong> <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a></p>
+
+        <h2>2. Datos que recopilamos</h2>
+        <ul>
+          <li>Cuenta: nombre, email y contrasena (almacenada como hash).</li>
+          <li>Perfil: bio y zona (opcional).</li>
+          <li>Actividad: solicitudes/ofertas, matches, mensajes y valoraciones.</li>
+          <li>Datos tecnicos: registros basicos de seguridad (por ejemplo, para evitar abuso).</li>
+        </ul>
+
+        <h2>3. Finalidades</h2>
+        <ul>
+          <li>Prestar el servicio (crear publicaciones, hacer match, chat y reputacion).</li>
+          <li>Seguridad y prevencion de fraude y abuso.</li>
+          <li>Mejora del producto (metricas agregadas).</li>
+        </ul>
+
+        <h2>4. Base legal</h2>
+        <p>Ejecucion del servicio (cuenta y uso) e interes legitimo (seguridad, prevencion de abuso).</p>
+
+        <h2>5. Pagos</h2>
+        <p>KingsHelp <strong>no</strong> procesa dinero entre usuarios. Si se acuerda un pago en EUR, se realiza fuera de la plataforma.
+          KingsHelp solo puede mostrar un "importe acordado" en el chat.</p>
+
+        <h2>6. Conservacion</h2>
+        <p>Conservamos los datos el tiempo necesario para prestar el servicio y cumplir obligaciones legales.
+          En MVP, los plazos son orientativos.</p>
+
+        <h2>7. Derechos</h2>
+        <p>Acceso, rectificacion, supresion, oposicion, limitacion y portabilidad, segun normativa aplicable.
+          Escribe a <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a>.</p>
+
+        <h2>8. Seguridad</h2>
+        <p>Aplicamos medidas tecnicas razonables: autenticacion, limitacion de peticiones, cabeceras de seguridad y control de acceso.</p>
+      </article>
+    </div>
+  </main>
+</body>
+
+</html>

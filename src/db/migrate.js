@@ -1,0 +1,301 @@
+'use strict';
+/**
+ * Migration — idempotent (IF NOT EXISTS everywhere).
+ * Run: npm run migrate
+ */
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+const db = require('../config/database');
+
+db.exec(`
+  -- ── Users ─────────────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS users (
+    id             TEXT PRIMARY KEY,
+    display_name   TEXT NOT NULL,
+    email          TEXT UNIQUE NOT NULL,
+    password_hash  TEXT,
+    avatar_url     TEXT,
+    bio            TEXT,
+    location_text  TEXT,
+    lat            REAL,
+    lng            REAL,
+    points_balance INTEGER NOT NULL DEFAULT 0,
+    rating_avg     REAL    NOT NULL DEFAULT 0.0,
+    rating_count   INTEGER NOT NULL DEFAULT 0,
+    premium_tier   TEXT    NOT NULL DEFAULT 'free',
+    premium_until  TEXT,
+    is_verified    INTEGER NOT NULL DEFAULT 0,
+    created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- ── Service Offers ────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS service_offers (
+    id            TEXT PRIMARY KEY,
+    provider_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title         TEXT NOT NULL,
+    description   TEXT,
+    category      TEXT NOT NULL,
+    points_value  INTEGER NOT NULL,
+    media_urls    TEXT NOT NULL DEFAULT '[]',
+    location_text TEXT,
+    lat           REAL,
+    lng           REAL,
+    expires_at    TEXT NOT NULL,
+    status        TEXT NOT NULL DEFAULT 'active',
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- ── Help Requests ─────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS help_requests (
+    id             TEXT PRIMARY KEY,
+    seeker_id      TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title          TEXT NOT NULL,
+    description    TEXT,
+    category       TEXT NOT NULL,
+    points_offered INTEGER NOT NULL,
+    media_urls     TEXT NOT NULL DEFAULT '[]',
+    location_text  TEXT,
+    lat            REAL,
+    lng            REAL,
+    expires_at     TEXT NOT NULL,
+    status         TEXT NOT NULL DEFAULT 'open',
+    created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- ── Matches ───────────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS matches (
+    id               TEXT PRIMARY KEY,
+    offer_id         TEXT REFERENCES service_offers(id),
+    request_id       TEXT REFERENCES help_requests(id),
+    provider_id      TEXT NOT NULL REFERENCES users(id),
+    seeker_id        TEXT NOT NULL REFERENCES users(id),
+    points_agreed    INTEGER NOT NULL,
+    status           TEXT NOT NULL DEFAULT 'pending',
+    initiated_by     TEXT NOT NULL,
+    seeker_cancelled INTEGER NOT NULL DEFAULT 0,
+    accepted_at      TEXT,
+    completed_at     TEXT,
+    rejected_at      TEXT,
+    expired_at       TEXT,
+    provider_rating  INTEGER,
+    seeker_rating    INTEGER,
+    provider_review  TEXT,
+    seeker_review    TEXT,
+    created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- ── Points Ledger ─────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS points_ledger (
+    id            TEXT PRIMARY KEY,
+    user_id       TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    match_id      TEXT REFERENCES matches(id),
+    delta         INTEGER NOT NULL,
+    reason        TEXT NOT NULL,
+    balance_after INTEGER NOT NULL,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- ── Badges ────────────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS badges (
+    id           TEXT PRIMARY KEY,
+    slug         TEXT UNIQUE NOT NULL,
+    name         TEXT NOT NULL,
+    description  TEXT,
+    icon_url     TEXT,
+    points_bonus INTEGER NOT NULL DEFAULT 0,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  -- ── User Badges (join) ────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS user_badges (
+    id         TEXT PRIMARY KEY,
+    user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    badge_id   TEXT NOT NULL REFERENCES badges(id) ON DELETE CASCADE,
+    awarded_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(user_id, badge_id)
+  );
+
+  -- ── Notification Cooldowns ────────────────────────────────────────────────
+  -- Stores the last time a user was notified per category to prevent spam.
+  CREATE TABLE IF NOT EXISTS notification_cooldowns (
+    id               TEXT PRIMARY KEY,
+    user_id          TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category         TEXT NOT NULL,
+    last_notified_at TEXT NOT NULL,
+    UNIQUE(user_id, category)
+  );
+
+  -- ── Indexes ───────────────────────────────────────────────────────────────
+  -- Offers: composite for the two most common feed queries
+  CREATE INDEX IF NOT EXISTS idx_offers_provider       ON service_offers(provider_id);
+  CREATE INDEX IF NOT EXISTS idx_offers_category_status ON service_offers(category, status);
+
+  -- Requests: composite mirrors offers pattern
+  CREATE INDEX IF NOT EXISTS idx_requests_seeker          ON help_requests(seeker_id);
+  CREATE INDEX IF NOT EXISTS idx_requests_category_status ON help_requests(category, status);
+
+  -- Matches: composite covers participant-status lookups; request_id for join
+  CREATE INDEX IF NOT EXISTS idx_matches_provider_status ON matches(provider_id, status);
+  CREATE INDEX IF NOT EXISTS idx_matches_seeker          ON matches(seeker_id);
+  CREATE INDEX IF NOT EXISTS idx_matches_request_id      ON matches(request_id);
+
+  -- Points ledger: single-user scans
+  CREATE INDEX IF NOT EXISTS idx_ledger_user ON points_ledger(user_id);
+
+  -- Badges
+  CREATE INDEX IF NOT EXISTS idx_user_badges_user ON user_badges(user_id);
+
+  -- Notification cooldowns
+  CREATE INDEX IF NOT EXISTS idx_cooldowns_user ON notification_cooldowns(user_id);
+
+  -- AutoMatch
+  CREATE TABLE IF NOT EXISTS automatch_settings (
+    user_id             TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    enabled             INTEGER NOT NULL DEFAULT 0,
+    categories_json     TEXT NOT NULL DEFAULT '[]',
+    radius_km           INTEGER NOT NULL DEFAULT 5,
+    max_invites_per_day INTEGER NOT NULL DEFAULT 25,
+    quiet_start         TEXT,
+    quiet_end           TEXT,
+    created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at          TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS automatch_invites (
+    id          TEXT PRIMARY KEY,
+    request_id  TEXT NOT NULL REFERENCES help_requests(id) ON DELETE CASCADE,
+    seeker_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    provider_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status      TEXT NOT NULL DEFAULT 'pending',
+    expires_at  TEXT NOT NULL,
+    accepted_at TEXT,
+    declined_at TEXT,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(request_id, provider_id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_automatch_inv_provider_status ON automatch_invites(provider_id, status);
+  CREATE INDEX IF NOT EXISTS idx_automatch_inv_expires ON automatch_invites(expires_at);
+
+  -- AutoMatch (offers -> seekers)
+  CREATE TABLE IF NOT EXISTS automatch_offer_invites (
+    id          TEXT PRIMARY KEY,
+    offer_id    TEXT NOT NULL REFERENCES service_offers(id) ON DELETE CASCADE,
+    provider_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    seeker_id   TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status      TEXT NOT NULL DEFAULT 'pending',
+    expires_at  TEXT NOT NULL,
+    accepted_at TEXT,
+    declined_at TEXT,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(offer_id, seeker_id)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_automatch_off_inv_seeker_status ON automatch_offer_invites(seeker_id, status);
+  CREATE INDEX IF NOT EXISTS idx_automatch_off_inv_expires ON automatch_offer_invites(expires_at);
+`);
+
+// ── Lightweight column adds (SQLite: ALTER TABLE ADD COLUMN) ────────────────
+// Keep migrations idempotent without a full migration framework.
+function hasColumn(table, col) {
+  try {
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+    return cols.some(c => c.name === col);
+  } catch {
+    return false;
+  }
+}
+
+function addColumn(table, ddl) {
+  try {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl};`);
+  } catch {
+    // ignore if already exists or table missing
+  }
+}
+
+// Compensation context
+if (!hasColumn('help_requests', 'compensation_type')) {
+  addColumn('help_requests', "compensation_type TEXT NOT NULL DEFAULT 'cash'");
+}
+if (!hasColumn('service_offers', 'compensation_type')) {
+  addColumn('service_offers', "compensation_type TEXT NOT NULL DEFAULT 'cash'");
+}
+if (!hasColumn('matches', 'compensation_type')) {
+  addColumn('matches', "compensation_type TEXT NOT NULL DEFAULT 'cash'");
+}
+
+// Match agreement + messages
+if (!hasColumn('matches', 'barter_terms')) {
+  addColumn('matches', 'barter_terms TEXT');
+}
+if (!hasColumn('matches', 'agreement_at')) {
+  addColumn('matches', 'agreement_at TEXT');
+}
+
+// Profile photos (max 2 in UI, stored as JSON array)
+if (!hasColumn('users', 'profile_photos')) {
+  addColumn('users', "profile_photos TEXT NOT NULL DEFAULT '[]'");
+}
+
+// AutoMatch settings additions (provider + seeker modes)
+if (!hasColumn('automatch_settings', 'seeker_enabled')) {
+  addColumn('automatch_settings', 'seeker_enabled INTEGER NOT NULL DEFAULT 0');
+}
+if (!hasColumn('automatch_settings', 'seeker_categories_json')) {
+  addColumn('automatch_settings', "seeker_categories_json TEXT NOT NULL DEFAULT '[]'");
+}
+
+// ── Perks / collections (lightweight) ───────────────────────────────────────
+if (!hasColumn('users', 'emblem_slug')) {
+  addColumn('users', 'emblem_slug TEXT');
+}
+if (!hasColumn('users', 'boost_48h_tokens')) {
+  addColumn('users', 'boost_48h_tokens INTEGER NOT NULL DEFAULT 0');
+}
+
+if (!hasColumn('help_requests', 'boost_48h_used')) {
+  addColumn('help_requests', 'boost_48h_used INTEGER NOT NULL DEFAULT 0');
+}
+if (!hasColumn('service_offers', 'boost_48h_used')) {
+  addColumn('service_offers', 'boost_48h_used INTEGER NOT NULL DEFAULT 0');
+}
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS match_messages (
+    id         TEXT PRIMARY KEY,
+    match_id   TEXT NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
+    user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message    TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_match_messages_match ON match_messages(match_id, created_at);
+`);
+
+// Seed core badges (idempotent) — so new installs get the gamification.
+function ensureBadge(slug, name, description, icon, pointsBonus) {
+  try {
+    const row = db.prepare('SELECT id FROM badges WHERE slug = ?').get(slug);
+    if (row) return;
+    const { randomUUID } = require('crypto');
+    const now = new Date().toISOString();
+    db.prepare('INSERT INTO badges (id, slug, name, description, icon_url, points_bonus, created_at) VALUES (?,?,?,?,?,?,?)')
+      .run(randomUUID(), slug, name, description, icon, pointsBonus, now);
+  } catch {
+    // ignore
+  }
+}
+
+ensureBadge('rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', '🧱', 0);
+ensureBadge('rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', '🏡', 0);
+ensureBadge('rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', '🛡️', 0);
+ensureBadge('rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', '🏛️', 0);
+
+console.log('✅  Migration complete — all tables and indexes created.');
+process.exit(0);

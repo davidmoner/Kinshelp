@@ -1,0 +1,127 @@
+/**
+ * KingsHelp Particles — capa decorativa de partículas drift.
+ * IIFE aislado. No toca KHApp, KHApi, KHFx, KHTheme ni el DOM funcional.
+ * Añade un <canvas id="kh-particles"> fijo, pointer-events:none, z-index:1.
+ */
+(function () {
+    'use strict';
+
+    /* ── Respetar prefers-reduced-motion ─────────────────────── */
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    /* ── Crear canvas ─────────────────────────────────────────── */
+    const canvas = document.createElement('canvas');
+    canvas.id = 'kh-particles';
+    canvas.setAttribute('aria-hidden', 'true');
+    canvas.style.cssText = [
+        'position:fixed', 'inset:0', 'width:100%', 'height:100%',
+        'pointer-events:none', 'z-index:1'
+    ].join(';');
+    document.body.prepend(canvas);
+
+    const ctx = canvas.getContext('2d');
+
+    /* ── Config ───────────────────────────────────────────────── */
+    const CFG = {
+        count: 52,        // partículas totales
+        minR: 1.2,       // radio mínimo (px)
+        maxR: 3.2,       // radio máximo
+        speed: 0.18,      // velocidad base (px/frame)
+        wobble: 0.0006,    // amplitud oscilación angular
+        opacityMaxDark: 0.10,   // opacidad máx en tema oscuro
+        opacityMaxLight: 0.055, // ~45% menos visible en tema claro
+    };
+
+    /* Colores para cada tema */
+    const PALETTE = {
+        dark: ['201,168,76', '123,92,250', '61,139,255'],   // gold · violeta · azul
+        light: ['160,120,40', '91,63,232', '45,107,228'],
+    };
+
+    /* ── Estado ───────────────────────────────────────────────── */
+    let W, H, particles = [], raf, paused = false;
+
+    /* ── Resize ───────────────────────────────────────────────── */
+    function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+    }
+
+    /* ── Crear una partícula ──────────────────────────────────── */
+    function makeParticle() {
+        const angle = Math.random() * Math.PI * 2;
+        const oMax = theme() === 'light' ? CFG.opacityMaxLight : CFG.opacityMaxDark;
+        return {
+            x: Math.random() * (W || 800),
+            y: Math.random() * (H || 600),
+            r: CFG.minR + Math.random() * (CFG.maxR - CFG.minR),
+            angle,
+            speed: CFG.speed * (0.5 + Math.random()),
+            wobble: CFG.wobble * (Math.random() - 0.5) * 2,
+            opacity: 0.02 + Math.random() * oMax,
+            colorIdx: Math.floor(Math.random() * 3),
+            phase: Math.random() * Math.PI * 2,
+        };
+    }
+
+    /* ── Inicializar pool ─────────────────────────────────────── */
+    function init() {
+        resize();
+        particles = Array.from({ length: CFG.count }, makeParticle);
+    }
+
+    /* ── Leer tema activo ─────────────────────────────────────── */
+    function theme() {
+        return document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+    }
+
+    /* ── Frame ────────────────────────────────────────────────── */
+    function tick(t) {
+        if (paused) { raf = requestAnimationFrame(tick); return; }
+
+        ctx.clearRect(0, 0, W, H);
+
+        const palette = PALETTE[theme()];
+        const isLight = theme() === 'light';
+
+        particles.forEach(p => {
+            /* drift + wobble suave */
+            p.angle += p.wobble + Math.sin(t * 0.0002 + p.phase) * 0.0008;
+            p.x += Math.cos(p.angle) * p.speed;
+            p.y += Math.sin(p.angle) * p.speed;
+
+            /* wrap (reaparece en el otro lado) */
+            if (p.x < -p.r) p.x = W + p.r;
+            if (p.x > W + p.r) p.x = -p.r;
+            if (p.y < -p.r) p.y = H + p.r;
+            if (p.y > H + p.r) p.y = -p.r;
+
+            /* opacidad adaptada al tema actual */
+            const oMax = isLight ? CFG.opacityMaxLight : CFG.opacityMaxDark;
+            const drawOp = Math.min(p.opacity, oMax);
+
+            /* dibujar */
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${palette[p.colorIdx]},${drawOp.toFixed(3)})`;
+            ctx.fill();
+        });
+
+        raf = requestAnimationFrame(tick);
+    }
+
+    /* ── Pausar si pestaña no visible ────────────────────────── */
+    document.addEventListener('visibilitychange', () => {
+        paused = document.hidden;
+    });
+
+    /* ── Ajuste sobre marcha al cambiar tema ─────────────────── */
+    const themeObs = new MutationObserver(() => { /* palette se lee en tick */ });
+    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+    /* ── Start ────────────────────────────────────────────────── */
+    window.addEventListener('resize', resize, { passive: true });
+    init();
+    raf = requestAnimationFrame(tick);
+
+})();

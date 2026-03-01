@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KingsHelp — Seguridad y Confianza</title>
+  <meta name="description" content="Seguridad y confianza en KingsHelp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="legal.css" />
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem('kh_theme'); } catch (e) { }
+      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="fx-aurora" aria-hidden="true"></div>
+  <div class="fx-grain" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="nav-brand">
+      <a href="../index.html" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
+        <img class="nav-brand-crown" src="../img/CORONAKH.png" alt="" aria-hidden="true" draggable="false"
+          onerror="this.style.display='none'" />
+        <img class="nav-brand-word" src="../img/KINGSHELP.png" alt="KingsHelp" draggable="false"
+          onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=nav-brand-fallback>KingsHelp</span>')" />
+      </a>
+      <span class="brand-badge">Seguridad</span>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm" href="../index.html#demo-section">Volver</a>
+    </div>
+  </nav>
+
+  <main class="legal-wrap">
+    <div class="container">
+      <article class="legal-card">
+        <h1>Seguridad y Confianza</h1>
+        <div class="legal-meta">Ultima actualizacion: 28/02/2026</div>
+
+        <p>KingsHelp esta pensado para acuerdos simples entre vecinos. Aqui estan las medidas y recomendaciones basicas.</p>
+
+        <h2>1. Pagos</h2>
+        <p>KingsHelp no procesa dinero. Si acordais un pago en EUR, hacedlo fuera y usa metodos seguros.</p>
+
+        <h2>2. Prevencion de fraude de reputacion</h2>
+        <ul>
+          <li>Para completar un match, pedimos un minimo de conversacion real (1 mensaje por cada parte).</li>
+          <li>Limitamos la reputacion cuando se completan demasiados servicios entre las mismas dos cuentas en poco tiempo.</li>
+          <li>Para desbloquear Premium por reputacion, se requiere historial con varios vecinos distintos.</li>
+        </ul>
+
+        <h2>3. Consejos para quedar</h2>
+        <ul>
+          <li>Quedad en lugares publicos cuando sea posible.</li>
+          <li>No compartas datos sensibles (documentos, tarjetas, etc.).</li>
+          <li>Si algo suena raro, cancela y reporta.</li>
+        </ul>
+
+        <h2>4. Contacto</h2>
+        <p>Si detectas abuso o contenido ilegal, escribe a <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a>.</p>
+      </article>
+    </div>
+  </main>
+</body>
+
+</html>

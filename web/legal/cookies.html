@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KingsHelp — Politica de Cookies</title>
+  <meta name="description" content="Politica de cookies de KingsHelp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="legal.css" />
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem('kh_theme'); } catch (e) { }
+      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="fx-aurora" aria-hidden="true"></div>
+  <div class="fx-grain" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="nav-brand">
+      <a href="../index.html" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
+        <img class="nav-brand-crown" src="../img/CORONAKH.png" alt="" aria-hidden="true" draggable="false"
+          onerror="this.style.display='none'" />
+        <img class="nav-brand-word" src="../img/KINGSHELP.png" alt="KingsHelp" draggable="false"
+          onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=nav-brand-fallback>KingsHelp</span>')" />
+      </a>
+      <span class="brand-badge">Legal</span>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm" href="../index.html">Volver</a>
+    </div>
+  </nav>
+
+  <main class="legal-wrap">
+    <div class="container">
+      <article class="legal-card">
+        <h1>Politica de Cookies</h1>
+        <div class="legal-meta">Ultima actualizacion: 28/02/2026</div>
+
+        <p>En este MVP, KingsHelp usa almacenamiento local del navegador para mejorar la experiencia:</p>
+        <ul>
+          <li><code>kh_token</code> (localStorage): mantiene tu sesion.</li>
+          <li><code>kh_theme</code> (localStorage): recuerda el tema (claro/oscuro).</li>
+          <li><code>kh_dash_view</code> (localStorage): recuerda la pestaña del dashboard.</li>
+        </ul>
+
+        <p>No utilizamos cookies de publicidad en este MVP. Si en el futuro se anaden cookies analiticas o de terceros,
+          se actualizara esta pagina y se solicitara consentimiento cuando sea necesario.</p>
+      </article>
+    </div>
+  </main>
+</body>
+
+</html>

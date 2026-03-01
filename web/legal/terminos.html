@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KingsHelp — Terminos y Condiciones</title>
+  <meta name="description" content="Terminos y condiciones de KingsHelp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="legal.css" />
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem('kh_theme'); } catch (e) { }
+      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="fx-aurora" aria-hidden="true"></div>
+  <div class="fx-grain" aria-hidden="true"></div>
+
+  <nav class="nav">
+    <div class="nav-brand">
+      <a href="../index.html" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
+        <img class="nav-brand-crown" src="../img/CORONAKH.png" alt="" aria-hidden="true" draggable="false"
+          onerror="this.style.display='none'" />
+        <img class="nav-brand-word" src="../img/KINGSHELP.png" alt="KingsHelp" draggable="false"
+          onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=nav-brand-fallback>KingsHelp</span>')" />
+      </a>
+      <span class="brand-badge">Legal</span>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm" href="../index.html#how">Volver</a>
+    </div>
+  </nav>
+
+  <main class="legal-wrap">
+    <div class="container">
+      <article class="legal-card">
+        <h1>Terminos y Condiciones</h1>
+        <div class="legal-meta">Ultima actualizacion: 28/02/2026</div>
+
+        <p>Estos terminos regulan el uso de KingsHelp. Texto orientativo para MVP: revisalo con un profesional antes de publicar.</p>
+
+        <h2>1. Que es KingsHelp</h2>
+        <p>KingsHelp conecta vecinos para ofrecer o solicitar ayuda. KingsHelp no garantiza la ejecucion de los servicios ni
+          actua como intermediario de pagos.</p>
+
+        <h2>2. Pagos y compensacion</h2>
+        <ul>
+          <li>Al crear una publicacion eliges el tipo de compensacion: pago en EUR, trueque o altruista.</li>
+          <li>Si hay pago en EUR, el importe se acuerda en el chat y el pago se realiza fuera de KingsHelp.</li>
+          <li>KingsHelp no retiene fondos, no hace escrow y no procesa transacciones entre usuarios.</li>
+        </ul>
+
+        <h2>3. Reputacion y Premium</h2>
+        <p>La reputacion se otorga por servicios completados. Para evitar abuso, KingsHelp puede aplicar limites y requisitos
+          (por ejemplo: chat minimo o limites por parejas).</p>
+
+        <h2>4. Conducta del usuario</h2>
+        <ul>
+          <li>No publiques contenido ilegal, ofensivo o fraudulento.</li>
+          <li>No intentes manipular la reputacion con servicios ficticios.</li>
+          <li>No compartas datos sensibles en abierto.</li>
+        </ul>
+
+        <h2>5. Responsabilidad</h2>
+        <p>Los usuarios son responsables de los acuerdos que realicen. KingsHelp ofrece herramientas de comunicacion y reputacion,
+          pero no verifica cada servicio ni su resultado.</p>
+
+        <h2>6. Contacto</h2>
+        <p>Escribe a <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a>.</p>
+      </article>
+    </div>
+  </main>
+</body>
+
+</html>

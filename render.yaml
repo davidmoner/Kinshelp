@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: kingshelp
+    env: node
+    plan: starter
+    buildCommand: npm ci
+    startCommand: node src/db/migrate.js && node src/server.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: DATA_DIR
+        value: /var/data
+      - key: DB_PATH
+        value: kingshelp.db
+
+disks:
+  - name: kingshelp-data
+    mountPath: /var/data
+    sizeGB: 1
