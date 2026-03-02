@@ -25,6 +25,18 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Fix prod: rate limit aplicado solo a `/api/v1` (no bloquea estaticos como `/img/*`).
 - OAuth: codigo listo para Google/Facebook (backend callbacks + UI), pero queda pendiente credenciales/validacion en produccion.
 
+- Hero (actualizacion mar 2026):
+  - Paneles laterales eliminados y assets laterales borrados (sin "ventanas" semitransparentes).
+  - Fondo hero con particulas tipo "antigravity" (burst dashes) dentro del hero + parallax scroll.
+  - Titulos de banners con typewriter domino (linea 1 -> linea 2) + cursor `|`.
+  - Rotacion de banners mas lenta (config en `web/js/hero.js`).
+
+- Admin panel (mar 2026):
+  - UI: `GET /admin/` (static) con Overview/Usuarios/Actividad/Moderacion/Auditoria/Config.
+  - API protegida: `/api/v1/admin/*` requiere token + `ADMIN_EMAILS`.
+  - Tablas: `admin_audit_log`, `admin_config`, `admin_events`, `reports`.
+  - Config via API: `fx_level` (y base para mas flags).
+
 ## Estado Actual
 
 - Backend API: Express (`src/app.js`) con rutas v1 para auth, users, offers, requests, matches, points, badges, premium, automatch, feed.
@@ -32,8 +44,11 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta)
 
-- Hero: modo noche (glow ventana, bokeh, glass oscuro) + alternativa iOS notifs donde no caben.
-- Hero: cuando se anadan mas imagenes, mantener naming (`Nizquierda.*`, `Nderecha.*`, `Nizquierdaoscuro.*`, `Nderechaoscuro.*`) y validar que el pool detecta todas (sin timeout) + ajustar `VISIBLE_PER_SIDE` si se quieren mas/menos tarjetas visibles.
+- Admin: instrumentar `admin_events` en flujos reales (register/login/create request/offer/match status) para que Actividad se llene automaticamente.
+- Admin: completar acciones de usuarios (ban/unban, ver detalle de user, reset cooldowns) + logs de auditoria.
+- Admin: moderacion real (reports desde web/mobile, hide/unhide contenido si aplica).
+
+- Hero: leer flags desde `admin_config` (ej `fx_level`, `hero_banner_durations`) para ajustar sin redeploy.
 
 - Producto: repaso completo (backend+web+mobile) y listado de faltantes en este STATUS (ver seccion "Plan" mas abajo).
 - FAQ: crear seccion en landing + pagina dedicada, contenido real y sitemap.
@@ -56,6 +71,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 ## Pendiente (Seguridad Web)
 
 - Endurecer CSP: eliminar handlers inline (`onclick=`, `onsubmit=`, etc.) en `index.html` moviendo eventos a `web/js/app.js`, para poder quitar `'unsafe-inline'` de CSP.
+
+## Backup / Rollback
+
+- Tag de backup antes del rework visual: `backup-pre-antigravity-hero`.
 
 ## Plan (Paso a Paso) — Construccion de Todo
 
