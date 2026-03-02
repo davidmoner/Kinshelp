@@ -11,28 +11,12 @@ const { errorHandler, notFound } = require('./middleware/error.middleware');
 
 const app = express();
 
-// Security headers (safe defaults; CSP is set to report-only to avoid breaking inline scripts)
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      reportOnly: true,
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https:'],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'", 'https:'],
-        fontSrc: ["'self'", 'https:', 'data:'],
-        frameAncestors: ["'self'"],
-        baseUri: ["'self'"],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    },
-    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-    crossOriginEmbedderPolicy: false,
-  })
-);
+// Security headers
+// Note: CSP is relaxed because the static landing uses inline scripts/handlers.
+app.use(helmet({
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  crossOriginEmbedderPolicy: false,
+}));
 app.disable('x-powered-by');
 
 // Stripe webhooks require raw body for signature verification.
@@ -98,21 +82,20 @@ app.use(cors({
 }));
 app.options('*', cors());
 
-// Allow inline scripts used by the static landing (no build step).
-// Without this, CSP blocks the KINGSHELP_BASE_URL bootstrap and breaks KHApp.
+// CSP (relaxed for current no-build frontend). Tighten later by removing inline scripts.
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      // The static landing uses inline bootstraps and some libs may use blob: URLs.
-      // Allow both to keep the no-build frontend working.
       'script-src': ["'self'", "'unsafe-inline'", 'blob:'],
       'script-src-elem': ["'self'", "'unsafe-inline'", 'blob:'],
-      // The landing uses inline onclick handlers in HTML.
-      'script-src-attr': ["'self'", "'unsafe-inline'"]
+      'script-src-attr': ["'self'", "'unsafe-inline'"],
+      'img-src': ["'self'", 'data:', 'https:'],
+      'connect-src': ["'self'", 'https:'],
     },
   },
+  hsts: process.env.NODE_ENV === 'production' ? { maxAge: 15552000, includeSubDomains: true, preload: true } : false,
 }));
 app.set('trust proxy', 1);
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
