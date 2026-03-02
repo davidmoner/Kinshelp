@@ -2267,6 +2267,23 @@
     </div>
   </div>
 
+  <!-- ── FEED DETAILS MODAL (match-selectivo helper) ────────────────────── -->
+  <div id="modal-feed-details" class="modal-overlay hidden" onclick="KHApp.closeFeedDetails(event)" role="dialog" aria-modal="true" aria-label="Detalles de publicación">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="KHApp.closeFeedDetails()">✕</button>
+      <div class="modal-title">Detalles</div>
+      <div id="feed-details-body" class="modal-body" style="display:grid; gap:12px;"></div>
+      <div class="premium-modal-actions" style="margin-top:14px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
+        <button class="btn btn-ghost" type="button" onclick="KHApp.closeFeedDetails()">
+          <span class="btn-label">Cerrar</span>
+        </button>
+        <button class="btn btn-primary" type="button" id="btn-feed-details-match" onclick="KHApp.feedDetailsCreateMatch()">
+          <span class="btn-label">Crear match</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       // Allow explicit override (e.g. injected by hosting).

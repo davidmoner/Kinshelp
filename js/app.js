@@ -2102,7 +2102,7 @@
             const btnHow = el.querySelector('button[data-feed-how]');
             if (btnHow) {
                 btnHow.addEventListener('click', () => {
-                    toast('Abre el perfil y crea un match para chatear', 'info');
+                    openFeedDetails(r);
                 });
             }
 
@@ -2135,6 +2135,88 @@
             }
             wrap.appendChild(el);
         });
+    }
+
+    // Feed details modal (minimal, keeps existing design system)
+    let feedDetailsRow = null;
+
+    function closeFeedDetails(event) {
+        if (event && event.target !== $('modal-feed-details')) return;
+        hide($('modal-feed-details'));
+        feedDetailsRow = null;
+    }
+
+    function openFeedDetails(row) {
+        feedDetailsRow = row || null;
+        const body = $('feed-details-body');
+        const btn = $('btn-feed-details-match');
+        if (!body || !btn) return;
+
+        const kind = (row && row.kind) === 'offer' ? 'offer' : 'request';
+        const title = escapeHtml((row && row.title) || '—');
+        const desc = escapeHtml((row && row.description) || '');
+        const cat = escapeHtml(catLabel(row && row.category));
+        const comp = escapeHtml(compLabel(row && row.compensation_type));
+        const loc = escapeHtml((row && row.location_text) || '—');
+        const user = escapeHtml((row && row.user_name) || '—');
+
+        body.innerHTML = `
+          <div class="glass-card" style="padding:14px;">
+            <div style="font-weight:900; font-size:18px; letter-spacing:-0.2px;">${title}</div>
+            ${desc ? `<div style="margin-top:8px; opacity:.92; line-height:1.45;">${desc}</div>` : ''}
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <span class="feed-pill">${cat}</span>
+              <span class="feed-pill">${comp}</span>
+              <span class="feed-pill">📍 ${loc}</span>
+            </div>
+            <div style="margin-top:12px; opacity:.9;">
+              <button class="feed-pill feed-user" type="button" id="btn-feed-details-user">${user}${row && row.user_verified ? ' ✓' : ''}</button>
+            </div>
+          </div>
+        `;
+
+        const btnUser = $('btn-feed-details-user');
+        if (btnUser) {
+            btnUser.addEventListener('click', async () => {
+                try {
+                    const u = await KHApi.getUser(row.user_id);
+                    openUserCard(u);
+                } catch {
+                    toast('No se pudo cargar el perfil', 'error');
+                }
+            }, { once: true });
+        }
+
+        btn.querySelector('.btn-label').textContent = (kind === 'offer') ? 'Pedir esta ayuda' : 'Ofrecer mi ayuda';
+
+        show($('modal-feed-details'));
+    }
+
+    async function feedDetailsCreateMatch() {
+        const row = feedDetailsRow;
+        if (!row) return;
+        if (!KHApi.getToken()) {
+            postLoginAction = 'go_dashboard_create';
+            openLogin();
+            return;
+        }
+        try {
+            await ensureCurrentUser();
+            if (!lastCreatedRequest || !lastCreatedRequest.id) {
+                toast('Primero crea una solicitud en "Crear" para poder hacer match selectivo', 'error');
+                closeFeedDetails();
+                setDashView('crear');
+                return;
+            }
+            closeFeedDetails();
+            await createMatchForRequest(lastCreatedRequest, {
+                id: row.user_id,
+                display_name: row.user_name,
+                premium_tier: row.premium_user ? 'premium' : 'free',
+            });
+        } catch (e) {
+            toast(e.message || 'No se pudo crear el match', 'error');
+        }
     }
 
     /* ── AutoMatch (Premium) ─────────────────────────────────────────────── */
@@ -3684,6 +3766,8 @@
         useMyLocation,
         setRankingQuery,
         closeUserCard,
+        closeFeedDetails,
+        feedDetailsCreateMatch,
         userCardToggleBadges,
         loadBadgesMine,
         dismissNext,
