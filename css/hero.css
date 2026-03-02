@@ -161,7 +161,7 @@ html[data-theme="dark"] .kh-ios-sub {
     overflow: hidden;
     white-space: nowrap;
     vertical-align: bottom;
-    width: 0;
+    width: auto;
 }
 
 /* Ensure width animation works reliably on inline spans */
@@ -179,7 +179,7 @@ html[data-theme="dark"] .kh-ios-sub {
 /* Restart typewriter when a banner becomes active */
 .hero-banner:not(.hero-banner--active) .kh-type {
     animation: none !important;
-    width: 0;
+    clip-path: inset(0 100% 0 0);
 }
 
 .hero-banner.hero-banner--active .kh-type--line2 {
