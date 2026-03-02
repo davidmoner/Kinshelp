@@ -43,6 +43,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 ## Pendiente (OAuth)
 
 - Nota: Login con Google/Facebook queda pendiente de configurar en produccion (apps/credenciales + callbacks). Codigo listo; faltan `GOOGLE_CLIENT_ID/SECRET` y `FACEBOOK_APP_ID/SECRET` en env y validar redirects reales.
+
+## Pendiente (Seguridad Web)
+
+- Endurecer CSP: eliminar handlers inline (`onclick=`, `onsubmit=`, etc.) en `index.html` moviendo eventos a `web/js/app.js`, para poder quitar `'unsafe-inline'` de CSP.
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 
 ## Estado (mar 2026)
