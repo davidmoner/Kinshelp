@@ -836,9 +836,39 @@
     }
 
     function authProvider(provider) {
-        if (provider === 'google' || provider === 'facebook') {
-            toast('Próximamente. Por ahora, continúa con el email.', 'info');
-            showEmailAuth('register');
+        if (provider === 'google') {
+            const base = (window.PUBLIC_BASE_URL || window.location.origin).replace(/\/$/, '');
+            const redirectUri = base + '/api/v1/auth/oauth/google/callback';
+            const qs = new URLSearchParams({
+                client_id: (window.GOOGLE_CLIENT_ID || ''),
+                redirect_uri: redirectUri,
+                response_type: 'code',
+                scope: 'openid email profile',
+                prompt: 'select_account',
+            });
+            if (!window.GOOGLE_CLIENT_ID) {
+                toast('Google OAuth aun no esta configurado. Usa email por ahora.', 'info');
+                showEmailAuth('register');
+                return;
+            }
+            window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + qs.toString();
+            return;
+        }
+        if (provider === 'facebook') {
+            const base = (window.PUBLIC_BASE_URL || window.location.origin).replace(/\/$/, '');
+            const redirectUri = base + '/api/v1/auth/oauth/facebook/callback';
+            const qs = new URLSearchParams({
+                client_id: (window.FACEBOOK_APP_ID || ''),
+                redirect_uri: redirectUri,
+                response_type: 'code',
+                scope: 'email,public_profile',
+            });
+            if (!window.FACEBOOK_APP_ID) {
+                toast('Facebook OAuth aun no esta configurado. Usa email por ahora.', 'info');
+                showEmailAuth('register');
+                return;
+            }
+            window.location.href = 'https://www.facebook.com/v18.0/dialog/oauth?' + qs.toString();
             return;
         }
         showEmailAuth('login');

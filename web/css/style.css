@@ -883,14 +883,18 @@ html[data-theme="light"] .auth-provider {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.auth-ico img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .auth-ico--g {
-  color: #0B0F1A;
   background: #fff;
   border-color: rgba(0, 0, 0, 0.12);
 }
 
 .auth-ico--f {
-  color: #fff;
   background: #1877F2;
   border-color: rgba(24, 119, 242, 0.35);
 }

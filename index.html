@@ -1900,11 +1900,11 @@
 
         <div class="auth-provider-list">
           <button class="auth-provider" type="button" onclick="KHApp.authProvider('google')" aria-label="Continuar con Google">
-            <span class="auth-ico auth-ico--g" aria-hidden="true">G</span>
+            <span class="auth-ico auth-ico--g" aria-hidden="true"><img src="web/img/google-g.svg" alt="" /></span>
             <span>Continuar con Google</span>
           </button>
           <button class="auth-provider" type="button" onclick="KHApp.authProvider('facebook')" aria-label="Continuar con Facebook">
-            <span class="auth-ico auth-ico--f" aria-hidden="true">f</span>
+            <span class="auth-ico auth-ico--f" aria-hidden="true"><img src="web/img/facebook-f.svg" alt="" /></span>
             <span>Continuar con Facebook</span>
           </button>
           <button class="auth-provider" type="button" onclick="KHApp.showEmailAuth('login')" aria-label="Continuar con el email">
@@ -2266,11 +2266,18 @@
           return;
         }
         window.KINGSHELP_BASE_URL = window.location.origin + '/api/v1';
+        // OAuth provider IDs (optional). If not set, provider buttons fall back to email.
+        window.PUBLIC_BASE_URL = window.PUBLIC_BASE_URL || window.location.origin;
+        window.GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '';
+        window.FACEBOOK_APP_ID = window.FACEBOOK_APP_ID || '';
         return;
       }
 
       // Fallback
       window.KINGSHELP_BASE_URL = 'http://localhost:3000/api/v1';
+      window.PUBLIC_BASE_URL = window.PUBLIC_BASE_URL || 'http://localhost:3000';
+      window.GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '';
+      window.FACEBOOK_APP_ID = window.FACEBOOK_APP_ID || '';
     })();
   </script>
   <script src="js/api.js"></script>

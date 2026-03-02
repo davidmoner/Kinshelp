@@ -56,10 +56,20 @@ export default function LoginScreen({ navigation }) {
       <View style={styles.card}>
         <View style={styles.socialRow}>
           <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={onGoogle}>
-            <Text style={styles.socialText}>Continuar con Google</Text>
+            <View style={styles.socialInner}>
+              <View style={[styles.socialIconBox, { backgroundColor: '#fff' }]}>
+                <Text style={styles.socialG}>G</Text>
+              </View>
+              <Text style={styles.socialText}>Continuar con Google</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.socialBtn, { borderColor: 'rgba(255,255,255,0.16)' }]} onPress={onFacebook}>
-            <Text style={styles.socialText}>Continuar con Facebook</Text>
+            <View style={styles.socialInner}>
+              <View style={[styles.socialIconBox, { backgroundColor: '#1877F2' }]}>
+                <Text style={styles.socialIconText}>f</Text>
+              </View>
+              <Text style={styles.socialText}>Continuar con Facebook</Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -125,6 +135,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
+  socialInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
+  socialIconBox: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  socialIcon: { width: 16, height: 16 },
+  socialG: { color: '#111827', fontWeight: '900' },
+  socialIconText: { color: '#fff', fontWeight: '900', fontSize: 16, marginTop: -2 },
   socialText: { color: theme.colors.text, fontWeight: '800' },
   divider: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 },
   line: { flex: 1, height: 1, backgroundColor: theme.colors.border },

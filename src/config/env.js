@@ -14,4 +14,10 @@ module.exports = {
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || null,
   MAIL_FROM: process.env.MAIL_FROM || null,
   CORS_ORIGINS: process.env.CORS_ORIGINS || null,
+
+  // OAuth (Google/Facebook) — used by /api/v1/auth/oauth/* flows
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || null,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || null,
+  FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID || null,
+  FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET || null,
 };
