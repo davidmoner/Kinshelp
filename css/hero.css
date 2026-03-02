@@ -162,6 +162,8 @@ html[data-theme="dark"] .kh-ios-sub {
     white-space: nowrap;
     vertical-align: bottom;
     width: auto;
+    /* Prevent clipping of glyphs (e.g. "ó") during reveal */
+    padding-right: 0.18em;
 }
 
 /* Ensure width animation works reliably on inline spans */
@@ -202,8 +204,8 @@ html[data-theme="dark"] .kh-ios-sub {
 /* line2 delay handled above */
 
 @keyframes khTypeClip {
-    from { clip-path: inset(0 100% 0 0); }
-    to { clip-path: inset(0 0% 0 0); }
+    from { clip-path: inset(0 calc(100% + 0.2em) 0 0); }
+    to { clip-path: inset(0 -0.2em 0 0); }
 }
 
 @keyframes khTypeJitter {
