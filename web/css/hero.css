@@ -164,8 +164,20 @@ html[data-theme="dark"] .kh-ios-sub {
     width: 0;
 }
 
+/* Ensure width animation works reliably on inline spans */
+.hero-title .kh-type,
+.hb3-title .kh-type {
+    display: inline-block;
+}
+
 .hero-banner.hero-banner--active .kh-type {
     animation: khTypeReveal var(--kh-type-dur, 1400ms) steps(var(--kh-type-steps, 24), end) both;
+}
+
+/* Restart typewriter when a banner becomes active */
+.hero-banner:not(.hero-banner--active) .kh-type {
+    animation: none !important;
+    width: 0;
 }
 
 .hero-banner.hero-banner--active .kh-type--line2 {
@@ -2204,10 +2216,12 @@ section.hero {
 
 html[data-theme="dark"] #kh-particles {
     filter: saturate(150%) contrast(128%);
+    mix-blend-mode: screen;
 }
 
 html[data-theme="light"] #kh-particles {
     filter: saturate(145%) contrast(128%);
+    mix-blend-mode: multiply;
 }
 
 /* ══════════════════════════════════════════════════════

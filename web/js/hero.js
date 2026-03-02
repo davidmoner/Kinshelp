@@ -14,7 +14,7 @@
     /* ── Config ──────────────────────────────────────────── */
     // +2000ms per banner (requested: slower rotation)
     // Slower rotation (requested): give each banner more time.
-    var BANNER_DURATIONS = [9000, 11000, 9000];
+    var BANNER_DURATIONS = [11000, 13000, 11000];
     var TRANSITION_MS = 550;                // must match CSS
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
     var INTRO_HOLD_MS = 820;                // ms KingsHelp intro is shown

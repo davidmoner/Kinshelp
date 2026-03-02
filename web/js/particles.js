@@ -31,8 +31,8 @@
         maxR: 2.0,
         speed: 0.18,
         wobble: 0.00055,
-        opacityMaxDark: 0.16,
-        opacityMaxLight: 0.12,
+        opacityMaxDark: 0.22,
+        opacityMaxLight: 0.16,
         scrollParallax: 0.09,
         scrollEase: 0.075,
         mouseEase: 0.06,
@@ -42,7 +42,7 @@
         dashLenMin: 2.6,
         dashLenMax: 9.6,
         dashWidthMin: 1.1,
-        dashWidthMax: 2.2,
+        dashWidthMax: 2.6,
     };
 
     /* Colores para cada tema */
