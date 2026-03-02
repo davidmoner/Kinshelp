@@ -20,6 +20,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Hero: paneles laterales en banners 1 y 3 con imagenes de `img/` (claro: `N{izquierda|derecha}.*`, oscuro: `N{izquierda|derecha}oscuro.*`), apilado (claro) / 1 por lado (oscuro), seleccion aleatoria sin repetir hasta agotar y sin movimiento por scroll.
 - Hero (fix): paneles laterales subidos ~10% para alinear con seccion, y corregida ruta de carga de imagenes desde `web/js/` (usa `../img/...`).
 
+- SEO: metadatos (canonical/OG/Twitter/JSON-LD) + `robots.txt` + `sitemap.xml` + `/.well-known/security.txt`.
+- Seguridad: headers via `helmet` + rate limit global; CSP relajada por inline handlers actuales.
+- OAuth: codigo listo para Google/Facebook (backend callbacks + UI), pero queda pendiente credenciales/validacion en produccion.
+
 ## Estado Actual
 
 - Backend API: Express (`src/app.js`) con rutas v1 para auth, users, offers, requests, matches, points, badges, premium, automatch, feed.
@@ -29,6 +33,9 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 - Hero: modo noche (glow ventana, bokeh, glass oscuro) + alternativa iOS notifs donde no caben.
 - Hero: cuando se anadan mas imagenes, mantener naming (`Nizquierda.*`, `Nderecha.*`, `Nizquierdaoscuro.*`, `Nderechaoscuro.*`) y validar que el pool detecta todas (sin timeout) + ajustar `VISIBLE_PER_SIDE` si se quieren mas/menos tarjetas visibles.
+
+- Producto: repaso completo (backend+web+mobile) y listado de faltantes en este STATUS (ver seccion "Plan" mas abajo).
+- FAQ: crear seccion en landing + pagina dedicada, contenido real y sitemap.
 - UI Web: tick de verificacion mas minimalista y sutil (sin redonda verde) en dashboard y carnet.
 - UI Web: repaso "pro" de detalles visuales (espaciados, tipografia, consistencia entre dashboard e inicio/reputacion).
 - UI Web: ranking vecinal popup +20% ancho.
@@ -48,6 +55,64 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 ## Pendiente (Seguridad Web)
 
 - Endurecer CSP: eliminar handlers inline (`onclick=`, `onsubmit=`, etc.) en `index.html` moviendo eventos a `web/js/app.js`, para poder quitar `'unsafe-inline'` de CSP.
+
+## Plan (Paso a Paso) — Construccion de Todo
+
+1) Seguridad critica de estaticos (NO saltar)
+   - Revisar `src/app.js` para que NO sirva estaticos desde la raiz del repo.
+   - Objetivo: servir solo assets publicos (landing, `web/`, `legal/`, `uploads/` si aplica) y bloquear DB/codigo.
+
+2) SEO de rutas y coherencia de archivos
+   - Asegurar que `/robots.txt`, `/sitemap.xml` y `/.well-known/security.txt` existen en la raiz que Google ve.
+   - Validar que el sitemap incluye landing + legales + futura FAQ.
+
+3) Endurecer CSP (cuando el punto 1 este estable)
+   - Migrar todos los `onclick/onsubmit/oninput/onchange` de `index.html` a listeners en `web/js/app.js`.
+   - Quitar `'unsafe-inline'` de CSP y bloquear `blob:` si no es necesario.
+
+4) OAuth Google/Facebook (pendiente de credenciales)
+   - Crear apps en Google/Facebook.
+   - Setear env vars en prod: `PUBLIC_BASE_URL`, `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_APP_ID/SECRET`.
+   - Validar redirect URIs reales y corregir cualquier mismatch de rutas.
+   - Evitar token en URL (ideal: cookie httpOnly).
+   - Botones con logos oficiales en web/mobile (ya en marcha, pero revisar assets finales).
+
+5) Paridad Postgres vs SQLite
+   - Implementar los 501 pendientes en PG (offers/requests edit, fotos, boost, automatch accept/decline, checks en matches).
+   - Decidir si prod sera PG obligatorio o SQLite con disco persistente.
+
+6) Bugs funcionales detectados
+   - Revisar `offers.service.js`: `requireOffer()` async usado como sync en fotos/boost.
+   - Agregar smoke tests de upload/boost.
+
+7) Validaciones y UX de errores
+   - Normalizar emails, reforzar password reset, limites de texto, lat/lng.
+   - Unificar respuestas 4xx para web/mobile.
+
+8) Observabilidad minima
+   - Logging estructurado, request-id, health extendido (DB ok).
+
+9) FAQ + soporte
+   - FAQ en landing (anchor `#faq`) + pagina dedicada (para SEO).
+   - Contenido inicial: 10-15 preguntas sobre funcionamiento, acuerdos (cash/barter/altruistic), reputacion, ranking, premium, automatch, fotos, privacidad, seguridad, verificacion email, abuso.
+   - Vincular desde nav/footer y meterla en `sitemap.xml`.
+
+## FAQ (Pendiente) — Contenido propuesto
+
+- Que es KingsHelp y como funciona el match?
+- KingsHelp gestiona pagos?
+- Que tipos de acuerdo hay (pago/trueque/altruista)?
+- Cuando se puede marcar un match como hecho?
+- Como funciona la reputacion/puntos y por que a veces no suma?
+- Como funciona el ranking vecinal?
+- Que es Premium y como se desbloquea?
+- Que es AutoMatch y que limites tiene?
+- Cuanto duran mis publicaciones?
+- Puedo subir fotos? formatos/limites?
+- Que datos de mi perfil se ven publicamente?
+- Hay notificaciones push?
+- Como verifico mi email o recupero mi contrasena?
+- Que hago si hay abuso/estafa/contenido peligroso?
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 
 ## Estado (mar 2026)
