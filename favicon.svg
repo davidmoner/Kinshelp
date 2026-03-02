@@ -19,12 +19,12 @@
   <rect x="3" y="3" width="58" height="58" rx="16" fill="url(#gold)"/>
   <rect x="3" y="3" width="58" height="58" rx="16" fill="url(#shine)"/>
 
-  <!-- Bold crown mark (bigger, higher contrast for tiny sizes) -->
+  <!-- Extra-bold crown mark (fills more area for maximum favicon impact) -->
   <g filter="url(#soft)">
-    <path fill="#FFFFFF" d="M15 41l5-20 12 11 12-11 5 20H15z"/>
-    <rect x="15" y="41" width="34" height="5" rx="2.5" fill="#FFFFFF"/>
-    <circle cx="20.5" cy="20" r="3.2" fill="#FFFFFF"/>
-    <circle cx="32" cy="16.5" r="3.2" fill="#FFFFFF"/>
-    <circle cx="43.5" cy="20" r="3.2" fill="#FFFFFF"/>
+    <path fill="#FFFFFF" d="M12.5 43l5.8-23 13.7 12.6L45.7 20l5.8 23H12.5z"/>
+    <rect x="12.5" y="43" width="39" height="6" rx="3" fill="#FFFFFF"/>
+    <circle cx="19.5" cy="19.5" r="3.6" fill="#FFFFFF"/>
+    <circle cx="32" cy="15.5" r="3.6" fill="#FFFFFF"/>
+    <circle cx="44.5" cy="19.5" r="3.6" fill="#FFFFFF"/>
   </g>
 </svg>
