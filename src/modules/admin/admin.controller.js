@@ -143,6 +143,7 @@ function patchUser(req, res) {
 
   const fields = {};
   if (req.body.is_verified !== undefined) fields.is_verified = req.body.is_verified ? 1 : 0;
+  if (req.body.is_banned !== undefined) fields.is_banned = req.body.is_banned ? 1 : 0;
 
   const keys = Object.keys(fields);
   if (!keys.length) throw httpError(400, 'No fields to update');
@@ -187,6 +188,50 @@ function patchUser(req, res) {
   });
 
   res.json({ ok: true, data: safeUser(after) });
+}
+
+function banUser(req, res) {
+  const db = require('../../config/db');
+  const id = req.params.id;
+  const before = repo.getUserById(id);
+  if (!before) throw httpError(404, 'User not found');
+  const now = new Date().toISOString();
+  if (db.isPg) {
+    db.exec('UPDATE users SET is_banned = TRUE, updated_at = $1 WHERE id = $2', [now, id])
+      .then(() => {
+        eventsRepo.logEvent({ type: 'user.ban', actorUserId: req.user.id, targetType: 'user', targetId: id, meta: {} });
+        return repo.insertAudit({ id: randomUUID(), adminUserId: req.user.id, action: 'user.ban', entityType: 'user', entityId: id, beforeJson: JSON.stringify(safeUser(before)), afterJson: JSON.stringify({ is_banned: true }), ip: req.ip, userAgent: req.headers['user-agent'] || null });
+      })
+      .then(() => res.json({ ok: true }))
+      .catch(() => res.status(500).json({ error: 'Failed to ban user' }));
+    return;
+  }
+  db.prepare("UPDATE users SET is_banned = 1, updated_at = ? WHERE id = ?").run(now, id);
+  try { eventsRepo.logEvent({ type: 'user.ban', actorUserId: req.user.id, targetType: 'user', targetId: id, meta: {} }); } catch { }
+  repo.insertAudit({ id: randomUUID(), adminUserId: req.user.id, action: 'user.ban', entityType: 'user', entityId: id, beforeJson: JSON.stringify(safeUser(before)), afterJson: JSON.stringify({ is_banned: true }), ip: req.ip, userAgent: req.headers['user-agent'] || null });
+  res.json({ ok: true });
+}
+
+function unbanUser(req, res) {
+  const db = require('../../config/db');
+  const id = req.params.id;
+  const before = repo.getUserById(id);
+  if (!before) throw httpError(404, 'User not found');
+  const now = new Date().toISOString();
+  if (db.isPg) {
+    db.exec('UPDATE users SET is_banned = FALSE, updated_at = $1 WHERE id = $2', [now, id])
+      .then(() => {
+        eventsRepo.logEvent({ type: 'user.unban', actorUserId: req.user.id, targetType: 'user', targetId: id, meta: {} });
+        return repo.insertAudit({ id: randomUUID(), adminUserId: req.user.id, action: 'user.unban', entityType: 'user', entityId: id, beforeJson: JSON.stringify({ is_banned: true }), afterJson: JSON.stringify({ is_banned: false }), ip: req.ip, userAgent: req.headers['user-agent'] || null });
+      })
+      .then(() => res.json({ ok: true }))
+      .catch(() => res.status(500).json({ error: 'Failed to unban user' }));
+    return;
+  }
+  db.prepare("UPDATE users SET is_banned = 0, updated_at = ? WHERE id = ?").run(now, id);
+  try { eventsRepo.logEvent({ type: 'user.unban', actorUserId: req.user.id, targetType: 'user', targetId: id, meta: {} }); } catch { }
+  repo.insertAudit({ id: randomUUID(), adminUserId: req.user.id, action: 'user.unban', entityType: 'user', entityId: id, beforeJson: JSON.stringify({ is_banned: true }), afterJson: JSON.stringify({ is_banned: false }), ip: req.ip, userAgent: req.headers['user-agent'] || null });
+  res.json({ ok: true });
 }
 
 function listAudit(req, res) {
@@ -240,6 +285,8 @@ module.exports = {
   listUsers,
   getUser,
   patchUser,
+  banUser,
+  unbanUser,
   listAudit,
   listReports,
   createReport,

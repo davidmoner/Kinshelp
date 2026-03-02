@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../../config/db');
 const httpError = require('../../shared/http-error');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../../config/env');
+const { logEvent } = require('../admin/admin.events.repo');
 
 function sanitize(user) {
     const { password_hash, ...safe } = user;
@@ -37,16 +38,20 @@ async function register({ display_name, email, password, bio, location_text }) {
             [id, display_name, email, passHash, bio || null, location_text || null, now, now]
         );
         const user = await db.one('SELECT * FROM users WHERE id = $1', [id]);
-        return { user: sanitize(user), token: jwt.sign({ sub: id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }) };
+        const token = jwt.sign({ sub: id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+        try { logEvent({ type: 'user.register', actorUserId: id, targetType: 'user', targetId: id, meta: { email } }); } catch { }
+        return { user: sanitize(user), token };
     }
 
     db.prepare(`
-      INSERT INTO users (id, display_name, email, password_hash, bio, location_text, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, display_name, email, passHash, bio || null, location_text || null, now, now);
+    INSERT INTO users (id, display_name, email, password_hash, bio, location_text, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(id, display_name, email, passHash, bio || null, location_text || null, now, now);
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
-    return { user: sanitize(user), token: jwt.sign({ sub: id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }) };
+    const token = jwt.sign({ sub: id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    try { logEvent({ type: 'user.register', actorUserId: id, targetType: 'user', targetId: id, meta: { email } }); } catch { }
+    return { user: sanitize(user), token };
 }
 
 async function login({ email, password }) {
@@ -55,6 +60,8 @@ async function login({ email, password }) {
         : db.prepare('SELECT * FROM users WHERE email = ?').get(email);
     if (!user || !user.password_hash || !bcrypt.compareSync(password, user.password_hash))
         throw httpError(401, 'Invalid email or password');
+    if (user.is_banned) throw httpError(403, 'Account suspended');
+    try { logEvent({ type: 'user.login', actorUserId: user.id, targetType: 'user', targetId: user.id, meta: { email } }); } catch { }
     return { user: sanitize(user), token: jwt.sign({ sub: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }) };
 }
 

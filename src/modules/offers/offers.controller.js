@@ -24,18 +24,18 @@ const update = (req, res, next) => { (async () => res.json(await svc.update(req.
 const remove = (req, res, next) => { (async () => res.json(await svc.remove(req.params.id, req.user.id)))().catch(next); };
 
 const addPhoto = (req, res, next) => {
-  try {
+  (async () => {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    res.status(201).json(svc.addPhoto(req.params.id, req.user.id, req.file, baseUrl));
-  } catch (e) { next(e); }
+    res.status(201).json(await svc.addPhoto(req.params.id, req.user.id, req.file, baseUrl));
+  })().catch(next);
 };
 
 const deletePhoto = (req, res, next) => {
-  try { res.json(svc.deletePhoto(req.params.id, req.user.id, req.params.photoId)); } catch (e) { next(e); }
+  (async () => res.json(await svc.deletePhoto(req.params.id, req.user.id, req.params.photoId)))().catch(next);
 };
 
 const boost48h = (req, res, next) => {
-  try { res.json(svc.boost48h(req.params.id, req.user.id)); } catch (e) { next(e); }
+  (async () => res.json(await svc.boost48h(req.params.id, req.user.id)))().catch(next);
 };
 
 module.exports = { list, getOne, create, update, remove, addPhoto, deletePhoto, boost48h };

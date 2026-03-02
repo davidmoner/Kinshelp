@@ -37,6 +37,18 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Tablas: `admin_audit_log`, `admin_config`, `admin_events`, `reports`.
   - Config via API: `fx_level` (y base para mas flags).
 
+- Sprint rendimiento + diseño (mar 2026):
+  - Performance: preload CSS critico + logos LCP con `fetchpriority:high`, fuente Manrope weight 900 añadido.
+  - Sección "Manual de usuario" estilo Apple scroll-storytelling: 5 pasos con iconos SVG, checklist, flow diagram, preview de reputacion, paso Premium con CTA dorado.
+  - Sección FAQ animada: 8 preguntas con acordeon accesible (aria-expanded, aria-controls, max-height CSS transition).
+  - Links Manual y FAQ en nav principal.
+  - `js/fx.js` refactorizado: IntersectionObserver con stagger automático por grupos, KPI counter animation (ease out cubic), FAQ accordion JS, lazy image .loaded, smooth anchor scroll, cursor glow mejorado con RAF.
+  - CSS: scrollbar premium, `::selection` con color de marca, hover lift mejorado para feature/trust/usecase cards, shimmer effect en btn-primary y btn-gold, `.reveal` con delay CSS vars.
+  - Admin panel: columna Estado (baneado/activo), botones Ban/Unban con confirmacion por fila.
+  - Backend ban/unban, logEvent en register/login/match, markAllRead notifications, bug async offers.service.js corregido.
+  - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
+
+
 ## Estado Actual
 
 - Backend API: Express (`src/app.js`) con rutas v1 para auth, users, offers, requests, matches, points, badges, premium, automatch, feed.

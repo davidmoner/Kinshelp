@@ -20,4 +20,11 @@ const markRead = (req, res, next) => {
   })().catch(next);
 };
 
-module.exports = { list, markRead };
+const markAllRead = (req, res, next) => {
+  (async () => {
+    await svc.markAllRead(req.user.id);
+    res.json({ ok: true });
+  })().catch(next);
+};
+
+module.exports = { list, markRead, markAllRead };

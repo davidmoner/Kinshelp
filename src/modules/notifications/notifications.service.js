@@ -14,4 +14,8 @@ async function markRead(userId, notificationId) {
   return repo.markRead(userId, notificationId);
 }
 
-module.exports = { notify, list, markRead };
+async function markAllRead(userId) {
+  return repo.markAllRead(userId);
+}
+
+module.exports = { notify, list, markRead, markAllRead };

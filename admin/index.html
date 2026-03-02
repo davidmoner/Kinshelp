@@ -288,6 +288,7 @@
                 <th>Reputacion</th>
                 <th>Premium</th>
                 <th>Verificado</th>
+                <th>Estado</th>
                 <th></th>
               </tr>
             </thead>
@@ -538,6 +539,10 @@
           tb.innerHTML = '';
           j.data.forEach(function (u) {
             var tr = document.createElement('tr');
+            var banned = u.is_banned == 1 || u.is_banned === true;
+            var banLabel = banned ? '\u2716 Baneado' : 'Activo';
+            var banBtnLabel = banned ? 'Desbanear' : 'Banear';
+            var banBtnClass = banned ? 'btn primary' : 'btn danger';
             tr.innerHTML =
               '<td><code>' + (u.id || '').slice(0, 8) + '</code></td>' +
               '<td>' + (u.display_name || '-') + '</td>' +
@@ -545,7 +550,11 @@
               '<td>' + (u.points_balance || 0) + '</td>' +
               '<td>' + (u.premium_tier || '-') + '</td>' +
               '<td>' + (u.is_verified ? 'si' : 'no') + '</td>' +
-              '<td><button class="btn" data-id="' + u.id + '" data-verify="' + (u.is_verified ? '0' : '1') + '">' + (u.is_verified ? 'Desverificar' : 'Verificar') + '</button></td>';
+              '<td><span style="' + (banned ? 'color:var(--bad);font-weight:700;' : 'color:var(--ok);') + '">' + banLabel + '</span></td>' +
+              '<td style="display:flex;gap:6px;">' +
+                '<button class="btn" data-id="' + u.id + '" data-verify="' + (u.is_verified ? '0' : '1') + '">' + (u.is_verified ? 'Desverificar' : 'Verificar') + '</button>' +
+                '<button class="' + banBtnClass + '" data-id="' + u.id + '" data-ban-action="' + (banned ? 'unban' : 'ban') + '">' + banBtnLabel + '</button>' +
+              '</td>';
             tb.appendChild(tr);
           });
         });
@@ -600,12 +609,25 @@
         });
         document.getElementById('usersTbody').addEventListener('click', function (e) {
           var t = e.target;
-          if (!t || !t.matches('button[data-id]')) return;
+          if (!t) return;
           var id = t.getAttribute('data-id');
-          var v = t.getAttribute('data-verify') === '1';
-          api('/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ is_verified: v }) })
-            .then(function () { toast('Usuario actualizado', true); return loadUsers(); })
-            .catch(function (err) { toast(err.message || 'Error', false); });
+          if (!id) return;
+          // Verify / unverify
+          if (t.matches('button[data-verify]')) {
+            var v = t.getAttribute('data-verify') === '1';
+            api('/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ is_verified: v }) })
+              .then(function () { toast('Usuario actualizado', true); return loadUsers(); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+          // Ban / unban
+          if (t.matches('button[data-ban-action]')) {
+            var action = t.getAttribute('data-ban-action');
+            var confirm_msg = action === 'ban' ? '¿Banear este usuario? No podrá iniciar sesión.' : '¿Desbanear este usuario?';
+            if (!window.confirm(confirm_msg)) return;
+            api('/users/' + encodeURIComponent(id) + '/' + action, { method: 'POST', body: JSON.stringify({}) })
+              .then(function () { toast(action === 'ban' ? 'Usuario baneado' : 'Usuario desbaneado', true); return loadUsers(); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
         });
 
         document.getElementById('btnLogout').addEventListener('click', function () {

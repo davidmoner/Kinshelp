@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KingsHelp — Match automático entre vecinos</title>
-  <meta name="description" content="KingsHelp hace match automático entre vecinos. Pide ayuda u ofrécela y conecta con personas cerca de ti en minutos." />
+  <meta name="description"
+    content="KingsHelp hace match automático entre vecinos. Pide ayuda u ofrécela y conecta con personas cerca de ti en minutos." />
   <link rel="canonical" href="https://kingshelp.es/" />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
@@ -14,12 +15,14 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="KingsHelp" />
   <meta property="og:title" content="KingsHelp — Match automático entre vecinos" />
-  <meta property="og:description" content="Pide ayuda u ofrécela. KingsHelp conecta vecinos en minutos con match automático." />
+  <meta property="og:description"
+    content="Pide ayuda u ofrécela. KingsHelp conecta vecinos en minutos con match automático." />
   <meta property="og:url" content="https://kingshelp.es/" />
   <meta property="og:image" content="https://kingshelp.es/img/LOGO_2.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="KingsHelp — Match automático entre vecinos" />
-  <meta name="twitter:description" content="Pide ayuda u ofrécela. KingsHelp conecta vecinos en minutos con match automático." />
+  <meta name="twitter:description"
+    content="Pide ayuda u ofrécela. KingsHelp conecta vecinos en minutos con match automático." />
   <meta name="twitter:image" content="https://kingshelp.es/img/LOGO_2.png" />
 
   <script type="application/ld+json">
@@ -52,7 +55,8 @@
   <link rel="manifest" href="site.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/demo.css" />
   <link rel="stylesheet" href="css/hero.css" />
@@ -116,10 +120,13 @@
       </div>
 
       <div class="nav-actions">
-        <button id="nav-ranking-btn" class="kh-pill hidden" type="button" onclick="KHApp.openRanking(event)" aria-label="Abrir ranking vecinal">
+        <button id="nav-ranking-btn" class="kh-pill hidden" type="button" onclick="KHApp.openRanking(event)"
+          aria-label="Abrir ranking vecinal">
           <span class="kh-theme-icon" aria-hidden="true">🏆</span>
           <span class="kh-theme-label">Ranking</span>
         </button>
+        <a href="#como-empezar" class="nav-link-manual" id="nav-manual-link">Manual</a>
+        <a href="#faq" class="nav-link-manual" id="nav-faq-link">FAQ</a>
         <span id="kh-theme-slot-landing">
           <button id="kh-theme-toggle" class="kh-theme-toggle" aria-label="Cambiar a tema claro" aria-pressed="true"
             type="button">
@@ -127,7 +134,8 @@
             <span id="kh-theme-label" class="kh-theme-label">Oscuro</span>
           </button>
         </span>
-        <button id="nav-auth-btn" class="btn btn-ghost btn-auth" onclick="KHApp.openLogin()">Regístrate o inicia sesión</button>
+        <button id="nav-auth-btn" class="btn btn-ghost btn-auth" onclick="KHApp.openLogin()">Regístrate o inicia
+          sesión</button>
         <button id="nav-panel-btn" class="btn btn-ghost hidden" onclick="KHApp.goDashboard()">Panel</button>
         <button id="nav-logout-btn" class="btn btn-ghost hidden" onclick="KHApp.logout()">Salir</button>
         <button class="btn btn-primary btn-create" onclick="KHApp.startFirstMatch()">
@@ -176,7 +184,8 @@
                 Match en tiempo real · vecinos conectados ahora
               </div>
 
-              <h1 class="hero-title" style="--kh-type-dur1: 1150ms; --kh-type-steps1: 14; --kh-type-dur2: 1100ms; --kh-type-steps2: 14; --kh-type-gap: 140ms;">
+              <h1 class="hero-title"
+                style="--kh-type-dur1: 1150ms; --kh-type-steps1: 14; --kh-type-dur2: 1100ms; --kh-type-steps2: 14; --kh-type-gap: 140ms;">
                 <span class="kh-type kh-type--line1">Match automático</span><br />
                 <span class="kh-type kh-type--line2 gradient-text">entre vecinos.</span>
               </h1>
@@ -246,199 +255,123 @@
             <div class="hb2p-wrap">
               <div class="hb2p-inner">
 
-              <div class="hb2p-copy">
-                <div class="hero-eyebrow reveal">
-                  <span class="pulse-dot"></span>
-                  Reputación en tu zona
+                <div class="hb2p-copy">
+                  <div class="hero-eyebrow reveal">
+                    <span class="pulse-dot"></span>
+                    Reputación en tu zona
+                  </div>
+
+                  <h2 class="hero-title reveal"
+                    style="font-size: clamp(28px,4vw,46px); --kh-type-dur1: 1250ms; --kh-type-steps1: 16; --kh-type-dur2: 1150ms; --kh-type-steps2: 14; --kh-type-gap: 150ms;">
+                    <span class="kh-type kh-type--line1">Convierte tu ayuda</span><br />
+                    <span class="kh-type kh-type--line2 gradient-text">en reputación.</span>
+                  </h2>
+
+                  <p class="hb2p-sub reveal">
+                    Ayudas reales, reputación real. Cada servicio completado sube tu visibilidad en el barrio.
+                  </p>
+
+                  <ul class="hb2p-bullets reveal" aria-hidden="true">
+                    <li class="hb2p-bullet">
+                      <span class="hb2p-bicon" aria-hidden="true">🏅</span>
+                      <span class="hb2p-btxt">Insignias y ranking vecinal por historial verificado.</span>
+                    </li>
+                    <li class="hb2p-bullet">
+                      <span class="hb2p-bicon" aria-hidden="true">⚡</span>
+                      <span class="hb2p-btxt">Notificaciones cercanas y match en segundos.</span>
+                    </li>
+                    <li class="hb2p-bullet">
+                      <span class="hb2p-bicon" aria-hidden="true">✅</span>
+                      <span class="hb2p-btxt">Solo suma cuando el servicio se completa.</span>
+                    </li>
+                  </ul>
+
+                  <div class="hero-cta" style="margin-top:22px;">
+                    <button class="btn btn-primary btn-lg" onclick="KHApp.startFirstMatch()">
+                      Empezar ahora
+                      <span class="btn-arrow">→</span>
+                    </button>
+                  </div>
                 </div>
-
-                <h2 class="hero-title reveal" style="font-size: clamp(28px,4vw,46px); --kh-type-dur1: 1250ms; --kh-type-steps1: 16; --kh-type-dur2: 1150ms; --kh-type-steps2: 14; --kh-type-gap: 150ms;">
-                  <span class="kh-type kh-type--line1">Convierte tu ayuda</span><br />
-                  <span class="kh-type kh-type--line2 gradient-text">en reputación.</span>
-                </h2>
-
-                <p class="hb2p-sub reveal">
-                  Ayudas reales, reputación real. Cada servicio completado sube tu visibilidad en el barrio.
-                </p>
-
-                <ul class="hb2p-bullets reveal" aria-hidden="true">
-                  <li class="hb2p-bullet">
-                    <span class="hb2p-bicon" aria-hidden="true">🏅</span>
-                    <span class="hb2p-btxt">Insignias y ranking vecinal por historial verificado.</span>
-                  </li>
-                  <li class="hb2p-bullet">
-                    <span class="hb2p-bicon" aria-hidden="true">⚡</span>
-                    <span class="hb2p-btxt">Notificaciones cercanas y match en segundos.</span>
-                  </li>
-                  <li class="hb2p-bullet">
-                    <span class="hb2p-bicon" aria-hidden="true">✅</span>
-                    <span class="hb2p-btxt">Solo suma cuando el servicio se completa.</span>
-                  </li>
-                </ul>
-
-                <div class="hero-cta" style="margin-top:22px;">
-                  <button class="btn btn-primary btn-lg" onclick="KHApp.startFirstMatch()">
-                    Empezar ahora
-                    <span class="btn-arrow">→</span>
-                  </button>
-                </div>
-              </div>
 
                 <div class="hb2p-phones" role="img"
                   aria-label="Demostración: María solicita ayuda para una mudanza, Elena acepta y se completa el servicio. La persona que ayuda gana +12 de reputación y sube en el ranking vecinal.">
 
                   <!-- Izquierda: Solicito -->
                   <div class="hb2p-device-col hb2p-device-col--left" aria-hidden="true">
-                  <div class="hb2p-device-label">María</div>
-                  <div class="hb2p-device-wrap hb2p-device--left">
-                    <div class="demo-phone">
-                      <div class="demo-phone-notch" aria-hidden="true"></div>
-                      <div class="demo-screen-status" aria-hidden="true">
-                        <span class="demo-status-time">9:41</span>
-                        <div class="demo-status-icons">
-                          <span>●●●</span>
-                          <span>WiFi</span>
-                          <span>🔋</span>
-                        </div>
-                      </div>
-
-                      <div class="demo-phone-screen hb2p-stage" aria-hidden="true">
-                        <!-- Escena A (Solicito) -->
-                        <div class="hb2p-scene hb2p-scene--a">
-                          <div class="ds-topbar">
-                            <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
-                            <span class="ds-app-name">KingsHelp</span>
-                            <span class="hb2p-user-tag" aria-hidden="true">María</span>
+                    <div class="hb2p-device-label">María</div>
+                    <div class="hb2p-device-wrap hb2p-device--left">
+                      <div class="demo-phone">
+                        <div class="demo-phone-notch" aria-hidden="true"></div>
+                        <div class="demo-screen-status" aria-hidden="true">
+                          <span class="demo-status-time">9:41</span>
+                          <div class="demo-status-icons">
+                            <span>●●●</span>
+                            <span>WiFi</span>
+                            <span>🔋</span>
                           </div>
-                          <div class="ds-scene-body">
-                            <div class="ds-label ds-label--muted">Nueva solicitud</div>
-                            <div class="ds-request-card">
-                              <div class="ds-req-icon">📦</div>
-                              <div class="ds-req-text">
-                                <span class="ds-req-title">Mudanza</span>
-                                <span class="ds-req-meta">Hoy · Zona Centro</span>
-                              </div>
+                        </div>
+
+                        <div class="demo-phone-screen hb2p-stage" aria-hidden="true">
+                          <!-- Escena A (Solicito) -->
+                          <div class="hb2p-scene hb2p-scene--a">
+                            <div class="ds-topbar">
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <span class="ds-app-name">KingsHelp</span>
+                              <span class="hb2p-user-tag" aria-hidden="true">María</span>
                             </div>
-
-                            <div class="hb2p-action">
-                              <div class="ds-btn-fake">Enviar solicitud</div>
-                              <div class="hb2p-tap hb2p-tap--a" aria-hidden="true">
-                                <span class="hb2p-tap-dot"></span>
-                                <span class="hb2p-tap-ring"></span>
+                            <div class="ds-scene-body">
+                              <div class="ds-label ds-label--muted">Nueva solicitud</div>
+                              <div class="ds-request-card">
+                                <div class="ds-req-icon">📦</div>
+                                <div class="ds-req-text">
+                                  <span class="ds-req-title">Mudanza</span>
+                                  <span class="ds-req-meta">Hoy · Zona Centro</span>
+                                </div>
                               </div>
-                            </div>
 
-                            <div class="ds-pill ds-pill--blue hb2p-pill-sent">Solicitud enviada ✓</div>
-                            <div class="ds-pill ds-pill--green hb2p-pill-left-accepted">Elena aceptó ✓</div>
-
-                            <div class="hb2p-mini hb2p-mini--offers" aria-hidden="true">
-                              <div class="hb2p-mini-title">Propuestas cerca</div>
-                              <div class="hb2p-mini-row">
-                                <span class="hb2p-mini-av hb2p-mini-av--green">E</span>
-                                <span class="hb2p-mini-name">Elena E.</span>
-                                <span class="hb2p-mini-meta">0.4 km</span>
-                              </div>
-                              <div class="hb2p-mini-row" style="opacity:.78">
-                                <span class="hb2p-mini-av">J</span>
-                                <span class="hb2p-mini-name">Javier R.</span>
-                                <span class="hb2p-mini-meta">0.7 km</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="ds-status-bar">
-                            <span class="ds-status-dot ds-status-dot--active"></span>
-                            <span class="ds-status-text">Buscando KingsHelp...</span>
-                          </div>
-                        </div>
-
-                        <!-- Escena C (Completado) -->
-                        <div class="hb2p-scene hb2p-scene--c">
-                          <div class="ds-topbar">
-                            <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
-                            <span class="ds-app-name">KingsHelp</span>
-                            <span class="hb2p-user-tag" aria-hidden="true">María</span>
-                          </div>
-                          <div class="ds-scene-body ds-scene-body--center">
-                            <div class="ds-check-ring ds-anim-pop" aria-hidden="true"><span class="ds-check-icon">✓</span></div>
-                            <div class="ds-label ds-label--success" style="margin-top:12px">Servicio completado ✅</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Derecha: Ofrezco -->
-                <div class="hb2p-device-col hb2p-device-col--right" aria-hidden="true">
-                  <div class="hb2p-device-label">Elena</div>
-                  <div class="hb2p-device-wrap hb2p-device--right">
-                    <div class="demo-phone">
-                      <div class="demo-phone-notch" aria-hidden="true"></div>
-                      <div class="demo-screen-status" aria-hidden="true">
-                        <span class="demo-status-time">9:41</span>
-                        <div class="demo-status-icons">
-                          <span>●●●</span>
-                          <span>WiFi</span>
-                          <span>🔋</span>
-                        </div>
-                      </div>
-
-                      <div class="demo-phone-screen hb2p-stage" aria-hidden="true">
-                        <!-- Escena B (Ofrezco) -->
-                        <div class="hb2p-scene hb2p-scene--b">
-                          <div class="ds-topbar">
-                            <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
-                            <span class="ds-app-name">KingsHelp</span>
-                            <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
-                          </div>
-                          <div class="ds-scene-body">
-                            <div class="hb2p-sys-notif">
-                              <div class="hb2p-sys-top">
-                                <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" />
-                                <span class="hb2p-sys-app">KingsHelp</span>
-                                <span class="hb2p-sys-chip">Mudanza</span>
-                                <span class="hb2p-sys-now">ahora</span>
-                              </div>
-                              <div class="hb2p-sys-title">Solicitud cerca: Mudanza 📦</div>
-                              <div class="hb2p-sys-sub"><span class="hb2p-sys-name">María</span> · 0.4 km · Hoy</div>
-                              <div class="hb2p-sys-note">Aceptar la mudanza de María y ganar reputación.</div>
-                              <div class="hb2p-action hb2p-action--accept">
-                                <div class="ds-btn-fake">Aceptar</div>
-                                <div class="hb2p-tap hb2p-tap--b" aria-hidden="true">
+                              <div class="hb2p-action">
+                                <div class="ds-btn-fake">Enviar solicitud</div>
+                                <div class="hb2p-tap hb2p-tap--a" aria-hidden="true">
                                   <span class="hb2p-tap-dot"></span>
                                   <span class="hb2p-tap-ring"></span>
                                 </div>
                               </div>
-                            </div>
 
-                            <div class="ds-match-card hb2p-match-card">
-                              <div class="ds-match-avatar">M</div>
-                              <div class="ds-match-info">
-                                <span class="ds-match-name">María G.</span>
-                                <span class="ds-match-meta">Mudanza · Zona Centro</span>
+                              <div class="ds-pill ds-pill--blue hb2p-pill-sent">Solicitud enviada ✓</div>
+                              <div class="ds-pill ds-pill--green hb2p-pill-left-accepted">Elena aceptó ✓</div>
+
+                              <div class="hb2p-mini hb2p-mini--offers" aria-hidden="true">
+                                <div class="hb2p-mini-title">Propuestas cerca</div>
+                                <div class="hb2p-mini-row">
+                                  <span class="hb2p-mini-av hb2p-mini-av--green">E</span>
+                                  <span class="hb2p-mini-name">Elena E.</span>
+                                  <span class="hb2p-mini-meta">0.4 km</span>
+                                </div>
+                                <div class="hb2p-mini-row" style="opacity:.78">
+                                  <span class="hb2p-mini-av">J</span>
+                                  <span class="hb2p-mini-name">Javier R.</span>
+                                  <span class="hb2p-mini-meta">0.7 km</span>
+                                </div>
                               </div>
-                              <span class="ds-match-rec">Cerca</span>
                             </div>
-
-                            <div class="ds-pill ds-pill--green hb2p-pill-match">Match confirmado</div>
+                            <div class="ds-status-bar">
+                              <span class="ds-status-dot ds-status-dot--active"></span>
+                              <span class="ds-status-text">Buscando KingsHelp...</span>
+                            </div>
                           </div>
-                        </div>
 
-                        <!-- Escena C (Completado + reputación) -->
-                        <div class="hb2p-scene hb2p-scene--c">
-                          <div class="ds-topbar">
-                            <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
-                            <span class="ds-app-name">KingsHelp</span>
-                            <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
-                          </div>
-                          <div class="ds-scene-body ds-scene-body--center">
-                            <div class="ds-check-ring ds-anim-pop" aria-hidden="true"><span class="ds-check-icon">✓</span></div>
-                            <div class="ds-label ds-label--success" style="margin-top:12px">Servicio completado ✅</div>
-                            <div class="ds-reward-card ds-reward-card--alt hb2p-reward-card" style="margin-top:14px;">
-                              <span class="ds-reward-icon">🏅</span>
-                              <div class="ds-reward-info">
-                                <span class="ds-reward-pts"><span class="hb2p-reward-plus">+12</span> reputación</span>
-                                <span class="ds-reward-label">Ranking vecinal ↑</span>
+                          <!-- Escena C (Completado) -->
+                          <div class="hb2p-scene hb2p-scene--c">
+                            <div class="ds-topbar">
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <span class="ds-app-name">KingsHelp</span>
+                              <span class="hb2p-user-tag" aria-hidden="true">María</span>
+                            </div>
+                            <div class="ds-scene-body ds-scene-body--center">
+                              <div class="ds-check-ring ds-anim-pop" aria-hidden="true"><span
+                                  class="ds-check-icon">✓</span></div>
+                              <div class="ds-label ds-label--success" style="margin-top:12px">Servicio completado ✅
                               </div>
                             </div>
                           </div>
@@ -446,23 +379,107 @@
                       </div>
                     </div>
                   </div>
-                </div>
 
+                  <!-- Derecha: Ofrezco -->
+                  <div class="hb2p-device-col hb2p-device-col--right" aria-hidden="true">
+                    <div class="hb2p-device-label">Elena</div>
+                    <div class="hb2p-device-wrap hb2p-device--right">
+                      <div class="demo-phone">
+                        <div class="demo-phone-notch" aria-hidden="true"></div>
+                        <div class="demo-screen-status" aria-hidden="true">
+                          <span class="demo-status-time">9:41</span>
+                          <div class="demo-status-icons">
+                            <span>●●●</span>
+                            <span>WiFi</span>
+                            <span>🔋</span>
+                          </div>
+                        </div>
+
+                        <div class="demo-phone-screen hb2p-stage" aria-hidden="true">
+                          <!-- Escena B (Ofrezco) -->
+                          <div class="hb2p-scene hb2p-scene--b">
+                            <div class="ds-topbar">
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <span class="ds-app-name">KingsHelp</span>
+                              <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
+                            </div>
+                            <div class="ds-scene-body">
+                              <div class="hb2p-sys-notif">
+                                <div class="hb2p-sys-top">
+                                  <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                                  <span class="hb2p-sys-app">KingsHelp</span>
+                                  <span class="hb2p-sys-chip">Mudanza</span>
+                                  <span class="hb2p-sys-now">ahora</span>
+                                </div>
+                                <div class="hb2p-sys-title">Solicitud cerca: Mudanza 📦</div>
+                                <div class="hb2p-sys-sub"><span class="hb2p-sys-name">María</span> · 0.4 km · Hoy</div>
+                                <div class="hb2p-sys-note">Aceptar la mudanza de María y ganar reputación.</div>
+                                <div class="hb2p-action hb2p-action--accept">
+                                  <div class="ds-btn-fake">Aceptar</div>
+                                  <div class="hb2p-tap hb2p-tap--b" aria-hidden="true">
+                                    <span class="hb2p-tap-dot"></span>
+                                    <span class="hb2p-tap-ring"></span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="ds-match-card hb2p-match-card">
+                                <div class="ds-match-avatar">M</div>
+                                <div class="ds-match-info">
+                                  <span class="ds-match-name">María G.</span>
+                                  <span class="ds-match-meta">Mudanza · Zona Centro</span>
+                                </div>
+                                <span class="ds-match-rec">Cerca</span>
+                              </div>
+
+                              <div class="ds-pill ds-pill--green hb2p-pill-match">Match confirmado</div>
+                            </div>
+                          </div>
+
+                          <!-- Escena C (Completado + reputación) -->
+                          <div class="hb2p-scene hb2p-scene--c">
+                            <div class="ds-topbar">
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <span class="ds-app-name">KingsHelp</span>
+                              <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
+                            </div>
+                            <div class="ds-scene-body ds-scene-body--center">
+                              <div class="ds-check-ring ds-anim-pop" aria-hidden="true"><span
+                                  class="ds-check-icon">✓</span></div>
+                              <div class="ds-label ds-label--success" style="margin-top:12px">Servicio completado ✅
+                              </div>
+                              <div class="ds-reward-card ds-reward-card--alt hb2p-reward-card" style="margin-top:14px;">
+                                <span class="ds-reward-icon">🏅</span>
+                                <div class="ds-reward-info">
+                                  <span class="ds-reward-pts"><span class="hb2p-reward-plus">+12</span>
+                                    reputación</span>
+                                  <span class="ds-reward-label">Ranking vecinal ↑</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
           </div>
         </div>
-        </div>
         <!-- /BANNER 1 -->
 
         <!-- ═══ BANNER 2 — Recompensa / Premium scene ═══ -->
-        <div class="hero-banner" data-banner="2" aria-label="Recompensa, trueque o altruista" aria-hidden="true" data-hero-alt="ios-notifs">
+        <div class="hero-banner" data-banner="2" aria-label="Recompensa, trueque o altruista" aria-hidden="true"
+          data-hero-alt="ios-notifs">
           <div class="container">
             <div class="hb3-inner">
               <div class="kh-ios-stack" aria-hidden="true"></div>
               <p class="hb3-eyebrow">Elige tu tipo de acuerdo</p>
 
-              <h2 class="hb3-title" style="--kh-type-dur1: 1350ms; --kh-type-steps1: 18; --kh-type-dur2: 1050ms; --kh-type-steps2: 12; --kh-type-gap: 150ms;">
+              <h2 class="hb3-title"
+                style="--kh-type-dur1: 1350ms; --kh-type-steps1: 18; --kh-type-dur2: 1050ms; --kh-type-steps2: 12; --kh-type-gap: 150ms;">
                 <span class="kh-type kh-type--line1">Recompensa, trueque</span><br />
                 <span class="kh-type kh-type--line2 gradient-text">o altruista.</span>
               </h2>
@@ -476,11 +493,18 @@
                 <div class="hb3-reward-card" data-kind="recompensa">
                   <div class="hb3-reward-icon" aria-hidden="true">
                     <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M7.5 8.2c0-1.7 1.4-3.1 3.1-3.1h6c1.7 0 3.1 1.4 3.1 3.1v7.6c0 1.7-1.4 3.1-3.1 3.1h-6c-1.7 0-3.1-1.4-3.1-3.1V8.2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M7.5 9.2H6.2c-1.3 0-2.4 1.1-2.4 2.4v5.2c0 1.3 1.1 2.4 2.4 2.4h8.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.7" />
-                      <path d="M13 8.5v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
-                      <path d="M15.6 10.1c0-1.1-1.1-1.9-2.6-1.9s-2.6.8-2.6 1.9 1.1 1.6 2.6 1.9 2.6.8 2.6 1.9-1.1 1.9-2.6 1.9-2.6-.8-2.6-1.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M5.3 6.2l.7 1.5 1.6.3-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.3.7-1.5Z" fill="currentColor" opacity="0.75" />
+                      <path
+                        d="M7.5 8.2c0-1.7 1.4-3.1 3.1-3.1h6c1.7 0 3.1 1.4 3.1 3.1v7.6c0 1.7-1.4 3.1-3.1 3.1h-6c-1.7 0-3.1-1.4-3.1-3.1V8.2Z"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M7.5 9.2H6.2c-1.3 0-2.4 1.1-2.4 2.4v5.2c0 1.3 1.1 2.4 2.4 2.4h8.2" stroke="currentColor"
+                        stroke-width="1.8" stroke-linecap="round" opacity="0.7" />
+                      <path d="M13 8.5v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        opacity="0.9" />
+                      <path
+                        d="M15.6 10.1c0-1.1-1.1-1.9-2.6-1.9s-2.6.8-2.6 1.9 1.1 1.6 2.6 1.9 2.6.8 2.6 1.9-1.1 1.9-2.6 1.9-2.6-.8-2.6-1.9"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                      <path d="M5.3 6.2l.7 1.5 1.6.3-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.3.7-1.5Z"
+                        fill="currentColor" opacity="0.75" />
                     </svg>
                   </div>
                   <div class="hb3-reward-label">Recompensa</div>
@@ -489,11 +513,16 @@
                 <div class="hb3-reward-card" data-kind="trueque">
                   <div class="hb3-reward-icon" aria-hidden="true">
                     <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M7 7h10.2c1.6 0 2.8 1.3 2.8 2.8v1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-                      <path d="M17.5 4.8 20 7.3l-2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M17 17H6.8C5.3 17 4 15.7 4 14.2v-1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-                      <path d="M6.5 19.2 4 16.7l2.5-2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-                      <path d="M9.2 12h5.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity="0.65" />
+                      <path d="M7 7h10.2c1.6 0 2.8 1.3 2.8 2.8v1" stroke="currentColor" stroke-width="1.9"
+                        stroke-linecap="round" />
+                      <path d="M17.5 4.8 20 7.3l-2.5 2.5" stroke="currentColor" stroke-width="1.9"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M17 17H6.8C5.3 17 4 15.7 4 14.2v-1" stroke="currentColor" stroke-width="1.9"
+                        stroke-linecap="round" />
+                      <path d="M6.5 19.2 4 16.7l2.5-2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                      <path d="M9.2 12h5.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+                        opacity="0.65" />
                     </svg>
                   </div>
                   <div class="hb3-reward-label">Trueque</div>
@@ -502,9 +531,14 @@
                 <div class="hb3-reward-card" data-kind="altruista">
                   <div class="hb3-reward-icon" aria-hidden="true">
                     <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 8.2c1.1-1.4 2.3-2.1 3.7-2.1 1.9 0 3.4 1.4 3.4 3.3 0 3.3-3.1 5.4-7.1 8.4-4-3-7.1-5.1-7.1-8.4 0-1.9 1.5-3.3 3.4-3.3 1.4 0 2.6.7 3.7 2.1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                      <path d="M7.6 14.4c-.9-.8-2.5-.6-3.4.5-.8 1.1-.6 2.6.6 3.4l2.2 1.5c.7.5 1.5.7 2.3.7H14c.9 0 1.6-.7 1.6-1.6 0-.5-.3-1-.7-1.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.75" />
-                      <path d="M16.4 14.4c.9-.8 2.5-.6 3.4.5.8 1.1.6 2.6-.6 3.4L17 19.8c-.7.5-1.5.7-2.3.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.75" />
+                      <path
+                        d="M12 8.2c1.1-1.4 2.3-2.1 3.7-2.1 1.9 0 3.4 1.4 3.4 3.3 0 3.3-3.1 5.4-7.1 8.4-4-3-7.1-5.1-7.1-8.4 0-1.9 1.5-3.3 3.4-3.3 1.4 0 2.6.7 3.7 2.1Z"
+                        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                      <path
+                        d="M7.6 14.4c-.9-.8-2.5-.6-3.4.5-.8 1.1-.6 2.6.6 3.4l2.2 1.5c.7.5 1.5.7 2.3.7H14c.9 0 1.6-.7 1.6-1.6 0-.5-.3-1-.7-1.3"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.75" />
+                      <path d="M16.4 14.4c.9-.8 2.5-.6 3.4.5.8 1.1.6 2.6-.6 3.4L17 19.8c-.7.5-1.5.7-2.3.7"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.75" />
                     </svg>
                   </div>
                   <div class="hb3-reward-label">Altruista</div>
@@ -518,10 +552,11 @@
 
               <div class="hb3-premium-teaser">
                 <span>♛</span>
-                Premium <em>(próximamente)</em> · <strong>0,99&nbsp;€/mes previsto</strong> o desbloqueable con reputación
+                Premium <em>(próximamente)</em> · <strong>0,99&nbsp;€/mes previsto</strong> o desbloqueable con
+                reputación
               </div>
 
-              
+
             </div>
           </div>
         </div>
@@ -602,88 +637,88 @@
         </div>
 
         <!-- Columna derecha: panel reputación -->
-          <div class="rep-panel reveal" aria-hidden="true">
-            <div class="rep-card">
-              <div class="rep-head">
-                <div class="rep-title">
-                  <span class="rep-crown" aria-hidden="true">♛</span>
-                  <span>Mi reputación</span>
+        <div class="rep-panel reveal" aria-hidden="true">
+          <div class="rep-card">
+            <div class="rep-head">
+              <div class="rep-title">
+                <span class="rep-crown" aria-hidden="true">♛</span>
+                <span>Mi reputación</span>
+              </div>
+              <span class="rep-pill">Verificada</span>
+            </div>
+
+            <div class="rep-grid" aria-hidden="true">
+              <div class="rep-col rep-col--left">
+                <div class="rep-score">
+                  <div class="rep-score-main">
+                    <span class="rep-score-val">842</span>
+                    <span class="rep-score-unit">rep</span>
+                  </div>
+                  <div class="rep-score-sub">Ranking vecinal: <strong>#12</strong> · Nivel: <strong>Plata</strong></div>
                 </div>
-                <span class="rep-pill">Verificada</span>
+
+                <div class="rep-progress">
+                  <div class="rep-progress-head">
+                    <span>Progreso a Premium</span>
+                    <span class="rep-mini">842 / 1000</span>
+                  </div>
+                  <div class="rep-bar">
+                    <div class="rep-bar-fill" style="width:84.2%"></div>
+                  </div>
+                  <div class="rep-progress-foot">Faltan <strong>158 rep</strong> para desbloquear Premium.</div>
+                </div>
+
+                <div class="rep-activity">
+                  <div class="rep-activity-head">
+                    <span>Últimas ayudas</span>
+                    <span class="rep-mini">verificado</span>
+                  </div>
+                  <div class="rep-act-row">
+                    <span class="rep-act-ico">📦</span>
+                    <span class="rep-act-txt">Mudanza (María)</span>
+                    <span class="rep-act-pts">+12</span>
+                  </div>
+                  <div class="rep-act-row" style="opacity:.92">
+                    <span class="rep-act-ico">🛞</span>
+                    <span class="rep-act-txt">Pinchazo (Javier)</span>
+                    <span class="rep-act-pts">+8</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="rep-grid" aria-hidden="true">
-                <div class="rep-col rep-col--left">
-                  <div class="rep-score">
-                    <div class="rep-score-main">
-                      <span class="rep-score-val">842</span>
-                      <span class="rep-score-unit">rep</span>
-                    </div>
-                    <div class="rep-score-sub">Ranking vecinal: <strong>#12</strong> · Nivel: <strong>Plata</strong></div>
+              <div class="rep-col rep-col--right">
+                <div class="rep-badges">
+                  <div class="rep-badges-head">
+                    <span>Insignias</span>
+                    <span class="rep-mini">6 disponibles</span>
                   </div>
-
-                  <div class="rep-progress">
-                    <div class="rep-progress-head">
-                      <span>Progreso a Premium</span>
-                      <span class="rep-mini">842 / 1000</span>
+                  <div class="rep-badges-grid" role="list">
+                    <div class="badge-item earned" role="listitem" title="Helping Hand">🙌<span>Helping Hand</span>
                     </div>
-                    <div class="rep-bar">
-                      <div class="rep-bar-fill" style="width:84.2%"></div>
-                    </div>
-                    <div class="rep-progress-foot">Faltan <strong>158 rep</strong> para desbloquear Premium.</div>
-                  </div>
-
-                  <div class="rep-activity">
-                    <div class="rep-activity-head">
-                      <span>Últimas ayudas</span>
-                      <span class="rep-mini">verificado</span>
-                    </div>
-                    <div class="rep-act-row">
-                      <span class="rep-act-ico">📦</span>
-                      <span class="rep-act-txt">Mudanza (María)</span>
-                      <span class="rep-act-pts">+12</span>
-                    </div>
-                    <div class="rep-act-row" style="opacity:.92">
-                      <span class="rep-act-ico">🛞</span>
-                      <span class="rep-act-txt">Pinchazo (Javier)</span>
-                      <span class="rep-act-pts">+8</span>
-                    </div>
+                    <div class="badge-item earned" role="listitem" title="Top Helper">⭐<span>Top Helper</span></div>
+                    <div class="badge-item earned" role="listitem" title="Five Star">🌟<span>Five Star</span></div>
+                    <div class="badge-item locked" role="listitem" title="Community">🏛️<span>Community</span></div>
+                    <div class="badge-item locked" role="listitem" title="Rápido">⚡<span>Rápido</span></div>
+                    <div class="badge-item locked" role="listitem" title="Vecino">🤝<span>Vecino</span></div>
                   </div>
                 </div>
 
-                <div class="rep-col rep-col--right">
-                  <div class="rep-badges">
-                    <div class="rep-badges-head">
-                      <span>Insignias</span>
-                      <span class="rep-mini">6 disponibles</span>
-                    </div>
-                    <div class="rep-badges-grid" role="list">
-                      <div class="badge-item earned" role="listitem" title="Helping Hand">🙌<span>Helping Hand</span>
-                      </div>
-                      <div class="badge-item earned" role="listitem" title="Top Helper">⭐<span>Top Helper</span></div>
-                      <div class="badge-item earned" role="listitem" title="Five Star">🌟<span>Five Star</span></div>
-                      <div class="badge-item locked" role="listitem" title="Community">🏛️<span>Community</span></div>
-                      <div class="badge-item locked" role="listitem" title="Rápido">⚡<span>Rápido</span></div>
-                      <div class="badge-item locked" role="listitem" title="Vecino">🤝<span>Vecino</span></div>
-                    </div>
+                <div class="rep-rank">
+                  <div class="rep-rank-head">
+                    <span>Top de tu zona</span>
+                    <span class="rep-mini">hoy</span>
                   </div>
-
-                  <div class="rep-rank">
-                    <div class="rep-rank-head">
-                      <span>Top de tu zona</span>
-                      <span class="rep-mini">hoy</span>
-                    </div>
-                    <div class="rep-row"><span class="rep-pos">1</span><span class="rep-name">María G.</span><span
-                        class="rep-pts">1.124</span></div>
-                    <div class="rep-row"><span class="rep-pos">2</span><span class="rep-name">Javier R.</span><span
-                        class="rep-pts">1.006</span></div>
-                    <div class="rep-row rep-row--me"><span class="rep-pos">12</span><span class="rep-name">Tú</span><span
-                        class="rep-pts">842</span></div>
-                  </div>
+                  <div class="rep-row"><span class="rep-pos">1</span><span class="rep-name">María G.</span><span
+                      class="rep-pts">1.124</span></div>
+                  <div class="rep-row"><span class="rep-pos">2</span><span class="rep-name">Javier R.</span><span
+                      class="rep-pts">1.006</span></div>
+                  <div class="rep-row rep-row--me"><span class="rep-pos">12</span><span class="rep-name">Tú</span><span
+                      class="rep-pts">842</span></div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
       </div>
     </section>
@@ -709,7 +744,7 @@
           <div class="kpi-card reveal">
             <div class="kpi-icon">⚡</div>
             <div class="kpi-value" data-target="2300000">0</div>
-          <div class="kpi-label">Reputación ganada</div>
+            <div class="kpi-label">Reputación ganada</div>
           </div>
           <div class="kpi-card reveal">
             <div class="kpi-icon">👑</div>
@@ -788,8 +823,8 @@
               <div class="plan-note">Sin permanencia</div>
             </button>
 
-            <button class="premium-plan premium-plan--featured premium-plan--active" type="button" role="radio" aria-checked="true"
-              data-interval="year" onclick="KHApp.setPremiumInterval('year')">
+            <button class="premium-plan premium-plan--featured premium-plan--active" type="button" role="radio"
+              aria-checked="true" data-interval="year" onclick="KHApp.setPremiumInterval('year')">
               <div class="plan-best-badge">Mejor precio</div>
               <div class="plan-period">Anual</div>
               <div class="plan-price">7,99<span>&nbsp;€<span class="plan-freq">/año</span></span></div>
@@ -847,7 +882,8 @@
               style="flex-shrink:0;margin-top:2px;color:var(--accent-light)">
               <path d="M13 2 L8 12 H12 L11 22 L16 12 H12 Z" />
             </svg>
-            <span>Ganas reputación ayudando <em>(pago en €, trueque o altruista)</em>. Cuando llegues al nivel necesario,
+            <span>Ganas reputación ayudando <em>(pago en €, trueque o altruista)</em>. Cuando llegues al nivel
+              necesario,
               desbloqueas Premium gratis.</span>
           </div>
 
@@ -878,7 +914,8 @@
               <span class="btn-arrow">→</span>
             </button>
           </div>
-          <p class="premium-btn-sub">Desde 0,99&nbsp;€/mes · Piensalo como una inversion: con 1 match vecinal extra al mes, se paga solo</p>
+          <p class="premium-btn-sub">Desde 0,99&nbsp;€/mes · Piensalo como una inversion: con 1 match vecinal extra al
+            mes, se paga solo</p>
 
           <p class="premium-disclaimer">Funcionalidad en desarrollo activo.</p>
         </div>
@@ -1004,9 +1041,11 @@
             <div>
               <div class="quick-match-eyebrow">Demo real</div>
               <h3 class="quick-match-title">Pruébalo en 15 segundos</h3>
-              <p class="quick-match-sub">Crea una solicitud, mira sugerencias y crea un match. (Requiere iniciar sesión)</p>
+              <p class="quick-match-sub">Crea una solicitud, mira sugerencias y crea un match. (Requiere iniciar sesión)
+              </p>
             </div>
-            <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.startFirstMatch()">Ir al dashboard</button>
+            <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.startFirstMatch()">Ir al
+              dashboard</button>
           </div>
 
           <form class="quick-match-form" id="quick-form" onsubmit="KHApp.startQuickMatch(event)">
@@ -1039,14 +1078,17 @@
               <div class="comp-switch" role="group" aria-label="Tipo de compensación">
                 <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
                   onclick="KHApp.selectComp('quick','cash')">Pago en €</button>
-                <button class="comp-choice" type="button" data-comp="barter" onclick="KHApp.selectComp('quick','barter')">Trueque</button>
+                <button class="comp-choice" type="button" data-comp="barter"
+                  onclick="KHApp.selectComp('quick','barter')">Trueque</button>
                 <button class="comp-choice" type="button" data-comp="altruistic"
                   onclick="KHApp.selectComp('quick','altruistic')">Altruistamente</button>
               </div>
-              <div class="comp-hint" id="quick-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de KingsHelp.</div>
+              <div class="comp-hint" id="quick-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
+                KingsHelp.</div>
             </div>
 
-            <div class="demo-hint" style="margin-top:-6px;">Caduca automaticamente: 1 semana (gratis) o 2 meses (Premium).</div>
+            <div class="demo-hint" style="margin-top:-6px;">Caduca automaticamente: 1 semana (gratis) o 2 meses
+              (Premium).</div>
 
             <div class="field field--wide">
               <label for="quick-desc">Detalles (opcional)</label>
@@ -1070,6 +1112,321 @@
       </div>
     </section>
 
+
+    <!-- ── MANUAL DE USUARIO (Apple-style scroll storytelling) ───────── -->
+    <section class="howto-section" id="como-empezar" aria-label="Cómo empezar con KingsHelp">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-eyebrow">Manual</span>
+          <h2 class="howto-headline">Todo lo que necesitas saber</h2>
+          <p class="howto-sub">Desde el registro hasta tu primer match. Simple, rápido, sin complicaciones.</p>
+        </div>
+
+        <div class="howto-steps">
+          <!-- Paso 1 -->
+          <div class="howto-step reveal" data-step="1">
+            <div class="howto-step-visual">
+              <div class="howto-step-num-wrap">
+                <span class="howto-step-num">01</span>
+              </div>
+              <div class="howto-step-icon" aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+            </div>
+            <div class="howto-step-body">
+              <h3 class="howto-step-title">Regístrate en 30 segundos</h3>
+              <p class="howto-step-desc">Solo necesitas email y contraseña. Sin datos bancarios, sin verificación
+                complicada. Empieza en minutos y personaliza tu perfil después.</p>
+              <ul class="howto-checklist">
+                <li><span class="howto-check" aria-hidden="true">✓</span> Registro con email</li>
+                <li><span class="howto-check" aria-hidden="true">✓</span> Verifica tu email para ganar reputación extra
+                </li>
+                <li><span class="howto-check" aria-hidden="true">✓</span> Añade tu zona y una bio breve</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="howto-step howto-step--alt reveal" data-step="2">
+            <div class="howto-step-visual">
+              <div class="howto-step-num-wrap">
+                <span class="howto-step-num">02</span>
+              </div>
+              <div class="howto-step-icon" aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </div>
+            </div>
+            <div class="howto-step-body">
+              <h3 class="howto-step-title">Publica tu solicitud u oferta</h3>
+              <p class="howto-step-desc">¿Necesitas ayuda? Publica una solicitud. ¿Sabes hacer algo? Crea una oferta.
+                Elige categoría, zona y el tipo de acuerdo que prefieres.</p>
+              <div class="howto-tags">
+                <span class="howto-tag">Pago en €</span>
+                <span class="howto-tag">Trueque</span>
+                <span class="howto-tag howto-tag--gold">Altruista</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 3 -->
+          <div class="howto-step reveal" data-step="3">
+            <div class="howto-step-visual">
+              <div class="howto-step-num-wrap">
+                <span class="howto-step-num">03</span>
+              </div>
+              <div class="howto-step-icon howto-step-icon--gold" aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10" />
+                </svg>
+              </div>
+            </div>
+            <div class="howto-step-body">
+              <h3 class="howto-step-title">El match ocurre automáticamente</h3>
+              <p class="howto-step-desc">KingsHelp cruza solicitudes y ofertas cercanas. Cuando encajan, ambas partes
+                reciben una notificación. Acepta y entra directo al chat.</p>
+              <div class="howto-flow" aria-hidden="true">
+                <span class="howto-flow-chip">Tu solicitud</span>
+                <span class="howto-flow-arrow">→</span>
+                <span class="howto-flow-chip howto-flow-chip--hl">Match ⚡</span>
+                <span class="howto-flow-arrow">→</span>
+                <span class="howto-flow-chip">Chat</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 4 -->
+          <div class="howto-step howto-step--alt reveal" data-step="4">
+            <div class="howto-step-visual">
+              <div class="howto-step-num-wrap">
+                <span class="howto-step-num">04</span>
+              </div>
+              <div class="howto-step-icon" aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="M9 12l2 2 4-4" stroke-width="2" />
+                </svg>
+              </div>
+            </div>
+            <div class="howto-step-body">
+              <h3 class="howto-step-title">Completa y gana reputación</h3>
+              <p class="howto-step-desc">Cuando el servicio termine, ambos marcan el match como completado. Cada ayuda
+                real suma puntos de reputación que te posicionan en el ranking vecinal.</p>
+              <div class="howto-rep-preview" aria-hidden="true">
+                <div class="hrp-row"><span class="hrp-icon">🏅</span><span>+12 reputación por match completado</span>
+                </div>
+                <div class="hrp-row"><span class="hrp-icon">⭐</span><span>Valoración 1–5 estrellas de ambas
+                    partes</span></div>
+                <div class="hrp-row hrp-row--gold"><span class="hrp-icon">👑</span><span>Sube en tu ranking
+                    vecinal</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 5 — Premium -->
+          <div class="howto-step howto-step--premium reveal" data-step="5">
+            <div class="howto-step-visual">
+              <div class="howto-step-num-wrap howto-step-num-wrap--gold">
+                <span class="howto-step-num">05</span>
+              </div>
+              <div class="howto-step-icon howto-step-icon--gold" aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 17l2-7 4 3 4-6 4 6 4-3 2 7H2z" />
+                  <path d="M2 17h20" />
+                </svg>
+              </div>
+            </div>
+            <div class="howto-step-body">
+              <h3 class="howto-step-title">Desbloquea Premium <span class="howto-badge-gold">0,99€/mes</span></h3>
+              <p class="howto-step-desc">Con Premium activas el <strong>Match Vecinal</strong> — el único sistema en
+                España que prioriza tu barrio. Recibe invitaciones automáticas sin buscar, boost de publicaciones y
+                mayor visibilidad.</p>
+              <button class="btn btn-gold btn-sm" style="margin-top:12px;" onclick="KHFx.openPremiumModal()">
+                Ver ventajas →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ─────────────────────────────────────────────────────────── -->
+    <section class="faq-section" id="faq" aria-label="Preguntas frecuentes">
+      <div class="container">
+        <div class="section-header reveal">
+          <span class="section-eyebrow">FAQ</span>
+          <h2>Preguntas frecuentes</h2>
+          <p>Todo lo que necesitas saber antes de empezar.</p>
+        </div>
+
+        <div class="faq-list reveal" role="list">
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-1" id="faq-btn-1">
+              <span>¿Qué es KingsHelp y cómo funciona el match?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-1" role="region" aria-labelledby="faq-btn-1" hidden>
+              <p>KingsHelp es una plataforma vecinal donde puedes <strong>pedir o ofrecer ayuda</strong> en tu zona.
+                Cuando tu solicitud o oferta encaja con alguien cercano, generamos un <em>match automático</em>: ambos
+                recibís notificación y podéis chatear para cerrar el acuerdo. No necesitas buscar activamente.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-2" id="faq-btn-2">
+              <span>¿KingsHelp gestiona pagos?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-2" role="region" aria-labelledby="faq-btn-2" hidden>
+              <p><strong>No.</strong> KingsHelp no procesa ni custodia dinero. Si acordáis un pago en euros, lo
+                gestionáis directamente entre vosotros fuera de la plataforma. KingsHelp solo facilita el match y
+                registra la reputación.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-3" id="faq-btn-3">
+              <span>¿Qué tipos de acuerdo hay?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-3" role="region" aria-labelledby="faq-btn-3" hidden>
+              <p>Hay tres tipos:</p>
+              <ul>
+                <li><strong>Pago en €:</strong> Acordáis el precio en el chat y lo pagáis fuera de KingsHelp.</li>
+                <li><strong>Trueque:</strong> Intercambio de servicios entre ambas partes.</li>
+                <li><strong>Altruista:</strong> Sin coste. Solo reputación y buena voluntad.</li>
+              </ul>
+              <p>Todos suman reputación cuando el match se completa.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-4" id="faq-btn-4">
+              <span>¿Cómo funciona la reputación y el ranking?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-4" role="region" aria-labelledby="faq-btn-4" hidden>
+              <p>Cada match completado suma puntos de reputación a ambas partes. El proveedor (quien ayuda) gana más
+                puntos. La reputación es pública y determina tu posición en el <strong>ranking vecinal</strong>. No se
+                puede comprar ni manipular: solo sube con ayuda real verificada.</p>
+              <p>Si hay indicios de fraude (demasiados matches entre las mismas dos cuentas), el sistema limita
+                automáticamente los puntos.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-5" id="faq-btn-5">
+              <span>¿Qué es Premium y qué incluye?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-5" role="region" aria-labelledby="faq-btn-5" hidden>
+              <p>Premium (desde <strong>0,99€/mes</strong>) desbloquea:</p>
+              <ul>
+                <li><strong>Match Vecinal:</strong> El algoritmo prioriza tu zona. Exclusivo de KingsHelp.</li>
+                <li>AutoMatch: invitaciones automáticas sin buscar activamente.</li>
+                <li>Publicaciones duran 2 meses (en vez de 1 semana).</li>
+                <li>Mayor visibilidad en el feed y en el ranking.</li>
+              </ul>
+              <p>También puedes desbloquear Premium sin pagar, acumulando suficiente reputación.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-6" id="faq-btn-6">
+              <span>¿Qué datos míos se publican?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-6" role="region" aria-labelledby="faq-btn-6" hidden>
+              <p>Solo tu <strong>nombre de usuario</strong>, zona aproximada (no dirección exacta), reputación y badges
+                son públicos. Tu email y coordenadas exactas nunca se exponen. Tus datos no se venden ni ceden a
+                terceros.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-7" id="faq-btn-7">
+              <span>¿Cómo denuncio un abuso o una mala experiencia?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-7" role="region" aria-labelledby="faq-btn-7" hidden>
+              <p>Desde el perfil de cualquier usuario puedes <strong>reportarlo</strong>. Nuestro equipo de moderación
+                revisa todos los reportes. En casos graves, los usuarios pueden ser suspendidos. También puedes
+                escribirnos a <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a>.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-8" id="faq-btn-8">
+              <span>¿Cuánto duran mis publicaciones?</span>
+              <span class="faq-chevron" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </span>
+            </button>
+            <div class="faq-a" id="faq-a-8" role="region" aria-labelledby="faq-btn-8" hidden>
+              <p>Sin Premium, las publicaciones caducan en <strong>1 semana</strong>. Con Premium duran <strong>2
+                  meses</strong> sin necesidad de renovar. Puedes boost una publicación manualmente para darle
+                visibilidad extra.</p>
+            </div>
+          </div>
+
+        </div><!-- /faq-list -->
+
+        <div class="faq-cta reveal">
+          <p>¿Más preguntas? Escríbenos:</p>
+          <a href="mailto:contacto@kingshelp.app" class="btn btn-ghost">contacto@kingshelp.app</a>
+        </div>
+      </div>
+    </section>
+
     <!-- ── FOOTER ─────────────────────────────────────────────────────── -->
     <footer class="site-footer" aria-label="Pie de pagina">
       <div class="container footer-inner">
@@ -1080,7 +1437,8 @@
             <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false"
               onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=nav-brand-fallback>KingsHelp</span>')" />
           </a>
-          <p class="footer-note">KingsHelp conecta vecinos. No procesamos dinero: cualquier pago en EUR se acuerda en el chat y se realiza fuera de la plataforma.</p>
+          <p class="footer-note">KingsHelp conecta vecinos. No procesamos dinero: cualquier pago en EUR se acuerda en el
+            chat y se realiza fuera de la plataforma.</p>
         </div>
 
         <nav class="footer-links" aria-label="Enlaces legales">
@@ -1112,15 +1470,17 @@
             onerror="this.style.display='none'; this.insertAdjacentHTML('afterend','<span class=nav-brand-fallback>KingsHelp</span>')" />
         </a>
       </div>
-        <div class="dash-user">
-          <div class="user-avatar" id="user-avatar">A</div>
-          <div class="user-info">
-			<div class="user-name" id="user-name">—</div>
-			<div class="user-tier" id="user-tier">free</div>
-		</div>
-			<span class="verified-badge hidden" id="user-verified" title="Email verificado" aria-label="Email verificado">✓</span>
+      <div class="dash-user">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">—</div>
+          <div class="user-tier" id="user-tier">free</div>
+        </div>
+        <span class="verified-badge hidden" id="user-verified" title="Email verificado"
+          aria-label="Email verificado">✓</span>
         <span id="kh-theme-slot-dash"></span>
-        <button class="btn btn-ghost btn-sm dash-burger" type="button" id="dash-burger" aria-label="Abrir menú" aria-haspopup="menu" aria-expanded="false" onclick="KHApp.toggleDashMenu(event)">
+        <button class="btn btn-ghost btn-sm dash-burger" type="button" id="dash-burger" aria-label="Abrir menú"
+          aria-haspopup="menu" aria-expanded="false" onclick="KHApp.toggleDashMenu(event)">
           ☰
         </button>
         <button class="kh-pill" type="button" onclick="KHApp.openRanking(event)" aria-label="Abrir ranking vecinal">
@@ -1128,17 +1488,24 @@
           <span class="kh-theme-label">Ranking</span>
         </button>
         <div class="dash-menu">
-          <button class="btn btn-ghost btn-sm" type="button" id="dash-menu-btn" aria-haspopup="menu" aria-expanded="false"
-            onclick="KHApp.toggleDashMenu(event)">Cuenta ▾</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="dash-menu-btn" aria-haspopup="menu"
+            aria-expanded="false" onclick="KHApp.toggleDashMenu(event)">Cuenta ▾</button>
           <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.gotoDashFromMenu('inicio')">Inicio</button>
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.gotoDashFromMenu('creaciones')">Mis creaciones</button>
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.gotoDashFromMenu('matches')">Mis matches</button>
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.gotoDashFromMenu('perfil')">Perfil</button>
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.openRanking(event)">Ranking</button>
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.gotoDashFromMenu('premium')">Premium</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              onclick="KHApp.gotoDashFromMenu('inicio')">Inicio</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              onclick="KHApp.gotoDashFromMenu('creaciones')">Mis creaciones</button>
+            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.gotoDashFromMenu('matches')">Mis
+              matches</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              onclick="KHApp.gotoDashFromMenu('perfil')">Perfil</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              onclick="KHApp.openRanking(event)">Ranking</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              onclick="KHApp.gotoDashFromMenu('premium')">Premium</button>
             <div class="dash-menu-sep" aria-hidden="true"></div>
-            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.goLanding(event)">Ir a inicio web</button>
+            <button class="dash-menu-item" type="button" role="menuitem" onclick="KHApp.goLanding(event)">Ir a inicio
+              web</button>
             <button class="dash-menu-item danger" type="button" role="menuitem" onclick="KHApp.logout()">Salir</button>
           </div>
         </div>
@@ -1147,8 +1514,8 @@
 
     <div class="dash-tabs-wrap" role="navigation" aria-label="Secciones del panel">
       <nav class="dash-tabs" role="tablist" aria-label="Secciones">
-        <button class="dash-tab dash-tab--automatch" type="button" role="tab" aria-selected="false" data-view="automatch" id="dash-primary-automatch"
-          onclick="KHApp.setDashView('automatch')">
+        <button class="dash-tab dash-tab--automatch" type="button" role="tab" aria-selected="false"
+          data-view="automatch" id="dash-primary-automatch" onclick="KHApp.setDashView('automatch')">
           <span class="dash-tab-label">AutoMatch</span>
           <span class="dash-tab-badge hidden" id="am-tab-badge" aria-label="Invitaciones pendientes">0</span>
         </button>
@@ -1172,8 +1539,10 @@
           </div>
           <p class="next-desc" id="dash-next-desc">—</p>
           <div class="mvp-row">
-            <button class="btn btn-primary btn-sm" type="button" id="dash-next-cta" onclick="KHApp.runNext()">Continuar</button>
-            <button class="btn btn-ghost btn-sm" type="button" id="dash-next-secondary" onclick="KHApp.runNextSecondary()">Ver detalles</button>
+            <button class="btn btn-primary btn-sm" type="button" id="dash-next-cta"
+              onclick="KHApp.runNext()">Continuar</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="dash-next-secondary"
+              onclick="KHApp.runNextSecondary()">Ver detalles</button>
           </div>
         </div>
 
@@ -1225,7 +1594,8 @@
         <!-- AutoMatch (Premium) -->
         <div class="glass-card card-automatch reveal" id="card-automatch" data-view="automatch">
           <div class="card-head">
-            <h3>AutoMatch <span class="badge-pill" style="margin-left:8px; border-color:rgba(201,168,76,.28); color:var(--gold-light);">Premium</span></h3>
+            <h3>AutoMatch <span class="badge-pill"
+                style="margin-left:8px; border-color:rgba(201,168,76,.28); color:var(--gold-light);">Premium</span></h3>
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="badge-pill success hidden" id="am-status-pill">Activo</span>
               <button class="btn btn-gold btn-sm" type="button" onclick="KHFx.openPremiumModal()" id="btn-am-premium">
@@ -1238,7 +1608,9 @@
             <div class="automatch-hero">
               <div class="automatch-hero-k">Sistema de notificaciones automaticas</div>
               <div class="automatch-hero-v">AutoMatch te trae el barrio.</div>
-              <div class="automatch-hero-sub">Programa lo que <strong>ofreces</strong> y lo que <strong>necesitas</strong>. Cuando haya encaje, recibes una invitacion con tiempo limitado.</div>
+              <div class="automatch-hero-sub">Programa lo que <strong>ofreces</strong> y lo que
+                <strong>necesitas</strong>. Cuando haya encaje, recibes una invitacion con tiempo limitado.
+              </div>
             </div>
 
             <div class="automatch-board" aria-label="Configuracion AutoMatch">
@@ -1253,7 +1625,8 @@
                     <span>Activo</span>
                   </label>
                 </div>
-                <div class="am-mode-sub">Te llegan <strong>solicitudes</strong> (pasear mascotas, transporte, jardineria...).</div>
+                <div class="am-mode-sub">Te llegan <strong>solicitudes</strong> (pasear mascotas, transporte,
+                  jardineria...).</div>
                 <div class="automatch-cats" id="am-provider-cats"></div>
               </div>
 
@@ -1268,7 +1641,8 @@
                     <span>Activo</span>
                   </label>
                 </div>
-                <div class="am-mode-sub">Te llegan <strong>ofertas</strong> sin navegar (y tambien al crear una solicitud).</div>
+                <div class="am-mode-sub">Te llegan <strong>ofertas</strong> sin navegar (y tambien al crear una
+                  solicitud).</div>
                 <div class="automatch-cats" id="am-seeker-cats"></div>
               </div>
 
@@ -1387,7 +1761,8 @@
 
           <div class="creations-search" style="margin: 2px 0 10px;">
             <span style="opacity:.8">🔎</span>
-            <input class="creations-q" id="feed-q" placeholder="Busca: mudanza, limpieza, clases..." oninput="KHApp.loadFeed()" />
+            <input class="creations-q" id="feed-q" placeholder="Busca: mudanza, limpieza, clases..."
+              oninput="KHApp.loadFeed()" />
           </div>
           <div class="feed-grid" id="feed-grid">
             <div class="ledger-empty">Cargando...</div>
@@ -1409,7 +1784,8 @@
                 <span class="btn-label">Recargar</span>
                 <span class="spinner hidden"></span>
               </button>
-              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resendVerifyEmail()" id="btn-verify-resend">
+              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resendVerifyEmail()"
+                id="btn-verify-resend">
                 <span class="btn-label">Reenviar verificación</span>
                 <span class="spinner hidden"></span>
               </button>
@@ -1418,8 +1794,8 @@
 
           <div class="profile-stats">
             <div class="profile-stat">
-            <div class="profile-stat-k">Reputación</div>
-            <div class="profile-stat-v" id="profile-points">—</div>
+              <div class="profile-stat-k">Reputación</div>
+              <div class="profile-stat-v" id="profile-points">—</div>
             </div>
             <div class="profile-stat">
               <div class="profile-stat-k">Valoración</div>
@@ -1441,7 +1817,8 @@
             <div class="profile-photos-grid" id="profile-photos-grid">
               <div class="ledger-empty">Aún no hay fotos</div>
             </div>
-            <div class="demo-hint" style="margin-top:-6px;">Recomendación: fotos cuadradas (JPG/PNG/WEBP) · max 900KB</div>
+            <div class="demo-hint" style="margin-top:-6px;">Recomendación: fotos cuadradas (JPG/PNG/WEBP) · max 900KB
+            </div>
           </div>
 
           <form id="profile-form" onsubmit="KHApp.submitProfile(event)">
@@ -1485,31 +1862,31 @@
         </div>
 
         <!-- Ledger -->
-          <div class="glass-card card-ledger reveal" data-view="perfil">
-            <div class="card-head">
-              <div class="card-title">
-                <div class="card-ico" aria-hidden="true"><span>⚡</span></div>
-                <div>
-                  <h3>Mi reputación</h3>
-                  <div class="card-sub">Reputación de barrio: gana confianza ayudando de verdad.</div>
-                </div>
+        <div class="glass-card card-ledger reveal" data-view="perfil">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-ico" aria-hidden="true"><span>⚡</span></div>
+              <div>
+                <h3>Mi reputación</h3>
+                <div class="card-sub">Reputación de barrio: gana confianza ayudando de verdad.</div>
               </div>
-              <span class="badge-pill" id="ledger-badge">—</span>
             </div>
+            <span class="badge-pill" id="ledger-badge">—</span>
+          </div>
           <div class="balance-display" id="balance-display">
             <span class="balance-icon">⚡</span>
             <span class="balance-value" id="balance-value">—</span>
             <span class="balance-unit">rep</span>
           </div>
           <div class="coin-stage" id="coin-stage"></div>
-            <div class="ledger-list" id="ledger-list">
-              <div class="ledger-empty">Pulsa "Cargar" para ver tu historial</div>
-            </div>
-            <button class="btn btn-primary btn-sm mt-auto" id="btn-ledger" onclick="KHApp.loadLedger()">
-              <span class="btn-label">Cargar reputación</span>
-              <span class="spinner hidden"></span>
-            </button>
+          <div class="ledger-list" id="ledger-list">
+            <div class="ledger-empty">Pulsa "Cargar" para ver tu historial</div>
           </div>
+          <button class="btn btn-primary btn-sm mt-auto" id="btn-ledger" onclick="KHApp.loadLedger()">
+            <span class="btn-label">Cargar reputación</span>
+            <span class="spinner hidden"></span>
+          </button>
+        </div>
 
         <!-- Premium progress -->
         <div class="glass-card card-premium-progress reveal" id="card-premium-progress" data-view="premium">
@@ -1521,7 +1898,8 @@
           <div class="premium-progress-body">
             <div class="premium-progress-row">
               <span class="premium-progress-k">Tu reputación</span>
-              <span class="premium-progress-v"><strong id="premium-rep">—</strong> / <span id="premium-th">1000</span></span>
+              <span class="premium-progress-v"><strong id="premium-rep">—</strong> / <span
+                  id="premium-th">1000</span></span>
             </div>
             <div class="premium-progress-bar" aria-label="Progreso a Premium">
               <div class="premium-progress-fill" id="premium-progress-fill" style="width:0%"></div>
@@ -1531,7 +1909,8 @@
 
           <div class="mvp-row" style="margin-top:12px;">
             <button class="btn btn-ghost btn-sm" type="button" onclick="KHFx.openPremiumModal()">Ver beneficios</button>
-            <button class="btn btn-primary btn-sm" type="button" id="btn-premium-unlock" onclick="KHApp.tryUnlockPremiumByReputation()" disabled>
+            <button class="btn btn-primary btn-sm" type="button" id="btn-premium-unlock"
+              onclick="KHApp.tryUnlockPremiumByReputation()" disabled>
               Desbloquear
             </button>
           </div>
@@ -1563,7 +1942,8 @@
             <span class="badge-pill" id="perk-boost">—</span>
           </div>
           <div class="collections-body" id="collections-body">
-            <div class="ledger-empty">Completa insignias de servicio para desbloquear logos, puntos y boosts de 48h.</div>
+            <div class="ledger-empty">Completa insignias de servicio para desbloquear logos, puntos y boosts de 48h.
+            </div>
           </div>
         </div>
 
@@ -1647,69 +2027,73 @@
           <!-- Solicitud -->
           <div id="req-form-wrap">
             <form id="request-form" onsubmit="KHApp.createRequest(event)">
-            <div class="field">
-              <label for="req-title">Título</label>
-              <input id="req-title" type="text" placeholder="Ej. Mudanza" required />
-            </div>
-
-            <div class="field">
-              <label for="req-location">Zona</label>
-              <input id="req-location" type="text" placeholder="Ej. Centro · Bescano · Barrio" autocomplete="address-level2" required />
-              <div class="demo-hint" style="margin-top:6px;">Pon una zona reconocible. La verdadera ayuda real empieza por encontrarse.</div>
-            </div>
-
-            <div class="field">
-              <label for="req-category">Categoría</label>
-              <select id="req-category" required>
-                <option value="repairs">Reparaciones</option>
-                <option value="packages">Paquetes</option>
-                <option value="pets">Mascotas</option>
-                <option value="cleaning">Limpieza</option>
-                <option value="transport">Transporte</option>
-                <option value="tech">Tecnología</option>
-                <option value="gardening">Jardinería</option>
-                <option value="care">Acompañamiento</option>
-                <option value="tutoring">Clases</option>
-                <option value="creative">Creativo</option>
-                <option value="errands">Recados</option>
-                <option value="other">Otros</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label>¿Cómo se compensa?</label>
-              <input type="hidden" id="req-comp" value="cash" />
-              <div class="comp-switch" role="group" aria-label="Tipo de compensación">
-                <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
-                  onclick="KHApp.selectComp('req','cash')">Pago en €</button>
-                <button class="comp-choice" type="button" data-comp="barter" onclick="KHApp.selectComp('req','barter')">Trueque</button>
-                <button class="comp-choice" type="button" data-comp="altruistic"
-                  onclick="KHApp.selectComp('req','altruistic')">Altruistamente</button>
+              <div class="field">
+                <label for="req-title">Título</label>
+                <input id="req-title" type="text" placeholder="Ej. Mudanza" required />
               </div>
-              <div class="comp-hint" id="req-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de KingsHelp.</div>
-            </div>
 
-            <div class="demo-hint" style="margin-top:2px;">Que sea sencillo: hoy lo publicas, hoy te encuentran.</div>
+              <div class="field">
+                <label for="req-location">Zona</label>
+                <input id="req-location" type="text" placeholder="Ej. Centro · Bescano · Barrio"
+                  autocomplete="address-level2" required />
+                <div class="demo-hint" style="margin-top:6px;">Pon una zona reconocible. La verdadera ayuda real empieza
+                  por encontrarse.</div>
+              </div>
 
-            <div class="field">
-              <label for="req-desc">Detalles (opcional)</label>
-              <textarea id="req-desc" rows="3" placeholder="Qué necesitas, cuándo y dónde"></textarea>
-            </div>
+              <div class="field">
+                <label for="req-category">Categoría</label>
+                <select id="req-category" required>
+                  <option value="repairs">Reparaciones</option>
+                  <option value="packages">Paquetes</option>
+                  <option value="pets">Mascotas</option>
+                  <option value="cleaning">Limpieza</option>
+                  <option value="transport">Transporte</option>
+                  <option value="tech">Tecnología</option>
+                  <option value="gardening">Jardinería</option>
+                  <option value="care">Acompañamiento</option>
+                  <option value="tutoring">Clases</option>
+                  <option value="creative">Creativo</option>
+                  <option value="errands">Recados</option>
+                  <option value="other">Otros</option>
+                </select>
+              </div>
 
-            <div class="field">
-              <label for="req-when">¿Cuándo?</label>
-              <select id="req-when" required>
-                <option value="asap">Lo antes posible</option>
-                <option value="today">Hoy</option>
-                <option value="this_week">Esta semana</option>
-                <option value="flexible">Flexible</option>
-              </select>
-            </div>
+              <div class="field">
+                <label>¿Cómo se compensa?</label>
+                <input type="hidden" id="req-comp" value="cash" />
+                <div class="comp-switch" role="group" aria-label="Tipo de compensación">
+                  <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
+                    onclick="KHApp.selectComp('req','cash')">Pago en €</button>
+                  <button class="comp-choice" type="button" data-comp="barter"
+                    onclick="KHApp.selectComp('req','barter')">Trueque</button>
+                  <button class="comp-choice" type="button" data-comp="altruistic"
+                    onclick="KHApp.selectComp('req','altruistic')">Altruistamente</button>
+                </div>
+                <div class="comp-hint" id="req-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
+                  KingsHelp.</div>
+              </div>
 
-            <button type="submit" class="btn btn-primary btn-sm" id="btn-req-create">
-              <span class="btn-label">Crear solicitud</span>
-              <span class="spinner hidden"></span>
-            </button>
+              <div class="demo-hint" style="margin-top:2px;">Que sea sencillo: hoy lo publicas, hoy te encuentran.</div>
+
+              <div class="field">
+                <label for="req-desc">Detalles (opcional)</label>
+                <textarea id="req-desc" rows="3" placeholder="Qué necesitas, cuándo y dónde"></textarea>
+              </div>
+
+              <div class="field">
+                <label for="req-when">¿Cuándo?</label>
+                <select id="req-when" required>
+                  <option value="asap">Lo antes posible</option>
+                  <option value="today">Hoy</option>
+                  <option value="this_week">Esta semana</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-sm" id="btn-req-create">
+                <span class="btn-label">Crear solicitud</span>
+                <span class="spinner hidden"></span>
+              </button>
             </form>
           </div>
 
@@ -1719,11 +2103,12 @@
               <span>Solicitud creada: <strong id="req-created-title">—</strong></span>
             </div>
             <div class="mvp-row">
-            <button class="btn btn-ghost btn-sm" id="btn-req-suggest" onclick="KHApp.loadSuggestedProviders()">
-              <span class="btn-label">Buscar KingsHelp cerca</span>
-              <span class="spinner hidden"></span>
-            </button>
-              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resetCreateForm('request')">Crear otra</button>
+              <button class="btn btn-ghost btn-sm" id="btn-req-suggest" onclick="KHApp.loadSuggestedProviders()">
+                <span class="btn-label">Buscar KingsHelp cerca</span>
+                <span class="spinner hidden"></span>
+              </button>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resetCreateForm('request')">Crear
+                otra</button>
             </div>
 
             <div class="listing-photos" aria-label="Fotos de la solicitud">
@@ -1776,14 +2161,16 @@
                 <div class="comp-switch" role="group" aria-label="Tipo de compensación">
                   <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
                     onclick="KHApp.selectComp('off','cash')">Pago en €</button>
-                  <button class="comp-choice" type="button" data-comp="barter" onclick="KHApp.selectComp('off','barter')">Trueque</button>
+                  <button class="comp-choice" type="button" data-comp="barter"
+                    onclick="KHApp.selectComp('off','barter')">Trueque</button>
                   <button class="comp-choice" type="button" data-comp="altruistic"
                     onclick="KHApp.selectComp('off','altruistic')">Altruistamente</button>
                 </div>
-                <div class="comp-hint" id="off-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de KingsHelp.</div>
+                <div class="comp-hint" id="off-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
+                  KingsHelp.</div>
               </div>
 
-            <div class="demo-hint" style="margin-top:2px;">Ofrece con calma. La reputacion se gana en detalles.</div>
+              <div class="demo-hint" style="margin-top:2px;">Ofrece con calma. La reputacion se gana en detalles.</div>
 
               <div class="field">
                 <label for="off-desc">Detalles (opcional)</label>
@@ -1803,8 +2190,10 @@
               <span>Oferta publicada: <strong id="off-created-title">—</strong></span>
             </div>
             <div class="mvp-row">
-              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resetCreateForm('offer')">Publicar otra</button>
-              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.scrollToCreations()">Ver en mis creaciones</button>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resetCreateForm('offer')">Publicar
+                otra</button>
+              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.scrollToCreations()">Ver en mis
+                creaciones</button>
             </div>
 
             <div class="listing-photos" aria-label="Fotos de la oferta">
@@ -1835,17 +2224,18 @@
             <div class="creations-tabs" role="tablist" aria-label="Tipo">
               <button class="creations-tab creations-tab--active" type="button" data-kind="all"
                 onclick="KHApp.setCreationsFilter('kind','all')" role="tab" aria-selected="true">Todo</button>
-              <button class="creations-tab" type="button" data-kind="request" onclick="KHApp.setCreationsFilter('kind','request')"
-                role="tab" aria-selected="false">Solicitudes</button>
-              <button class="creations-tab" type="button" data-kind="offer" onclick="KHApp.setCreationsFilter('kind','offer')" role="tab"
-                aria-selected="false">Ofertas</button>
+              <button class="creations-tab" type="button" data-kind="request"
+                onclick="KHApp.setCreationsFilter('kind','request')" role="tab"
+                aria-selected="false">Solicitudes</button>
+              <button class="creations-tab" type="button" data-kind="offer"
+                onclick="KHApp.setCreationsFilter('kind','offer')" role="tab" aria-selected="false">Ofertas</button>
             </div>
 
             <div class="creations-tabs" role="tablist" aria-label="Estado">
               <button class="creations-tab creations-tab--active" type="button" data-status="active"
                 onclick="KHApp.setCreationsFilter('status','active')" role="tab" aria-selected="true">Activas</button>
-              <button class="creations-tab" type="button" data-status="closed" onclick="KHApp.setCreationsFilter('status','closed')" role="tab"
-                aria-selected="false">Cerradas</button>
+              <button class="creations-tab" type="button" data-status="closed"
+                onclick="KHApp.setCreationsFilter('status','closed')" role="tab" aria-selected="false">Cerradas</button>
             </div>
 
             <div class="creations-search" role="search">
@@ -1878,13 +2268,14 @@
             <div class="creations-tabs" role="tablist" aria-label="Estado de match">
               <button class="creations-tab creations-tab--active" type="button" data-mstatus="all"
                 onclick="KHApp.setMatchesFilter('status','all')" role="tab" aria-selected="true">Todos</button>
-              <button class="creations-tab" type="button" data-mstatus="pending" onclick="KHApp.setMatchesFilter('status','pending')"
-                role="tab" aria-selected="false">Pendiente</button>
-              <button class="creations-tab" type="button" data-mstatus="accepted" onclick="KHApp.setMatchesFilter('status','accepted')"
-                role="tab" aria-selected="false">Aceptado</button>
-              <button class="creations-tab" type="button" data-mstatus="done" onclick="KHApp.setMatchesFilter('status','done')" role="tab"
-                aria-selected="false">Hecho</button>
-              <button class="creations-tab" type="button" data-mstatus="rejected" onclick="KHApp.setMatchesFilter('status','rejected')" role="tab"
+              <button class="creations-tab" type="button" data-mstatus="pending"
+                onclick="KHApp.setMatchesFilter('status','pending')" role="tab" aria-selected="false">Pendiente</button>
+              <button class="creations-tab" type="button" data-mstatus="accepted"
+                onclick="KHApp.setMatchesFilter('status','accepted')" role="tab" aria-selected="false">Aceptado</button>
+              <button class="creations-tab" type="button" data-mstatus="done"
+                onclick="KHApp.setMatchesFilter('status','done')" role="tab" aria-selected="false">Hecho</button>
+              <button class="creations-tab" type="button" data-mstatus="rejected"
+                onclick="KHApp.setMatchesFilter('status','rejected')" role="tab"
                 aria-selected="false">Rechazado</button>
             </div>
 
@@ -1922,15 +2313,18 @@
         <p class="modal-sub">Te estamos esperando. Entra en KingsHelp y crea tu primer match.</p>
 
         <div class="auth-provider-list">
-          <button class="auth-provider" type="button" onclick="KHApp.authProvider('google')" aria-label="Continuar con Google">
+          <button class="auth-provider" type="button" onclick="KHApp.authProvider('google')"
+            aria-label="Continuar con Google">
             <span class="auth-ico auth-ico--g" aria-hidden="true"><img src="web/img/google-g.svg" alt="" /></span>
             <span>Continuar con Google</span>
           </button>
-          <button class="auth-provider" type="button" onclick="KHApp.authProvider('facebook')" aria-label="Continuar con Facebook">
+          <button class="auth-provider" type="button" onclick="KHApp.authProvider('facebook')"
+            aria-label="Continuar con Facebook">
             <span class="auth-ico auth-ico--f" aria-hidden="true"><img src="web/img/facebook-f.svg" alt="" /></span>
             <span>Continuar con Facebook</span>
           </button>
-          <button class="auth-provider" type="button" onclick="KHApp.showEmailAuth('login')" aria-label="Continuar con el email">
+          <button class="auth-provider" type="button" onclick="KHApp.showEmailAuth('login')"
+            aria-label="Continuar con el email">
             <span class="auth-ico auth-ico--m" aria-hidden="true">@</span>
             <span>Continuar con el email</span>
           </button>
@@ -1955,11 +2349,13 @@
         <form id="login-form" onsubmit="KHApp.submitLogin(event)">
           <div class="field">
             <label for="login-email">Email</label>
-            <input id="login-email" type="email" placeholder="demo.alice@kingshelp.local" value="demo.alice@kingshelp.local" required autocomplete="email" />
+            <input id="login-email" type="email" placeholder="demo.alice@kingshelp.local"
+              value="demo.alice@kingshelp.local" required autocomplete="email" />
           </div>
           <div class="field">
             <label for="login-pass">Contraseña</label>
-            <input id="login-pass" type="password" placeholder="password123" value="password123" required autocomplete="current-password" />
+            <input id="login-pass" type="password" placeholder="password123" value="password123" required
+              autocomplete="current-password" />
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="btn-login">
             <span class="btn-label">Entrar</span>
@@ -1978,7 +2374,8 @@
           </div>
           <div class="field">
             <label for="reg-pass">Contraseña</label>
-            <input id="reg-pass" type="password" placeholder="Mínimo 8 caracteres" required autocomplete="new-password" />
+            <input id="reg-pass" type="password" placeholder="Mínimo 8 caracteres" required
+              autocomplete="new-password" />
           </div>
           <div class="field">
             <label for="reg-location">Zona (opcional)</label>
@@ -2034,7 +2431,8 @@
         <span class="brand-icon">💬</span>
         <span class="modal-title">Acuerdo del match</span>
       </div>
-      <p class="modal-sub" id="chat-sub">Hablad y cerrad el acuerdo para continuar. KingsHelp no gestiona pagos: si es en €, se paga fuera.</p>
+      <p class="modal-sub" id="chat-sub">Hablad y cerrad el acuerdo para continuar. KingsHelp no gestiona pagos: si es
+        en €, se paga fuera.</p>
 
       <div class="chat-agreement" id="chat-agreement">
         <div class="chat-agreement-head">
@@ -2043,9 +2441,12 @@
         </div>
 
         <div class="comp-switch" role="group" aria-label="Tipo de compensación">
-          <button class="comp-choice" type="button" data-comp="cash" onclick="KHApp.chatSelectComp('cash')">Pago en €</button>
-          <button class="comp-choice" type="button" data-comp="barter" onclick="KHApp.chatSelectComp('barter')">Trueque</button>
-          <button class="comp-choice" type="button" data-comp="altruistic" onclick="KHApp.chatSelectComp('altruistic')">Altruistamente</button>
+          <button class="comp-choice" type="button" data-comp="cash" onclick="KHApp.chatSelectComp('cash')">Pago en
+            €</button>
+          <button class="comp-choice" type="button" data-comp="barter"
+            onclick="KHApp.chatSelectComp('barter')">Trueque</button>
+          <button class="comp-choice" type="button" data-comp="altruistic"
+            onclick="KHApp.chatSelectComp('altruistic')">Altruistamente</button>
         </div>
 
         <div class="chat-coins" id="chat-coins">
@@ -2062,13 +2463,15 @@
         <div class="chat-barter hidden" id="chat-barter">
           <div class="field" style="margin-bottom:0;">
             <label for="chat-barter-terms">Términos del trueque</label>
-            <textarea id="chat-barter-terms" rows="3" placeholder="Ej. Yo te ayudo 1 hora, tu me prestas una escalera"></textarea>
+            <textarea id="chat-barter-terms" rows="3"
+              placeholder="Ej. Yo te ayudo 1 hora, tu me prestas una escalera"></textarea>
           </div>
           <div class="comp-hint">Dejad el acuerdo escrito para evitar malentendidos.</div>
         </div>
 
         <div class="chat-actions">
-          <button class="btn btn-primary btn-block" type="button" id="btn-chat-agree" onclick="KHApp.chatConfirmAgreement()">
+          <button class="btn btn-primary btn-block" type="button" id="btn-chat-agree"
+            onclick="KHApp.chatConfirmAgreement()">
             <span class="btn-label">Confirmar acuerdo</span>
             <span class="spinner hidden"></span>
           </button>
@@ -2108,7 +2511,8 @@
           <div class="premium-pick-k">Mensual</div>
           <div class="premium-pick-v">0,99&nbsp;€<span>/mes</span></div>
         </button>
-        <button class="premium-pick premium-pick--active" type="button" data-interval="year" onclick="KHApp.setPremiumInterval('year')">
+        <button class="premium-pick premium-pick--active" type="button" data-interval="year"
+          onclick="KHApp.setPremiumInterval('year')">
           <div class="premium-pick-badge">Mejor</div>
           <div class="premium-pick-k">Anual</div>
           <div class="premium-pick-v">7,99&nbsp;€<span>/año</span></div>
@@ -2142,13 +2546,15 @@
       <div class="upgrade-top">
         <div class="upgrade-k">AutoMatch</div>
         <div class="upgrade-v">Te falta poco para Premium</div>
-        <div class="upgrade-sub">Premium te avisa de solicitudes que encajan con lo que ofreces. Aceptas en segundos y se abre el chat.</div>
+        <div class="upgrade-sub">Premium te avisa de solicitudes que encajan con lo que ofreces. Aceptas en segundos y
+          se abre el chat.</div>
       </div>
 
       <div class="upgrade-progress">
         <div class="premium-progress-row">
           <span class="premium-progress-k">Progreso</span>
-          <span class="premium-progress-v"><strong id="upgrade-rep">—</strong> / <span id="upgrade-th">—</span> rep</span>
+          <span class="premium-progress-v"><strong id="upgrade-rep">—</strong> / <span id="upgrade-th">—</span>
+            rep</span>
         </div>
         <div class="premium-progress-bar">
           <div class="premium-progress-fill" id="upgrade-fill" style="width:0%"></div>
@@ -2174,46 +2580,52 @@
   <div id="toast-container"></div>
 
   <!-- ── RANKING MODAL (landing) ───────────────────────────────────────── -->
-   <div id="modal-ranking" class="modal-overlay hidden" onclick="KHApp.closeRankingModal(event)" role="dialog" aria-modal="true" aria-label="Ranking vecinal">
-     <div class="modal-box modal-ranking-box" onclick="event.stopPropagation()">
+  <div id="modal-ranking" class="modal-overlay hidden" onclick="KHApp.closeRankingModal(event)" role="dialog"
+    aria-modal="true" aria-label="Ranking vecinal">
+    <div class="modal-box modal-ranking-box" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="KHApp.closeRankingModal()">✕</button>
-       <div class="ranking-head">
-         <div class="upgrade-top" style="padding-bottom:0;">
-           <div class="upgrade-k">Ranking vecinal</div>
-           <div class="upgrade-v">Tu barrio en directo</div>
-           <div class="upgrade-sub" id="ranking-me" style="margin-top:10px; display:none;"></div>
-         </div>
+      <div class="ranking-head">
+        <div class="upgrade-top" style="padding-bottom:0;">
+          <div class="upgrade-k">Ranking vecinal</div>
+          <div class="upgrade-v">Tu barrio en directo</div>
+          <div class="upgrade-sub" id="ranking-me" style="margin-top:10px; display:none;"></div>
+        </div>
 
-         <div class="rank-controls" style="margin-top:14px;">
-           <div class="rank-controls-row">
-             <div class="rank-search" role="search" aria-label="Buscar vecino">
-               <input class="rank-search-input" id="rank-q-modal" type="search" placeholder="Buscar vecino o zona" autocomplete="off"
-                 oninput="KHApp.setRankingQuery(this.value, { modal: true })" />
-             </div>
-             <button class="rank-chip rank-chip--active" type="button" data-scope="global" onclick="KHApp.setRankingScope('global', { modal: true })">Global</button>
-             <button class="rank-chip" type="button" data-scope="near" onclick="KHApp.setRankingScope('near', { modal: true })">Cerca de mi</button>
-             <select class="rank-select" id="rank-radius-modal" onchange="KHApp.setRankingRadius(this.value, { modal: true })" aria-label="Radio">
-               <option value="1">1 km</option>
-               <option value="3">3 km</option>
-               <option value="5" selected>5 km</option>
-               <option value="10">10 km</option>
-             </select>
-             <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.useMyLocation({ modal: true })">Ubicacion</button>
-              <select class="rank-select" id="rank-level-modal" onchange="KHApp.setRankingLevel(this.value, { modal: true })" aria-label="Nivel minimo">
-               <option value="all" selected>Todos</option>
-               <option value="incept">Incept (0+)</option>
-               <option value="bronze">Bronce (100+)</option>
-               <option value="silver">Plata (250+)</option>
-               <option value="gold">Oro (500+)</option>
-               <option value="legend">Leyenda (1000+)</option>
-             </select>
-           </div>
-         </div>
+        <div class="rank-controls" style="margin-top:14px;">
+          <div class="rank-controls-row">
+            <div class="rank-search" role="search" aria-label="Buscar vecino">
+              <input class="rank-search-input" id="rank-q-modal" type="search" placeholder="Buscar vecino o zona"
+                autocomplete="off" oninput="KHApp.setRankingQuery(this.value, { modal: true })" />
+            </div>
+            <button class="rank-chip rank-chip--active" type="button" data-scope="global"
+              onclick="KHApp.setRankingScope('global', { modal: true })">Global</button>
+            <button class="rank-chip" type="button" data-scope="near"
+              onclick="KHApp.setRankingScope('near', { modal: true })">Cerca de mi</button>
+            <select class="rank-select" id="rank-radius-modal"
+              onchange="KHApp.setRankingRadius(this.value, { modal: true })" aria-label="Radio">
+              <option value="1">1 km</option>
+              <option value="3">3 km</option>
+              <option value="5" selected>5 km</option>
+              <option value="10">10 km</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" type="button"
+              onclick="KHApp.useMyLocation({ modal: true })">Ubicacion</button>
+            <select class="rank-select" id="rank-level-modal"
+              onchange="KHApp.setRankingLevel(this.value, { modal: true })" aria-label="Nivel minimo">
+              <option value="all" selected>Todos</option>
+              <option value="incept">Incept (0+)</option>
+              <option value="bronze">Bronce (100+)</option>
+              <option value="silver">Plata (250+)</option>
+              <option value="gold">Oro (500+)</option>
+              <option value="legend">Leyenda (1000+)</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-       <div class="leaderboard-list ranking-list" id="leaderboard-list-modal">
-         <div class="ledger-empty">Pulsa “Ubicacion” o usa Global</div>
-       </div>
+      <div class="leaderboard-list ranking-list" id="leaderboard-list-modal">
+        <div class="ledger-empty">Pulsa “Ubicacion” o usa Global</div>
+      </div>
 
       <div class="premium-modal-actions" id="ranking-more-wrap" style="margin-top:12px; display:none;">
         <button class="btn btn-ghost btn-block" id="btn-ranking-more" type="button" onclick="KHApp.rankingLoadMore()">
@@ -2231,12 +2643,14 @@
   </div>
 
   <!-- ── USER CARD MODAL (ranking) ─────────────────────────────────────── -->
-  <div id="modal-usercard" class="modal-overlay hidden" onclick="KHApp.closeUserCard(event)" role="dialog" aria-modal="true" aria-label="Perfil de vecino">
+  <div id="modal-usercard" class="modal-overlay hidden" onclick="KHApp.closeUserCard(event)" role="dialog"
+    aria-modal="true" aria-label="Perfil de vecino">
     <div class="modal-box modal-usercard-box" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="KHApp.closeUserCard()">✕</button>
       <div class="usercard-head">
         <div class="usercard-avatar" id="usercard-avatar">—</div>
-        <span class="verified-badge hidden" id="usercard-verified" title="Email verificado" aria-label="Email verificado">✓</span>
+        <span class="verified-badge hidden" id="usercard-verified" title="Email verificado"
+          aria-label="Email verificado">✓</span>
         <div style="min-width:0;">
           <div class="usercard-name" id="usercard-name">—</div>
           <div class="usercard-sub" id="usercard-sub">—</div>
@@ -2252,7 +2666,8 @@
       <div class="usercard-badges">
         <div class="usercard-badges-head">
           <div class="usercard-section-title">Insignias</div>
-          <button class="btn btn-ghost btn-sm usercard-more hidden" type="button" id="usercard-more" onclick="KHApp.userCardToggleBadges()">Ver todas</button>
+          <button class="btn btn-ghost btn-sm usercard-more hidden" type="button" id="usercard-more"
+            onclick="KHApp.userCardToggleBadges()">Ver todas</button>
         </div>
         <div class="usercard-badges-grid" id="usercard-badges">
           <div class="ledger-empty">Cargando…</div>
@@ -2268,16 +2683,19 @@
   </div>
 
   <!-- ── FEED DETAILS MODAL (match-selectivo helper) ────────────────────── -->
-  <div id="modal-feed-details" class="modal-overlay hidden" onclick="KHApp.closeFeedDetails(event)" role="dialog" aria-modal="true" aria-label="Detalles de publicación">
+  <div id="modal-feed-details" class="modal-overlay hidden" onclick="KHApp.closeFeedDetails(event)" role="dialog"
+    aria-modal="true" aria-label="Detalles de publicación">
     <div class="modal-box" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="KHApp.closeFeedDetails()">✕</button>
       <div class="modal-title">Detalles</div>
       <div id="feed-details-body" class="modal-body" style="display:grid; gap:12px;"></div>
-      <div class="premium-modal-actions" style="margin-top:14px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
+      <div class="premium-modal-actions"
+        style="margin-top:14px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
         <button class="btn btn-ghost" type="button" onclick="KHApp.closeFeedDetails()">
           <span class="btn-label">Cerrar</span>
         </button>
-        <button class="btn btn-primary" type="button" id="btn-feed-details-match" onclick="KHApp.feedDetailsCreateMatch()">
+        <button class="btn btn-primary" type="button" id="btn-feed-details-match"
+          onclick="KHApp.feedDetailsCreateMatch()">
           <span class="btn-label">Crear match</span>
         </button>
       </div>

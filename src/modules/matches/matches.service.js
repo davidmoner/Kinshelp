@@ -19,6 +19,7 @@ const {
     ANTI_FRAUD_PAIR_WINDOW_DAYS,
     ANTI_FRAUD_PAIR_MAX_FULL_AWARDS,
 } = require('../../config/constants');
+const { logEvent } = require('../admin/admin.events.repo');
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 function requireMatch(id) {
@@ -110,31 +111,41 @@ function getById(id) {
     return requireMatch(id);
 }
 
-function create(data) {
+async function create(data) {
     const { offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type } = data;
 
     if (offer_id) requireOffer(offer_id);
     if (request_id) requireRequest(request_id);
 
+    let matchId;
     if (db.isPg) {
-        return db.tx(async (tx) => {
+        matchId = await db.tx(async (tx) => {
             const id = await repo.insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type }, tx);
             const now = new Date().toISOString();
             if (offer_id) await tx.exec("UPDATE service_offers SET status='matched', updated_at=$1 WHERE id=$2", [now, offer_id]);
             if (request_id) await tx.exec("UPDATE help_requests SET status='matched', updated_at=$1 WHERE id=$2", [now, request_id]);
             return id;
-        }).then(matchId => repo.findById(matchId));
+        });
+    } else {
+        matchId = db.transaction(() => {
+            const id = repo.insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type });
+            const now = new Date().toISOString();
+            if (offer_id) db.prepare("UPDATE service_offers SET status='matched', updated_at=? WHERE id=?").run(now, offer_id);
+            if (request_id) db.prepare("UPDATE help_requests  SET status='matched', updated_at=? WHERE id=?").run(now, request_id);
+            return id;
+        })();
     }
 
-    const matchId = db.transaction(() => {
-        const id = repo.insert({ offer_id, request_id, provider_id, seeker_id, points_agreed, initiated_by, compensation_type });
-        const now = new Date().toISOString();
-        if (offer_id) db.prepare("UPDATE service_offers SET status='matched', updated_at=? WHERE id=?").run(now, offer_id);
-        if (request_id) db.prepare("UPDATE help_requests  SET status='matched', updated_at=? WHERE id=?").run(now, request_id);
-        return id;
-    })();
-
-    return requireMatch(matchId);
+    const created = requireMatch(matchId);
+    try {
+        notifications.notify(provider_id, 'match_created', {
+            title: 'Nuevo match',
+            body: 'Tienes una nueva solicitud de match. Acepta o rechaza desde tu panel.',
+            payload: { match_id: matchId },
+        });
+    } catch { }
+    try { logEvent({ type: 'match.created', actorUserId: initiated_by === 'provider' ? provider_id : seeker_id, targetType: 'match', targetId: matchId, meta: { provider_id, seeker_id, compensation_type } }); } catch { }
+    return created;
 }
 
 async function changeStatus(matchId, actingUserId, action) {
@@ -179,8 +190,6 @@ async function changeStatus(matchId, actingUserId, action) {
         }
 
         if (newStatus === 'done') {
-            // Money is agreed in chat and paid outside KingsHelp.
-            // Here we award reputation based on compensation type.
             const comp = normalizeCompType(match);
             const cfg = (REPUTATION_AWARD && REPUTATION_AWARD.match_done && REPUTATION_AWARD.match_done[comp])
                 || { provider: 12, seeker: 6 };
@@ -210,7 +219,7 @@ async function changeStatus(matchId, actingUserId, action) {
         }
     }
 
-    // Cooldown-gated notification hook (replace with real push/email later)
+    // Cooldown-gated notification hook
     const notifyTarget = newStatus === 'accepted' || newStatus === 'done' ? match.seeker_id : match.provider_id;
     try {
         const ok = await cooldown.tryNotify(notifyTarget, `match_${newStatus}`);
@@ -222,6 +231,7 @@ async function changeStatus(matchId, actingUserId, action) {
             });
         }
     } catch { }
+    try { logEvent({ type: `match.${newStatus}`, actorUserId: actingUserId, targetType: 'match', targetId: matchId, meta: { prev_status: match.status, new_status: newStatus } }); } catch { }
 
     return requireMatch(matchId);
 }

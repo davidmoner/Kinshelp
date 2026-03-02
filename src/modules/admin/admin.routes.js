@@ -24,6 +24,8 @@ r.post('/reports/:id/resolve', controller.resolveReport);
 r.get('/users', controller.listUsers);
 r.get('/users/:id', controller.getUser);
 r.patch('/users/:id', controller.patchUser);
+r.post('/users/:id/ban', controller.banUser);
+r.post('/users/:id/unban', controller.unbanUser);
 
 // Audit log
 r.get('/audit', controller.listAudit);

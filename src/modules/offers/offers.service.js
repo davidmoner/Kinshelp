@@ -58,12 +58,12 @@ function getById(id) {
 }
 
 function create(data) {
-  return Promise.resolve(computeExpiresAt(data.provider_id)).then(expires_at => repo.insert({ ...data, expires_at }))
-    .then(id => requireOffer(id))
-    .then(row => {
-      try { automatchSvc.onOfferCreated(row); } catch { /* don't block offer creation */ }
-      return row;
-    });
+    return Promise.resolve(computeExpiresAt(data.provider_id)).then(expires_at => repo.insert({ ...data, expires_at }))
+        .then(id => requireOffer(id))
+        .then(row => {
+            try { automatchSvc.onOfferCreated(row); } catch { /* don't block offer creation */ }
+            return row;
+        });
 }
 
 function update(id, userId, fields) {
@@ -71,13 +71,13 @@ function update(id, userId, fields) {
         if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
         if (offer.status !== OFFER_STATUS.ACTIVE) throw httpError(422, 'Only active offers can be edited');
 
-    const sets = [], vals = [];
-    for (const key of EDITABLE) {
-        if (fields[key] !== undefined) {
-            sets.push(`${key} = ?`);
-            vals.push(key === 'media_urls' ? JSON.stringify(fields[key]) : fields[key]);
+        const sets = [], vals = [];
+        for (const key of EDITABLE) {
+            if (fields[key] !== undefined) {
+                sets.push(`${key} = ?`);
+                vals.push(key === 'media_urls' ? JSON.stringify(fields[key]) : fields[key]);
+            }
         }
-    }
         if (!sets.length) return requireOffer(id);
         if (db.isPg) throw httpError(501, 'Editing offers not supported on Postgres yet');
         repo.patch(id, sets.join(', '), vals);
@@ -104,9 +104,9 @@ function parseMedia(raw) {
     }
 }
 
-function addPhoto(id, userId, file, baseUrl) {
+async function addPhoto(id, userId, file, baseUrl) {
     if (!file) throw httpError(400, 'Photo is required');
-    const offer = requireOffer(id);
+    const offer = await requireOffer(id);
     if (offer.provider_id !== userId) {
         try { fs.unlinkSync(file.path); } catch { }
         throw httpError(403, 'Forbidden');
@@ -130,8 +130,8 @@ function addPhoto(id, userId, file, baseUrl) {
     return { ok: true, media_urls: next };
 }
 
-function deletePhoto(id, userId, photoId) {
-    const offer = requireOffer(id);
+async function deletePhoto(id, userId, photoId) {
+    const offer = await requireOffer(id);
     if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
     const media = parseMedia(offer.media_urls);
     const idx = media.findIndex(p => String(p && p.id) === String(photoId));
@@ -147,12 +147,13 @@ function deletePhoto(id, userId, photoId) {
     return { ok: true, media_urls: media };
 }
 
-function boost48h(id, userId) {
-    const offer = requireOffer(id);
+async function boost48h(id, userId) {
+    const offer = await requireOffer(id);
     if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
     if (offer.status !== OFFER_STATUS.ACTIVE) throw httpError(422, 'Solo se pueden boostear ofertas activas');
     if (Number(offer.boost_48h_used || 0) === 1) throw httpError(409, 'Este anuncio ya uso su boost 48h');
 
+    if (db.isPg) throw httpError(501, 'Boost not supported on Postgres yet');
     const u = db.prepare('SELECT premium_tier, premium_until, boost_48h_tokens FROM users WHERE id = ?').get(userId);
     if (!u) throw httpError(404, 'User not found');
 

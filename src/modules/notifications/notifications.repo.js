@@ -67,4 +67,16 @@ async function markRead(userId, notificationId) {
   db.prepare('UPDATE notifications SET read_at = COALESCE(read_at, ?) WHERE id = ? AND user_id = ?').run(now, notificationId, userId);
 }
 
-module.exports = { create, listForUser, markRead };
+async function markAllRead(userId) {
+  const now = new Date().toISOString();
+  if (db.isPg) {
+    await db.exec(
+      'UPDATE notifications SET read_at = COALESCE(read_at, $1) WHERE user_id = $2 AND read_at IS NULL',
+      [now, userId]
+    );
+    return;
+  }
+  db.prepare('UPDATE notifications SET read_at = COALESCE(read_at, ?) WHERE user_id = ? AND read_at IS NULL').run(now, userId);
+}
+
+module.exports = { create, listForUser, markRead, markAllRead };
