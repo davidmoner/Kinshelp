@@ -2984,12 +2984,24 @@
             await ensureCurrentUser();
             if (!currentUser) throw new Error('No se pudo cargar tu usuario');
 
+            const loc = String((currentUser && currentUser.location_text) || '').trim();
+            if (!loc) {
+                status.textContent = 'Falta tu zona';
+                list.innerHTML = '<div class="ledger-empty">Para probar la demo, primero completa tu <b>Zona</b> en Perfil.</div>';
+                toast('Completa tu zona en Perfil para usar la demo', 'error');
+                // Send them to Profile in-dashboard (fast fix).
+                try { setDashView('perfil'); } catch { }
+                return;
+            }
+
             const body = {
                 title: draft.title,
                 category: draft.category,
                 points_offered: 0,
                 description: draft.description,
                 compensation_type: draft.compensation_type || 'cash',
+                location_text: loc,
+                when: 'asap',
             };
 
             const req = await KHApi.createRequest(body);
