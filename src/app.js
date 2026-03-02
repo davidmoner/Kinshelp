@@ -134,10 +134,13 @@ api.use('/requests', require('./modules/requests/requests.routes'));
 api.use('/matches', require('./modules/matches/matches.routes'));
 api.use('/points', require('./modules/points/points.routes'));
 api.use('/badges', require('./modules/badges/badges.routes'));
-api.use('/premium', require('./modules/premium/premium.routes'));
-api.use('/automatch', require('./modules/automatch/automatch.routes'));
-api.use('/feed', require('./modules/feed/feed.routes'));
-api.use('/notifications', require('./modules/notifications/notifications.routes'));
+  api.use('/premium', require('./modules/premium/premium.routes'));
+  api.use('/automatch', require('./modules/automatch/automatch.routes'));
+  api.use('/feed', require('./modules/feed/feed.routes'));
+  api.use('/notifications', require('./modules/notifications/notifications.routes'));
+
+  // Admin (protected by auth + ADMIN_EMAILS)
+  api.use('/admin', require('./modules/admin/admin.routes'));
 
 app.use('/api/v1', apiLimiter, api);
 
@@ -148,6 +151,7 @@ const webDir = path.resolve(__dirname, '..');
 app.use('/web', express.static(path.join(webDir, 'web')));
 app.use('/legal', express.static(path.join(webDir, 'legal')));
 app.use('/img', express.static(path.join(webDir, 'img')));
+app.use('/admin', express.static(path.join(webDir, 'admin')));
 
 // Landing assets at repo root (only files, no directory listing).
 app.use('/', express.static(webDir, { index: false, extensions: false }));

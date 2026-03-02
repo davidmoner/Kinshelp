@@ -188,6 +188,15 @@ async function run() {
     failed++;
   }
 
+  /* ── 4b. Admin requires auth ─────────────────────────────────────────── */
+  try {
+    const adminMe = await requestJson('GET', '/api/v1/admin/me');
+    assert(adminMe.status === 401, 'GET /api/v1/admin/me sin token → 401');
+  } catch (e) {
+    console.error(`  ❌  admin me (no token) failed: ${e.message}`);
+    failed++;
+  }
+
   if (token) {
     try {
       const out = await requestJson('POST', '/api/v1/premium/checkout', { token, payload: { interval: 'month' } });

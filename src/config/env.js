@@ -20,4 +20,7 @@ module.exports = {
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || null,
   FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID || null,
   FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET || null,
+
+  // Admin access (comma-separated emails)
+  ADMIN_EMAILS: process.env.ADMIN_EMAILS || null,
 };

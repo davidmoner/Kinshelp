@@ -308,6 +308,30 @@ if (!hasColumn('users', 'boost_48h_tokens')) {
   addColumn('users', 'boost_48h_tokens INTEGER NOT NULL DEFAULT 0');
 }
 
+// Admin tables (idempotent)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS admin_audit_log (
+    id            TEXT PRIMARY KEY,
+    admin_user_id TEXT NOT NULL,
+    action        TEXT NOT NULL,
+    entity_type   TEXT NOT NULL,
+    entity_id     TEXT,
+    before_json   TEXT,
+    after_json    TEXT,
+    ip            TEXT,
+    user_agent    TEXT,
+    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at);
+  CREATE INDEX IF NOT EXISTS idx_admin_audit_admin ON admin_audit_log(admin_user_id, created_at);
+
+  CREATE TABLE IF NOT EXISTS admin_config (
+    key        TEXT PRIMARY KEY,
+    value_json TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
 if (!hasColumn('help_requests', 'boost_48h_used')) {
   addColumn('help_requests', 'boost_48h_used INTEGER NOT NULL DEFAULT 0');
 }

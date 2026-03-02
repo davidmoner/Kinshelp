@@ -1,0 +1,27 @@
+'use strict';
+const express = require('express');
+const { authenticate } = require('../../middleware/auth.middleware');
+const { requireAdmin } = require('../../middleware/admin.middleware');
+const controller = require('./admin.controller');
+
+const r = express.Router();
+
+// All admin routes require auth + admin.
+r.use(authenticate, requireAdmin);
+
+r.get('/me', controller.me);
+r.get('/stats/overview', controller.overview);
+
+// Users
+r.get('/users', controller.listUsers);
+r.get('/users/:id', controller.getUser);
+r.patch('/users/:id', controller.patchUser);
+
+// Audit log
+r.get('/audit', controller.listAudit);
+
+// Config
+r.get('/config', controller.getConfig);
+r.patch('/config', controller.patchConfig);
+
+module.exports = r;

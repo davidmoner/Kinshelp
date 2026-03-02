@@ -202,6 +202,30 @@ async function migrate() {
       CREATE INDEX IF NOT EXISTS idx_auth_tokens_user_type ON auth_tokens(user_id, type);
     `);
 
+    // Admin tables
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_audit_log (
+        id            uuid PRIMARY KEY,
+        admin_user_id uuid NOT NULL,
+        action        text NOT NULL,
+        entity_type   text NOT NULL,
+        entity_id     text,
+        before_json   jsonb,
+        after_json    jsonb,
+        ip            text,
+        user_agent    text,
+        created_at    timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at);
+      CREATE INDEX IF NOT EXISTS idx_admin_audit_admin ON admin_audit_log(admin_user_id, created_at);
+
+      CREATE TABLE IF NOT EXISTS admin_config (
+        key        text PRIMARY KEY,
+        value_json jsonb NOT NULL,
+        updated_at timestamptz NOT NULL DEFAULT now()
+      );
+    `);
+
     await client.query(`
       CREATE TABLE IF NOT EXISTS automatch_settings (
         user_id             uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
