@@ -170,12 +170,22 @@ html[data-theme="dark"] .kh-ios-sub {
     display: inline-block;
 }
 
-/* Typewriter reveal (clip-path + tiny jitter for digital feel) */
+/* Typewriter reveal (domino: line1 then line2) */
 .hero-banner.hero-banner--active .kh-type {
     clip-path: inset(0 100% 0 0);
+}
+
+.hero-banner.hero-banner--active .kh-type--line1 {
     animation:
-        khTypeClip var(--kh-type-dur, 1400ms) steps(var(--kh-type-steps, 24), end) both,
+        khTypeClip var(--kh-type-dur1, 1200ms) steps(var(--kh-type-steps1, 16), end) both,
         khTypeJitter 520ms steps(2, end) 2 both;
+}
+
+.hero-banner.hero-banner--active .kh-type--line2 {
+    animation:
+        khTypeClip var(--kh-type-dur2, 1100ms) steps(var(--kh-type-steps2, 14), end) both,
+        khTypeJitter 520ms steps(2, end) 2 both;
+    animation-delay: calc(var(--kh-type-dur1, 1200ms) + var(--kh-type-gap, 140ms));
 }
 
 /* Restart typewriter when a banner becomes active */
@@ -184,9 +194,12 @@ html[data-theme="dark"] .kh-ios-sub {
     clip-path: inset(0 100% 0 0);
 }
 
-.hero-banner.hero-banner--active .kh-type--line2 {
-    animation-delay: var(--kh-type-delay2, 260ms);
+.hero-banner:not(.hero-banner--active) .kh-type::after {
+    animation: none !important;
+    opacity: 0 !important;
 }
+
+/* line2 delay handled above */
 
 @keyframes khTypeClip {
     from { clip-path: inset(0 100% 0 0); }
@@ -208,18 +221,37 @@ html[data-theme="dark"] .kh-ios-sub {
     color: currentColor;
     opacity: 0.78;
     transform: translateY(0.02em);
-    animation:
-        khCaretBlink 720ms step-end infinite,
-        khCaretGlitch 2600ms steps(1, end) infinite;
+    animation: khCaretBlink 720ms step-end infinite;
 }
 
-/* keep caret only on the last line */
+/* Domino caret: show on current line only */
 .hero-banner.hero-banner--active .kh-type--line1::after {
-    display: none;
+    opacity: 0;
+    animation:
+        khCaretBlink 720ms step-end infinite,
+        khCaretLife var(--kh-type-dur1, 1200ms) steps(1, end) both;
+}
+
+.hero-banner.hero-banner--active .kh-type--line2::after {
+    opacity: 0;
+    animation:
+        khCaretBlink 720ms step-end infinite,
+        khCaretLife var(--kh-type-dur2, 1100ms) steps(1, end) both,
+        khCaretGlitch 2600ms steps(1, end) infinite;
+    animation-delay:
+        calc(var(--kh-type-dur1, 1200ms) + var(--kh-type-gap, 140ms)),
+        calc(var(--kh-type-dur1, 1200ms) + var(--kh-type-gap, 140ms)),
+        calc(var(--kh-type-dur1, 1200ms) + var(--kh-type-gap, 140ms));
 }
 
 @keyframes khCaretBlink {
     50% { opacity: 0; }
+}
+
+@keyframes khCaretLife {
+    0% { opacity: 0.92; }
+    99% { opacity: 0.92; }
+    100% { opacity: 0; }
 }
 
 @keyframes khCaretGlitch {
