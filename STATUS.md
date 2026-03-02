@@ -39,6 +39,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Auth: agregar endpoint para enviar/verificar email de forma clickeable (resend verify) y UX en mobile/web.
 - OAuth: implementar verificacion real de Google/Facebook cuando existan credenciales.
 - Auth/OAuth (objetivo): cerrar login con plataformas (Google/Facebook) end-to-end, con botones profesionales (logos oficiales), UX consistente web/mobile, y flujo 100% funcional (callback backend + manejo de errores + estados).
+
+## Pendiente (OAuth)
+
+- Nota: Login con Google/Facebook queda pendiente de configurar en produccion (apps/credenciales + callbacks). Codigo listo; faltan `GOOGLE_CLIENT_ID/SECRET` y `FACEBOOK_APP_ID/SECRET` en env y validar redirects reales.
 - Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
 
 ## Estado (mar 2026)

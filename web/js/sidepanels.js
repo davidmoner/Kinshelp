@@ -92,7 +92,7 @@
             tryOne();
             return;
           }
-          var cand = 'img/' + n + side + suff + '.' + exts[i++];
+          var cand = '../img/' + n + side + suff + '.' + exts[i++];
           var img = new Image();
           img.onload = function () {
             if (done) return;
@@ -115,7 +115,7 @@
     }
 
     return {
-      initial: ['img/1' + side + suff + '.png'],
+      initial: ['../img/1' + side + suff + '.png'],
       probeAll: probeAll
     };
   }
@@ -215,11 +215,16 @@
     return cand2;
   }
 
+  function isDarkAssetPath(p) {
+    return !!p && String(p).indexOf(DARK_SUFFIX) !== -1;
+  }
+
   function mkScene(side, imgPath) {
     return {
       img: imgPath,
       alt: 'Panel ' + side,
-      pill: side === 'izquierda' ? 'Vecina' : 'Vecino'
+      pill: side === 'izquierda' ? 'Vecina' : 'Vecino',
+      _darkImg: isDarkAssetPath(imgPath)
     };
   }
 
@@ -241,7 +246,7 @@
       img.loading = 'eager';
       img.decoding = 'async';
       img.draggable = false;
-      if (isDarkTheme()) img.setAttribute('data-kh-darkimg', '1');
+      if (scene._darkImg) img.setAttribute('data-kh-darkimg', '1');
       img.onerror = function () {
         // Keep layout intact even if a file is missing.
         this.style.opacity = '0';

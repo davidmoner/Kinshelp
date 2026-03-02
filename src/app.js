@@ -10,6 +10,29 @@ const rateLimit = require('express-rate-limit');
 const { errorHandler, notFound } = require('./middleware/error.middleware');
 
 const app = express();
+
+// Security headers (safe defaults; CSP is set to report-only to avoid breaking inline scripts)
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      reportOnly: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https:'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https:'],
+        fontSrc: ["'self'", 'https:', 'data:'],
+        frameAncestors: ["'self'"],
+        baseUri: ["'self'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 app.disable('x-powered-by');
 
 // Stripe webhooks require raw body for signature verification.
