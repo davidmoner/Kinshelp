@@ -92,7 +92,7 @@
             tryOne();
             return;
           }
-          var cand = '../img/' + n + side + suff + '.' + exts[i++];
+          var cand = 'img/' + n + side + suff + '.' + exts[i++];
           var img = new Image();
           img.onload = function () {
             if (done) return;
@@ -116,7 +116,7 @@
     }
 
     return {
-      initial: ['../img/1' + side + suff + '.png'],
+      initial: ['img/1' + side + suff + '.png'],
       probeAll: probeAll
     };
   }
