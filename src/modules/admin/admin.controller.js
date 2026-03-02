@@ -1,6 +1,8 @@
 'use strict';
 const { randomUUID } = require('crypto');
 const repo = require('./admin.repo');
+const eventsRepo = require('./admin.events.repo');
+const reportsRepo = require('./admin.reports.repo');
 const httpError = require('../../shared/http-error');
 
 function safeUser(user) {
@@ -19,19 +21,101 @@ function overview(req, res) {
   // For now: total users + last 24h registrations.
   const db = require('../../config/db');
 
-  if (db.isPg) {
-    Promise.all([
-      db.one('SELECT COUNT(*)::int AS n FROM users', []),
-      db.one("SELECT COUNT(*)::int AS n FROM users WHERE created_at >= (now() - interval '1 day')", []),
-    ]).then(([a, b]) => {
-      res.json({ ok: true, users: { total: a.n, last_24h: b.n } });
-    }).catch(() => res.status(500).json({ error: 'Failed to compute overview' }));
-    return;
-  }
+  const get = async () => {
+    if (db.isPg) {
+      const [a, b, reqOpen, mPend, mDone, prem] = await Promise.all([
+        db.one('SELECT COUNT(*)::int AS n FROM users', []),
+        db.one("SELECT COUNT(*)::int AS n FROM users WHERE created_at >= (now() - interval '1 day')", []),
+        db.one("SELECT COUNT(*)::int AS n FROM help_requests WHERE status = 'open'", []),
+        db.one("SELECT COUNT(*)::int AS n FROM matches WHERE status = 'pending'", []),
+        db.one("SELECT COUNT(*)::int AS n FROM matches WHERE status = 'done'", []),
+        db.one("SELECT COUNT(*)::int AS n FROM users WHERE premium_tier <> 'free'", []),
+      ]);
+      return {
+        users: { total: a.n, last_24h: b.n },
+        requests: { open: reqOpen.n },
+        matches: { pending: mPend.n, done: mDone.n },
+        premium: { active_users: prem.n },
+      };
+    }
 
-  const totalUsers = db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
-  const last24h = db.prepare("SELECT COUNT(*) AS n FROM users WHERE created_at >= datetime('now','-1 day')").get().n;
-  res.json({ ok: true, users: { total: totalUsers, last_24h: last24h } });
+    const totalUsers = db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
+    const last24h = db.prepare("SELECT COUNT(*) AS n FROM users WHERE created_at >= datetime('now','-1 day')").get().n;
+    const reqOpen = db.prepare("SELECT COUNT(*) AS n FROM help_requests WHERE status = 'open'").get().n;
+    const mPend = db.prepare("SELECT COUNT(*) AS n FROM matches WHERE status = 'pending'").get().n;
+    const mDone = db.prepare("SELECT COUNT(*) AS n FROM matches WHERE status = 'done'").get().n;
+    const prem = db.prepare("SELECT COUNT(*) AS n FROM users WHERE premium_tier <> 'free'").get().n;
+    return {
+      users: { total: totalUsers, last_24h: last24h },
+      requests: { open: reqOpen },
+      matches: { pending: mPend, done: mDone },
+      premium: { active_users: prem },
+    };
+  };
+
+  get().then(async (stats) => {
+    const events = await Promise.resolve(eventsRepo.listEvents({ limit: 12, offset: 0 }));
+    const reports = await Promise.resolve(reportsRepo.listReports({ status: 'open', limit: 8, offset: 0 }));
+    res.json({ ok: true, data: { ...stats, recent_events: events, open_reports: reports } });
+  }).catch(() => res.status(500).json({ error: 'Failed to compute overview' }));
+}
+
+function listEvents(req, res) {
+  const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '25', 10)));
+  const page = Math.max(1, parseInt(req.query.page || '1', 10));
+  const offset = (page - 1) * limit;
+  const type = req.query.type ? String(req.query.type) : null;
+  Promise.resolve(eventsRepo.listEvents({ type, limit, offset }))
+    .then(rows => res.json({ ok: true, data: rows, meta: { page, limit, count: rows.length } }))
+    .catch(() => res.status(500).json({ error: 'Failed to load events' }));
+}
+
+function listReports(req, res) {
+  const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '25', 10)));
+  const page = Math.max(1, parseInt(req.query.page || '1', 10));
+  const offset = (page - 1) * limit;
+  const status = req.query.status ? String(req.query.status) : null;
+  Promise.resolve(reportsRepo.listReports({ status, limit, offset }))
+    .then(rows => res.json({ ok: true, data: rows, meta: { page, limit, count: rows.length } }))
+    .catch(() => res.status(500).json({ error: 'Failed to load reports' }));
+}
+
+function createReport(req, res) {
+  const { target_type, target_id, reason } = req.body || {};
+  if (!target_type || !target_id || !reason) throw httpError(400, 'Missing target_type, target_id, or reason');
+  Promise.resolve(reportsRepo.createReport({ reporterId: req.user.id, targetType: String(target_type), targetId: String(target_id), reason: String(reason) }))
+    .then(out => {
+      // Track as an admin event as well.
+      return Promise.resolve(eventsRepo.logEvent({
+        type: 'report.created',
+        actorUserId: req.user.id,
+        targetType: String(target_type),
+        targetId: String(target_id),
+        meta: { reason: String(reason) },
+      })).then(() => out);
+    })
+    .then(out => res.status(201).json({ ok: true, data: out }))
+    .catch(() => res.status(500).json({ error: 'Failed to create report' }));
+}
+
+function resolveReport(req, res) {
+  const id = String(req.params.id);
+  const notes = (req.body && req.body.notes) ? String(req.body.notes) : null;
+  Promise.resolve(reportsRepo.resolveReport({ id, adminUserId: req.user.id, notes }))
+    .then(() => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'report.resolve',
+      entityType: 'report',
+      entityId: id,
+      beforeJson: null,
+      afterJson: JSON.stringify({ status: 'resolved', notes: notes || null }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }))
+    .then(() => Promise.resolve(eventsRepo.logEvent({ type: 'report.resolved', actorUserId: req.user.id, targetType: 'report', targetId: id, meta: { notes: notes || null } })))
+    .then(() => res.json({ ok: true }))
+    .catch(() => res.status(500).json({ error: 'Failed to resolve report' }));
 }
 
 function listUsers(req, res) {
@@ -152,10 +236,14 @@ function patchConfig(req, res) {
 module.exports = {
   me,
   overview,
+  listEvents,
   listUsers,
   getUser,
   patchUser,
   listAudit,
+  listReports,
+  createReport,
+  resolveReport,
   getConfig,
   patchConfig,
 };

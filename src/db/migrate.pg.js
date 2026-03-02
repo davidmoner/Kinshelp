@@ -224,6 +224,32 @@ async function migrate() {
         value_json jsonb NOT NULL,
         updated_at timestamptz NOT NULL DEFAULT now()
       );
+
+      CREATE TABLE IF NOT EXISTS admin_events (
+        id            uuid PRIMARY KEY,
+        type          text NOT NULL,
+        actor_user_id uuid,
+        target_type   text,
+        target_id     text,
+        meta_json     jsonb NOT NULL DEFAULT '{}'::jsonb,
+        created_at    timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_admin_events_created ON admin_events(created_at);
+      CREATE INDEX IF NOT EXISTS idx_admin_events_type_created ON admin_events(type, created_at);
+
+      CREATE TABLE IF NOT EXISTS reports (
+        id          uuid PRIMARY KEY,
+        reporter_id uuid,
+        target_type text NOT NULL,
+        target_id   text NOT NULL,
+        reason      text NOT NULL,
+        status      text NOT NULL DEFAULT 'open',
+        notes       text,
+        resolved_at timestamptz,
+        resolved_by uuid,
+        created_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_reports_status_created ON reports(status, created_at);
     `);
 
     await client.query(`

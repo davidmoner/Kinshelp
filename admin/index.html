@@ -185,6 +185,8 @@
       <div class="nav" role="navigation" aria-label="Admin">
         <button class="active" data-view="overview" type="button">Overview</button>
         <button data-view="users" type="button">Usuarios</button>
+        <button data-view="events" type="button">Actividad</button>
+        <button data-view="reports" type="button">Moderacion</button>
         <button data-view="audit" type="button">Auditoria</button>
         <button data-view="config" type="button">Config</button>
       </div>
@@ -215,6 +217,56 @@
             <div class="kpi">
               <div class="label">Usuarios (ultimas 24h)</div>
               <div class="val" id="kpiUsers24">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <div class="card" style="box-shadow:none;">
+            <div class="kpi">
+              <div class="label">Requests abiertas</div>
+              <div class="val" id="kpiReqOpen">-</div>
+            </div>
+          </div>
+          <div class="card" style="box-shadow:none;">
+            <div class="kpi">
+              <div class="label">Premium activos</div>
+              <div class="val" id="kpiPremActive">-</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          <div class="card" style="box-shadow:none;">
+            <div class="muted" style="margin-bottom:10px;">Actividad reciente</div>
+            <div style="overflow:auto; max-height: 320px;">
+              <table aria-label="Eventos">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Actor</th>
+                    <th>Target</th>
+                  </tr>
+                </thead>
+                <tbody id="eventsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" style="box-shadow:none;">
+            <div class="muted" style="margin-bottom:10px;">Moderacion (open)</div>
+            <div style="overflow:auto; max-height: 320px;">
+              <table aria-label="Reports">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Target</th>
+                    <th>Motivo</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="reportsTbody"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -258,6 +310,51 @@
               </tr>
             </thead>
             <tbody id="auditTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-events" class="card" style="display:none;">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+          <input id="eventType" placeholder="Filtrar por type (opcional)" />
+          <button class="btn primary" id="btnEventSearch" type="button">Filtrar</button>
+        </div>
+        <div class="muted" id="eventsMeta" style="margin-bottom:10px;"></div>
+        <div style="overflow:auto;">
+          <table aria-label="Eventos">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Actor</th>
+                <th>Target</th>
+                <th>Meta</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTbodyFull"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-reports" class="card" style="display:none;">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+          <input id="reportStatus" placeholder="status (open/resolved)" value="open" />
+          <button class="btn primary" id="btnReportSearch" type="button">Cargar</button>
+        </div>
+        <div class="muted" id="reportsMeta" style="margin-bottom:10px;"></div>
+        <div style="overflow:auto;">
+          <table aria-label="Reports">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Status</th>
+                <th>Target</th>
+                <th>Motivo</th>
+                <th>Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="reportsTbodyFull"></tbody>
           </table>
         </div>
       </section>
@@ -338,12 +435,14 @@
       }
 
       function showView(name) {
-        var ids = ['overview', 'users', 'audit', 'config'];
+        var ids = ['overview', 'users', 'events', 'reports', 'audit', 'config'];
         ids.forEach(function (k) {
           document.getElementById('view-' + k).style.display = (k === name) ? '' : 'none';
         });
         document.getElementById('title').textContent = name === 'overview' ? 'Overview' :
           name === 'users' ? 'Usuarios' :
+          name === 'events' ? 'Actividad' :
+          name === 'reports' ? 'Moderacion' :
           name === 'audit' ? 'Auditoria' : 'Config';
       }
 
@@ -355,8 +454,78 @@
 
       function loadOverview() {
         return api('/stats/overview').then(function (j) {
-          document.getElementById('kpiUsersTotal').textContent = j.users.total;
-          document.getElementById('kpiUsers24').textContent = j.users.last_24h;
+          var d = j.data || {};
+          document.getElementById('kpiUsersTotal').textContent = (d.users && d.users.total) || 0;
+          document.getElementById('kpiUsers24').textContent = (d.users && d.users.last_24h) || 0;
+          document.getElementById('kpiReqOpen').textContent = (d.requests && d.requests.open) || 0;
+          document.getElementById('kpiPremActive').textContent = (d.premium && d.premium.active_users) || 0;
+
+          var etb = document.getElementById('eventsTbody');
+          etb.innerHTML = '';
+          (d.recent_events || []).forEach(function (e) {
+            var tr = document.createElement('tr');
+            tr.innerHTML =
+              '<td>' + (e.created_at || '-') + '</td>' +
+              '<td>' + (e.type || '-') + '</td>' +
+              '<td><code>' + ((e.actor_user_id || '').slice(0, 8)) + '</code></td>' +
+              '<td>' + (e.target_type || '-') + (e.target_id ? (':' + (String(e.target_id).slice(0, 8))) : '') + '</td>';
+            etb.appendChild(tr);
+          });
+
+          var rtb = document.getElementById('reportsTbody');
+          rtb.innerHTML = '';
+          (d.open_reports || []).forEach(function (r) {
+            var tr2 = document.createElement('tr');
+            tr2.innerHTML =
+              '<td>' + (r.created_at || '-') + '</td>' +
+              '<td>' + (r.target_type || '-') + ':' + (String(r.target_id || '').slice(0, 8)) + '</td>' +
+              '<td>' + (r.reason || '-') + '</td>' +
+              '<td><button class="btn" data-resolve-report="' + r.id + '">Resolver</button></td>';
+            rtb.appendChild(tr2);
+          });
+        });
+      }
+
+      function loadEvents() {
+        var t = document.getElementById('eventType').value || '';
+        var url = '/events?limit=40&page=1' + (t ? '&type=' + encodeURIComponent(t) : '');
+        return api(url).then(function (j) {
+          document.getElementById('eventsMeta').textContent = 'Mostrando ' + j.meta.count + ' eventos';
+          var tb = document.getElementById('eventsTbodyFull');
+          tb.innerHTML = '';
+          j.data.forEach(function (e) {
+            var meta = '';
+            try { meta = JSON.stringify(e.meta_json || {}).slice(0, 140); } catch (err) { meta = '-'; }
+            var tr = document.createElement('tr');
+            tr.innerHTML =
+              '<td>' + (e.created_at || '-') + '</td>' +
+              '<td>' + (e.type || '-') + '</td>' +
+              '<td><code>' + ((e.actor_user_id || '').slice(0, 8)) + '</code></td>' +
+              '<td>' + (e.target_type || '-') + (e.target_id ? (':' + (String(e.target_id).slice(0, 8))) : '') + '</td>' +
+              '<td class="muted">' + meta.replace(/</g, '&lt;') + '</td>';
+            tb.appendChild(tr);
+          });
+        });
+      }
+
+      function loadReports() {
+        var s = document.getElementById('reportStatus').value || '';
+        var url = '/reports?limit=40&page=1' + (s ? '&status=' + encodeURIComponent(s) : '');
+        return api(url).then(function (j) {
+          document.getElementById('reportsMeta').textContent = 'Mostrando ' + j.meta.count + ' reports';
+          var tb = document.getElementById('reportsTbodyFull');
+          tb.innerHTML = '';
+          j.data.forEach(function (r) {
+            var tr = document.createElement('tr');
+            tr.innerHTML =
+              '<td>' + (r.created_at || '-') + '</td>' +
+              '<td>' + (r.status || '-') + '</td>' +
+              '<td>' + (r.target_type || '-') + ':' + (String(r.target_id || '').slice(0, 8)) + '</td>' +
+              '<td>' + (r.reason || '-') + '</td>' +
+              '<td class="muted">' + ((r.notes || '-') + '').replace(/</g, '&lt;') + '</td>' +
+              '<td>' + (r.status === 'open' ? ('<button class="btn" data-resolve-report="' + r.id + '">Resolver</button>') : '') + '</td>';
+            tb.appendChild(tr);
+          });
         });
       }
 
@@ -408,11 +577,27 @@
             showView(v);
             if (v === 'overview') loadOverview();
             if (v === 'users') loadUsers();
+            if (v === 'events') loadEvents();
+            if (v === 'reports') loadReports();
             if (v === 'audit') loadAudit();
           });
         });
 
         document.getElementById('btnUserSearch').addEventListener('click', loadUsers);
+        document.getElementById('btnEventSearch').addEventListener('click', loadEvents);
+        document.getElementById('btnReportSearch').addEventListener('click', loadReports);
+
+        document.body.addEventListener('click', function (e) {
+          var t = e.target;
+          if (!t) return;
+          if (t.matches('button[data-resolve-report]')) {
+            var id = t.getAttribute('data-resolve-report');
+            var notes = prompt('Notas (opcional):') || '';
+            api('/reports/' + encodeURIComponent(id) + '/resolve', { method: 'POST', body: JSON.stringify({ notes: notes }) })
+              .then(function () { toast('Report resuelto', true); return Promise.all([loadOverview(), loadReports()]); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+        });
         document.getElementById('usersTbody').addEventListener('click', function (e) {
           var t = e.target;
           if (!t || !t.matches('button[data-id]')) return;

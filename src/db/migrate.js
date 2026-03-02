@@ -332,6 +332,35 @@ db.exec(`
   );
 `);
 
+// Admin events (activity) + reports (moderation)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS admin_events (
+    id            TEXT PRIMARY KEY,
+    type          TEXT NOT NULL,
+    actor_user_id TEXT,
+    target_type   TEXT,
+    target_id     TEXT,
+    meta_json     TEXT NOT NULL DEFAULT '{}',
+    created_at    TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_admin_events_created ON admin_events(created_at);
+  CREATE INDEX IF NOT EXISTS idx_admin_events_type_created ON admin_events(type, created_at);
+
+  CREATE TABLE IF NOT EXISTS reports (
+    id           TEXT PRIMARY KEY,
+    reporter_id  TEXT,
+    target_type  TEXT NOT NULL,
+    target_id    TEXT NOT NULL,
+    reason       TEXT NOT NULL,
+    status       TEXT NOT NULL DEFAULT 'open',
+    notes        TEXT,
+    resolved_at  TEXT,
+    resolved_by  TEXT,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_reports_status_created ON reports(status, created_at);
+`);
+
 if (!hasColumn('help_requests', 'boost_48h_used')) {
   addColumn('help_requests', 'boost_48h_used INTEGER NOT NULL DEFAULT 0');
 }

@@ -12,6 +12,14 @@ r.use(authenticate, requireAdmin);
 r.get('/me', controller.me);
 r.get('/stats/overview', controller.overview);
 
+// Activity
+r.get('/events', controller.listEvents);
+
+// Moderation
+r.get('/reports', controller.listReports);
+r.post('/reports', controller.createReport);
+r.post('/reports/:id/resolve', controller.resolveReport);
+
 // Users
 r.get('/users', controller.listUsers);
 r.get('/users/:id', controller.getUser);
