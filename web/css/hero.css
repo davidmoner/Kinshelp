@@ -154,6 +154,55 @@ html[data-theme="dark"] .kh-ios-sub {
     text-align: center;
 }
 
+/* ── Typewriter titles (banner headings) ───────────────────────── */
+.kh-type {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.hero-banner.hero-banner--active .kh-type {
+    animation: khTypeReveal var(--kh-type-dur, 1400ms) steps(var(--kh-type-steps, 24), end) both;
+}
+
+.hero-banner.hero-banner--active .kh-type--line2 {
+    animation-delay: var(--kh-type-delay2, 260ms);
+}
+
+@keyframes khTypeReveal {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+/* Soft caret */
+.hero-banner.hero-banner--active .kh-type::after {
+    content: '';
+    display: inline-block;
+    width: 0.11em;
+    height: 1em;
+    margin-left: 0.08em;
+    background: currentColor;
+    opacity: 0.65;
+    transform: translateY(0.12em);
+    animation: khCaretBlink 800ms step-end infinite;
+}
+
+.hero-banner.hero-banner--active .kh-type--line2::after {
+    /* keep caret only on the last line */
+    display: none;
+}
+
+@keyframes khCaretBlink {
+    50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-banner.hero-banner--active .kh-type { animation: none; }
+    .hero-banner.hero-banner--active .kh-type::after { animation: none; opacity: 0; }
+}
+
 .hero-banner[data-banner="0"] .hero-chips {
     justify-content: center;
 }
@@ -1143,7 +1192,8 @@ html[data-theme="light"] .hb2p-notif {
 }
 
 .hero-banner[data-banner="1"].hero-banner--active {
-    --hb2p-dur: 6s;
+    /* Slower mobile demo timeline (+2s) */
+    --hb2p-dur: 8s;
 }
 
 .hero-banner[data-banner="1"].hero-banner--active .hb2p-phones {

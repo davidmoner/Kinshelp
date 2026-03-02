@@ -181,8 +181,10 @@ html[data-theme="light"] .fx-aurora {
 
 /* Nav: fondo claro */
 html[data-theme="light"] .nav {
-  background: rgba(245, 246, 250, 0.88);
-  border-bottom-color: rgba(0, 0, 0, 0.09);
+  /* Light theme: keep nav noticeably darker than page bg */
+  background: rgba(224, 228, 238, 0.92);
+  border-bottom-color: rgba(15, 23, 42, 0.14);
+  box-shadow: 0 16px 46px rgba(15, 23, 42, 0.14);
 }
 
 /* Dashboard header */
@@ -505,10 +507,21 @@ body {
   justify-content: space-between;
   padding: 0 40px;
   height: 64px;
-  background: rgba(7, 10, 16, 0.80);
+  /* Dark theme: keep nav noticeably lighter than page bg */
+  background: rgba(16, 22, 34, 0.78);
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.42);
+}
+
+/* Particles canvas (decorative, behind content) */
+#kh-particles {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #kh-particles { display: none; }
 }
 
 .nav-brand {

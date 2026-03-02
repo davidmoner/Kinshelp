@@ -12,7 +12,8 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ── Config ──────────────────────────────────────────── */
-    var BANNER_DURATIONS = [4000, 6000, 4000]; // ms per banner (banner 2 needs +2s)
+    // +2000ms per banner (requested: slower rotation)
+    var BANNER_DURATIONS = [6000, 8000, 6000];
     var TRANSITION_MS = 550;                // must match CSS
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
     var INTRO_HOLD_MS = 820;                // ms KingsHelp intro is shown

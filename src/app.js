@@ -88,6 +88,8 @@ app.use(helmet({
     useDefaults: true,
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      // Current landing uses inline scripts and inline handlers.
+      // Once migrated to external listeners, remove unsafe-inline from script-src-attr (and ideally from script-src).
       'script-src': ["'self'", "'unsafe-inline'", 'blob:'],
       'script-src-elem': ["'self'", "'unsafe-inline'", 'blob:'],
       'script-src-attr': ["'self'", "'unsafe-inline'"],
@@ -139,13 +141,16 @@ api.use('/notifications', require('./modules/notifications/notifications.routes'
 
 app.use('/api/v1', apiLimiter, api);
 
-// Serve the frontend (single-page) from repo root
-// (Render runs the service from /opt/render/project/src)
+// Serve only public static assets (avoid exposing repo root).
+// Keep the set tight: landing, web SPA pages, legal, and images.
 const webDir = path.resolve(__dirname, '..');
 
-// Serve static assets (css/js/img + web/* pages)
-app.use('/', express.static(webDir));
 app.use('/web', express.static(path.join(webDir, 'web')));
+app.use('/legal', express.static(path.join(webDir, 'legal')));
+app.use('/img', express.static(path.join(webDir, 'img')));
+
+// Landing assets at repo root (only files, no directory listing).
+app.use('/', express.static(webDir, { index: false, extensions: false }));
 
 // Best-effort SPA entrypoint: only serve index.html if it exists.
 // In some deployments the frontend may not be bundled; avoid ENOENT.

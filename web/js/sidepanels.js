@@ -14,9 +14,8 @@
   var hero = document.getElementById('kh-hero');
   if (!hero) return;
 
-  // Only show side panels on banner 1 and 3.
-  // Current hero uses data-banner 0/1/2, so "1 y 3" => 0 and 2.
-  var ALLOWED = { '0': true, '2': true };
+  // Side panels disabled (no images next to banners).
+  var ALLOWED = { };
   var stage = document.getElementById('kh-hero-stage');
   var bannerObs = null;
   var activeBanner = '0';

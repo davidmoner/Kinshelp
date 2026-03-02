@@ -30,6 +30,8 @@
         wobble: 0.00045,
         opacityMaxDark: 0.085,
         opacityMaxLight: 0.048,
+        scrollParallax: 0.12,
+        scrollEase: 0.08,
     };
 
     /* Colores para cada tema */
@@ -41,11 +43,22 @@
 
     /* ── Estado ───────────────────────────────────────────────── */
     let W, H, particles = [], raf, paused = false;
+    let lastScrollY = window.scrollY || 0;
+    let scrollOffset = 0;
+    let scrollTarget = 0;
 
     /* ── Resize ───────────────────────────────────────────────── */
     function resize() {
         W = canvas.width = window.innerWidth;
         H = canvas.height = window.innerHeight;
+    }
+
+    // Clamp scroll offset so particles never disappear on long pages.
+    function clampScroll() {
+        // keep within ~12% of viewport height
+        const max = (H || window.innerHeight || 800) * 0.12;
+        if (scrollTarget > max) scrollTarget = max;
+        if (scrollTarget < -max) scrollTarget = -max;
     }
 
     /* ── Crear una partícula ──────────────────────────────────── */
@@ -85,6 +98,14 @@
         const palette = PALETTE[theme()];
         const isLight = theme() === 'light';
 
+        // Smooth scroll-driven parallax (subtle)
+        const sy = window.scrollY || 0;
+        const d = sy - lastScrollY;
+        lastScrollY = sy;
+        scrollTarget += d * CFG.scrollParallax;
+        clampScroll();
+        scrollOffset += (scrollTarget - scrollOffset) * CFG.scrollEase;
+
         particles.forEach(p => {
             // Drift hipnotico, mas simetrico: mezcla de 2 ondas suaves (Lissajous-ish)
             const tt = t * 0.001;
@@ -104,9 +125,9 @@
             const oMax = isLight ? CFG.opacityMaxLight : CFG.opacityMaxDark;
             const drawOp = Math.min(p.opacity, oMax);
 
-            /* dibujar */
+            /* dibujar (parallax) */
             ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y + scrollOffset, p.r, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(${palette[p.colorIdx]},${drawOp.toFixed(3)})`;
             ctx.fill();
         });
