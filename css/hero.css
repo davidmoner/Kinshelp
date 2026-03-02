@@ -170,10 +170,12 @@ html[data-theme="dark"] .kh-ios-sub {
     display: inline-block;
 }
 
-/* Typewriter reveal (clip-path based so gradients always animate) */
+/* Typewriter reveal (clip-path + tiny jitter for digital feel) */
 .hero-banner.hero-banner--active .kh-type {
     clip-path: inset(0 100% 0 0);
-    animation: khTypeClip var(--kh-type-dur, 1400ms) steps(var(--kh-type-steps, 24), end) both;
+    animation:
+        khTypeClip var(--kh-type-dur, 1400ms) steps(var(--kh-type-steps, 24), end) both,
+        khTypeJitter 520ms steps(2, end) 2 both;
 }
 
 /* Restart typewriter when a banner becomes active */
@@ -191,15 +193,24 @@ html[data-theme="dark"] .kh-ios-sub {
     to { clip-path: inset(0 0% 0 0); }
 }
 
+@keyframes khTypeJitter {
+    0% { transform: translate3d(0, 0, 0); }
+    25% { transform: translate3d(0.3px, 0, 0); }
+    55% { transform: translate3d(-0.2px, 0, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+}
+
 /* Text caret */
 .hero-banner.hero-banner--active .kh-type::after {
     content: '|';
     display: inline-block;
     margin-left: 0.08em;
     color: currentColor;
-    opacity: 0.72;
+    opacity: 0.78;
     transform: translateY(0.02em);
-    animation: khCaretBlink 780ms step-end infinite;
+    animation:
+        khCaretBlink 720ms step-end infinite,
+        khCaretGlitch 2600ms steps(1, end) infinite;
 }
 
 /* keep caret only on the last line */
@@ -209,6 +220,12 @@ html[data-theme="dark"] .kh-ios-sub {
 
 @keyframes khCaretBlink {
     50% { opacity: 0; }
+}
+
+@keyframes khCaretGlitch {
+    0%, 92%, 100% { filter: none; transform: translateY(0.02em); }
+    93% { filter: drop-shadow(0 0 10px rgba(41, 90, 173, 0.55)); transform: translate3d(0.5px, 0.02em, 0); }
+    95% { filter: drop-shadow(0 0 10px rgba(201, 168, 76, 0.45)); transform: translate3d(-0.4px, 0.02em, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
