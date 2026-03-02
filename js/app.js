@@ -971,6 +971,13 @@
             if (postLoginAction === 'first_match') {
                 postLoginAction = null;
                 openFirstMatchFlow();
+                return;
+            }
+
+            if (postLoginAction === 'go_dashboard_create') {
+                postLoginAction = null;
+                setDashView('crear');
+                return;
             }
         } catch (err) {
             // Show more context for common failures (CORS/network vs 4xx)
@@ -2071,6 +2078,13 @@
                   <button class="feed-pill feed-user" type="button" data-user="1">${escapeHtml(r.user_name || '—')}${r.user_verified ? ' ✓' : ''} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</button>
                   ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
                 </div>
+
+                <div class="feed-actions" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn btn-primary btn-sm" type="button" data-feed-match="1">
+                    ${kind === 'offer' ? 'Pedir esta ayuda' : 'Ofrecer mi ayuda'}
+                  </button>
+                  <button class="btn btn-ghost btn-sm" type="button" data-feed-how="1">Ver detalles</button>
+                </div>
               </div>
             `;
             const btnUser = el.querySelector('button[data-user]');
@@ -2081,6 +2095,41 @@
                         openUserCard(u);
                     } catch {
                         toast('No se pudo cargar el perfil', 'error');
+                    }
+                });
+            }
+
+            const btnHow = el.querySelector('button[data-feed-how]');
+            if (btnHow) {
+                btnHow.addEventListener('click', () => {
+                    toast('Abre el perfil y crea un match para chatear', 'info');
+                });
+            }
+
+            const btnMatch = el.querySelector('button[data-feed-match]');
+            if (btnMatch) {
+                btnMatch.addEventListener('click', async () => {
+                    if (!KHApi.getToken()) {
+                        postLoginAction = 'go_dashboard_create';
+                        openLogin();
+                        return;
+                    }
+                    try {
+                        await ensureCurrentUser();
+                        // Minimal match-selectivo: ask user to create a listing first.
+                        if (!lastCreatedRequest || !lastCreatedRequest.id) {
+                            toast('Primero crea una solicitud en "Crear" para poder hacer match selectivo', 'error');
+                            setDashView('crear');
+                            return;
+                        }
+
+                        await createMatchForRequest(lastCreatedRequest, {
+                            id: r.user_id,
+                            display_name: r.user_name,
+                            premium_tier: r.premium_user ? 'premium' : 'free',
+                        });
+                    } catch (e) {
+                        toast(e.message || 'No se pudo crear el match', 'error');
                     }
                 });
             }
