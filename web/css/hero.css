@@ -2190,6 +2190,27 @@ section.hero .preview-card {
         0 24px 64px rgba(0, 0, 0, 0.5);
 }
 
+/* ── Hero Burst Particles (canvas lives inside #kh-hero) ───────────── */
+section.hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+#kh-particles {
+    filter: saturate(115%) contrast(108%);
+    opacity: 1;
+    mix-blend-mode: normal;
+}
+
+html[data-theme="dark"] #kh-particles {
+    filter: saturate(130%) contrast(112%);
+}
+
+html[data-theme="light"] #kh-particles {
+    filter: saturate(120%) contrast(110%);
+}
+
 /* ══════════════════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════════════════ */

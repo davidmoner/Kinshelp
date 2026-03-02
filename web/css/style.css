@@ -515,11 +515,6 @@ body {
   box-shadow: 0 14px 44px rgba(0, 0, 0, 0.42);
 }
 
-/* Particles canvas (decorative, behind content) */
-#kh-particles {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
   #kh-particles { display: none; }
 }
