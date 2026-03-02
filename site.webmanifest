@@ -3,7 +3,7 @@
   "short_name": "KingsHelp",
   "icons": [
     {
-      "src": "favicon.svg",
+      "src": "favicon.svg?v=4",
       "sizes": "any",
       "type": "image/svg+xml"
     }
