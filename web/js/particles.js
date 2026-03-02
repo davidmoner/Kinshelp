@@ -26,23 +26,23 @@
 
     /* ── Config ───────────────────────────────────────────────── */
     const CFG = {
-        count: 240,
+        count: 360,
         minR: 0.7,
         maxR: 2.0,
         speed: 0.18,
         wobble: 0.00055,
-        opacityMaxDark: 0.10,
-        opacityMaxLight: 0.075,
+        opacityMaxDark: 0.16,
+        opacityMaxLight: 0.12,
         scrollParallax: 0.09,
         scrollEase: 0.075,
         mouseEase: 0.06,
         // Burst focus around title
         focusRadius: 520,
         focusTightness: 0.52,
-        dashLenMin: 2.0,
-        dashLenMax: 7.0,
-        dashWidthMin: 1.0,
-        dashWidthMax: 1.8,
+        dashLenMin: 2.6,
+        dashLenMax: 9.6,
+        dashWidthMin: 1.1,
+        dashWidthMax: 2.2,
     };
 
     /* Colores para cada tema */
@@ -135,7 +135,10 @@
     /* ── Inicializar pool ─────────────────────────────────────── */
     function init() {
         resize();
-        particles = Array.from({ length: CFG.count }, makeParticle);
+        const isMobile = window.matchMedia('(max-width: 640px)').matches;
+        const isSmall = window.matchMedia('(max-height: 720px)').matches;
+        const n = Math.max(140, Math.floor(CFG.count * (isMobile ? 0.58 : 1) * (isSmall ? 0.82 : 1)));
+        particles = Array.from({ length: n }, makeParticle);
     }
 
     // Pause when hero not visible

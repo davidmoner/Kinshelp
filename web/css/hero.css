@@ -161,6 +161,7 @@ html[data-theme="dark"] .kh-ios-sub {
     overflow: hidden;
     white-space: nowrap;
     vertical-align: bottom;
+    width: 0;
 }
 
 .hero-banner.hero-banner--active .kh-type {
@@ -176,21 +177,19 @@ html[data-theme="dark"] .kh-ios-sub {
     to { width: 100%; }
 }
 
-/* Soft caret */
+/* Text caret */
 .hero-banner.hero-banner--active .kh-type::after {
-    content: '';
+    content: '|';
     display: inline-block;
-    width: 0.11em;
-    height: 1em;
     margin-left: 0.08em;
-    background: currentColor;
-    opacity: 0.65;
-    transform: translateY(0.12em);
-    animation: khCaretBlink 800ms step-end infinite;
+    color: currentColor;
+    opacity: 0.72;
+    transform: translateY(0.02em);
+    animation: khCaretBlink 780ms step-end infinite;
 }
 
-.hero-banner.hero-banner--active .kh-type--line2::after {
-    /* keep caret only on the last line */
+/* keep caret only on the last line */
+.hero-banner.hero-banner--active .kh-type--line1::after {
     display: none;
 }
 
@@ -2198,17 +2197,17 @@ section.hero {
 }
 
 #kh-particles {
-    filter: saturate(115%) contrast(108%);
+    filter: saturate(140%) contrast(125%);
     opacity: 1;
     mix-blend-mode: normal;
 }
 
 html[data-theme="dark"] #kh-particles {
-    filter: saturate(130%) contrast(112%);
+    filter: saturate(150%) contrast(128%);
 }
 
 html[data-theme="light"] #kh-particles {
-    filter: saturate(120%) contrast(110%);
+    filter: saturate(145%) contrast(128%);
 }
 
 /* ══════════════════════════════════════════════════════
