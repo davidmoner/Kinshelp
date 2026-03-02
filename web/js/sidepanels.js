@@ -103,6 +103,7 @@
           img.onerror = function () {
             tryExt();
           };
+          img.referrerPolicy = 'no-referrer';
           img.src = cand;
         }
 
@@ -251,6 +252,12 @@
         // Keep layout intact even if a file is missing.
         this.style.opacity = '0';
       };
+      img.addEventListener('load', function () {
+        try {
+          // Debug aid: remove this later if noisy.
+          // console.log('[sidepanels] loaded', this.currentSrc || this.src);
+        } catch (e) { }
+      });
 
       // (image already selected)
 

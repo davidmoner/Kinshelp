@@ -13,7 +13,7 @@
 
 .kh-panel {
   position: absolute;
-  top: 86px;
+  top: 54px;
   bottom: 24px;
   width: min(320px, 26vw);
   display: flex;
@@ -32,7 +32,7 @@
 
 .kh-panel-inner {
   position: sticky;
-  top: 94px;
+  top: 62px;
   height: calc(100vh - 130px);
   height: calc(100svh - 130px);
   min-height: 560px;
