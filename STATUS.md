@@ -22,6 +22,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 - SEO: metadatos (canonical/OG/Twitter/JSON-LD) + `robots.txt` + `sitemap.xml` + `/.well-known/security.txt`.
 - Seguridad: headers via `helmet` + rate limit global; CSP relajada por inline handlers actuales.
+- Fix prod: rate limit aplicado solo a `/api/v1` (no bloquea estaticos como `/img/*`).
 - OAuth: codigo listo para Google/Facebook (backend callbacks + UI), pero queda pendiente credenciales/validacion en produccion.
 
 ## Estado Actual

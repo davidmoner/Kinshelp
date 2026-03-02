@@ -98,7 +98,9 @@ app.use(helmet({
   hsts: process.env.NODE_ENV === 'production' ? { maxAge: 15552000, includeSubDomains: true, preload: true } : false,
 }));
 app.set('trust proxy', 1);
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
+
+// Rate limit: keep API protected, avoid breaking static assets.
+const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'KingsHelp API', ts: new Date().toISOString() });
@@ -135,7 +137,7 @@ api.use('/automatch', require('./modules/automatch/automatch.routes'));
 api.use('/feed', require('./modules/feed/feed.routes'));
 api.use('/notifications', require('./modules/notifications/notifications.routes'));
 
-app.use('/api/v1', api);
+app.use('/api/v1', apiLimiter, api);
 
 // Serve the frontend (single-page) from repo root
 // (Render runs the service from /opt/render/project/src)
