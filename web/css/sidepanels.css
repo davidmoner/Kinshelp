@@ -14,7 +14,7 @@
 .kh-panel {
   position: absolute;
   top: 54px;
-  bottom: 24px;
+  bottom: 72px;
   width: min(320px, 26vw);
   display: flex;
   flex-direction: column;
@@ -179,6 +179,12 @@ html[data-theme="dark"] .kh-panel-scene {
   object-position: center;
   display: block;
   filter: saturate(1.02) contrast(1.02);
+}
+
+/* Debug: show a subtle placeholder if an image fails to load */
+.kh-scene-img[data-kh-img-error="1"] {
+  opacity: 0.12 !important;
+  filter: none !important;
 }
 
 html[data-theme="dark"] .kh-scene-img {

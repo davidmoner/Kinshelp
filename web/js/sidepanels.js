@@ -251,6 +251,7 @@
       img.onerror = function () {
         // Keep layout intact even if a file is missing.
         this.style.opacity = '0';
+        this.setAttribute('data-kh-img-error', '1');
       };
       img.addEventListener('load', function () {
         try {
