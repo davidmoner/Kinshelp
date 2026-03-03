@@ -94,6 +94,12 @@
   --kh-warm-soft: rgba(226, 184, 107, 0.12);
 }
 
+/* ── Media defaults ───────────────────────────────────── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ════════════════════════════════════════════════════════
    DESIGN TOKENS — LIGHT override
 ════════════════════════════════════════════════════════ */
@@ -2801,7 +2807,7 @@ html[data-theme="light"] .dash-menu-sep {
   background-image: url("/img/explora2.png");
   background-repeat: no-repeat;
   background-position: 18px 16px;
-  background-size: 270px auto;
+  background-size: clamp(200px, 35vw, 360px) auto;
   opacity: 1;
   pointer-events: none;
   z-index: 0;

@@ -63,6 +63,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Nav landing: tema junto al logo, busqueda centrada, CTA a la derecha; Manual/FAQ movidos al footer.
   - Nav landing: boton "Tablero" siempre visible para acceso directo al panel.
   - Explorar: imagen de cabecera ampliada y titulo/subtitulo centrados y mas llamativos.
+  - UI: imagenes responsive con escala fluida en resize.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
