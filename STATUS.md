@@ -61,6 +61,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Hero: banners +2s, progreso visible en selector y arranque tras intro.
   - Hero demo: nombres de los moviles animados y mas llamativos.
   - Nav landing: tema junto al logo, busqueda centrada, CTA a la derecha; Manual/FAQ movidos al footer.
+  - Explorar: imagen de cabecera ampliada y titulo/subtitulo centrados y mas llamativos.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
