@@ -23,15 +23,15 @@
 
     /* ── Config ───────────────────────────────────────────────── */
     const CFG = {
-        count: 62,        // partículas totales
-        minR: 1.8,       // radio mínimo (px)
-        maxR: 4.2,       // radio máximo
-        speed: 0.15,      // velocidad base (px/frame)
-        wobble: 0.0007,    // amplitud oscilación angular
-        opacityMaxDark: 0.14,   // opacidad máx en tema oscuro
-        opacityMaxLight: 0.075, // ~45% menos visible en tema claro
-        repelRadius: 180,
-        repelForce: 0.7,
+        count: 42,        // partículas totales
+        minR: 1.6,       // radio mínimo (px)
+        maxR: 3.6,       // radio máximo
+        speed: 0.12,      // velocidad base (px/frame)
+        wobble: 0.0006,    // amplitud oscilación angular
+        opacityMaxDark: 0.12,   // opacidad máx en tema oscuro
+        opacityMaxLight: 0.07, // ~45% menos visible en tema claro
+        repelRadius: 160,
+        repelForce: 0.6,
     };
 
     /* Colores para cada tema */
@@ -43,6 +43,7 @@
     /* ── Estado ───────────────────────────────────────────────── */
     let W, H, particles = [], raf, paused = false;
     const mouse = { x: 0, y: 0, active: false };
+    const introOverlay = document.getElementById('kh-intro-overlay');
 
     /* ── Resize ───────────────────────────────────────────────── */
     function resize() {
@@ -83,7 +84,8 @@
 
     /* ── Frame ────────────────────────────────────────────────── */
     function tick(t) {
-        if (paused) { raf = requestAnimationFrame(tick); return; }
+        const introActive = introOverlay && introOverlay.isConnected;
+        if (paused || introActive) { raf = requestAnimationFrame(tick); return; }
 
         ctx.clearRect(0, 0, W, H);
 
