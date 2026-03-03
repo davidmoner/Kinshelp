@@ -1291,8 +1291,8 @@ html[data-theme="light"] .hb2p-notif {
 }
 
 .hero-banner[data-banner="1"].hero-banner--active {
-    /* Slower mobile demo timeline (+2s) */
-    --hb2p-dur: 10s;
+    /* Slower mobile demo timeline (+1.5s) */
+    --hb2p-dur: 7.5s;
 }
 
 .hero-banner[data-banner="1"].hero-banner--active .hb2p-phones {

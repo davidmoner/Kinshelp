@@ -12,8 +12,8 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ── Config ──────────────────────────────────────────── */
-    var EXTRA_BANNER_MS = 2000;
-    var BANNER_DURATIONS = [6000, 8000, 6000]; // ms per banner (+2s each)
+    var EXTRA_BANNER_MS = 1500;
+    var BANNER_DURATIONS = [5500, 7500, 5500]; // ms per banner (+1.5s each)
     var TRANSITION_MS = 550;                // must match CSS
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
     var INTRO_DURATION_MS = 2000;           // total intro duration
