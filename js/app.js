@@ -371,7 +371,7 @@
         const rank = document.getElementById('nav-ranking-btn');
         const logged = !!(user && user.id);
         if (auth) auth.classList.toggle('hidden', logged);
-        if (panel) panel.classList.toggle('hidden', !logged);
+        if (panel) panel.classList.remove('hidden');
         if (out) out.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
     }
