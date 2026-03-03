@@ -2484,27 +2484,29 @@ html[data-theme="light"] #kh-particles {
 
 /* ── Intro video ───────────────────────────────────────── */
 .kh-intro-video-wrap {
-    width: min(720px, 90vw);
+    width: min(720px, 92vw);
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: scale(1.12);
+    transform: scale(1.18);
     transform-origin: center;
-    animation: khIntroVideoShrink var(--intro-shrink, 57000ms) ease-out forwards;
+    animation: khIntroVideoShrink var(--intro-shrink, 5000ms) cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
     will-change: transform;
 }
 
 .kh-intro-video {
     width: 100%;
     height: auto;
+    aspect-ratio: 16 / 9;
     display: block;
     border-radius: 14px;
     pointer-events: none;
     user-select: none;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    object-fit: contain;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
     transform: translateZ(0);
     will-change: transform, opacity;
-    animation: khIntroVideoIn 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation: khIntroVideoIn 800ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 html[data-theme="light"] .kh-intro-video {
@@ -2526,7 +2528,7 @@ html[data-theme="light"] .kh-intro-video {
 
 @keyframes khIntroVideoShrink {
     from {
-        transform: scale(1.18);
+        transform: scale(1.24);
     }
     to {
         transform: scale(1);
