@@ -34,6 +34,8 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Fondo hero con particulas tipo "antigravity" (burst dashes) dentro del hero + parallax scroll.
   - Titulos de banners con typewriter domino (linea 1 -> linea 2) + cursor `|`.
   - Rotacion de banners mas lenta (config en `web/js/hero.js`).
+  - Intro overlay: logo original (corona + wordmark) con `img/CORONAKH.png` y `img/KINGSHELP.png`, sin burst/animacion morada.
+  - Intro overlay: wordmark aparece con fade; duracion aprox. 2s antes de salir.
 
 - Admin panel (mar 2026):
   - UI: `GET /admin/` (static) con Overview/Usuarios/Actividad/Moderacion/Auditoria/Config.
