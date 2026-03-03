@@ -2357,11 +2357,12 @@
                     <div class="feed-time-label">${escapeHtml(expiry.label)}</div>
                   </div>`
                 : '';
+            const mediaStyle = mediaSrc ? ` style="--feed-cover:url('${escapeHtml(String(mediaSrc))}')"` : '';
 
             el.innerHTML = `
-              <div class="feed-media">
+              <div class="feed-media"${mediaStyle}>
                 <span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span>
-                ${mediaSrc ? `<img class="feed-photo" src="${escapeHtml(String(mediaSrc))}" alt="" loading="lazy" data-cat="${escapeHtml(cat)}" />` : `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>`}
+                ${!mediaSrc ? `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>` : ''}
               </div>
               <div class="feed-body">
                 <div class="feed-title">${escapeHtml(r.title || '—')}</div>
@@ -2385,29 +2386,6 @@
                 </div>
               </div>
             `;
-            const imgEl = el.querySelector('img.feed-photo');
-            if (imgEl) {
-                const applyFallback = () => {
-                    if (imgEl.dataset.aiFallback === '1') {
-                        const wrapMedia = imgEl.parentElement;
-                        if (!wrapMedia) return;
-                        wrapMedia.innerHTML = `<span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span><div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>`;
-                        return;
-                    }
-                    const fallback = generateAiImage(cat);
-                    if (fallback) {
-                        imgEl.dataset.aiFallback = '1';
-                        imgEl.src = fallback;
-                    }
-                };
-
-                imgEl.addEventListener('error', applyFallback, { once: false });
-
-                // If image already failed (cached error), fallback immediately
-                if (imgEl.complete && imgEl.naturalWidth === 0) {
-                    applyFallback();
-                }
-            }
             const btnUser = el.querySelector('button[data-user]');
             if (btnUser) {
                 btnUser.addEventListener('click', async () => {

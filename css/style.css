@@ -3629,7 +3629,12 @@ html[data-theme="light"] .dash-menu-sep {
 
 .feed-media {
   height: 160px;
-  background: radial-gradient(circle at 30% 30%, rgba(82, 49, 148, 0.22), rgba(33, 82, 173, 0.16));
+  background-image:
+    var(--feed-cover),
+    radial-gradient(circle at 30% 30%, rgba(82, 49, 148, 0.22), rgba(33, 82, 173, 0.16));
+  background-size: cover, auto;
+  background-position: center, center;
+  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
 }
@@ -3638,22 +3643,8 @@ html[data-theme="light"] .dash-menu-sep {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.35));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.28));
   pointer-events: none;
-}
-
-.feed-media img.feed-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transform: scale(1.01);
-  transition: transform 0.6s ease;
-  filter: saturate(1.08) contrast(1.02);
-}
-
-.feed-card:hover .feed-media img.feed-photo {
-  transform: scale(1.04);
 }
 
 .feed-hero {
