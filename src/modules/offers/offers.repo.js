@@ -125,7 +125,12 @@ function insert({ provider_id, title, description, category, points_value, expir
 
 function patch(id, sets, vals) {
     if (db.isPg) {
-        throw new Error('service_offers patch not implemented for Postgres yet');
+        let i = 1;
+        const pgSets = sets.replace(/\?/g, () => `$${i++}`);
+        return db.exec(
+            `UPDATE service_offers SET ${pgSets}, updated_at = $${i++} WHERE id = $${i}`,
+            [...vals, new Date().toISOString(), id]
+        );
     }
     db.prepare(`UPDATE service_offers SET ${sets}, updated_at = ? WHERE id = ?`).run(...vals, new Date().toISOString(), id);
 }

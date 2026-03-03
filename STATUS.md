@@ -48,33 +48,120 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Backend ban/unban, logEvent en register/login/match, markAllRead notifications, bug async offers.service.js corregido.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
+- Paso 1 — UX Crear solicitud/oferta (mar 2026):
+  - Preview inline antes de publicar: al pulsar "Publicar solicitud/oferta →" se muestra un panel de revisión con título, chips (categoría, zona, cuándo, compensación), descripción y fotos staged; dos botones: "← Editar" (vuelve al form) y "Confirmar y publicar" (llama a la API).
+  - Variables de estado: `pendingDraft` almacena el borrador hasta confirmación; `showCreatePreview()`, `backToEdit()`, `confirmCreate()` son las nuevas funciones exportadas a `KHApp`.
+  - `resetCreateForm()` ahora también cierra el panel de preview y limpia `pendingDraft`.
+  - Badges de estado en "Mis creaciones": activa (verde), expirada (naranja, cuando `expires_at < now`), cerrada (rojo). Expiry note inteligente: muestra "caduca en Xd" si quedan ≤ 3 días.
+  - CSS: `.preview-card`, `.preview-head`, `.preview-title`, `.preview-kind-label`, `.preview-desc`, `.preview-photos`, `.preview-photo-thumb` en `css/style.css`.
+
 
 ## Estado Actual
 
 - Backend API: Express (`src/app.js`) con rutas v1 para auth, users, offers, requests, matches, points, badges, premium, automatch, feed.
 - Frontend: SPA simple en `web/` consumiendo `http://localhost:3000/api/v1` por defecto.
 
-## Siguiente (Prioridad Alta)
+## Siguiente (Prioridad Alta) — Próxima sesión
 
-- Admin: instrumentar `admin_events` en flujos reales (register/login/create request/offer/match status) para que Actividad se llene automaticamente.
-- Admin: completar acciones de usuarios (ban/unban, ver detalle de user, reset cooldowns) + logs de auditoria.
-- Admin: moderacion real (reports desde web/mobile, hide/unhide contenido si aplica).
+### ✅ Ya resuelto (no tocar)
+- Bug async `offers.service.js` (addPhoto/deletePhoto/boost48h).
+- Admin ban/unban (backend + UI admin panel).
+- Login bloqueado para baneados (403).
+- `admin_events` instrumentados en register, login, match.created, match.status.
+- Notificaciones `markAllRead` (PATCH /notifications/read-all).
+- FAQ animada con 8 preguntas reales y acordeón accesible.
+- Manual de usuario estilo Apple (5 pasos con SVG, checklist, flows).
+- Links Manual + FAQ en nav principal.
+- CSS premium: scrollbar, shimmer btns, hover lift cards, stagger reveal.
+- KPI counters animados (ease cubic) en el landing.
+- Tick verificación minimalista (sin círculo verde).
+- Ranking popup +20% ancho (770px → 924px).
+- **Paso 1 completo**: preview inline antes de publicar, badges activa/expirada/cerrada en "Mis creaciones", expiry countdown ≤ 3 días.
 
-- Hero: leer flags desde `admin_config` (ej `fx_level`, `hero_banner_durations`) para ajustar sin redeploy.
+---
 
-- Producto: repaso completo (backend+web+mobile) y listado de faltantes en este STATUS (ver seccion "Plan" mas abajo).
-- FAQ: crear seccion en landing + pagina dedicada, contenido real y sitemap.
-- UI Web: tick de verificacion mas minimalista y sutil (sin redonda verde) en dashboard y carnet.
-- UI Web: repaso "pro" de detalles visuales (espaciados, tipografia, consistencia entre dashboard e inicio/reputacion).
-- UI Web: ranking vecinal popup +20% ancho.
-- UI Web: fondo tipo particulas hipnoticas (estilo antigravity) sutil con paleta KingsHelp.
-- Mobile Web: repaso completo de layout (hamburguesa, logo centrado, menu sin deformar elementos).
-- UX Crear: preparar sistema robusto para crear solicitudes/ofertas (flujo, validaciones, fotos, estado, errores) para contexto KingsHelp.
-- Contenido: rellenar secciones con frases motivadoras con vida (tono KingsHelp).
-- Email: validar entrega end-to-end en produccion (SendGrid Single Sender ahora; luego dominio `kingshelp.es`).
-- Auth: agregar endpoint para enviar/verificar email de forma clickeable (resend verify) y UX en mobile/web.
-- OAuth: implementar verificacion real de Google/Facebook cuando existan credenciales.
-- Auth/OAuth (objetivo): cerrar login con plataformas (Google/Facebook) end-to-end, con botones profesionales (logos oficiales), UX consistente web/mobile, y flujo 100% funcional (callback backend + manejo de errores + estados).
+### ✅ Paso 1 — UX Crear solicitud/oferta — COMPLETADO
+- ✅ Validaciones front claras (errores inline, no alert).
+- ✅ Preview antes de publicar (panel inline con chips, fotos, ← Editar / Confirmar).
+- ✅ Confirmación visual al crear (toast + scroll al bloque de éxito).
+- ✅ Soporte de fotos en el formulario (upload con previsualización staged).
+- ✅ Estado de la publicación visible (activa / expirada / archivada) con countdown.
+
+### ✅ Paso 2 — Mobile Web: repaso layout — COMPLETADO
+- ✅ Header ≤560px: logo centrado (position absolute + translateX(-50%)), avatar/nombre del header ocultos (accesibles via burger).
+- ✅ Menú como bottom-sheet (position fixed, no deforma layout) — ya existía.
+- ✅ Dashboard tabs scroll horizontal (overflow-x: auto; white-space: nowrap) — ya existía.
+- ✅ Hero ≤400px: letter-spacing reducido a -0.5px (a 36px era demasiado apretado), hero-sub a 15px.
+- ✅ Modal y dashboard padding compactados en ≤400px.
+
+### ✅ Paso 3 — Email verificación (código) — COMPLETADO
+- ✅ Botón "Reenviar verificación" ahora oculto si `is_verified` (se muestra solo a usuarios no verificados).
+- ✅ Indicador visual en perfil: "✓ Email verificado" (verde) / "⚠ Email sin verificar" (naranja) — `#profile-verify-status`.
+- ✅ Email de verificación en español: subject "KingsHelp — Verifica tu email", body con saludo y disclaimer.
+- ✅ Pages success/invalid/error en `/web/verify-email/` ya existen y el GET redirect funciona.
+- ⏳ Validar entrega SendGrid en producción (pendiente: configurar env vars en Render).
+- ⏳ Domain auth SPF/DKIM/DMARC: pendiente de que kingshelp.es resuelva correctamente en Hostinger/Cloudflare.
+
+### Config pendiente en Render (env vars)
+```
+EMAIL_PROVIDER=sendgrid
+SENDGRID_API_KEY=<tu key>
+MAIL_FROM=KingsHelp <davidmoner90@gmail.com>
+PUBLIC_BASE_URL=https://kingshelp.es
+```
+
+### ✅ Paso 4 — Admin: moderación real (parcial) — COMPLETADO fase 1
+- ✅ Botón "⚑" en tarjetas del feed para reportar contenido (discreto, baja opacidad).
+- ✅ Modal de reporte con selector de motivo (spam / estafa / abuso / inapropiado / otro).
+- ✅ `POST /api/v1/reports` — endpoint público autenticado (`src/modules/reports/reports.routes.js`).
+- ✅ Admin panel ya tenía: listado de reports, resolución, ban/unban, log de auditoría.
+- ⏳ Pendiente fase 2:
+  - Hide/unhide publicaciones reportadas (requiere columna `is_hidden` en offers/requests + migración).
+  - Vista detalle de usuario en admin (historial matches, reportes recibidos, badges).
+  - Reset cooldowns desde admin.
+
+### 🔜 Paso 5 — OAuth Google/Facebook (cuando haya credenciales)
+- Crear apps en Google Developer Console y Facebook Developers.
+- Setear `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_APP_ID/SECRET` en Render env.
+- Validar redirect URIs reales.
+- Botones con logos oficiales (web + mobile).
+- Flujo completo: callback backend → token → dashboard.
+
+### ✅ Optimización de rendimiento (mar 2026)
+- ✅ `index.html`: scripts visuales (fx.js, particles.js, demo.js, hero.js, hero_alt_fx.js) con `defer` → no bloquean parsing.
+- ✅ `index.html`: `loading="lazy"` en imágenes fuera del fold (demo mockups, iconos OAuth).
+- ✅ `js/app.js`: chat polling 2000ms → 5000ms (−60% llamadas API en chat); automatch countdown 1000ms → 2000ms; automatch poll 12000ms → 20000ms; feed debounce 180ms → 350ms.
+- ✅ `js/api.js`: deduplicación de GETs en vuelo (evita llamadas duplicadas simultáneas).
+- ✅ `.claude/settings.local.json`: comandos de desarrollo pre-aprobados (git, npm run, node --check).
+
+### ✅ Paso 6 — Paridad Postgres (producción) — COMPLETADO
+- ✅ `matches.service.js`: `requireMatch/requireOffer/requireRequest/ensureAntiFraudForDone/updateUserRating` ahora async; `changeStatus`, `setAgreement`, `listMessages`, `postMessage`, `submitRating` correctamente awaiteados en PG.
+- ✅ `offers.repo.js` + `requests.repo.js`: `patch()` convierte `?` → `$N` dinámicamente para PG.
+- ✅ `offers.service.js`: `update()`, `addPhoto()`, `deletePhoto()`, `boost48h()` — eliminados 501, soporte PG.
+- ✅ `requests.service.js`: `update()`, `addPhoto()`, `deletePhoto()`, `boost48h()` — eliminados 501, soporte PG.
+- ✅ `automatch.repo.js`: `getSettings()`, `upsertSettings()` (ON CONFLICT), `getInvite/OfferInvite`, `markAccepted/Declined`, `expireOtherPending*` — soporte PG.
+- ✅ `automatch.service.js`: `acceptInvite()` y `declineInvite()` convertidas a async, PG compatible.
+
+### 🔜 Paso 7 — Observabilidad
+- Logging estructurado (request-id, user-id, latencia).
+- Health extendido: `GET /health` devuelve estado DB + uptime.
+- Error reporting básico (console.error → Sentry o similar cuando escale).
+
+### 🔜 Paso 8 — Hero: flags desde admin_config
+- `fx_level` ya existe en admin_config.
+- Hero debería leerlo via API al cargar y ajustar efectos sin redeploy.
+- Añadir `hero_banner_duration` como flag configurable.
+
+### 🔜 Paso 9 — SEO + Contenido real
+- FAQ en sitemap.xml (añadir `#faq` o futura `/faq.html`).
+- Contenido real en secciones (no datos de ejemplo tipo "34 servicios completados").
+- KPIs reales desde la API real del servidor.
+- `og:image` real (captura de pantalla de la web).
+
+### 🔜 Paso 10 — CSP Hardening
+- Migrar `onclick=`, `onsubmit=`, `oninput=` de `index.html` a listeners en `js/app.js`.
+- Quitar `'unsafe-inline'` de la Content-Security-Policy.
+- Objetivo: A+ en securityheaders.com.
 
 ## Pendiente (OAuth)
 

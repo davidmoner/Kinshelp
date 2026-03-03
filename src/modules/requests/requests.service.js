@@ -72,8 +72,7 @@ async function update(id, userId, fields) {
     }
   }
   if (!sets.length) return requireRequest(id);
-  if (db.isPg) throw httpError(501, 'Editing requests not supported on Postgres yet');
-  repo.patch(id, sets.join(', '), vals);
+  await Promise.resolve(repo.patch(id, sets.join(', '), vals));
   return requireRequest(id);
 }
 
@@ -101,11 +100,9 @@ function parseMedia(raw) {
   }
 }
 
-function addPhoto(id, userId, file, baseUrl) {
+async function addPhoto(id, userId, file, baseUrl) {
   if (!file) throw httpError(400, 'Photo is required');
-  // Photos not yet supported for Postgres path
-  if (db.isPg) throw httpError(501, 'Photos not supported on Postgres yet');
-  const req = repo.findById(id);
+  const req = await Promise.resolve(repo.findById(id));
   if (!req) throw httpError(404, 'Request not found');
   if (req.seeker_id !== userId) {
     try { fs.unlinkSync(file.path); } catch { }
@@ -126,20 +123,19 @@ function addPhoto(id, userId, file, baseUrl) {
   const pid = randomUUID();
   const url = `${String(baseUrl || '').replace(/\/$/, '')}/uploads/${file.filename}`;
   const next = [...media, { id: pid, url, filename: file.filename, created_at: new Date().toISOString() }];
-  repo.patch(id, 'media_urls = ?', [JSON.stringify(next)]);
+  await Promise.resolve(repo.patch(id, 'media_urls = ?', [JSON.stringify(next)]));
   return { ok: true, media_urls: next };
 }
 
-function deletePhoto(id, userId, photoId) {
-  if (db.isPg) throw httpError(501, 'Photos not supported on Postgres yet');
-  const req = repo.findById(id);
+async function deletePhoto(id, userId, photoId) {
+  const req = await Promise.resolve(repo.findById(id));
   if (!req) throw httpError(404, 'Request not found');
   if (req.seeker_id !== userId) throw httpError(403, 'Forbidden');
   const media = parseMedia(req.media_urls);
   const idx = media.findIndex(p => String(p && p.id) === String(photoId));
   if (idx < 0) throw httpError(404, 'Photo not found');
   const [removed] = media.splice(idx, 1);
-  repo.patch(id, 'media_urls = ?', [JSON.stringify(media)]);
+  await Promise.resolve(repo.patch(id, 'media_urls = ?', [JSON.stringify(media)]));
 
   const filename = removed && removed.filename;
   if (filename) {
@@ -149,15 +145,19 @@ function deletePhoto(id, userId, photoId) {
   return { ok: true, media_urls: media };
 }
 
-function boost48h(id, userId) {
-  if (db.isPg) throw httpError(501, 'Boost not supported on Postgres yet');
-  const req = repo.findById(id);
+async function boost48h(id, userId) {
+  const req = await Promise.resolve(repo.findById(id));
   if (!req) throw httpError(404, 'Request not found');
   if (req.seeker_id !== userId) throw httpError(403, 'Forbidden');
   if (req.status !== 'open') throw httpError(422, 'Solo se pueden boostear solicitudes activas');
   if (Number(req.boost_48h_used || 0) === 1) throw httpError(409, 'Este anuncio ya uso su boost 48h');
 
-  const u = db.prepare('SELECT premium_tier, premium_until, boost_48h_tokens FROM users WHERE id = ?').get(userId);
+  let u;
+  if (db.isPg) {
+    u = await db.one('SELECT premium_tier, premium_until, boost_48h_tokens FROM users WHERE id = $1', [userId]);
+  } else {
+    u = db.prepare('SELECT premium_tier, premium_until, boost_48h_tokens FROM users WHERE id = ?').get(userId);
+  }
   if (!u) throw httpError(404, 'User not found');
 
   const premiumActive = (u.premium_tier && u.premium_tier !== 'free')
@@ -172,11 +172,16 @@ function boost48h(id, userId) {
   const base = Math.max(cur, Date.now());
   const next = new Date(base + 48 * 60 * 60 * 1000).toISOString();
 
-  db.transaction(() => {
-    db.prepare('UPDATE users SET boost_48h_tokens = boost_48h_tokens - 1 WHERE id = ? AND COALESCE(boost_48h_tokens,0) > 0')
-      .run(userId);
-    repo.patch(id, 'expires_at = ?, boost_48h_used = 1', [next]);
-  })();
+  if (db.isPg) {
+    await db.exec('UPDATE users SET boost_48h_tokens = boost_48h_tokens - 1 WHERE id = $1 AND COALESCE(boost_48h_tokens,0) > 0', [userId]);
+    await repo.patch(id, 'expires_at = ?, boost_48h_used = 1', [next]);
+  } else {
+    db.transaction(() => {
+      db.prepare('UPDATE users SET boost_48h_tokens = boost_48h_tokens - 1 WHERE id = ? AND COALESCE(boost_48h_tokens,0) > 0')
+        .run(userId);
+      repo.patch(id, 'expires_at = ?, boost_48h_used = 1', [next]);
+    })();
+  }
 
   return requireRequest(id);
 }

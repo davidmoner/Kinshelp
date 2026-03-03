@@ -25,29 +25,42 @@
         localStorage.removeItem(TOKEN_KEY);
     }
 
+    /* ── In-flight GET deduplication ────────────────────────────────────────── */
+    // Prevents identical simultaneous GET requests (e.g. loadMatches called twice on login).
+    const _inflight = new Map();
+
     /* ── Core fetch wrapper ─────────────────────────────────────────────────── */
     async function apiFetch(path, { method = 'GET', body } = {}) {
         const headers = { 'Content-Type': 'application/json' };
         const token = getToken();
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
-        const res = await fetch(BASE_URL + path, {
+        // Dedup: reuse in-flight Promise for identical GET requests
+        const dedupeKey = method === 'GET' ? path + '\0' + (token || '') : null;
+        if (dedupeKey && _inflight.has(dedupeKey)) {
+            return _inflight.get(dedupeKey);
+        }
+
+        const promise = fetch(BASE_URL + path, {
             method,
             headers,
             body: body !== undefined ? JSON.stringify(body) : undefined,
+        }).then(async res => {
+            let data;
+            try { data = await res.json(); } catch { data = {}; }
+            if (!res.ok) {
+                const err = new Error(data.error || ('HTTP ' + res.status));
+                err.status = res.status;
+                err.data = data;
+                throw err;
+            }
+            return data;
+        }).finally(() => {
+            if (dedupeKey) _inflight.delete(dedupeKey);
         });
 
-        let data;
-        try { data = await res.json(); }
-        catch { data = {}; }
-
-        if (!res.ok) {
-            const err = new Error(data.error || ('HTTP ' + res.status));
-            err.status = res.status;
-            err.data = data;
-            throw err;
-        }
-        return data;
+        if (dedupeKey) _inflight.set(dedupeKey, promise);
+        return promise;
     }
 
     /* ── Named endpoints ────────────────────────────────────────────────────── */
@@ -303,6 +316,10 @@
         return apiFetch('/offers/' + encodeURIComponent(offerId) + '/boost48h', { method: 'POST', body: {} });
     }
 
+    async function createReport(body) {
+        return apiFetch('/reports', { method: 'POST', body });
+    }
+
     /* ── Export ─────────────────────────────────────────────────────────────── */
     window.KHApi = {
         setToken,
@@ -354,6 +371,7 @@
         deleteOfferPhoto,
         boostRequest48h,
         boostOffer48h,
+        createReport,
     };
 
     // Back-compat: tolerate console checks like `khapi`.

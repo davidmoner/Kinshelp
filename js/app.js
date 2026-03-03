@@ -11,6 +11,7 @@
     let lastCreatedOffer = null;
     let ratingMatchId = null;
     let quickDraft = null;
+    let pendingDraft = null;
     let createKind = 'request';
     const creationsFilter = { kind: 'all', status: 'active', q: '' };
     const matchesFilter = { status: 'all', q: '' };
@@ -122,7 +123,105 @@
         if (spinner) state ? show(spinner) : hide(spinner);
     }
 
+    /* ── Inline field validation ────────────────────────────────────────────── */
+    function showFieldError(inputId, errId, msg) {
+        const inp = $(inputId);
+        const err = $(errId);
+        if (inp) inp.classList.add('field-error--input');
+        if (err) { err.textContent = msg; err.classList.remove('hidden'); }
+        if (inp) inp.focus();
+    }
+
+    function clearFieldError(inputId, errId) {
+        const inp = $(inputId);
+        const err = $(errId);
+        if (inp) inp.classList.remove('field-error--input');
+        if (err) { err.textContent = ''; err.classList.add('hidden'); }
+    }
+
+    function onFieldInput(inputId, errId, countId, maxLen) {
+        if (errId) clearFieldError(inputId, errId);
+        if (countId) {
+            const inp = $(inputId);
+            const cnt = $(countId);
+            if (inp && cnt) {
+                const len = inp.value.length;
+                cnt.textContent = `${len}\u202f/\u202f${maxLen}`;
+                cnt.classList.toggle('field-counter--warn', len >= maxLen * 0.9);
+                cnt.classList.toggle('field-counter--limit', len >= maxLen);
+            }
+        }
+    }
+
+    /* ── Create step indicator ───────────────────────────────────────────────── */
+    function setCreateStep(n) {
+        for (let i = 1; i <= 3; i++) {
+            const el = document.getElementById(`cstep-${i}`);
+            if (!el) continue;
+            el.classList.toggle('create-step--active', i === n);
+            el.classList.toggle('create-step--done', i < n);
+        }
+    }
+
+    /* ── Pre-publish photo staging ───────────────────────────────────────────── */
+    const prePhotos = { req: [], off: [] };
+
+    function pickPrePhoto(prefix) {
+        const inp = document.getElementById(`${prefix}-pre-photo-input`);
+        if (inp) inp.click();
+    }
+
+    function addPrePhoto(prefix, event) {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+        const arr = prePhotos[prefix];
+        const toAdd = files.slice(0, 6 - arr.length);
+        toAdd.forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                arr.push({ dataUrl: ev.target.result, file });
+                renderPrePhotos(prefix);
+            };
+            reader.readAsDataURL(file);
+        });
+        event.target.value = '';
+    }
+
+    function removePrePhoto(prefix, idx) {
+        prePhotos[prefix].splice(idx, 1);
+        renderPrePhotos(prefix);
+    }
+
+    function renderPrePhotos(prefix) {
+        const grid = document.getElementById(`${prefix}-pre-photos-grid`);
+        if (!grid) return;
+        const addBtn = grid.querySelector('.create-photo-add');
+        grid.innerHTML = '';
+        prePhotos[prefix].forEach((p, i) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'pre-photo-thumb';
+            wrap.innerHTML = `<img src="${p.dataUrl}" alt="Foto ${i + 1}" loading="lazy" /><button class="pre-photo-remove" type="button" aria-label="Eliminar foto" onclick="KHApp.removePrePhoto('${prefix}',${i})">✕</button>`;
+            grid.appendChild(wrap);
+        });
+        if (addBtn && prePhotos[prefix].length < 6) grid.appendChild(addBtn);
+    }
+
+    async function uploadStagedPhotos(prefix, listingId) {
+        const arr = [...prePhotos[prefix]];
+        if (!arr.length) return 0;
+        const uploadFn = prefix === 'req'
+            ? (id, f) => KHApi.uploadRequestPhoto(id, f)
+            : (id, f) => KHApi.uploadOfferPhoto(id, f);
+        const results = await Promise.allSettled(arr.map(p => uploadFn(listingId, p.file)));
+        prePhotos[prefix] = [];
+        renderPrePhotos(prefix);
+        const ok = results.filter(r => r.status === 'fulfilled').length;
+        return ok;
+    }
+
     /* ── Toast ────────────────────────────────────────────────────────────────── */
+
     function toast(msg, type = 'info') {
         const icons = { success: '✅', error: '❌', info: 'ℹ️' };
         const el = document.createElement('div');
@@ -335,12 +434,12 @@
                 const root = document.querySelector('main.dashboard');
                 if (!root || root.dataset.view !== 'automatch') return;
                 loadAutoMatch({ silent: true });
-            }, 12000);
+            }, 20000);
             automatchCountdownTimer = setInterval(() => {
                 const root = document.querySelector('main.dashboard');
                 if (!root || root.dataset.view !== 'automatch') return;
                 tickInviteCountdowns();
-            }, 1000);
+            }, 2000);
         }
         if (v === 'creaciones') loadCreations();
         if (v === 'matches') loadMatches();
@@ -588,7 +687,7 @@
         chatPollTimer = setInterval(() => {
             if (!chatMatchId) return;
             refreshChat({ silent: true });
-        }, 2000);
+        }, 5000);
     }
 
     function chatSelectComp(comp) {
@@ -710,13 +809,15 @@
     }
 
     function resetCreateForm(kind) {
+        pendingDraft = null;
         if (kind === 'offer') {
             const f = $('offer-form');
             if (f) f.reset();
             hide($('off-created'));
+            hide($('off-preview'));
             show($('off-form-wrap'));
             selectCreateKind('offer');
-            selectComp('off', (document.getElementById('off-comp') && document.getElementById('off-comp').value) || 'cash');
+            selectComp('off', 'cash');
             const t = $('off-title');
             if (t) t.focus();
             return;
@@ -725,10 +826,11 @@
         const f = $('request-form');
         if (f) f.reset();
         hide($('req-created'));
+        hide($('req-preview'));
         hide($('req-suggestions'));
         show($('req-form-wrap'));
         selectCreateKind('request');
-        selectComp('req', (document.getElementById('req-comp') && document.getElementById('req-comp').value) || 'cash');
+        selectComp('req', 'cash');
         const t = $('req-title');
         if (t) t.focus();
     }
@@ -1069,8 +1171,20 @@
         $('user-avatar').textContent = (user.display_name || '?')[0].toUpperCase();
         $('user-tier').style.color = (user.premium_tier && user.premium_tier !== 'free') ? 'var(--gold-light)' : 'var(--kh-brand-500)';
 
+        const isVerified = user.is_verified === true || user.is_verified === 1;
         const v = document.getElementById('user-verified');
-        if (v) v.classList.toggle('hidden', !(user.is_verified === true || user.is_verified === 1));
+        if (v) v.classList.toggle('hidden', !isVerified);
+
+        // "Reenviar verificación" button: solo visible si el email NO está verificado
+        const verifyBtn = document.getElementById('btn-verify-resend');
+        if (verifyBtn) verifyBtn.classList.toggle('hidden', isVerified);
+
+        // Indicador de estado de verificación en el perfil
+        const verifyStatus = document.getElementById('profile-verify-status');
+        if (verifyStatus) {
+            verifyStatus.textContent = isVerified ? '✓ Email verificado' : '⚠ Email sin verificar';
+            verifyStatus.className = isVerified ? 'profile-verify-ok' : 'profile-verify-warn';
+        }
 
         // Hide/Show premium CTAs depending on status
         const premium = isPremiumActive(user);
@@ -1768,7 +1882,7 @@
                 const meBox = $('ranking-me');
                 if (meBox) {
                     if (reset && currentUser && currentUser.id && KHApi.getToken()) {
-                        const qs = { };
+                        const qs = {};
                         if (rankingScope === 'near' && rankingOrigin) {
                             qs.lat = String(rankingOrigin.lat);
                             qs.lng = String(rankingOrigin.lng);
@@ -2042,7 +2156,7 @@
             } finally {
                 if (btn) setLoading(btn, false);
             }
-        }, 180);
+        }, 350);
     }
 
     function renderFeed(rows) {
@@ -2079,11 +2193,12 @@
                   ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
                 </div>
 
-                <div class="feed-actions" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                <div class="feed-actions" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                   <button class="btn btn-primary btn-sm" type="button" data-feed-match="1">
                     ${kind === 'offer' ? 'Pedir esta ayuda' : 'Ofrecer mi ayuda'}
                   </button>
                   <button class="btn btn-ghost btn-sm" type="button" data-feed-how="1">Ver detalles</button>
+                  <button class="btn btn-ghost btn-sm feed-report-btn" type="button" data-feed-report="1" title="Reportar" aria-label="Reportar este contenido" style="opacity:.5; font-size:11px; padding:4px 8px;">⚑</button>
                 </div>
               </div>
             `;
@@ -2133,6 +2248,14 @@
                     }
                 });
             }
+
+            const btnReport = el.querySelector('button[data-feed-report]');
+            if (btnReport) {
+                const targetType = kind;
+                const targetId = r.id;
+                btnReport.addEventListener('click', () => openReportModal(targetType, targetId));
+            }
+
             wrap.appendChild(el);
         });
     }
@@ -2831,60 +2954,33 @@
             return;
         }
 
-        await ensureCurrentUser();
+        // ── Inline validation ──────────────────────────────────────
+        const titleEl = $('req-title');
+        const locationEl = $('req-location');
+        const title = (titleEl && titleEl.value || '').trim();
+        const location_text = (locationEl && locationEl.value || '').trim();
 
-        const btn = $('btn-req-create');
-        setLoading(btn, true);
-        try {
-            const title = $('req-title').value.trim();
-            const category = $('req-category').value;
-            const description = $('req-desc').value.trim();
-            const location_text = ($('req-location') && $('req-location').value || '').trim();
-            const when = ($('req-when') && $('req-when').value || 'asap');
-
-            if (!location_text) {
-                toast('Indica tu zona (ej. barrio)', 'error');
-                return;
-            }
-
-            const comp = (document.getElementById('req-comp') && document.getElementById('req-comp').value) || 'cash';
-            const points = 0;
-
-            const body = {
-                title,
-                category,
-                points_offered: points,
-                description: description || undefined,
-                location_text,
-                when,
-                compensation_type: comp,
-            };
-
-            const req = await KHApi.createRequest(body);
-            lastCreatedRequest = req;
-            $('req-created-title').textContent = req.title;
-            show($('req-created'));
-            hide($('req-form-wrap'));
-            hide($('req-suggestions'));
-            $('req-suggestions-list').innerHTML = '';
-            toast('Solicitud creada ✓', 'success');
-            try { loadFeed(); } catch { }
-
-            renderListingPhotos('req-photos-grid', req.media_urls, 'deleteRequestPhoto', req.id);
-
-            const f = $('request-form');
-            if (f) f.reset();
-
-            loadCreations();
-
-            // Bring the "buscar" CTA into view
-            const blk = $('req-created');
-            if (blk && blk.scrollIntoView) blk.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } catch (err) {
-            toast(err.message || 'No se pudo crear la solicitud', 'error');
-        } finally {
-            setLoading(btn, false);
+        let hasError = false;
+        if (!title) {
+            showFieldError('req-title', 'req-title-err', 'El título es obligatorio.');
+            hasError = true;
         }
+        if (!location_text) {
+            showFieldError('req-location', 'req-location-err', 'Indica tu zona (ej. barrio o ciudad).');
+            hasError = true;
+        }
+        if (hasError) return;
+
+        const category = ($('req-category') && $('req-category').value) || 'other';
+        const description = ($('req-desc') && $('req-desc').value || '').trim();
+        const when = ($('req-when') && $('req-when').value || 'asap');
+        const comp = (document.getElementById('req-comp') && document.getElementById('req-comp').value) || 'cash';
+
+        pendingDraft = {
+            kind: 'request',
+            body: { title, category, points_offered: 0, description: description || undefined, location_text, when, compensation_type: comp },
+        };
+        showCreatePreview('request');
     }
 
     async function createOffer(event) {
@@ -2895,42 +2991,140 @@
             return;
         }
 
-        await ensureCurrentUser();
-        const btn = $('btn-off-create');
+        // ── Inline validation ──────────────────────────────────────
+        const titleEl = $('off-title');
+        const title = (titleEl && titleEl.value || '').trim();
+        if (!title) {
+            showFieldError('off-title', 'off-title-err', 'El título es obligatorio.');
+            return;
+        }
+
+        const category = ($('off-category') && $('off-category').value) || 'other';
+        const description = ($('off-desc') && $('off-desc').value || '').trim();
+        const comp = (document.getElementById('off-comp') && document.getElementById('off-comp').value) || 'cash';
+
+        pendingDraft = {
+            kind: 'offer',
+            body: { title, category, points_value: 0, description: description || undefined, compensation_type: comp },
+        };
+        showCreatePreview('offer');
+    }
+
+    function showCreatePreview(kind) {
+        const isReq = kind === 'request';
+        const d = pendingDraft;
+        if (!d) return;
+
+        const prefix = isReq ? 'req' : 'off';
+        const whenMap = { asap: '⚡ Lo antes posible', today: '📅 Hoy', this_week: '📆 Esta semana', flexible: '🕐 Flexible' };
+        const compMap = { cash: 'Pago en €', barter: 'Trueque', altruistic: 'Altruista' };
+
+        const titleEl = $(`${prefix}-preview-title`);
+        if (titleEl) titleEl.textContent = d.body.title;
+
+        const chipsEl = $(`${prefix}-preview-chips`);
+        if (chipsEl) {
+            let chips = `<span class="mvp-meta-tag">${escapeHtml(catLabel(d.body.category))}</span>`;
+            if (isReq) {
+                chips += `<span class="mvp-meta-tag">${escapeHtml(d.body.location_text)}</span>`;
+                chips += `<span class="mvp-meta-tag">${whenMap[d.body.when] || d.body.when}</span>`;
+            }
+            chips += `<span class="mvp-meta-tag">${compMap[d.body.compensation_type] || d.body.compensation_type}</span>`;
+            chipsEl.innerHTML = chips;
+        }
+
+        const descEl = $(`${prefix}-preview-desc`);
+        if (descEl) {
+            descEl.textContent = d.body.description || '';
+            descEl.classList.toggle('hidden', !d.body.description);
+        }
+
+        const photosEl = $(`${prefix}-preview-photos`);
+        if (photosEl) {
+            const arr = prePhotos[prefix] || [];
+            photosEl.innerHTML = arr.map(p => `<img src="${p.dataUrl}" class="preview-photo-thumb" alt="foto previa">`).join('');
+        }
+
+        // Wire up confirm button
+        const confirmBtn = $(`btn-${prefix}-confirm`);
+        if (confirmBtn) {
+            confirmBtn.onclick = () => confirmCreate(kind);
+        }
+
+        hide($(isReq ? 'req-form-wrap' : 'off-form-wrap'));
+        show($(`${prefix}-preview`));
+        const pv = $(`${prefix}-preview`);
+        if (pv && pv.scrollIntoView) pv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function backToEdit(kind) {
+        const isReq = kind === 'request';
+        hide($(`${isReq ? 'req' : 'off'}-preview`));
+        show($(`${isReq ? 'req-form-wrap' : 'off-form-wrap'}`));
+        pendingDraft = null;
+        const form = $(isReq ? 'request-form' : 'offer-form');
+        if (form && form.scrollIntoView) form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function confirmCreate(kind) {
+        if (!pendingDraft || pendingDraft.kind !== kind) return;
+        const isReq = kind === 'request';
+        const prefix = isReq ? 'req' : 'off';
+        const btn = $(`btn-${prefix}-confirm`);
         setLoading(btn, true);
         try {
-            const title = $('off-title').value.trim();
-            const category = $('off-category').value;
-            const description = $('off-desc').value.trim();
+            const whenMap = { asap: '⚡ Lo antes posible', today: '📅 Hoy', this_week: '📆 Esta semana', flexible: '🕐 Flexible' };
+            const compMap = { cash: 'Pago en €', barter: 'Trueque', altruistic: 'Altruista' };
+            const b = pendingDraft.body;
 
-            const comp = (document.getElementById('off-comp') && document.getElementById('off-comp').value) || 'cash';
-            const points = 0;
+            if (isReq) {
+                const req = await KHApi.createRequest(b);
+                lastCreatedRequest = req;
+                await uploadStagedPhotos('req', req.id).catch(() => 0);
 
-            const body = {
-                title,
-                category,
-                points_value: points,
-                description: description || undefined,
-                compensation_type: comp,
-            };
+                const titleEl = $('req-created-title');
+                if (titleEl) titleEl.textContent = req.title;
+                const meta = $('req-created-meta');
+                if (meta) {
+                    meta.innerHTML = `<span class="mvp-meta-tag">${escapeHtml(catLabel(b.category))}</span><span class="mvp-meta-tag">${escapeHtml(b.location_text)}</span><span class="mvp-meta-tag">${whenMap[b.when] || b.when}</span><span class="mvp-meta-tag">${compMap[b.compensation_type] || b.compensation_type}</span>`;
+                }
+                hide($('req-preview'));
+                show($('req-created'));
+                hide($('req-suggestions'));
+                $('req-suggestions-list').innerHTML = '';
+                setCreateStep(3);
+                toast('¡Solicitud publicada! ✓', 'success');
+                try { loadFeed(); } catch { }
+                renderListingPhotos('req-photos-grid', req.media_urls, 'deleteRequestPhoto', req.id);
+                const f = $('request-form');
+                if (f) f.reset();
+                loadCreations();
+                const blk = $('req-created');
+                if (blk && blk.scrollIntoView) blk.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                const offer = await KHApi.createOffer(b);
+                lastCreatedOffer = offer;
+                await uploadStagedPhotos('off', offer.id).catch(() => 0);
 
-            const offer = await KHApi.createOffer(body);
-            lastCreatedOffer = offer;
-            $('off-created-title').textContent = offer.title;
-            show($('off-created'));
-            hide($('off-form-wrap'));
-            toast('Oferta publicada ✓', 'success');
-            try { loadFeed(); } catch { }
-
-            renderListingPhotos('off-photos-grid', offer.media_urls, 'deleteOfferPhoto', offer.id);
-
-            const f = $('offer-form');
-            if (f) f.reset();
-
-            loadCreations();
-            scrollToCreations();
+                const titleEl = $('off-created-title');
+                if (titleEl) titleEl.textContent = offer.title;
+                const meta = $('off-created-meta');
+                if (meta) {
+                    meta.innerHTML = `<span class="mvp-meta-tag">${escapeHtml(catLabel(b.category))}</span><span class="mvp-meta-tag">${compMap[b.compensation_type] || b.compensation_type}</span>`;
+                }
+                hide($('off-preview'));
+                show($('off-created'));
+                setCreateStep(3);
+                toast('¡Oferta publicada! ✓', 'success');
+                try { loadFeed(); } catch { }
+                renderListingPhotos('off-photos-grid', offer.media_urls, 'deleteOfferPhoto', offer.id);
+                const f = $('offer-form');
+                if (f) f.reset();
+                loadCreations();
+            }
+            pendingDraft = null;
         } catch (err) {
-            toast(err.message || 'No se pudo publicar la oferta', 'error');
+            toast(err.message || 'No se pudo publicar', 'error');
         } finally {
             setLoading(btn, false);
         }
@@ -2999,24 +3193,41 @@
         }
 
         const isActive = wantStatus !== 'closed';
+        const now = Date.now();
         filtered.slice(0, 12).forEach(it => {
             const el = document.createElement('div');
             el.className = 'mvp-item';
             const isReq = it.kind === 'request';
-            const title = isReq ? it.row.title : it.row.title;
             const comp = (it.row.compensation_type === 'coins') ? 'cash' : (it.row.compensation_type || 'cash');
             const meta = `${it.row.category} · ${COMP_LABEL[comp] || comp}`;
-            const when = fmtShortDate(it.row.expires_at || it.row.created_at);
+            const expiresAt = it.row.expires_at ? new Date(it.row.expires_at).getTime() : null;
+            const isExpired = expiresAt && expiresAt < now;
+            const daysLeft = (expiresAt && !isExpired) ? Math.ceil((expiresAt - now) / 86400000) : null;
+            let expiryNote = '';
+            if (isExpired) {
+                expiryNote = ' · expirada';
+            } else if (daysLeft !== null && daysLeft <= 3) {
+                expiryNote = ` · caduca en ${daysLeft}d`;
+            } else if (expiresAt) {
+                expiryNote = ` · caduca ${fmtShortDate(it.row.expires_at)}`;
+            }
             const kindLabel = isReq ? 'Solicitud' : 'Oferta';
             const kindClass = isReq ? 'req' : 'off';
-            const stateBadge = isActive ? '' : '<span class="mvp-status err">cerrada</span>';
+            let stateBadge;
+            if (!isActive) {
+                stateBadge = '<span class="mvp-status err">cerrada</span>';
+            } else if (isExpired) {
+                stateBadge = '<span class="mvp-status warn">expirada</span>';
+            } else {
+                stateBadge = '<span class="mvp-status ok">activa</span>';
+            }
 
             el.innerHTML = `
               <div class="mvp-item-left">
                 <span class="mvp-kind ${kindClass}">${kindLabel}</span>
                 <div class="mvp-txt">
-                  <div class="mvp-title">${escapeHtml(title)}</div>
-                  <div class="mvp-meta">${escapeHtml(meta)}${when ? ' · caduca ' + escapeHtml(when) : ''}</div>
+                  <div class="mvp-title">${escapeHtml(it.row.title)}</div>
+                  <div class="mvp-meta">${escapeHtml(meta)}${expiryNote ? escapeHtml(expiryNote) : ''}</div>
                 </div>
               </div>
               <div class="mvp-actions">
@@ -3384,18 +3595,18 @@
                 const canRate = match.status === 'done' && !ratedByMe;
                 const gotRated = match[otherRatingCol] != null;
 
-                    const subject = (match.request_title || match.offer_title || '').trim();
-                    const when = match.completed_at || match.accepted_at || match.created_at;
-                    const whenTxt = fmtShortDate(when);
-                    const comp = (match.compensation_type === 'coins') ? 'cash' : (match.compensation_type || 'cash');
-                    const compTxt = COMP_LABEL[comp] || comp;
-                    const agreedCoins = (+match.points_agreed || 0);
-                    const agreedOk = comp === 'cash'
-                        ? agreedCoins > 0
-                        : (comp === 'barter' ? String(match.barter_terms || '').trim().length > 0 : true);
-                    const compMeta = comp === 'cash'
-                        ? (agreedCoins > 0 ? `${compTxt} · ${agreedCoins} €` : `${compTxt} · pendiente acuerdo`)
-                        : (agreedOk ? `${compTxt} · acordado` : `${compTxt} · pendiente acuerdo`);
+                const subject = (match.request_title || match.offer_title || '').trim();
+                const when = match.completed_at || match.accepted_at || match.created_at;
+                const whenTxt = fmtShortDate(when);
+                const comp = (match.compensation_type === 'coins') ? 'cash' : (match.compensation_type || 'cash');
+                const compTxt = COMP_LABEL[comp] || comp;
+                const agreedCoins = (+match.points_agreed || 0);
+                const agreedOk = comp === 'cash'
+                    ? agreedCoins > 0
+                    : (comp === 'barter' ? String(match.barter_terms || '').trim().length > 0 : true);
+                const compMeta = comp === 'cash'
+                    ? (agreedCoins > 0 ? `${compTxt} · ${agreedCoins} €` : `${compTxt} · pendiente acuerdo`)
+                    : (agreedOk ? `${compTxt} · acordado` : `${compTxt} · pendiente acuerdo`);
 
                 const starsHtml = canRate
                     ? `<span class="mvp-stars" aria-label="Valorar 1 a 5">
@@ -3705,6 +3916,44 @@
         });
     });
 
+    /* ── Report modal ────────────────────────────────────────────────────────── */
+    function openReportModal(targetType, targetId) {
+        if (!KHApi.getToken()) {
+            toast('Inicia sesión para reportar contenido', 'error');
+            openLogin();
+            return;
+        }
+        const el = $('modal-report');
+        if (!el) return;
+        $('report-target-type').value = targetType;
+        $('report-target-id').value = targetId;
+        $('report-reason').value = 'spam';
+        el.classList.remove('hidden');
+    }
+
+    function closeReportModal(event) {
+        if (event && event.target !== $('modal-report')) return;
+        hide($('modal-report'));
+    }
+
+    async function submitReport() {
+        const targetType = $('report-target-type').value;
+        const targetId = $('report-target-id').value;
+        const reason = $('report-reason').value;
+        if (!targetType || !targetId) return;
+        const btn = $('btn-report-submit');
+        setLoading(btn, true);
+        try {
+            await KHApi.createReport({ target_type: targetType, target_id: targetId, reason });
+            hide($('modal-report'));
+            toast('Reporte enviado. Revisaremos el contenido en breve.', 'success');
+        } catch (err) {
+            toast(err.message || 'No se pudo enviar el reporte', 'error');
+        } finally {
+            setLoading(btn, false);
+        }
+    }
+
     /* ── Public API ───────────────────────────────────────────────────────────── */
     window.KHApp = {
         goLanding,
@@ -3787,6 +4036,12 @@
         loadLedger,
         createRequest,
         createOffer,
+        showCreatePreview,
+        backToEdit,
+        confirmCreate,
+        openReportModal,
+        closeReportModal,
+        submitReport,
         loadSuggestedProviders,
         loadCreations,
         loadMatches,

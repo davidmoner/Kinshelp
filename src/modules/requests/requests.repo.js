@@ -126,9 +126,12 @@ function insert({ seeker_id, title, description, category, points_offered, expir
 
 function patch(id, sets, vals) {
     if (db.isPg) {
-        // NOTE: this function is only used by SQLite pathways today.
-        // For PG edits, implement a dedicated updater when needed.
-        throw new Error('help_requests patch not implemented for Postgres yet');
+        let i = 1;
+        const pgSets = sets.replace(/\?/g, () => `$${i++}`);
+        return db.exec(
+            `UPDATE help_requests SET ${pgSets}, updated_at = $${i++} WHERE id = $${i}`,
+            [...vals, new Date().toISOString(), id]
+        );
     }
     db.prepare(`UPDATE help_requests SET ${sets}, updated_at = ? WHERE id = ?`).run(...vals, new Date().toISOString(), id);
 }

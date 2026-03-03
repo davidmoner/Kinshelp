@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(wc:*)",
+      "Bash(test:*)",
+      "Bash(node --check *)",
+      "Bash(node src/server.js)",
+      "Bash(npm run start)",
+      "Bash(npm run dev)",
+      "Bash(npm run migrate)",
+      "Bash(npm run test)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add *)",
+      "Bash(git commit*)"
+    ]
+  },
+  "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
+  }
+}

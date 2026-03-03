@@ -70,8 +70,8 @@ async function requestVerifyEmail({ userId, email, isVerified }) {
   const link = emailSvc.buildLink(`/api/v1/auth/verify-email?token=${encodeURIComponent(t.token)}`);
   const out = await emailSvc.send({
     to: email,
-    subject: 'KingsHelp - Verify your email',
-    text: `Para verificar tu email, abre este enlace (valido 24h):\n\n${link}`,
+    subject: 'KingsHelp — Verifica tu email',
+    text: `Hola,\n\nPara verificar tu email en KingsHelp, abre este enlace (válido 24 horas):\n\n${link}\n\nSi no has creado una cuenta en KingsHelp, ignora este mensaje.\n\nEl equipo de KingsHelp`,
   });
 
   return { implemented: !!out.implemented, email_sent: !!out.ok };

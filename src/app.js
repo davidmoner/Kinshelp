@@ -138,6 +138,7 @@ api.use('/badges', require('./modules/badges/badges.routes'));
   api.use('/automatch', require('./modules/automatch/automatch.routes'));
   api.use('/feed', require('./modules/feed/feed.routes'));
   api.use('/notifications', require('./modules/notifications/notifications.routes'));
+  api.use('/reports', require('./modules/reports/reports.routes'));
 
   // Admin (protected by auth + ADMIN_EMAILS)
   api.use('/admin', require('./modules/admin/admin.routes'));

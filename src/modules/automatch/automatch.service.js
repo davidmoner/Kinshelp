@@ -208,76 +208,84 @@ function listInvites(userId, opts) {
   });
 }
 
-function acceptInvite(inviteId, actingProviderId) {
-  if (db.isPg) throw httpError(501, 'AutoMatch no disponible en Postgres aun');
-  if (!isPremiumActive(actingProviderId)) throw httpError(403, 'AutoMatch es una funcion Premium');
+async function acceptInvite(inviteId, actingProviderId) {
+  const premOk = await Promise.resolve(isPremiumActive(actingProviderId));
+  if (!premOk) throw httpError(403, 'AutoMatch es una funcion Premium');
 
-  const invReq = repo.getInvite(inviteId);
+  const invReq = await Promise.resolve(repo.getInvite(inviteId));
   if (invReq) {
     if (invReq.provider_id !== actingProviderId) throw httpError(403, 'Forbidden');
     if (invReq.status !== 'pending') throw httpError(422, `Invitacion no disponible (${invReq.status})`);
     if (new Date(invReq.expires_at).getTime() <= Date.now()) throw httpError(422, 'Invitacion caducada');
-    const req = db.prepare('SELECT id, status, compensation_type FROM help_requests WHERE id = ?').get(invReq.request_id);
+
+    let req;
+    if (db.isPg) {
+      req = await db.one('SELECT id, status, compensation_type FROM help_requests WHERE id = $1', [invReq.request_id]);
+    } else {
+      req = db.prepare('SELECT id, status, compensation_type FROM help_requests WHERE id = ?').get(invReq.request_id);
+    }
     if (!req) throw httpError(404, 'Solicitud no encontrada');
     if (req.status !== 'open') throw httpError(422, 'La solicitud ya no esta disponible');
 
-    const match = db.transaction(() => {
-      repo.markAccepted(inviteId);
-      repo.expireOtherPendingForRequest(invReq.request_id, inviteId);
-      return matchesSvc.create({
-        request_id: invReq.request_id,
-        offer_id: null,
-        provider_id: invReq.provider_id,
-        seeker_id: invReq.seeker_id,
-        points_agreed: 0,
-        initiated_by: 'provider',
-        compensation_type: req.compensation_type || 'cash',
-      });
-    })();
+    await Promise.resolve(repo.markAccepted(inviteId));
+    await Promise.resolve(repo.expireOtherPendingForRequest(invReq.request_id, inviteId));
+    const match = await matchesSvc.create({
+      request_id: invReq.request_id,
+      offer_id: null,
+      provider_id: invReq.provider_id,
+      seeker_id: invReq.seeker_id,
+      points_agreed: 0,
+      initiated_by: 'provider',
+      compensation_type: req.compensation_type || 'cash',
+    });
     return { ok: true, match };
   }
 
-  const invOffer = repo.getOfferInvite(inviteId);
+  const invOffer = await Promise.resolve(repo.getOfferInvite(inviteId));
   if (!invOffer) throw httpError(404, 'Invitacion no encontrada');
   if (invOffer.seeker_id !== actingProviderId) throw httpError(403, 'Forbidden');
   if (invOffer.status !== 'pending') throw httpError(422, `Invitacion no disponible (${invOffer.status})`);
   if (new Date(invOffer.expires_at).getTime() <= Date.now()) throw httpError(422, 'Invitacion caducada');
-  const off = db.prepare('SELECT id, status, compensation_type FROM service_offers WHERE id = ?').get(invOffer.offer_id);
+
+  let off;
+  if (db.isPg) {
+    off = await db.one('SELECT id, status, compensation_type FROM service_offers WHERE id = $1', [invOffer.offer_id]);
+  } else {
+    off = db.prepare('SELECT id, status, compensation_type FROM service_offers WHERE id = ?').get(invOffer.offer_id);
+  }
   if (!off) throw httpError(404, 'Oferta no encontrada');
   if (off.status !== 'active') throw httpError(422, 'La oferta ya no esta disponible');
 
-  const match2 = db.transaction(() => {
-    repo.markOfferAccepted(inviteId);
-    repo.expireOtherPendingForOffer(invOffer.offer_id, inviteId);
-    return matchesSvc.create({
-      request_id: null,
-      offer_id: invOffer.offer_id,
-      provider_id: invOffer.provider_id,
-      seeker_id: invOffer.seeker_id,
-      points_agreed: 0,
-      initiated_by: 'seeker',
-      compensation_type: off.compensation_type || 'cash',
-    });
-  })();
-
+  await Promise.resolve(repo.markOfferAccepted(inviteId));
+  await Promise.resolve(repo.expireOtherPendingForOffer(invOffer.offer_id, inviteId));
+  const match2 = await matchesSvc.create({
+    request_id: null,
+    offer_id: invOffer.offer_id,
+    provider_id: invOffer.provider_id,
+    seeker_id: invOffer.seeker_id,
+    points_agreed: 0,
+    initiated_by: 'seeker',
+    compensation_type: off.compensation_type || 'cash',
+  });
   return { ok: true, match: match2 };
 }
 
-function declineInvite(inviteId, actingProviderId) {
-  if (db.isPg) throw httpError(501, 'AutoMatch no disponible en Postgres aun');
-  if (!isPremiumActive(actingProviderId)) throw httpError(403, 'AutoMatch es una funcion Premium');
-  const invReq = repo.getInvite(inviteId);
+async function declineInvite(inviteId, actingProviderId) {
+  const premOk = await Promise.resolve(isPremiumActive(actingProviderId));
+  if (!premOk) throw httpError(403, 'AutoMatch es una funcion Premium');
+
+  const invReq = await Promise.resolve(repo.getInvite(inviteId));
   if (invReq) {
     if (invReq.provider_id !== actingProviderId) throw httpError(403, 'Forbidden');
     if (invReq.status !== 'pending') throw httpError(422, `Invitacion no disponible (${invReq.status})`);
-    repo.markDeclined(inviteId);
+    await Promise.resolve(repo.markDeclined(inviteId));
     return { ok: true };
   }
-  const invOff = repo.getOfferInvite(inviteId);
+  const invOff = await Promise.resolve(repo.getOfferInvite(inviteId));
   if (!invOff) throw httpError(404, 'Invitacion no encontrada');
   if (invOff.seeker_id !== actingProviderId) throw httpError(403, 'Forbidden');
   if (invOff.status !== 'pending') throw httpError(422, `Invitacion no disponible (${invOff.status})`);
-  repo.markOfferDeclined(inviteId);
+  await Promise.resolve(repo.markOfferDeclined(inviteId));
   return { ok: true };
 }
 

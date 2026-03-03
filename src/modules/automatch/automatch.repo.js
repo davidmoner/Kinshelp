@@ -22,9 +22,7 @@ function expireStale() {
   `).run(now, now);
 }
 
-function getSettings(userId) {
-  if (db.isPg) return null;
-  const row = db.prepare('SELECT * FROM automatch_settings WHERE user_id = ?').get(userId);
+function parseSettingsRow(row) {
   if (!row) return null;
   try { row.categories = JSON.parse(row.categories_json || '[]'); } catch { row.categories = []; }
   try { row.seeker_categories = JSON.parse(row.seeker_categories_json || '[]'); } catch { row.seeker_categories = []; }
@@ -33,8 +31,42 @@ function getSettings(userId) {
   return row;
 }
 
+function getSettings(userId) {
+  if (db.isPg) {
+    return db.one('SELECT * FROM automatch_settings WHERE user_id = $1', [userId])
+      .then(parseSettingsRow);
+  }
+  const row = db.prepare('SELECT * FROM automatch_settings WHERE user_id = ?').get(userId);
+  return parseSettingsRow(row ? { ...row } : null);
+}
+
 function upsertSettings(userId, fields) {
-  if (db.isPg) throw new Error('AutoMatch settings not supported on Postgres yet');
+  if (db.isPg) {
+    return Promise.resolve(getSettings(userId)).then(existing => {
+      const now = nowIso();
+      const enabled = fields.enabled != null ? (fields.enabled ? 1 : 0) : (existing ? existing.enabled : 0);
+      const seeker_enabled = fields.seeker_enabled != null ? (fields.seeker_enabled ? 1 : 0) : (existing ? (existing.seeker_enabled ? 1 : 0) : 0);
+      const radius_km = fields.radius_km != null ? Number(fields.radius_km) : (existing ? Number(existing.radius_km) : 5);
+      const max_invites_per_day = fields.max_invites_per_day != null ? Number(fields.max_invites_per_day)
+        : (existing ? Number(existing.max_invites_per_day) : 25);
+      const quiet_start = fields.quiet_start !== undefined ? fields.quiet_start : (existing ? existing.quiet_start : null);
+      const quiet_end = fields.quiet_end !== undefined ? fields.quiet_end : (existing ? existing.quiet_end : null);
+      const categories_json = JSON.stringify(Array.isArray(fields.categories) ? fields.categories : (existing ? existing.categories : []));
+      const seeker_categories_json = JSON.stringify(Array.isArray(fields.seeker_categories) ? fields.seeker_categories : (existing ? existing.seeker_categories : []));
+      return db.exec(`
+        INSERT INTO automatch_settings
+          (user_id, enabled, seeker_enabled, categories_json, seeker_categories_json, radius_km, max_invites_per_day, quiet_start, quiet_end, created_at, updated_at)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        ON CONFLICT (user_id) DO UPDATE SET
+          enabled = EXCLUDED.enabled, seeker_enabled = EXCLUDED.seeker_enabled,
+          categories_json = EXCLUDED.categories_json, seeker_categories_json = EXCLUDED.seeker_categories_json,
+          radius_km = EXCLUDED.radius_km, max_invites_per_day = EXCLUDED.max_invites_per_day,
+          quiet_start = EXCLUDED.quiet_start, quiet_end = EXCLUDED.quiet_end,
+          updated_at = EXCLUDED.updated_at
+      `, [userId, enabled, seeker_enabled, categories_json, seeker_categories_json, radius_km, max_invites_per_day, quiet_start || null, quiet_end || null, now, now])
+        .then(() => getSettings(userId));
+    });
+  }
   const existing = getSettings(userId);
   const now = nowIso();
 
@@ -123,37 +155,27 @@ function insertOfferInvites({ offerId, providerId, seekerIds, expiresAt }) {
 }
 
 function getOfferInvite(id) {
+  if (db.isPg) return db.one('SELECT * FROM automatch_offer_invites WHERE id = $1', [id]);
   expireStale();
   return db.prepare('SELECT * FROM automatch_offer_invites WHERE id = ?').get(id);
 }
 
 function markOfferAccepted(inviteId) {
   const now = nowIso();
-  db.prepare(`
-    UPDATE automatch_offer_invites
-    SET status = 'accepted', accepted_at = ?, updated_at = ?
-    WHERE id = ?
-  `).run(now, now, inviteId);
+  if (db.isPg) return db.exec("UPDATE automatch_offer_invites SET status='accepted', accepted_at=$1, updated_at=$2 WHERE id=$3", [now, now, inviteId]);
+  db.prepare("UPDATE automatch_offer_invites SET status='accepted', accepted_at=?, updated_at=? WHERE id=?").run(now, now, inviteId);
 }
 
 function markOfferDeclined(inviteId) {
   const now = nowIso();
-  db.prepare(`
-    UPDATE automatch_offer_invites
-    SET status = 'declined', declined_at = ?, updated_at = ?
-    WHERE id = ?
-  `).run(now, now, inviteId);
+  if (db.isPg) return db.exec("UPDATE automatch_offer_invites SET status='declined', declined_at=$1, updated_at=$2 WHERE id=$3", [now, now, inviteId]);
+  db.prepare("UPDATE automatch_offer_invites SET status='declined', declined_at=?, updated_at=? WHERE id=?").run(now, now, inviteId);
 }
 
 function expireOtherPendingForOffer(offerId, exceptInviteId) {
   const now = nowIso();
-  db.prepare(`
-    UPDATE automatch_offer_invites
-    SET status = 'expired', updated_at = ?
-    WHERE offer_id = ?
-      AND status = 'pending'
-      AND id != ?
-  `).run(now, offerId, exceptInviteId);
+  if (db.isPg) return db.exec("UPDATE automatch_offer_invites SET status='expired', updated_at=$1 WHERE offer_id=$2 AND status='pending' AND id!=$3", [now, offerId, exceptInviteId]);
+  db.prepare("UPDATE automatch_offer_invites SET status='expired', updated_at=? WHERE offer_id=? AND status='pending' AND id!=?").run(now, offerId, exceptInviteId);
 }
 
 function findEligibleSeekersForCategory({ category, excludeUserId, limit = 6 }) {
@@ -228,37 +250,27 @@ function insertInvites({ requestId, seekerId, providerIds, expiresAt }) {
 }
 
 function getInvite(id) {
+  if (db.isPg) return db.one('SELECT * FROM automatch_invites WHERE id = $1', [id]);
   expireStale();
   return db.prepare('SELECT * FROM automatch_invites WHERE id = ?').get(id);
 }
 
 function markAccepted(inviteId) {
   const now = nowIso();
-  db.prepare(`
-    UPDATE automatch_invites
-    SET status = 'accepted', accepted_at = ?, updated_at = ?
-    WHERE id = ?
-  `).run(now, now, inviteId);
+  if (db.isPg) return db.exec("UPDATE automatch_invites SET status='accepted', accepted_at=$1, updated_at=$2 WHERE id=$3", [now, now, inviteId]);
+  db.prepare("UPDATE automatch_invites SET status='accepted', accepted_at=?, updated_at=? WHERE id=?").run(now, now, inviteId);
 }
 
 function markDeclined(inviteId) {
   const now = nowIso();
-  db.prepare(`
-    UPDATE automatch_invites
-    SET status = 'declined', declined_at = ?, updated_at = ?
-    WHERE id = ?
-  `).run(now, now, inviteId);
+  if (db.isPg) return db.exec("UPDATE automatch_invites SET status='declined', declined_at=$1, updated_at=$2 WHERE id=$3", [now, now, inviteId]);
+  db.prepare("UPDATE automatch_invites SET status='declined', declined_at=?, updated_at=? WHERE id=?").run(now, now, inviteId);
 }
 
 function expireOtherPendingForRequest(requestId, exceptInviteId) {
   const now = nowIso();
-  db.prepare(`
-    UPDATE automatch_invites
-    SET status = 'expired', updated_at = ?
-    WHERE request_id = ?
-      AND status = 'pending'
-      AND id != ?
-  `).run(now, requestId, exceptInviteId);
+  if (db.isPg) return db.exec("UPDATE automatch_invites SET status='expired', updated_at=$1 WHERE request_id=$2 AND status='pending' AND id!=$3", [now, requestId, exceptInviteId]);
+  db.prepare("UPDATE automatch_invites SET status='expired', updated_at=? WHERE request_id=? AND status='pending' AND id!=?").run(now, requestId, exceptInviteId);
 }
 
 function findEligibleProvidersForCategory({ category, excludeUserId, limit = 6 }) {

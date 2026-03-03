@@ -316,7 +316,7 @@
                           <!-- Escena A (Solicito) -->
                           <div class="hb2p-scene hb2p-scene--a">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag" aria-hidden="true">María</span>
                             </div>
@@ -364,7 +364,7 @@
                           <!-- Escena C (Completado) -->
                           <div class="hb2p-scene hb2p-scene--c">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag" aria-hidden="true">María</span>
                             </div>
@@ -399,14 +399,14 @@
                           <!-- Escena B (Ofrezco) -->
                           <div class="hb2p-scene hb2p-scene--b">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
                             </div>
                             <div class="ds-scene-body">
                               <div class="hb2p-sys-notif">
                                 <div class="hb2p-sys-top">
-                                  <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                                  <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
                                   <span class="hb2p-sys-app">KingsHelp</span>
                                   <span class="hb2p-sys-chip">Mudanza</span>
                                   <span class="hb2p-sys-now">ahora</span>
@@ -439,7 +439,7 @@
                           <!-- Escena C (Completado + reputación) -->
                           <div class="hb2p-scene hb2p-scene--c">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" />
+                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
                             </div>
@@ -1785,12 +1785,14 @@
                 <span class="spinner hidden"></span>
               </button>
               <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resendVerifyEmail()"
-                id="btn-verify-resend">
+                id="btn-verify-resend" class="hidden">
                 <span class="btn-label">Reenviar verificación</span>
                 <span class="spinner hidden"></span>
               </button>
             </div>
           </div>
+
+          <div id="profile-verify-status" class="profile-verify-warn" aria-live="polite"></div>
 
           <div class="profile-stats">
             <div class="profile-stat">
@@ -2014,6 +2016,24 @@
             <span class="badge-pill">MVP</span>
           </div>
 
+          <!-- Steps indicator -->
+          <div class="create-steps" aria-label="Pasos para crear">
+            <div class="create-step create-step--active" id="cstep-1">
+              <span class="create-step-num">1</span>
+              <span class="create-step-label">Tipo</span>
+            </div>
+            <div class="create-step-line"></div>
+            <div class="create-step" id="cstep-2">
+              <span class="create-step-num">2</span>
+              <span class="create-step-label">Detalles</span>
+            </div>
+            <div class="create-step-line"></div>
+            <div class="create-step" id="cstep-3">
+              <span class="create-step-num">3</span>
+              <span class="create-step-label">Publicado</span>
+            </div>
+          </div>
+
           <div class="create-switch" role="group" aria-label="Elegir tipo de creacion">
             <button class="create-choice create-choice--active" type="button" data-kind="request"
               onclick="KHApp.selectCreateKind('request')">
@@ -2026,35 +2046,44 @@
 
           <!-- Solicitud -->
           <div id="req-form-wrap">
-            <form id="request-form" onsubmit="KHApp.createRequest(event)">
-              <div class="field">
-                <label for="req-title">Título</label>
-                <input id="req-title" type="text" placeholder="Ej. Mudanza" required />
+            <form id="request-form" onsubmit="KHApp.createRequest(event)" novalidate>
+
+              <div class="field" id="fld-req-title">
+                <label for="req-title">Título <span class="field-required" aria-hidden="true">*</span></label>
+                <div class="field-input-wrap">
+                  <input id="req-title" type="text" placeholder="Ej. Mudanza en el barrio" maxlength="80"
+                    oninput="KHApp.onFieldInput('req-title','req-title-err','req-title-count',80)"
+                    onfocus="KHApp.clearFieldError('req-title','req-title-err')" autocomplete="off" />
+                  <span class="field-counter" id="req-title-count">0 / 80</span>
+                </div>
+                <div class="field-error hidden" id="req-title-err" role="alert"></div>
               </div>
 
-              <div class="field">
-                <label for="req-location">Zona</label>
-                <input id="req-location" type="text" placeholder="Ej. Centro · Bescano · Barrio"
-                  autocomplete="address-level2" required />
-                <div class="demo-hint" style="margin-top:6px;">Pon una zona reconocible. La verdadera ayuda real empieza
-                  por encontrarse.</div>
+              <div class="field" id="fld-req-location">
+                <label for="req-location">Zona <span class="field-required" aria-hidden="true">*</span></label>
+                <div class="field-input-wrap">
+                  <input id="req-location" type="text" placeholder="Ej. Centro · Gracia · Barrio"
+                    autocomplete="address-level2" onfocus="KHApp.clearFieldError('req-location','req-location-err')" />
+                </div>
+                <div class="field-error hidden" id="req-location-err" role="alert"></div>
+                <div class="field-hint">Pon una zona reconocible. La ayuda real empieza por encontrarse.</div>
               </div>
 
               <div class="field">
                 <label for="req-category">Categoría</label>
-                <select id="req-category" required>
-                  <option value="repairs">Reparaciones</option>
-                  <option value="packages">Paquetes</option>
-                  <option value="pets">Mascotas</option>
-                  <option value="cleaning">Limpieza</option>
-                  <option value="transport">Transporte</option>
-                  <option value="tech">Tecnología</option>
-                  <option value="gardening">Jardinería</option>
-                  <option value="care">Acompañamiento</option>
-                  <option value="tutoring">Clases</option>
-                  <option value="creative">Creativo</option>
-                  <option value="errands">Recados</option>
-                  <option value="other">Otros</option>
+                <select id="req-category">
+                  <option value="repairs">🔧 Reparaciones</option>
+                  <option value="packages">📦 Paquetes</option>
+                  <option value="pets">🐾 Mascotas</option>
+                  <option value="cleaning">🧹 Limpieza</option>
+                  <option value="transport">🚗 Transporte</option>
+                  <option value="tech">💻 Tecnología</option>
+                  <option value="gardening">🌿 Jardinería</option>
+                  <option value="care">🤝 Acompañamiento</option>
+                  <option value="tutoring">📚 Clases</option>
+                  <option value="creative">🎨 Creativo</option>
+                  <option value="errands">🧾 Recados</option>
+                  <option value="other">✨ Otros</option>
                 </select>
               </div>
 
@@ -2073,37 +2102,84 @@
                   KingsHelp.</div>
               </div>
 
-              <div class="demo-hint" style="margin-top:2px;">Que sea sencillo: hoy lo publicas, hoy te encuentran.</div>
-
-              <div class="field">
-                <label for="req-desc">Detalles (opcional)</label>
-                <textarea id="req-desc" rows="3" placeholder="Qué necesitas, cuándo y dónde"></textarea>
-              </div>
-
               <div class="field">
                 <label for="req-when">¿Cuándo?</label>
-                <select id="req-when" required>
-                  <option value="asap">Lo antes posible</option>
-                  <option value="today">Hoy</option>
-                  <option value="this_week">Esta semana</option>
-                  <option value="flexible">Flexible</option>
+                <select id="req-when">
+                  <option value="asap">⚡ Lo antes posible</option>
+                  <option value="today">📅 Hoy</option>
+                  <option value="this_week">📆 Esta semana</option>
+                  <option value="flexible">🕐 Flexible</option>
                 </select>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-sm" id="btn-req-create">
-                <span class="btn-label">Crear solicitud</span>
+              <div class="field">
+                <label for="req-desc">Detalles <span style="opacity:.6;font-weight:400">(opcional)</span></label>
+                <div class="field-input-wrap">
+                  <textarea id="req-desc" rows="3" placeholder="Qué necesitas exactamente, cuándo y condiciones…"
+                    maxlength="500" oninput="KHApp.onFieldInput('req-desc','','req-desc-count',500)"></textarea>
+                  <span class="field-counter field-counter--ta" id="req-desc-count">0 / 500</span>
+                </div>
+              </div>
+
+              <!-- Fotos ANTES de publicar -->
+              <div class="field create-photos-pre">
+                <label>Fotos <span style="opacity:.6;font-weight:400">(opcional · hasta 6)</span></label>
+                <div class="create-photos-pre-grid" id="req-pre-photos-grid">
+                  <button class="create-photo-add" type="button" onclick="KHApp.pickPrePhoto('req')"
+                    aria-label="Añadir foto">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="3" width="18" height="18" rx="3" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <path d="m21 15-5-5L5 21" />
+                    </svg>
+                    <span>Añadir foto</span>
+                  </button>
+                </div>
+                <input id="req-pre-photo-input" class="hidden" type="file" accept="image/png,image/jpeg,image/webp"
+                  multiple onchange="KHApp.addPrePhoto('req',event)" />
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block" id="btn-req-create" style="margin-top:4px;">
+                <span class="btn-label">Publicar solicitud →</span>
                 <span class="spinner hidden"></span>
               </button>
             </form>
           </div>
 
-          <div class="mvp-block hidden" id="req-created">
-            <div class="mvp-created">
-              <span class="mvp-created-dot"></span>
-              <span>Solicitud creada: <strong id="req-created-title">—</strong></span>
+          <!-- Preview solicitud (antes de publicar) -->
+          <div class="mvp-block hidden" id="req-preview">
+            <div class="preview-head">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Revisa antes de publicar</span>
             </div>
+            <div class="preview-card">
+              <div class="preview-kind-label">Solicitud</div>
+              <div class="preview-title" id="req-preview-title"></div>
+              <div class="preview-chips" id="req-preview-chips"></div>
+              <div class="preview-desc" id="req-preview-desc"></div>
+              <div class="preview-photos" id="req-preview-photos"></div>
+            </div>
+            <div class="mvp-row" style="margin-top:16px">
+              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.backToEdit('request')">← Editar</button>
+              <button class="btn btn-primary" type="button" id="btn-req-confirm">
+                <span class="btn-label">Confirmar y publicar</span>
+                <span class="spinner hidden"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mvp-block hidden" id="req-created">
+            <div class="mvp-created-banner">
+              <div class="mvp-created-check" aria-hidden="true">✓</div>
+              <div>
+                <div class="mvp-created-label">¡Solicitud publicada!</div>
+                <strong class="mvp-created-title" id="req-created-title">—</strong>
+              </div>
+            </div>
+            <div class="mvp-created-meta" id="req-created-meta"></div>
             <div class="mvp-row">
-              <button class="btn btn-ghost btn-sm" id="btn-req-suggest" onclick="KHApp.loadSuggestedProviders()">
+              <button class="btn btn-primary btn-sm" id="btn-req-suggest" onclick="KHApp.loadSuggestedProviders()">
                 <span class="btn-label">Buscar KingsHelp cerca</span>
                 <span class="spinner hidden"></span>
               </button>
@@ -2131,27 +2207,34 @@
 
           <!-- Oferta -->
           <div id="off-form-wrap" class="hidden">
-            <form id="offer-form" onsubmit="KHApp.createOffer(event)">
-              <div class="field">
-                <label for="off-title">Título</label>
-                <input id="off-title" type="text" placeholder="Ej. Ayuda con mudanza" required />
+            <form id="offer-form" onsubmit="KHApp.createOffer(event)" novalidate>
+
+              <div class="field" id="fld-off-title">
+                <label for="off-title">Título <span class="field-required" aria-hidden="true">*</span></label>
+                <div class="field-input-wrap">
+                  <input id="off-title" type="text" placeholder="Ej. Ayudo con mudanzas en mi zona" maxlength="80"
+                    oninput="KHApp.onFieldInput('off-title','off-title-err','off-title-count',80)"
+                    onfocus="KHApp.clearFieldError('off-title','off-title-err')" autocomplete="off" />
+                  <span class="field-counter" id="off-title-count">0 / 80</span>
+                </div>
+                <div class="field-error hidden" id="off-title-err" role="alert"></div>
               </div>
 
               <div class="field">
                 <label for="off-category">Categoría</label>
-                <select id="off-category" required>
-                  <option value="repairs">Reparaciones</option>
-                  <option value="packages">Paquetes</option>
-                  <option value="pets">Mascotas</option>
-                  <option value="cleaning">Limpieza</option>
-                  <option value="transport">Transporte</option>
-                  <option value="tech">Tecnología</option>
-                  <option value="gardening">Jardinería</option>
-                  <option value="care">Acompañamiento</option>
-                  <option value="tutoring">Clases</option>
-                  <option value="creative">Creativo</option>
-                  <option value="errands">Recados</option>
-                  <option value="other">Otros</option>
+                <select id="off-category">
+                  <option value="repairs">🔧 Reparaciones</option>
+                  <option value="packages">📦 Paquetes</option>
+                  <option value="pets">🐾 Mascotas</option>
+                  <option value="cleaning">🧹 Limpieza</option>
+                  <option value="transport">🚗 Transporte</option>
+                  <option value="tech">💻 Tecnología</option>
+                  <option value="gardening">🌿 Jardinería</option>
+                  <option value="care">🤝 Acompañamiento</option>
+                  <option value="tutoring">📚 Clases</option>
+                  <option value="creative">🎨 Creativo</option>
+                  <option value="errands">🧾 Recados</option>
+                  <option value="other">✨ Otros</option>
                 </select>
               </div>
 
@@ -2170,29 +2253,76 @@
                   KingsHelp.</div>
               </div>
 
-              <div class="demo-hint" style="margin-top:2px;">Ofrece con calma. La reputacion se gana en detalles.</div>
-
               <div class="field">
-                <label for="off-desc">Detalles (opcional)</label>
-                <textarea id="off-desc" rows="3" placeholder="Qué ofreces, condiciones y disponibilidad"></textarea>
+                <label for="off-desc">Detalles <span style="opacity:.6;font-weight:400">(opcional)</span></label>
+                <div class="field-input-wrap">
+                  <textarea id="off-desc" rows="3" placeholder="Qué ofreces, tus condiciones y disponibilidad…"
+                    maxlength="500" oninput="KHApp.onFieldInput('off-desc','','off-desc-count',500)"></textarea>
+                  <span class="field-counter field-counter--ta" id="off-desc-count">0 / 500</span>
+                </div>
               </div>
 
-              <button type="submit" class="btn btn-primary btn-sm" id="btn-off-create">
-                <span class="btn-label">Publicar oferta</span>
+              <!-- Fotos ANTES de publicar -->
+              <div class="field create-photos-pre">
+                <label>Fotos <span style="opacity:.6;font-weight:400">(opcional · hasta 6)</span></label>
+                <div class="create-photos-pre-grid" id="off-pre-photos-grid">
+                  <button class="create-photo-add" type="button" onclick="KHApp.pickPrePhoto('off')"
+                    aria-label="Añadir foto">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="3" width="18" height="18" rx="3" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <path d="m21 15-5-5L5 21" />
+                    </svg>
+                    <span>Añadir foto</span>
+                  </button>
+                </div>
+                <input id="off-pre-photo-input" class="hidden" type="file" accept="image/png,image/jpeg,image/webp"
+                  multiple onchange="KHApp.addPrePhoto('off',event)" />
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block" id="btn-off-create" style="margin-top:4px;">
+                <span class="btn-label">Publicar oferta →</span>
                 <span class="spinner hidden"></span>
               </button>
             </form>
           </div>
 
-          <div class="mvp-block hidden" id="off-created">
-            <div class="mvp-created">
-              <span class="mvp-created-dot"></span>
-              <span>Oferta publicada: <strong id="off-created-title">—</strong></span>
+          <!-- Preview oferta (antes de publicar) -->
+          <div class="mvp-block hidden" id="off-preview">
+            <div class="preview-head">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Revisa antes de publicar</span>
             </div>
+            <div class="preview-card">
+              <div class="preview-kind-label off">Oferta</div>
+              <div class="preview-title" id="off-preview-title"></div>
+              <div class="preview-chips" id="off-preview-chips"></div>
+              <div class="preview-desc" id="off-preview-desc"></div>
+              <div class="preview-photos" id="off-preview-photos"></div>
+            </div>
+            <div class="mvp-row" style="margin-top:16px">
+              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.backToEdit('offer')">← Editar</button>
+              <button class="btn btn-primary" type="button" id="btn-off-confirm">
+                <span class="btn-label">Confirmar y publicar</span>
+                <span class="spinner hidden"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mvp-block hidden" id="off-created">
+            <div class="mvp-created-banner">
+              <div class="mvp-created-check" aria-hidden="true">✓</div>
+              <div>
+                <div class="mvp-created-label">¡Oferta publicada!</div>
+                <strong class="mvp-created-title" id="off-created-title">—</strong>
+              </div>
+            </div>
+            <div class="mvp-created-meta" id="off-created-meta"></div>
             <div class="mvp-row">
               <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.resetCreateForm('offer')">Publicar
                 otra</button>
-              <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.scrollToCreations()">Ver en mis
+              <button class="btn btn-primary btn-sm" type="button" onclick="KHApp.scrollToCreations()">Ver en mis
                 creaciones</button>
             </div>
 
@@ -2315,12 +2445,12 @@
         <div class="auth-provider-list">
           <button class="auth-provider" type="button" onclick="KHApp.authProvider('google')"
             aria-label="Continuar con Google">
-            <span class="auth-ico auth-ico--g" aria-hidden="true"><img src="web/img/google-g.svg" alt="" /></span>
+            <span class="auth-ico auth-ico--g" aria-hidden="true"><img src="web/img/google-g.svg" alt="" loading="lazy" /></span>
             <span>Continuar con Google</span>
           </button>
           <button class="auth-provider" type="button" onclick="KHApp.authProvider('facebook')"
             aria-label="Continuar con Facebook">
-            <span class="auth-ico auth-ico--f" aria-hidden="true"><img src="web/img/facebook-f.svg" alt="" /></span>
+            <span class="auth-ico auth-ico--f" aria-hidden="true"><img src="web/img/facebook-f.svg" alt="" loading="lazy" /></span>
             <span>Continuar con Facebook</span>
           </button>
           <button class="auth-provider" type="button" onclick="KHApp.showEmailAuth('login')"
@@ -2702,6 +2832,35 @@
     </div>
   </div>
 
+  <!-- Modal de reporte -->
+  <div id="modal-report" class="modal-overlay hidden" onclick="KHApp.closeReportModal(event)" role="dialog"
+    aria-modal="true" aria-labelledby="modal-report-title">
+    <div class="modal-box modal-box--sm" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="KHApp.closeReportModal()">✕</button>
+      <div class="modal-title" id="modal-report-title">Reportar contenido</div>
+      <p class="modal-sub" style="margin:6px 0 18px; opacity:.7; font-size:13px;">Ayúdanos a mantener la comunidad segura. Solo lo ven los moderadores.</p>
+      <input type="hidden" id="report-target-type" />
+      <input type="hidden" id="report-target-id" />
+      <div class="field">
+        <label for="report-reason">Motivo</label>
+        <select id="report-reason">
+          <option value="spam">Spam o publicidad</option>
+          <option value="scam">Estafa o fraude</option>
+          <option value="abuse">Contenido abusivo o amenazante</option>
+          <option value="inappropriate">Contenido inapropiado</option>
+          <option value="other">Otro</option>
+        </select>
+      </div>
+      <div class="premium-modal-actions" style="margin-top:18px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.closeReportModal()">Cancelar</button>
+        <button class="btn btn-primary" type="button" id="btn-report-submit" onclick="KHApp.submitReport()">
+          <span class="btn-label">Enviar reporte</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       // Allow explicit override (e.g. injected by hosting).
@@ -2741,12 +2900,12 @@
   <script src="js/api.js"></script>
   <script src="js/app.js"></script>
   <script src="js/theme.js"></script>
-  <script src="js/fx.js"></script>
-  <script src="js/particles.js"></script>
-  <script src="js/demo.js"></script>
+  <script src="js/fx.js" defer></script>
+  <script src="js/particles.js" defer></script>
+  <script src="js/demo.js" defer></script>
   <!-- sidepanels.js removed -->
-  <script src="web/js/hero_alt_fx.js"></script>
-  <script src="js/hero.js"></script>
+  <script src="web/js/hero_alt_fx.js" defer></script>
+  <script src="js/hero.js" defer></script>
 </body>
 
 </html>
