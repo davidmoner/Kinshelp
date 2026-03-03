@@ -32,6 +32,9 @@
                 overlay.style.display = 'none';
                 if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
             }
+            if (video) {
+                try { video.pause(); } catch { }
+            }
         }
         if (cfg.hero_banner_duration) {
             var baseMs = Math.max(3000, Number(cfg.hero_banner_duration) * 1000);
@@ -251,8 +254,10 @@
     }
 
     /* ── Init: show banner 0 immediately — but after intro splash ───── */
-    /* ── PNG Intro Overlay ─────────────────────────────── */
+    /* ── Intro Overlay (video) ─────────────────────────── */
     var overlay = document.getElementById('kh-intro-overlay');
+    var video = document.getElementById('kh-intro-video');
+    var videoWrap = document.getElementById('kh-intro-video-wrap');
 
     function startBanners() {
         banners[0].classList.add('hero-banner--active');
@@ -280,25 +285,53 @@
         }
         startBanners();
     } else {
-        /* ── Intro sequence (total ~2000ms) ────────────────
-           0ms    : crown enters (CSS animation 1200ms zoom-out)
-           1100ms : wordmark fades in (500ms)
-           1700ms : banners start (behind overlay)
-           2000ms : overlay fades out (620ms)
-           2620ms : overlay removed from DOM
-        ─────────────────────────────────────────────────── */
-        var wordmarkEl = document.getElementById('kh-intro-wordmark');
+        var fallbackDuration = 57000;
+        var durationMs = fallbackDuration;
+        var dismissed = false;
+        var dismissTimer = null;
 
-        /* Reveal wordmark at 1100ms */
-        setTimeout(function () {
-            if (wordmarkEl) wordmarkEl.classList.add('kh-intro-word--visible');
-        }, 1100);
+        function scheduleDismiss(ms) {
+            if (dismissTimer) clearTimeout(dismissTimer);
+            dismissTimer = setTimeout(function () {
+                if (dismissed) return;
+                dismissed = true;
+                dismissOverlay();
+            }, ms);
+        }
+
+        if (video) {
+            try {
+                video.controls = false;
+                video.loop = false;
+                video.muted = true;
+                var playPromise = video.play();
+                if (playPromise && typeof playPromise.catch === 'function') {
+                    playPromise.catch(function () { /* ignore autoplay errors */ });
+                }
+            } catch { }
+
+            video.addEventListener('loadedmetadata', function () {
+                if (video.duration && isFinite(video.duration)) {
+                    durationMs = Math.max(6000, Math.floor(video.duration * 1000));
+                    if (videoWrap) videoWrap.style.setProperty('--intro-shrink', durationMs + 'ms');
+                    scheduleDismiss(durationMs + 700);
+                }
+            }, { once: true });
+
+            video.addEventListener('ended', function () {
+                if (dismissed) return;
+                dismissed = true;
+                dismissOverlay();
+            }, { once: true });
+        }
+
+        if (videoWrap) videoWrap.style.setProperty('--intro-shrink', durationMs + 'ms');
 
         /* Start banners early so they're ready behind overlay */
-        setTimeout(startBanners, 1700);
+        setTimeout(startBanners, 1600);
 
-        /* Dismiss overlay at 2000ms */
-        setTimeout(dismissOverlay, 2000);
+        /* Dismiss after video duration + fade time */
+        scheduleDismiss(durationMs + 700);
     }
 
 })();

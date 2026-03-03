@@ -2483,35 +2483,49 @@ html[data-theme="light"] #kh-particles {
 }
 
 /* ── Intro video ───────────────────────────────────────── */
+.kh-intro-video-wrap {
+    width: min(720px, 90vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(1.18);
+    transform-origin: center;
+    animation: khIntroVideoShrink var(--intro-shrink, 57000ms) ease-out forwards;
+}
+
 .kh-intro-video {
-    width: clamp(220px, 28vw, 360px);
+    width: 100%;
     height: auto;
     display: block;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: rgba(8, 12, 20, 0.8);
-    box-shadow:
-        0 18px 48px rgba(0, 0, 0, 0.55),
-        0 0 0 1px rgba(201, 168, 76, 0.10);
-    animation: khIntroVideoIn 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    border-radius: 14px;
+    pointer-events: none;
+    user-select: none;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    animation: khIntroVideoIn 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 html[data-theme="light"] .kh-intro-video {
-    border-color: rgba(0, 0, 0, 0.08);
-    background: rgba(255, 255, 255, 0.85);
     box-shadow:
-        0 16px 36px rgba(0, 0, 0, 0.18),
-        0 0 0 1px rgba(33, 82, 173, 0.10);
+        0 18px 40px rgba(0, 0, 0, 0.20);
 }
 
 @keyframes khIntroVideoIn {
     from {
         opacity: 0;
-        transform: scale(0.9);
+        transform: scale(0.92);
     }
 
     to {
         opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes khIntroVideoShrink {
+    from {
+        transform: scale(1.25);
+    }
+    to {
         transform: scale(1);
     }
 }

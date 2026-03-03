@@ -23,13 +23,15 @@
 
     /* ── Config ───────────────────────────────────────────────── */
     const CFG = {
-        count: 52,        // partículas totales
-        minR: 1.2,       // radio mínimo (px)
-        maxR: 3.2,       // radio máximo
-        speed: 0.18,      // velocidad base (px/frame)
-        wobble: 0.0006,    // amplitud oscilación angular
-        opacityMaxDark: 0.10,   // opacidad máx en tema oscuro
-        opacityMaxLight: 0.055, // ~45% menos visible en tema claro
+        count: 62,        // partículas totales
+        minR: 1.8,       // radio mínimo (px)
+        maxR: 4.2,       // radio máximo
+        speed: 0.15,      // velocidad base (px/frame)
+        wobble: 0.0007,    // amplitud oscilación angular
+        opacityMaxDark: 0.14,   // opacidad máx en tema oscuro
+        opacityMaxLight: 0.075, // ~45% menos visible en tema claro
+        repelRadius: 180,
+        repelForce: 0.7,
     };
 
     /* Colores para cada tema */
@@ -40,6 +42,7 @@
 
     /* ── Estado ───────────────────────────────────────────────── */
     let W, H, particles = [], raf, paused = false;
+    const mouse = { x: 0, y: 0, active: false };
 
     /* ── Resize ───────────────────────────────────────────────── */
     function resize() {
@@ -61,6 +64,9 @@
             opacity: 0.02 + Math.random() * oMax,
             colorIdx: Math.floor(Math.random() * 3),
             phase: Math.random() * Math.PI * 2,
+            vx: 0,
+            vy: 0,
+            shape: Math.random() > 0.72 ? 'square' : 'circle',
         };
     }
 
@@ -87,8 +93,24 @@
         particles.forEach(p => {
             /* drift + wobble suave */
             p.angle += p.wobble + Math.sin(t * 0.0002 + p.phase) * 0.0008;
-            p.x += Math.cos(p.angle) * p.speed;
-            p.y += Math.sin(p.angle) * p.speed;
+            p.vx += Math.cos(p.angle) * p.speed;
+            p.vy += Math.sin(p.angle) * p.speed;
+
+            if (mouse.active) {
+                const dx = p.x - mouse.x;
+                const dy = p.y - mouse.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < CFG.repelRadius && dist > 0.1) {
+                    const force = (1 - dist / CFG.repelRadius) * CFG.repelForce;
+                    p.vx += (dx / dist) * force;
+                    p.vy += (dy / dist) * force;
+                }
+            }
+
+            p.vx *= 0.92;
+            p.vy *= 0.92;
+            p.x += p.vx;
+            p.y += p.vy;
 
             /* wrap (reaparece en el otro lado) */
             if (p.x < -p.r) p.x = W + p.r;
@@ -101,10 +123,21 @@
             const drawOp = Math.min(p.opacity, oMax);
 
             /* dibujar */
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(${palette[p.colorIdx]},${drawOp.toFixed(3)})`;
-            ctx.fill();
+            if (p.shape === 'square') {
+                const s = p.r * 1.9;
+                ctx.beginPath();
+                if (typeof ctx.roundRect === 'function') {
+                    ctx.roundRect(p.x - s / 2, p.y - s / 2, s, s, s * 0.35);
+                } else {
+                    ctx.rect(p.x - s / 2, p.y - s / 2, s, s);
+                }
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            }
         });
 
         raf = requestAnimationFrame(tick);
@@ -121,6 +154,12 @@
 
     /* ── Start ────────────────────────────────────────────────── */
     window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('pointermove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.active = true;
+    }, { passive: true });
+    window.addEventListener('pointerleave', () => { mouse.active = false; }, { passive: true });
     init();
     raf = requestAnimationFrame(tick);
 
