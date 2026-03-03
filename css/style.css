@@ -2796,18 +2796,31 @@ html[data-theme="light"] .dash-menu-sep {
   display: block;
 }
 
-#card-feed .card-ico {
-  background: rgba(124, 58, 237, 0.14);
-  border-color: rgba(124, 58, 237, 0.28);
-  background-image: url("/img/explora.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 22px 22px;
+#card-feed {
+  position: relative;
+  overflow: hidden;
 }
 
-html[data-theme="light"] #card-feed .card-ico {
-  background: rgba(124, 58, 237, 0.12);
-  border-color: rgba(124, 58, 237, 0.22);
+#card-feed::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/img/explora.png");
+  background-repeat: no-repeat;
+  background-position: 18px 16px;
+  background-size: 120px auto;
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+
+html[data-theme="light"] #card-feed::before {
+  opacity: 0.18;
+}
+
+#card-feed > * {
+  position: relative;
+  z-index: 1;
 }
 
 .card-title h3 {
