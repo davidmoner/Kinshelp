@@ -417,6 +417,8 @@ html[data-theme="dark"] .kh-ios-sub {
     /* Smaller phones so banner breathes within margins */
     /* +10% bigger phones */
     --hb2p-device-scale: 0.77;
+    --hb2p-zoom-left: 1.08;
+    --hb2p-zoom-right: 1.08;
 }
 
 @media (max-height: 860px) {
@@ -446,6 +448,8 @@ html[data-theme="dark"] .kh-ios-sub {
 @media (max-width: 520px) {
     .hb2p-wrap {
         --hb2p-device-scale: 0.67;
+        --hb2p-zoom-left: 1.04;
+        --hb2p-zoom-right: 1.04;
     }
 }
 
@@ -512,6 +516,7 @@ html[data-theme="dark"] .kh-ios-sub {
     width: 100%;
     padding-top: 0;
     position: relative;
+    overflow: visible;
 }
 
 /* (sonar removed) */
@@ -523,6 +528,16 @@ html[data-theme="dark"] .kh-ios-sub {
     position: relative;
     flex: 0 0 auto;
     margin: 0 auto;
+}
+
+.hb2p-device--left {
+    transform-origin: 50% 50%;
+    z-index: 1;
+}
+
+.hb2p-device--right {
+    transform-origin: 50% 50%;
+    z-index: 2;
 }
 
 .hb2p-device-wrap .demo-phone {
@@ -1378,6 +1393,26 @@ html[data-theme="light"] .hb2p-notif {
         transform: translateY(0) scale(1);
     }
 
+    10% {
+        opacity: 1;
+        transform: translateY(0) scale(1.04);
+    }
+
+    16% {
+        opacity: 1;
+        transform: translateY(0) scale(var(--hb2p-zoom-left));
+    }
+
+    24% {
+        opacity: 1;
+        transform: translateY(0) scale(var(--hb2p-zoom-left));
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
     96% {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -1401,6 +1436,26 @@ html[data-theme="light"] .hb2p-notif {
     }
 
     38% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    44% {
+        opacity: 1;
+        transform: translateY(0) scale(1.04);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(0) scale(var(--hb2p-zoom-right));
+    }
+
+    58% {
+        opacity: 1;
+        transform: translateY(0) scale(var(--hb2p-zoom-right));
+    }
+
+    62% {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
@@ -2398,6 +2453,11 @@ html[data-theme="light"] #kh-particles {
     .hero-banner[data-banner="1"] .hb2p-device-wrap {
         animation: none !important;
         opacity: 1 !important;
+    }
+
+    .hero-banner[data-banner="1"] .hb2p-device--left,
+    .hero-banner[data-banner="1"] .hb2p-device--right {
+        transform: none !important;
     }
 
     .hero-banner[data-banner="1"] .demo-phone {
