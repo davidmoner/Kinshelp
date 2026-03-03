@@ -15,7 +15,7 @@
     canvas.setAttribute('aria-hidden', 'true');
     canvas.style.cssText = [
         'position:fixed', 'inset:0', 'width:100%', 'height:100%',
-        'pointer-events:none', 'z-index:1'
+        'pointer-events:none', 'z-index:0'
     ].join(';');
     document.body.prepend(canvas);
 
@@ -23,10 +23,10 @@
 
     /* ── Config ───────────────────────────────────────────────── */
     const CFG = {
-        count: 42,        // partículas totales
-        minR: 1.6,       // radio mínimo (px)
-        maxR: 3.6,       // radio máximo
-        speed: 0.12,      // velocidad base (px/frame)
+        count: 86,        // partículas totales
+        minR: 1.4,       // radio mínimo (px)
+        maxR: 4.0,       // radio máximo
+        speed: 0.11,      // velocidad base (px/frame)
         wobble: 0.0006,    // amplitud oscilación angular
         opacityMaxDark: 0.12,   // opacidad máx en tema oscuro
         opacityMaxLight: 0.07, // ~45% menos visible en tema claro
@@ -36,8 +36,8 @@
 
     /* Colores para cada tema */
     const PALETTE = {
-        dark: ['201,168,76', '123,92,250', '61,139,255'],   // gold · violeta · azul
-        light: ['160,120,40', '91,63,232', '45,107,228'],
+        dark: ['201,168,76', '128,96,255'],   // gold · violeta
+        light: ['160,120,40', '99,70,240'],
     };
 
     /* ── Estado ───────────────────────────────────────────────── */
@@ -63,7 +63,7 @@
             speed: CFG.speed * (0.5 + Math.random()),
             wobble: CFG.wobble * (Math.random() - 0.5) * 2,
             opacity: 0.02 + Math.random() * oMax,
-            colorIdx: Math.floor(Math.random() * 3),
+            colorIdx: Math.floor(Math.random() * PALETTE.dark.length),
             phase: Math.random() * Math.PI * 2,
             vx: 0,
             vy: 0,
