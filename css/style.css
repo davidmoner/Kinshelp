@@ -2135,6 +2135,12 @@ html[data-theme="light"] .site-footer {
   z-index: 50;
 }
 
+.dash-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 @media (max-width: 820px) {
   /* Keep mobile tabs from squashing their shape */
   .dash-tabs {
@@ -2149,23 +2155,10 @@ html[data-theme="light"] .site-footer {
     /* sticky ya definido en base; position no se sobreescribe */
   }
 
-  /* Logo: positioned absolutely in the center (el header sticky actúa de containing block) */
-  .dash-header .nav-brand {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    pointer-events: none;
-  }
-
-  .dash-header .nav-brand .nav-brand-lockup {
-    pointer-events: auto;
-  }
-
   /* Hide avatar and name info — accessible via burger menu */
   .dash-header .user-avatar,
   .dash-header .user-info,
-  .dash-header .verified-badge,
-  .dash-header #kh-theme-slot-dash {
+  .dash-header .verified-badge {
     display: none;
   }
 }

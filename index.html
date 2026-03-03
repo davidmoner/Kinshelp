@@ -1449,11 +1449,14 @@
   <div id="page-dashboard" class="page hidden">
 
     <header class="dash-header">
-      <div class="nav-brand">
-        <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio" data-action="goLanding" data-args="$event">
-          <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
-          <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
-        </a>
+      <div class="dash-left">
+        <div class="nav-brand">
+          <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio" data-action="goLanding" data-args="$event">
+            <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
+            <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
+          </a>
+        </div>
+        <span id="kh-theme-slot-dash"></span>
       </div>
       <div class="dash-user">
         <div class="user-avatar" id="user-avatar">A</div>
@@ -1463,7 +1466,6 @@
         </div>
         <span class="verified-badge hidden" id="user-verified" title="Email verificado"
           aria-label="Email verificado">✓</span>
-        <span id="kh-theme-slot-dash"></span>
         <button class="btn btn-ghost btn-sm dash-burger" type="button" id="dash-burger" aria-label="Abrir menú"
           aria-haspopup="menu" aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
           ☰
