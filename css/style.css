@@ -3632,7 +3632,9 @@ html[data-theme="light"] .dash-menu-sep {
 }
 
 .feed-media {
-  height: 160px;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
   background-image: radial-gradient(circle at 30% 30%, rgba(82, 49, 148, 0.22), rgba(33, 82, 173, 0.16));
   background-size: auto;
   background-position: center;
@@ -3814,13 +3816,13 @@ html[data-theme="light"] .dash-menu-sep {
 
 @media (max-width: 980px) {
   .feed-grid {
-    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    grid-template-columns: repeat(2, minmax(240px, 300px));
   }
 }
 
 @media (max-width: 520px) {
   .feed-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(220px, 320px);
   }
 
   .feed-media {
