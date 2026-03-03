@@ -2611,7 +2611,7 @@ html[data-theme="light"] #kh-particles {
 
 /* ── Wordmark image — delayed fade + slide-up ─────────── */
 .kh-intro-word-img {
-    width: clamp(170px, 22vw, 240px);
+    width: clamp(220px, 30vw, 340px);
     height: auto;
     display: block;
     image-rendering: -webkit-optimize-contrast;

@@ -3601,8 +3601,9 @@ html[data-theme="light"] .dash-menu-sep {
 
 .feed-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, minmax(260px, 300px));
   gap: 12px;
+  justify-content: center;
 }
 
 .feed-card {
@@ -3629,14 +3630,28 @@ html[data-theme="light"] .dash-menu-sep {
 
 .feed-media {
   height: 160px;
-  background-image:
-    var(--feed-cover),
-    radial-gradient(circle at 30% 30%, rgba(82, 49, 148, 0.22), rgba(33, 82, 173, 0.16));
-  background-size: cover, auto;
-  background-position: center, center;
+  background-image: radial-gradient(circle at 30% 30%, rgba(82, 49, 148, 0.22), rgba(33, 82, 173, 0.16));
+  background-size: auto;
+  background-position: center;
   background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
+}
+
+.feed-media::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--feed-cover);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 1;
+  z-index: 0;
+}
+
+.feed-media--category::before {
+  opacity: 0.9;
 }
 
 .feed-media::after {
@@ -3645,6 +3660,7 @@ html[data-theme="light"] .dash-menu-sep {
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.0), rgba(0, 0, 0, 0.28));
   pointer-events: none;
+  z-index: 2;
 }
 
 .feed-hero {
@@ -3701,7 +3717,7 @@ html[data-theme="light"] .dash-menu-sep {
   display: block;
   height: 100%;
   width: var(--p, 0%);
-  background: linear-gradient(90deg, rgba(201, 168, 76, 0.95), rgba(79, 70, 229, 0.85));
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.95), rgba(239, 68, 68, 0.9));
   border-radius: 999px;
 }
 
@@ -3795,7 +3811,7 @@ html[data-theme="light"] .dash-menu-sep {
 
 @media (max-width: 980px) {
   .feed-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
   }
 }
 

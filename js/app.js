@@ -2350,6 +2350,7 @@
             const ico = inviteIcon(cat);
             const aiSrc = aiImageForCategory(cat);
             const mediaSrc = media || aiSrc;
+            const isCategoryCover = !media && !!aiSrc;
             const expiry = expiryInfo(r);
             const expiryHtml = expiry
                 ? `<div class="feed-time" aria-label="${escapeHtml(expiry.label)}">
@@ -2359,8 +2360,9 @@
                 : '';
             const mediaStyle = mediaSrc ? ` style="--feed-cover:url('${escapeHtml(String(mediaSrc))}')"` : '';
 
+            const mediaClass = `feed-media${isCategoryCover ? ' feed-media--category' : ''}`;
             el.innerHTML = `
-              <div class="feed-media"${mediaStyle}>
+              <div class="${mediaClass}"${mediaStyle}>
                 <span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span>
                 ${!mediaSrc ? `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>` : ''}
               </div>
