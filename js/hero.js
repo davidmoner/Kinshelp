@@ -15,8 +15,9 @@
     var BANNER_DURATIONS = [4000, 6000, 4000]; // ms per banner (banner 2 needs +2s)
     var TRANSITION_MS = 550;                // must match CSS
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
-    var INTRO_DURATION_MS = 4000;           // total intro duration
-    var INTRO_BURST_MS = 3000;              // particle burst timing
+    var INTRO_DURATION_MS = 2000;           // total intro duration
+    var INTRO_WORD_DELAY_MS = 1100;         // wordmark reveal timing
+    var INTRO_BANNERS_START_MS = 1700;      // banners start behind overlay
     var INTRO_EXIT_MS = 620;                // overlay fade duration
     var fxLevel = 'wow';
 
@@ -255,12 +256,9 @@
     }
 
     /* ── Init: show banner 0 immediately — but after intro splash ───── */
-    /* ── Intro Overlay (logo image + burst) ─────────────── */
+    /* ── Intro Overlay (logo images) ────────────────────── */
     var overlay = document.getElementById('kh-intro-overlay');
-    var burstCanvas = document.getElementById('kh-intro-burst');
-    var logoWrap = document.getElementById('kh-intro-logo-wrap');
-    var burstTimer = null;
-    var burstRaf = null;
+    var wordmarkEl = document.getElementById('kh-intro-wordmark');
 
     function startBanners() {
         banners[0].classList.add('hero-banner--active');
@@ -273,107 +271,11 @@
         if (!overlay) return;
         overlay.classList.add('kh-intro-overlay--exit');
         try { document.body.classList.remove('intro-active'); } catch { }
-        if (burstTimer) clearTimeout(burstTimer);
-        if (burstRaf) cancelAnimationFrame(burstRaf);
         setTimeout(function () {
             if (overlay && overlay.parentNode) {
                 overlay.parentNode.removeChild(overlay);
             }
         }, INTRO_EXIT_MS);
-    }
-
-    function startBurst() {
-        if (!burstCanvas || !logoWrap || prefersReduced) return;
-        var ctx = burstCanvas.getContext('2d');
-        if (!ctx) return;
-
-        var rect = burstCanvas.getBoundingClientRect();
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
-        burstCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
-        burstCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        var logoRect = logoWrap.getBoundingClientRect();
-        var cx = logoRect.left + logoRect.width / 2 - rect.left;
-        var cy = logoRect.top + logoRect.height / 2 - rect.top;
-
-        var colors = ['#7c3aed', '#8b5cf6', '#a855f7'];
-        var count = Math.floor(80 + Math.random() * 60);
-        var particles = [];
-
-        for (var i = 0; i < count; i += 1) {
-            var angle = Math.random() * Math.PI * 2;
-            var speed = 1.8 + Math.random() * 4.2;
-            var size = 1.2 + Math.random() * 2.6;
-            var life = 750 + Math.random() * 350;
-            var color = colors[Math.floor(Math.random() * colors.length)];
-            particles.push({
-                x: cx,
-                y: cy,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                size: size,
-                life: life,
-                age: 0,
-                color: color,
-                dash: Math.random() < 0.45,
-                glow: 10 + Math.random() * 18
-            });
-        }
-
-        var start = performance.now();
-        var last = start;
-        ctx.lineCap = 'round';
-
-        function frame(now) {
-            var dt = Math.min(32, now - last);
-            last = now;
-            ctx.clearRect(0, 0, rect.width, rect.height);
-            ctx.globalCompositeOperation = 'lighter';
-
-            var alive = 0;
-            for (var i = 0; i < particles.length; i += 1) {
-                var p = particles[i];
-                p.age += dt;
-                if (p.age >= p.life) continue;
-                alive += 1;
-
-                var t = p.age / p.life;
-                var fade = 1 - t;
-                var step = dt / 16.666;
-
-                p.vx *= 0.985;
-                p.vy *= 0.985;
-                p.x += p.vx * step * 6;
-                p.y += p.vy * step * 6;
-
-                ctx.globalAlpha = fade;
-                ctx.shadowBlur = p.glow * fade;
-                ctx.shadowColor = p.color;
-
-                if (p.dash) {
-                    ctx.strokeStyle = p.color;
-                    ctx.lineWidth = p.size;
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p.x - p.vx * 1.8, p.y - p.vy * 1.8);
-                    ctx.stroke();
-                } else {
-                    ctx.fillStyle = p.color;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size * (0.8 + fade * 0.6), 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            if (alive > 0 && now - start < 1400) {
-                burstRaf = requestAnimationFrame(frame);
-            } else {
-                ctx.clearRect(0, 0, rect.width, rect.height);
-            }
-        }
-
-        burstRaf = requestAnimationFrame(frame);
     }
 
     /* Show intro on each fresh load. */
@@ -393,12 +295,13 @@
             }, ms);
         }
 
-        /* Start banners early so they're ready behind overlay */
-        setTimeout(startBanners, 1600);
+        /* Reveal wordmark */
+        setTimeout(function () {
+            if (wordmarkEl) wordmarkEl.classList.add('kh-intro-word--visible');
+        }, INTRO_WORD_DELAY_MS);
 
-        if (!prefersReduced) {
-            burstTimer = setTimeout(startBurst, INTRO_BURST_MS);
-        }
+        /* Start banners early so they're ready behind overlay */
+        setTimeout(startBanners, INTRO_BANNERS_START_MS);
 
         /* Dismiss after intro duration */
         scheduleDismiss(INTRO_DURATION_MS);
