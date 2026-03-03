@@ -2789,10 +2789,21 @@ html[data-theme="light"] .dash-menu-sep {
 }
 
 .card-ico-img {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.25)) saturate(1.2);
+  display: block;
+}
+
+#card-feed .card-ico {
+  background: rgba(124, 58, 237, 0.14);
+  border-color: rgba(124, 58, 237, 0.28);
+}
+
+html[data-theme="light"] #card-feed .card-ico {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.22);
 }
 
 .card-title h3 {
