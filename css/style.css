@@ -2799,6 +2799,10 @@ html[data-theme="light"] .dash-menu-sep {
 #card-feed .card-ico {
   background: rgba(124, 58, 237, 0.14);
   border-color: rgba(124, 58, 237, 0.28);
+  background-image: url("/img/explora.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 22px 22px;
 }
 
 html[data-theme="light"] #card-feed .card-ico {
