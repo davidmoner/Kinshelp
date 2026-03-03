@@ -53,6 +53,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - CSS: scrollbar premium, `::selection` con color de marca, hover lift mejorado para feature/trust/usecase cards, shimmer effect en btn-primary y btn-gold, `.reveal` con delay CSS vars.
   - Admin panel: columna Estado (baneado/activo), botones Ban/Unban con confirmacion por fila.
   - Backend ban/unban, logEvent en register/login/match, markAllRead notifications, bug async offers.service.js corregido.
+  - Feed: tabs centrados y cards con marco sutil para delimitar cada solicitud/oferta.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
