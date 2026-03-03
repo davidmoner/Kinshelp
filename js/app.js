@@ -2268,6 +2268,7 @@
                     );
                 }
                 renderFeed(rows);
+                setFeedTab(activeFeedTab);
             } catch (err) {
                 ['feed-need', 'feed-offer', 'feed-premium'].forEach(id => {
                     const wrap = $(id);
@@ -2277,6 +2278,46 @@
                 if (btn) setLoading(btn, false);
             }
         }, 350);
+    }
+
+    const FEED_TAB_KEY = 'kh_feed_tab';
+    let activeFeedTab = 'need';
+
+    function getSavedFeedTab() {
+        try {
+            const v = localStorage.getItem(FEED_TAB_KEY);
+            return v || 'need';
+        } catch {
+            return 'need';
+        }
+    }
+
+    function setFeedTab(tab) {
+        activeFeedTab = tab;
+        try { localStorage.setItem(FEED_TAB_KEY, tab); } catch { }
+        document.querySelectorAll('.feed-tab').forEach(btn => {
+            const isActive = btn.getAttribute('data-feed-tab') === tab;
+            btn.classList.toggle('feed-tab--active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        const need = document.querySelector('.feed-section--need');
+        const offer = document.querySelector('.feed-section--offer');
+        const premium = document.querySelector('.feed-section--premium');
+        if (need) need.hidden = tab !== 'need';
+        if (offer) offer.hidden = tab !== 'offer';
+        if (premium) premium.hidden = tab !== 'premium';
+    }
+
+    function bindFeedTabs() {
+        const tabs = document.querySelectorAll('.feed-tab');
+        if (!tabs.length) return;
+        tabs.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.getAttribute('data-feed-tab') || 'need';
+                setFeedTab(tab);
+            });
+        });
+        setFeedTab(getSavedFeedTab());
     }
 
     function renderFeed(rows) {
@@ -2301,16 +2342,26 @@
 
         rows.forEach(r => {
             const kind = r.kind === 'offer' ? 'offer' : 'request';
-            const img = (r.media_urls && r.media_urls[0] && (r.media_urls[0].url || r.media_urls[0])) || '';
+            const media = (r.media_urls && r.media_urls[0] && (r.media_urls[0].url || r.media_urls[0])) || '';
             const el = document.createElement('div');
-            el.className = 'feed-card';
+            el.className = 'feed-card' + (r.premium_user ? ' is-premium' : '');
             const dist = (r.distance_km != null) ? `${r.distance_km} km` : (r.location_text ? 'cerca' : '—');
             const cat = String(r.category || 'other');
             const ico = inviteIcon(cat);
+            const aiSrc = aiImageForCategory(cat);
+            const mediaSrc = media || aiSrc;
+            const expiry = expiryInfo(r);
+            const expiryHtml = expiry
+                ? `<div class="feed-time" aria-label="${escapeHtml(expiry.label)}">
+                    <div class="feed-time-bar"><span class="feed-time-fill" style="--p:${expiry.pct.toFixed(0)}%"></span></div>
+                    <div class="feed-time-label">${escapeHtml(expiry.label)}</div>
+                  </div>`
+                : '';
+
             el.innerHTML = `
               <div class="feed-media">
                 <span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span>
-                ${img ? `<img src="${escapeHtml(String(img))}" alt="" loading="lazy" />` : `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>`}
+                ${mediaSrc ? `<img class="feed-photo" src="${escapeHtml(String(mediaSrc))}" alt="" loading="lazy" data-cat="${escapeHtml(cat)}" />` : `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>`}
               </div>
               <div class="feed-body">
                 <div class="feed-title">${escapeHtml(r.title || '—')}</div>
@@ -2323,6 +2374,7 @@
                   <button class="feed-pill feed-user" type="button" data-user="1">${escapeHtml(r.user_name || '—')}${r.user_verified ? ' ✓' : ''} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</button>
                   ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
                 </div>
+                ${expiryHtml}
 
                 <div class="feed-actions" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
                   <button class="btn btn-primary btn-sm" type="button" data-feed-match="1">
@@ -2333,6 +2385,23 @@
                 </div>
               </div>
             `;
+            const imgEl = el.querySelector('img.feed-photo');
+            if (imgEl) {
+                imgEl.addEventListener('error', () => {
+                    if (imgEl.dataset.aiFallback === '1') {
+                        const wrapMedia = imgEl.parentElement;
+                        if (!wrapMedia) return;
+                        wrapMedia.innerHTML = `<span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span><div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>`;
+                        return;
+                    }
+                    const fallback = generateAiImage(cat);
+                    if (fallback) {
+                        imgEl.dataset.aiFallback = '1';
+                        imgEl.src = fallback;
+                        return;
+                    }
+                }, { once: false });
+            }
             const btnUser = el.querySelector('button[data-user]');
             if (btnUser) {
                 btnUser.addEventListener('click', async () => {
@@ -2775,6 +2844,147 @@
     function inviteIcon(cat) {
         const hit = AM_CATS.find(c => c.id === cat);
         return hit ? hit.icon : '⚡';
+    }
+
+    const AI_CATEGORY_IMAGES = {
+        repairs: 'img/ai/repairs.jpg',
+        packages: 'img/ai/packages.jpg',
+        pets: 'img/ai/pets.jpg',
+        cleaning: 'img/ai/cleaning.jpg',
+        transport: 'img/ai/transport.jpg',
+        tech: 'img/ai/tech.jpg',
+        gardening: 'img/ai/gardening.jpg',
+        care: 'img/ai/care.jpg',
+        tutoring: 'img/ai/tutoring.jpg',
+        creative: 'img/ai/creative.jpg',
+        errands: 'img/ai/errands.jpg',
+        other: 'img/ai/other.jpg',
+    };
+
+    const AI_CATEGORY_PALETTES = {
+        repairs: ['#1a1f2d', '#2a5bce', '#7f56d9'],
+        packages: ['#20262f', '#0ea5e9', '#7dd3fc'],
+        pets: ['#1f2a22', '#16a34a', '#86efac'],
+        cleaning: ['#1e2833', '#38bdf8', '#60a5fa'],
+        transport: ['#231f2e', '#8b5cf6', '#c4b5fd'],
+        tech: ['#161c2c', '#3b82f6', '#93c5fd'],
+        gardening: ['#1c2a22', '#22c55e', '#bbf7d0'],
+        care: ['#222025', '#f97316', '#fdba74'],
+        tutoring: ['#1c2030', '#eab308', '#fde68a'],
+        creative: ['#221827', '#ec4899', '#fbcfe8'],
+        errands: ['#1c2430', '#14b8a6', '#99f6e4'],
+        other: ['#1f2433', '#a855f7', '#c7d2fe'],
+    };
+
+    const aiImageCache = {};
+
+    const AI_IMAGE_MODE = (typeof window !== 'undefined' && window.KH_AI_IMAGE_MODE)
+        ? String(window.KH_AI_IMAGE_MODE)
+        : 'generated';
+
+    function aiImageForCategory(cat) {
+        if (AI_IMAGE_MODE === 'file') {
+            return AI_CATEGORY_IMAGES[cat] || AI_CATEGORY_IMAGES.other;
+        }
+        return generateAiImage(cat);
+    }
+
+    function generateAiImage(cat) {
+        if (aiImageCache[cat]) return aiImageCache[cat];
+        const palette = AI_CATEGORY_PALETTES[cat] || AI_CATEGORY_PALETTES.other;
+        const icon = inviteIcon(cat);
+        const canvas = document.createElement('canvas');
+        const w = 720;
+        const h = 420;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        const grad = ctx.createLinearGradient(0, 0, w, h);
+        grad.addColorStop(0, palette[0]);
+        grad.addColorStop(0.55, palette[1]);
+        grad.addColorStop(1, palette[2]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Soft light blobs
+        const blobs = [
+            { x: w * 0.2, y: h * 0.2, r: 160, c: 'rgba(255,255,255,0.10)' },
+            { x: w * 0.8, y: h * 0.3, r: 180, c: 'rgba(0,0,0,0.18)' },
+            { x: w * 0.6, y: h * 0.8, r: 140, c: 'rgba(255,255,255,0.08)' },
+        ];
+        blobs.forEach(b => {
+            const rg = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+            rg.addColorStop(0, b.c);
+            rg.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = rg;
+            ctx.fillRect(0, 0, w, h);
+        });
+
+        // Noise texture
+        ctx.globalAlpha = 0.08;
+        for (let i = 0; i < 220; i += 1) {
+            ctx.fillStyle = i % 2 ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+            const x = Math.random() * w;
+            const y = Math.random() * h;
+            const r = 1 + Math.random() * 2.5;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        // Icon watermark
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.font = '96px "Segoe UI Emoji", "Apple Color Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(icon, w * 0.5, h * 0.52);
+        ctx.restore();
+
+        // Vignette
+        const vg = ctx.createRadialGradient(w * 0.5, h * 0.4, w * 0.2, w * 0.5, h * 0.4, w * 0.65);
+        vg.addColorStop(0, 'rgba(0,0,0,0)');
+        vg.addColorStop(1, 'rgba(0,0,0,0.35)');
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, w, h);
+
+        const out = canvas.toDataURL('image/jpeg', 0.82);
+        aiImageCache[cat] = out;
+        return out;
+    }
+
+    function parseTime(val) {
+        if (!val) return null;
+        const t = Date.parse(val);
+        return Number.isFinite(t) ? t : null;
+    }
+
+    function formatRemaining(ms) {
+        if (ms <= 0) return 'Caducado';
+        const totalMin = Math.floor(ms / 60000);
+        const days = Math.floor(totalMin / 1440);
+        const hours = Math.floor((totalMin % 1440) / 60);
+        const mins = totalMin % 60;
+        if (days > 0) return `Caduca en ${days}d ${hours}h`;
+        if (hours > 0) return `Caduca en ${hours}h ${mins}m`;
+        return `Caduca en ${mins}m`;
+    }
+
+    function expiryInfo(row) {
+        const now = Date.now();
+        const expiresTs = parseTime(row && row.expires_at);
+        if (!expiresTs) return null;
+        const createdTs = parseTime(row && row.created_at);
+        const totalMs = createdTs ? Math.max(1, expiresTs - createdTs) : (7 * 24 * 60 * 60 * 1000);
+        const remainingMs = expiresTs - now;
+        const pct = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100));
+        return {
+            pct,
+            label: formatRemaining(remainingMs),
+        };
     }
 
     function renderInvites(wrapId, rows, opts = {}) {
@@ -4144,6 +4354,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         bindDataHandlers();
         bindImageFallbacks();
+        bindFeedTabs();
         initOAuthButtons();
         const oauthHandled = handleOAuthRedirect();
         initReveal();

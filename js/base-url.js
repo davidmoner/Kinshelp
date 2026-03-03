@@ -24,6 +24,7 @@
     window.PUBLIC_BASE_URL = window.PUBLIC_BASE_URL || window.location.origin;
     window.GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '';
     window.FACEBOOK_APP_ID = window.FACEBOOK_APP_ID || '';
+    window.KH_AI_IMAGE_MODE = window.KH_AI_IMAGE_MODE || 'file';
     return;
   }
 

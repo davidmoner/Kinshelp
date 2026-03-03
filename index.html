@@ -1746,13 +1746,23 @@
             </button>
           </div>
 
+          <div class="feed-tabs" role="tablist" aria-label="Explorar por tipo">
+            <button class="feed-tab feed-tab--active" id="feed-tab-need" type="button" role="tab" aria-selected="true"
+              aria-controls="feed-section-need" data-feed-tab="need">Necesito un KingsHelp</button>
+            <button class="feed-tab" id="feed-tab-offer" type="button" role="tab" aria-selected="false"
+              aria-controls="feed-section-offer" data-feed-tab="offer">Soy tu KingsHelp</button>
+            <button class="feed-tab" id="feed-tab-premium" type="button" role="tab" aria-selected="false"
+              aria-controls="feed-section-premium" data-feed-tab="premium">Anuncios Premium</button>
+          </div>
+
           <div class="creations-search" style="margin: 2px 0 10px;">
             <span style="opacity:.8">🔎</span>
             <input class="creations-q" id="feed-q" placeholder="Busca: mudanza, limpieza, clases..."
               data-input="loadFeed" />
           </div>
           <div class="feed-sections" id="feed-sections">
-            <section class="feed-section feed-section--need" aria-label="Necesito un KingsHelp">
+            <section class="feed-section feed-section--need" id="feed-section-need" role="tabpanel"
+              aria-labelledby="feed-tab-need" aria-label="Necesito un KingsHelp">
               <div class="feed-section-head">
                 <div>
                   <div class="feed-section-title">Necesito un KingsHelp</div>
@@ -1765,7 +1775,8 @@
               </div>
             </section>
 
-            <section class="feed-section feed-section--offer" aria-label="Soy tu KingsHelp">
+            <section class="feed-section feed-section--offer" id="feed-section-offer" role="tabpanel"
+              aria-labelledby="feed-tab-offer" aria-label="Soy tu KingsHelp">
               <div class="feed-section-head">
                 <div>
                   <div class="feed-section-title">Soy tu KingsHelp</div>
@@ -1778,7 +1789,8 @@
               </div>
             </section>
 
-            <section class="feed-section feed-section--premium" aria-label="Anuncios Premium">
+            <section class="feed-section feed-section--premium" id="feed-section-premium" role="tabpanel"
+              aria-labelledby="feed-tab-premium" aria-label="Anuncios Premium">
               <div class="feed-section-head">
                 <div>
                   <div class="feed-section-title">Anuncios Premium</div>
