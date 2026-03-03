@@ -2206,12 +2206,16 @@ html[data-theme="light"] .hero-progress-seg {
     height: 100%;
     width: 0%;
     border-radius: 999px;
-    background: linear-gradient(90deg, rgba(82, 49, 148, 0.95), rgba(16, 185, 129, 0.82));
-    will-change: width;
+    background: linear-gradient(90deg, #C9A84C 0%, #2A5BCE 55%, #6F46FF 100%);
+    background-size: 200% 100%;
+    box-shadow: 0 0 18px rgba(201, 168, 76, 0.25);
+    will-change: width, background-position;
 }
 
 .hero-progress-seg--active .hero-progress-fill {
-    animation: heroProgressFill var(--dur, 4000ms) linear forwards;
+    animation:
+        heroProgressFill var(--dur, 4000ms) linear forwards,
+        heroProgressGlow 2.4s ease-in-out infinite;
 }
 
 @keyframes heroProgressFill {
@@ -2221,6 +2225,21 @@ html[data-theme="light"] .hero-progress-seg {
 
     to {
         width: 100%;
+    }
+}
+
+@keyframes heroProgressGlow {
+    0% {
+        background-position: 0% 50%;
+        filter: saturate(105%);
+    }
+    50% {
+        background-position: 100% 50%;
+        filter: saturate(130%);
+    }
+    100% {
+        background-position: 0% 50%;
+        filter: saturate(110%);
     }
 }
 

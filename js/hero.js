@@ -28,6 +28,10 @@
             prefersReduced = true;
             isPlaying = false;
             pause();
+            if (overlay) {
+                overlay.style.display = 'none';
+                if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            }
         }
         if (cfg.hero_banner_duration) {
             var baseMs = Math.max(3000, Number(cfg.hero_banner_duration) * 1000);
@@ -267,12 +271,8 @@
         }, 620);
     }
 
-    /* Show intro once per tab session (regardless of login). */
-    var INTRO_SEEN_KEY = 'kh_intro_seen_v1';
-    var introSeen = false;
-    try { introSeen = sessionStorage.getItem(INTRO_SEEN_KEY) === '1'; } catch (e) { }
-
-    if (!overlay || prefersReduced || introSeen) {
+    /* Show intro on each fresh load (skip for reduced motion). */
+    if (!overlay || prefersReduced) {
         /* Reduced-motion / already seen / no overlay: skip instantly */
         if (overlay) {
             overlay.style.display = 'none';
@@ -280,7 +280,6 @@
         }
         startBanners();
     } else {
-        try { sessionStorage.setItem(INTRO_SEEN_KEY, '1'); } catch (e) { }
         /* ── Intro sequence (total ~2000ms) ────────────────
            0ms    : crown enters (CSS animation 1200ms zoom-out)
            1100ms : wordmark fades in (500ms)

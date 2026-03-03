@@ -1751,8 +1751,45 @@
             <input class="creations-q" id="feed-q" placeholder="Busca: mudanza, limpieza, clases..."
               data-input="loadFeed" />
           </div>
-          <div class="feed-grid" id="feed-grid">
-            <div class="ledger-empty">Cargando...</div>
+          <div class="feed-sections" id="feed-sections">
+            <section class="feed-section feed-section--need" aria-label="Necesito un KingsHelp">
+              <div class="feed-section-head">
+                <div>
+                  <div class="feed-section-title">Necesito un KingsHelp</div>
+                  <div class="feed-section-sub">Solicitudes reales de vecinos que necesitan ayuda.</div>
+                </div>
+                <span class="feed-section-pill">Necesidad</span>
+              </div>
+              <div class="feed-grid" id="feed-need">
+                <div class="ledger-empty">Cargando...</div>
+              </div>
+            </section>
+
+            <section class="feed-section feed-section--offer" aria-label="Soy tu KingsHelp">
+              <div class="feed-section-head">
+                <div>
+                  <div class="feed-section-title">Soy tu KingsHelp</div>
+                  <div class="feed-section-sub">Ofertas de ayuda disponibles ahora mismo.</div>
+                </div>
+                <span class="feed-section-pill">Oferta</span>
+              </div>
+              <div class="feed-grid" id="feed-offer">
+                <div class="ledger-empty">Cargando...</div>
+              </div>
+            </section>
+
+            <section class="feed-section feed-section--premium" aria-label="Anuncios Premium">
+              <div class="feed-section-head">
+                <div>
+                  <div class="feed-section-title">Anuncios Premium</div>
+                  <div class="feed-section-sub">Vecinos destacados con mayor visibilidad.</div>
+                </div>
+                <span class="feed-section-pill premium">Premium</span>
+              </div>
+              <div class="feed-grid" id="feed-premium">
+                <div class="ledger-empty">Cargando...</div>
+              </div>
+            </section>
           </div>
         </div>
 
@@ -1781,53 +1818,59 @@
 
           <div id="profile-verify-status" class="profile-verify-warn" aria-live="polite"></div>
 
-          <div class="profile-stats">
-            <div class="profile-stat">
-              <div class="profile-stat-k">Reputación</div>
-              <div class="profile-stat-v" id="profile-points">—</div>
+          <div class="profile-layout">
+            <div class="profile-panel">
+              <div class="profile-stats">
+                <div class="profile-stat">
+                  <div class="profile-stat-k">Reputación</div>
+                  <div class="profile-stat-v" id="profile-points">—</div>
+                </div>
+                <div class="profile-stat">
+                  <div class="profile-stat-k">Valoración</div>
+                  <div class="profile-stat-v"><span id="profile-rating">—</span><span class="profile-stat-s">/5</span></div>
+                </div>
+                <div class="profile-stat">
+                  <div class="profile-stat-k">Reviews</div>
+                  <div class="profile-stat-v" id="profile-rating-count">—</div>
+                </div>
+              </div>
+
+              <div class="profile-photos" aria-label="Fotos de perfil">
+                <div class="profile-photos-head">
+                  <div class="profile-photos-title">Fotos (max 2)</div>
+                  <button class="btn btn-ghost btn-sm" type="button" data-action="pickProfilePhoto">Subir foto</button>
+                  <input id="profile-photo-input" class="hidden" type="file" accept="image/png,image/jpeg,image/webp"
+                    data-change="uploadProfilePhoto" data-change-args="$event" />
+                </div>
+                <div class="profile-photos-grid" id="profile-photos-grid">
+                  <div class="ledger-empty">Aún no hay fotos</div>
+                </div>
+                <div class="demo-hint" style="margin-top:-6px;">Recomendación: fotos cuadradas (JPG/PNG/WEBP) · max 900KB
+                </div>
+              </div>
             </div>
-            <div class="profile-stat">
-              <div class="profile-stat-k">Valoración</div>
-              <div class="profile-stat-v"><span id="profile-rating">—</span><span class="profile-stat-s">/5</span></div>
-            </div>
-            <div class="profile-stat">
-              <div class="profile-stat-k">Reviews</div>
-              <div class="profile-stat-v" id="profile-rating-count">—</div>
+
+            <div class="profile-panel">
+              <form id="profile-form" data-submit="submitProfile">
+                <div class="field">
+                  <label for="profile-name">Nombre</label>
+                  <input id="profile-name" type="text" placeholder="Tu nombre" required />
+                </div>
+                <div class="field">
+                  <label for="profile-bio">Bio (opcional)</label>
+                  <textarea id="profile-bio" rows="3" placeholder="Cuenta que sabes hacer y que te gusta ayudar"></textarea>
+                </div>
+                <div class="field">
+                  <label for="profile-location">Zona (opcional)</label>
+                  <input id="profile-location" type="text" placeholder="Ej. Madrid" />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="btn-profile-save">
+                  <span class="btn-label">Guardar cambios</span>
+                  <span class="spinner hidden"></span>
+                </button>
+              </form>
             </div>
           </div>
-
-          <div class="profile-photos" aria-label="Fotos de perfil">
-            <div class="profile-photos-head">
-              <div class="profile-photos-title">Fotos (max 2)</div>
-              <button class="btn btn-ghost btn-sm" type="button" data-action="pickProfilePhoto">Subir foto</button>
-              <input id="profile-photo-input" class="hidden" type="file" accept="image/png,image/jpeg,image/webp"
-                data-change="uploadProfilePhoto" data-change-args="$event" />
-            </div>
-            <div class="profile-photos-grid" id="profile-photos-grid">
-              <div class="ledger-empty">Aún no hay fotos</div>
-            </div>
-            <div class="demo-hint" style="margin-top:-6px;">Recomendación: fotos cuadradas (JPG/PNG/WEBP) · max 900KB
-            </div>
-          </div>
-
-          <form id="profile-form" data-submit="submitProfile">
-            <div class="field">
-              <label for="profile-name">Nombre</label>
-              <input id="profile-name" type="text" placeholder="Tu nombre" required />
-            </div>
-            <div class="field">
-              <label for="profile-bio">Bio (opcional)</label>
-              <textarea id="profile-bio" rows="3" placeholder="Cuenta que sabes hacer y que te gusta ayudar"></textarea>
-            </div>
-            <div class="field">
-              <label for="profile-location">Zona (opcional)</label>
-              <input id="profile-location" type="text" placeholder="Ej. Madrid" />
-            </div>
-            <button type="submit" class="btn btn-primary btn-block" id="btn-profile-save">
-              <span class="btn-label">Guardar cambios</span>
-              <span class="spinner hidden"></span>
-            </button>
-          </form>
         </div>
 
         <!-- API Status -->
@@ -2057,22 +2100,34 @@
                 <div class="field-hint">Pon una zona reconocible. La ayuda real empieza por encontrarse.</div>
               </div>
 
-              <div class="field">
-                <label for="req-category">Categoría</label>
-                <select id="req-category">
-                  <option value="repairs">🔧 Reparaciones</option>
-                  <option value="packages">📦 Paquetes</option>
-                  <option value="pets">🐾 Mascotas</option>
-                  <option value="cleaning">🧹 Limpieza</option>
-                  <option value="transport">🚗 Transporte</option>
-                  <option value="tech">💻 Tecnología</option>
-                  <option value="gardening">🌿 Jardinería</option>
-                  <option value="care">🤝 Acompañamiento</option>
-                  <option value="tutoring">📚 Clases</option>
-                  <option value="creative">🎨 Creativo</option>
-                  <option value="errands">🧾 Recados</option>
-                  <option value="other">✨ Otros</option>
-                </select>
+              <div class="field-row">
+                <div class="field">
+                  <label for="req-category">Categoría</label>
+                  <select id="req-category">
+                    <option value="repairs">🔧 Reparaciones</option>
+                    <option value="packages">📦 Paquetes</option>
+                    <option value="pets">🐾 Mascotas</option>
+                    <option value="cleaning">🧹 Limpieza</option>
+                    <option value="transport">🚗 Transporte</option>
+                    <option value="tech">💻 Tecnología</option>
+                    <option value="gardening">🌿 Jardinería</option>
+                    <option value="care">🤝 Acompañamiento</option>
+                    <option value="tutoring">📚 Clases</option>
+                    <option value="creative">🎨 Creativo</option>
+                    <option value="errands">🧾 Recados</option>
+                    <option value="other">✨ Otros</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="req-when">¿Cuándo?</label>
+                  <select id="req-when">
+                    <option value="asap">⚡ Lo antes posible</option>
+                    <option value="today">📅 Hoy</option>
+                    <option value="this_week">📆 Esta semana</option>
+                    <option value="flexible">🕐 Flexible</option>
+                  </select>
+                </div>
               </div>
 
               <div class="field">
@@ -2088,16 +2143,6 @@
                 </div>
                 <div class="comp-hint" id="req-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
                   KingsHelp.</div>
-              </div>
-
-              <div class="field">
-                <label for="req-when">¿Cuándo?</label>
-                <select id="req-when">
-                  <option value="asap">⚡ Lo antes posible</option>
-                  <option value="today">📅 Hoy</option>
-                  <option value="this_week">📆 Esta semana</option>
-                  <option value="flexible">🕐 Flexible</option>
-                </select>
               </div>
 
               <div class="field">

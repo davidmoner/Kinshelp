@@ -2269,8 +2269,10 @@
                 }
                 renderFeed(rows);
             } catch (err) {
-                const wrap = $('feed-grid');
-                if (wrap) wrap.innerHTML = '<div class="ledger-empty" style="color:var(--danger)">No se pudo cargar el muro</div>';
+                ['feed-need', 'feed-offer', 'feed-premium'].forEach(id => {
+                    const wrap = $(id);
+                    if (wrap) wrap.innerHTML = '<div class="ledger-empty" style="color:var(--danger)">No se pudo cargar el muro</div>';
+                });
             } finally {
                 if (btn) setLoading(btn, false);
             }
@@ -2278,15 +2280,26 @@
     }
 
     function renderFeed(rows) {
-        const wrap = $('feed-grid');
+        if (!rows) rows = [];
+        const premium = rows.filter(r => r.premium_user);
+        const need = rows.filter(r => r.kind !== 'offer' && !r.premium_user);
+        const offer = rows.filter(r => r.kind === 'offer' && !r.premium_user);
+
+        renderFeedSection(need.slice(0, 30), 'feed-need', 'No hay solicitudes todavía');
+        renderFeedSection(offer.slice(0, 30), 'feed-offer', 'No hay ofertas todavía');
+        renderFeedSection(premium.slice(0, 18), 'feed-premium', 'No hay anuncios premium en este momento');
+    }
+
+    function renderFeedSection(rows, wrapId, emptyMsg) {
+        const wrap = $(wrapId);
         if (!wrap) return;
         wrap.innerHTML = '';
         if (!rows || !rows.length) {
-            wrap.innerHTML = '<div class="ledger-empty">No hay resultados</div>';
+            wrap.innerHTML = `<div class="ledger-empty">${emptyMsg || 'No hay resultados'}</div>`;
             return;
         }
 
-        rows.slice(0, 60).forEach(r => {
+        rows.forEach(r => {
             const kind = r.kind === 'offer' ? 'offer' : 'request';
             const img = (r.media_urls && r.media_urls[0] && (r.media_urls[0].url || r.media_urls[0])) || '';
             const el = document.createElement('div');

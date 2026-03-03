@@ -14,6 +14,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Premium Stripe (checkout + webhook) con persistencia en tabla `payments`.
 - Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` (WIP triggers).
 - Notificaciones: triggers para mensajes de match y AutoMatch (invitaciones) con cooldown.
+- API publica: `/api/v1/stats` (KPIs reales) y `/api/v1/config` (flags visuales).
 - Postgres hardening: transacciones disponibles via `db.tx()` y points transfer atomico en PG.
 - Auth: tokens persistidos en `auth_tokens` + endpoints `forgot-password`, `reset-password`, `verify-email`.
 - Email: servicio `src/shared/email.service.js` (SendGrid si esta configurado) + `PUBLIC_BASE_URL` para links.
