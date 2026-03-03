@@ -43,6 +43,7 @@ db.exec(`
     lng           REAL,
     expires_at    TEXT NOT NULL,
     status        TEXT NOT NULL DEFAULT 'active',
+    is_hidden     INTEGER NOT NULL DEFAULT 0,
     created_at    TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
   );
@@ -62,6 +63,7 @@ db.exec(`
     lng            REAL,
     expires_at     TEXT NOT NULL,
     status         TEXT NOT NULL DEFAULT 'open',
+    is_hidden      INTEGER NOT NULL DEFAULT 0,
     created_at     TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
   );
@@ -366,6 +368,14 @@ if (!hasColumn('help_requests', 'boost_48h_used')) {
 }
 if (!hasColumn('service_offers', 'boost_48h_used')) {
   addColumn('service_offers', 'boost_48h_used INTEGER NOT NULL DEFAULT 0');
+}
+
+// Moderation: hide/unhide content
+if (!hasColumn('service_offers', 'is_hidden')) {
+  addColumn('service_offers', 'is_hidden INTEGER NOT NULL DEFAULT 0');
+}
+if (!hasColumn('help_requests', 'is_hidden')) {
+  addColumn('help_requests', 'is_hidden INTEGER NOT NULL DEFAULT 0');
 }
 
 db.exec(`

@@ -23,12 +23,13 @@ function findById(id) {
     return row;
 }
 
-function list({ category, status = 'open', seeker_id, limit = 20, offset = 0 }) {
+function list({ category, status = 'open', seeker_id, include_hidden = false, limit = 20, offset = 0 }) {
     expireStale();
     if (db.isPg) {
         let i = 1;
         let sql = `${WITH_SEEKER} WHERE r.status = $${i++}`;
         const params = [status];
+        if (!include_hidden) { sql += ` AND r.is_hidden = FALSE`; }
         if (category) { sql += ` AND r.category = $${i++}`; params.push(category); }
         if (seeker_id) { sql += ` AND r.seeker_id = $${i++}`; params.push(seeker_id); }
         sql += ` ORDER BY r.created_at DESC LIMIT $${i++} OFFSET $${i++}`;
@@ -43,6 +44,7 @@ function list({ category, status = 'open', seeker_id, limit = 20, offset = 0 }) 
 
     let sql = `${WITH_SEEKER} WHERE r.status = ?`;
     const params = [status];
+    if (!include_hidden) { sql += ' AND r.is_hidden = 0'; }
     if (category) { sql += ' AND r.category = ?'; params.push(category); }
     if (seeker_id) { sql += ' AND r.seeker_id = ?'; params.push(seeker_id); }
     sql += ' ORDER BY r.created_at DESC LIMIT ? OFFSET ?';

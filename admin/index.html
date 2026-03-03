@@ -295,6 +295,13 @@
             <tbody id="usersTbody"></tbody>
           </table>
         </div>
+        <div class="card" id="userDetailCard" style="box-shadow:none; margin-top:12px; display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div style="font-weight:800;">Detalle usuario</div>
+            <button class="btn" id="btnUserDetailClose" type="button">Cerrar</button>
+          </div>
+          <pre id="userDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
+        </div>
       </section>
 
       <section id="view-audit" class="card" style="display:none;">
@@ -477,11 +484,16 @@
           rtb.innerHTML = '';
           (d.open_reports || []).forEach(function (r) {
             var tr2 = document.createElement('tr');
+            var isHidden = r.target_hidden == 1 || r.target_hidden === true;
+            var canHide = r.target_type === 'offer' || r.target_type === 'request';
+            var hideBtn = canHide
+              ? ('<button class="btn" data-' + (isHidden ? 'unhide-report' : 'hide-report') + '="' + r.id + '">' + (isHidden ? 'Mostrar' : 'Ocultar') + '</button>')
+              : '';
             tr2.innerHTML =
               '<td>' + (r.created_at || '-') + '</td>' +
               '<td>' + (r.target_type || '-') + ':' + (String(r.target_id || '').slice(0, 8)) + '</td>' +
               '<td>' + (r.reason || '-') + '</td>' +
-              '<td><button class="btn" data-resolve-report="' + r.id + '">Resolver</button></td>';
+              '<td style="display:flex; gap:6px;">' + hideBtn + '<button class="btn" data-resolve-report="' + r.id + '">Resolver</button></td>';
             rtb.appendChild(tr2);
           });
         });
@@ -518,13 +530,18 @@
           tb.innerHTML = '';
           j.data.forEach(function (r) {
             var tr = document.createElement('tr');
+            var isHidden = r.target_hidden == 1 || r.target_hidden === true;
+            var canHide = r.target_type === 'offer' || r.target_type === 'request';
+            var hideBtn = canHide
+              ? ('<button class="btn" data-' + (isHidden ? 'unhide-report' : 'hide-report') + '="' + r.id + '">' + (isHidden ? 'Mostrar' : 'Ocultar') + '</button>')
+              : '';
             tr.innerHTML =
               '<td>' + (r.created_at || '-') + '</td>' +
-              '<td>' + (r.status || '-') + '</td>' +
+              '<td>' + (r.status || '-') + (isHidden ? ' · oculto' : '') + '</td>' +
               '<td>' + (r.target_type || '-') + ':' + (String(r.target_id || '').slice(0, 8)) + '</td>' +
               '<td>' + (r.reason || '-') + '</td>' +
               '<td class="muted">' + ((r.notes || '-') + '').replace(/</g, '&lt;') + '</td>' +
-              '<td>' + (r.status === 'open' ? ('<button class="btn" data-resolve-report="' + r.id + '">Resolver</button>') : '') + '</td>';
+              '<td style="display:flex; gap:6px;">' + hideBtn + (r.status === 'open' ? ('<button class="btn" data-resolve-report="' + r.id + '">Resolver</button>') : '') + '</td>';
             tb.appendChild(tr);
           });
         });
@@ -552,12 +569,29 @@
               '<td>' + (u.is_verified ? 'si' : 'no') + '</td>' +
               '<td><span style="' + (banned ? 'color:var(--bad);font-weight:700;' : 'color:var(--ok);') + '">' + banLabel + '</span></td>' +
               '<td style="display:flex;gap:6px;">' +
+                '<button class="btn" data-id="' + u.id + '" data-detail="1">Detalle</button>' +
+                '<button class="btn" data-id="' + u.id + '" data-reset-cooldowns="1">Reset cooldowns</button>' +
                 '<button class="btn" data-id="' + u.id + '" data-verify="' + (u.is_verified ? '0' : '1') + '">' + (u.is_verified ? 'Desverificar' : 'Verificar') + '</button>' +
                 '<button class="' + banBtnClass + '" data-id="' + u.id + '" data-ban-action="' + (banned ? 'unban' : 'ban') + '">' + banBtnLabel + '</button>' +
               '</td>';
             tb.appendChild(tr);
           });
         });
+      }
+
+      function showUserDetail(data) {
+        var card = document.getElementById('userDetailCard');
+        var pre = document.getElementById('userDetailPre');
+        if (!card || !pre) return;
+        pre.textContent = JSON.stringify(data || {}, null, 2);
+        card.style.display = '';
+      }
+
+      function loadUserDetail(id) {
+        return api('/users/' + encodeURIComponent(id) + '/detail')
+          .then(function (j) {
+            showUserDetail(j.data || {});
+          });
       }
 
       function loadAudit() {
@@ -606,6 +640,13 @@
               .then(function () { toast('Report resuelto', true); return Promise.all([loadOverview(), loadReports()]); })
               .catch(function (err) { toast(err.message || 'Error', false); });
           }
+          if (t.matches('button[data-hide-report], button[data-unhide-report]')) {
+            var hideId = t.getAttribute('data-hide-report') || t.getAttribute('data-unhide-report');
+            var action = t.hasAttribute('data-hide-report') ? 'hide' : 'unhide';
+            api('/reports/' + encodeURIComponent(hideId) + '/' + action, { method: 'POST', body: JSON.stringify({}) })
+              .then(function () { toast(action === 'hide' ? 'Contenido oculto' : 'Contenido visible', true); return Promise.all([loadOverview(), loadReports()]); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
         });
         document.getElementById('usersTbody').addEventListener('click', function (e) {
           var t = e.target;
@@ -628,12 +669,32 @@
               .then(function () { toast(action === 'ban' ? 'Usuario baneado' : 'Usuario desbaneado', true); return loadUsers(); })
               .catch(function (err) { toast(err.message || 'Error', false); });
           }
+          // User detail
+          if (t.matches('button[data-detail]')) {
+            loadUserDetail(id)
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+          // Reset cooldowns
+          if (t.matches('button[data-reset-cooldowns]')) {
+            if (!window.confirm('¿Resetear cooldowns de notificaciones para este usuario?')) return;
+            api('/users/' + encodeURIComponent(id) + '/reset-cooldowns', { method: 'POST', body: JSON.stringify({}) })
+              .then(function () { toast('Cooldowns reseteados', true); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
         });
 
         document.getElementById('btnLogout').addEventListener('click', function () {
           try { localStorage.removeItem('kh_token'); } catch (e) { }
           location.reload();
         });
+
+        var closeDetail = document.getElementById('btnUserDetailClose');
+        if (closeDetail) {
+          closeDetail.addEventListener('click', function () {
+            var card = document.getElementById('userDetailCard');
+            if (card) card.style.display = 'none';
+          });
+        }
 
         document.querySelectorAll('button[data-fx]').forEach(function (b) {
           b.addEventListener('click', function () {

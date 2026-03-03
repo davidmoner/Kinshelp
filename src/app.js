@@ -6,6 +6,9 @@ const fs = require('fs');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const { randomUUID } = require('crypto');
+const env = require('./config/env');
+const db = require('./config/db');
 
 const { errorHandler, notFound } = require('./middleware/error.middleware');
 
@@ -82,17 +85,21 @@ app.use(cors({
 }));
 app.options('*', cors());
 
-// CSP (relaxed for current no-build frontend). Tighten later by removing inline scripts.
+// CSP (hardened): inline handlers removed; allow only hashed inline scripts (JSON-LD + admin bundle).
+const cspScriptHashes = [
+  "'sha256-SXk7z1QIWnFhmfe1L3zWbBaoIOoy8eRqkbIL09e/eVk='",
+  "'sha256-o5jUa2287/3qNrLao2K53IA9k0M3fu/1sqSLdPpmHK4='",
+  "'sha256-JTjyXuayNLBFuWUzYAd9l738VJLG8G6iLww6OlHAPIA='",
+];
+
 app.use(helmet({
   contentSecurityPolicy: {
     useDefaults: true,
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      // Current landing uses inline scripts and inline handlers.
-      // Once migrated to external listeners, remove unsafe-inline from script-src-attr (and ideally from script-src).
-      'script-src': ["'self'", "'unsafe-inline'", 'blob:'],
-      'script-src-elem': ["'self'", "'unsafe-inline'", 'blob:'],
-      'script-src-attr': ["'self'", "'unsafe-inline'"],
+      'script-src': ["'self'", ...cspScriptHashes],
+      'script-src-elem': ["'self'", ...cspScriptHashes],
+      'script-src-attr': ["'none'"],
       'img-src': ["'self'", 'data:', 'https:'],
       'connect-src': ["'self'", 'https:'],
     },
@@ -104,8 +111,61 @@ app.set('trust proxy', 1);
 // Rate limit: keep API protected, avoid breaking static assets.
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
 
+// Request ID + lightweight structured logging
+app.use((req, res, next) => {
+  const inbound = req.headers['x-request-id'];
+  const requestId = inbound ? String(inbound) : randomUUID();
+  req.requestId = requestId;
+  res.setHeader('X-Request-Id', requestId);
+
+  const start = Date.now();
+  res.on('finish', () => {
+    if (process.env.NODE_ENV === 'test') return;
+    const durationMs = Date.now() - start;
+    const entry = {
+      ts: new Date().toISOString(),
+      request_id: requestId,
+      method: req.method,
+      path: req.originalUrl || req.url,
+      status: res.statusCode,
+      ms: durationMs,
+      user_id: req.user && req.user.id ? req.user.id : null,
+    };
+    try { console.log(JSON.stringify(entry)); } catch { }
+  });
+  next();
+});
+
+async function checkDb() {
+  if (db.isPg) {
+    await db.one('SELECT 1 AS ok', []);
+    return { ok: true, type: 'postgres' };
+  }
+  // SQLite
+  db.prepare('SELECT 1 AS ok').get();
+  return { ok: true, type: 'sqlite' };
+}
+
+async function healthPayload() {
+  let dbStatus = { ok: false, type: db.isPg ? 'postgres' : 'sqlite' };
+  try { dbStatus = await checkDb(); } catch (e) { dbStatus = { ok: false, type: db.isPg ? 'postgres' : 'sqlite', error: e && e.message ? e.message : String(e) }; }
+  const emailConfigured = !!(env.EMAIL_PROVIDER && env.MAIL_FROM && (env.EMAIL_PROVIDER !== 'sendgrid' || env.SENDGRID_API_KEY));
+  const oauthGoogle = !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
+  const oauthFacebook = !!(env.FACEBOOK_APP_ID && env.FACEBOOK_APP_SECRET);
+  return {
+    status: 'ok',
+    service: 'KingsHelp API',
+    ts: new Date().toISOString(),
+    db: dbStatus,
+    email: { provider: env.EMAIL_PROVIDER || null, configured: emailConfigured },
+    oauth: { google_configured: oauthGoogle, facebook_configured: oauthFacebook },
+  };
+}
+
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'KingsHelp API', ts: new Date().toISOString() });
+  healthPayload()
+    .then(payload => res.json(payload))
+    .catch(() => res.status(500).json({ status: 'error', service: 'KingsHelp API' }));
 });
 
 const api = express.Router();
@@ -123,7 +183,9 @@ api.use(express.json({ limit: '64kb' }));
 
 // Convenience: allow API health checks via /api/v1/health
 api.get('/health', (req, res) => {
-  res.json({ status: 'ok', service: 'KingsHelp API', version: 'v1', ts: new Date().toISOString() });
+  healthPayload()
+    .then(payload => res.json({ ...payload, version: 'v1' }))
+    .catch(() => res.status(500).json({ status: 'error', service: 'KingsHelp API', version: 'v1' }));
 });
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });

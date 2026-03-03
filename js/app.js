@@ -3850,6 +3850,133 @@
         }
     });
 
+    /* ── CSP-safe bindings (data-* actions) ─────────────────────────────────── */
+    function parsePrimitive(val) {
+        if (val === 'true') return true;
+        if (val === 'false') return false;
+        if (val === 'null') return null;
+        if (val === 'undefined') return undefined;
+        if (val && /^-?\d+(\.\d+)?$/.test(val)) return Number(val);
+        return val;
+    }
+
+    function parseObjectToken(raw) {
+        const out = {};
+        String(raw || '').split(',').forEach(part => {
+            const seg = part.trim();
+            if (!seg) return;
+            const idx = seg.indexOf('=');
+            if (idx < 0) return;
+            const key = seg.slice(0, idx).trim();
+            const val = seg.slice(idx + 1).trim();
+            if (!key) return;
+            out[key] = parsePrimitive(val);
+        });
+        return out;
+    }
+
+    function parseArgs(raw, el, evt) {
+        if (!raw) return [];
+        return String(raw).split('|').map(token => {
+            const t = token.trim();
+            if (!t) return '';
+            if (t === '$event') return evt;
+            if (t === '$value') return el && 'value' in el ? el.value : undefined;
+            if (t === '$checked') return el && 'checked' in el ? !!el.checked : false;
+            if (t.startsWith('$data:')) {
+                const key = t.slice('$data:'.length);
+                return el && el.dataset ? el.dataset[key] : undefined;
+            }
+            if (t.startsWith('obj:')) return parseObjectToken(t.slice(4));
+            return parsePrimitive(t);
+        });
+    }
+
+    function resolveAction(action) {
+        if (!action) return null;
+        if (action.startsWith('fx.')) {
+            const name = action.slice(3);
+            return (window.KHFx && typeof window.KHFx[name] === 'function') ? { ctx: window.KHFx, name } : null;
+        }
+        return (window.KHApp && typeof window.KHApp[action] === 'function') ? { ctx: window.KHApp, name: action } : null;
+    }
+
+    function bindDataHandlers() {
+        document.body.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-action]');
+            if (!el) return;
+            const action = resolveAction(el.getAttribute('data-action'));
+            if (!action) return;
+            const args = parseArgs(el.getAttribute('data-args'), el, e);
+            action.ctx[action.name](...args);
+        });
+
+        document.body.addEventListener('submit', (e) => {
+            const el = e.target.closest('[data-submit]');
+            if (!el) return;
+            const action = resolveAction(el.getAttribute('data-submit'));
+            if (!action) return;
+            const args = parseArgs(el.getAttribute('data-submit-args'), el, e);
+            action.ctx[action.name](e, ...args);
+        });
+
+        document.body.addEventListener('input', (e) => {
+            const el = e.target.closest('[data-input]');
+            if (!el) return;
+            const action = resolveAction(el.getAttribute('data-input'));
+            if (!action) return;
+            const args = parseArgs(el.getAttribute('data-input-args'), el, e);
+            action.ctx[action.name](...args);
+        });
+
+        document.body.addEventListener('change', (e) => {
+            const el = e.target.closest('[data-change]');
+            if (!el) return;
+            const action = resolveAction(el.getAttribute('data-change'));
+            if (!action) return;
+            const args = parseArgs(el.getAttribute('data-change-args'), el, e);
+            action.ctx[action.name](...args);
+        });
+
+        document.body.addEventListener('focusin', (e) => {
+            const el = e.target.closest('[data-focus]');
+            if (!el) return;
+            const action = resolveAction(el.getAttribute('data-focus'));
+            if (!action) return;
+            const args = parseArgs(el.getAttribute('data-focus-args'), el, e);
+            action.ctx[action.name](...args);
+        });
+    }
+
+    function bindImageFallbacks() {
+        const intro = document.getElementById('kh-intro-crown');
+        if (intro) {
+            intro.addEventListener('error', () => {
+                const fallback = intro.getAttribute('data-fallback-src');
+                if (fallback && intro.src !== fallback) intro.src = fallback;
+            });
+        }
+
+        document.querySelectorAll('img.nav-brand-crown').forEach(img => {
+            img.addEventListener('error', () => {
+                img.style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('img.nav-brand-word').forEach(img => {
+            img.addEventListener('error', () => {
+                img.style.display = 'none';
+                const parent = img.parentElement;
+                if (!parent) return;
+                if (parent.querySelector('.nav-brand-fallback')) return;
+                const span = document.createElement('span');
+                span.className = 'nav-brand-fallback';
+                span.textContent = 'KingsHelp';
+                parent.appendChild(span);
+            });
+        });
+    }
+
     /* ── Auto-restore session ─────────────────────────────────────────────────── */
     async function tryRestoreSession() {
         if (!KHApi.getToken()) return;
@@ -3870,6 +3997,8 @@
 
     /* ── Init ─────────────────────────────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', () => {
+        bindDataHandlers();
+        bindImageFallbacks();
         initReveal();
         initKpiCounters();
         relocateThemeToggle('page-landing');
@@ -3972,6 +4101,8 @@
         goPremiumTab,
         selectCreateKind,
         selectComp,
+        clearFieldError,
+        onFieldInput,
         setCreationsFilter,
         setMatchesFilter,
         resetCreateForm,
@@ -3992,6 +4123,9 @@
         pickOfferPhoto,
         uploadOfferPhoto,
         deleteOfferPhoto,
+        pickPrePhoto,
+        addPrePhoto,
+        removePrePhoto,
         loadFeed,
         loadAutoMatch,
         saveAutoMatchSettings,

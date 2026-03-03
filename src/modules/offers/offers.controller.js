@@ -2,15 +2,35 @@
 const svc = require('./offers.service');
 const validators = require('./offers.validators');
 
+const { ADMIN_EMAILS } = require('../../config/env');
+
+function isAdminUser(user) {
+  if (!user || !user.email || !ADMIN_EMAILS) return false;
+  const admins = String(ADMIN_EMAILS).split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  return admins.includes(String(user.email).toLowerCase());
+}
+
 const list = (req, res, next) => {
   (async () => {
     const { category, status, provider_id, limit = 20, offset = 0 } = req.query;
-    const data = await svc.list({ category, status, provider_id, limit: +limit, offset: +offset });
+    let include_hidden = false;
+    if (provider_id && req.user && String(req.user.id) === String(provider_id)) include_hidden = true;
+    if (!include_hidden && req.query.include_hidden === '1' && isAdminUser(req.user)) include_hidden = true;
+    const data = await svc.list({ category, status, provider_id, include_hidden, limit: +limit, offset: +offset });
     res.json({ data });
   })().catch(next);
 };
 
-const getOne = (req, res, next) => { (async () => res.json(await svc.getById(req.params.id)))().catch(next); };
+const getOne = (req, res, next) => {
+  (async () => {
+    const row = await svc.getById(req.params.id);
+    if (!row) return res.status(404).json({ error: 'Offer not found' });
+    if (row.is_hidden && !(isAdminUser(req.user) || (req.user && String(req.user.id) === String(row.provider_id)))) {
+      return res.status(404).json({ error: 'Offer not found' });
+    }
+    return res.json(row);
+  })().catch(next);
+};
 
 const create = (req, res, next) => {
   (async () => {

@@ -11,14 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="legal.css" />
-  <script>
-    (function () {
-      var t;
-      try { t = localStorage.getItem('kh_theme'); } catch (e) { }
-      if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-      document.documentElement.dataset.theme = t;
-    })();
-  </script>
+  <script src="../js/theme-init.js"></script>
 </head>
 
 <body>

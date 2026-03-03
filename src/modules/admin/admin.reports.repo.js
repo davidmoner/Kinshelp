@@ -45,7 +45,12 @@ function listReports({ status, limit, offset }) {
   if (db.isPg) {
     if (status) {
       return db.many(
-        `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
+        `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+            CASE
+              WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
+              WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
+              ELSE NULL
+            END AS target_hidden
          FROM reports
          WHERE status = $1
          ORDER BY created_at DESC
@@ -54,7 +59,12 @@ function listReports({ status, limit, offset }) {
       );
     }
     return db.many(
-      `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
+      `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+          CASE
+            WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
+            WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
+            ELSE NULL
+          END AS target_hidden
        FROM reports
        ORDER BY created_at DESC
        LIMIT $1 OFFSET $2`,
@@ -64,7 +74,12 @@ function listReports({ status, limit, offset }) {
 
   if (status) {
     return db.prepare(`
-      SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
+      SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+        CASE
+          WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
+          WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
+          ELSE NULL
+        END AS target_hidden
       FROM reports
       WHERE status = ?
       ORDER BY created_at DESC
@@ -72,11 +87,49 @@ function listReports({ status, limit, offset }) {
     `).all(status, limit, offset);
   }
   return db.prepare(`
-    SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
+    SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+      CASE
+        WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
+        WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
+        ELSE NULL
+      END AS target_hidden
     FROM reports
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
   `).all(limit, offset);
+}
+
+function getReportById(id) {
+  ensureTables();
+  if (db.isPg) {
+    return db.one(
+      `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
+       FROM reports WHERE id = $1`,
+      [id]
+    );
+  }
+  return db.prepare(`
+    SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
+    FROM reports WHERE id = ?
+  `).get(id);
+}
+
+function setContentHidden({ targetType, targetId, hidden }) {
+  const isHidden = hidden ? 1 : 0;
+  const now = new Date().toISOString();
+  if (targetType === 'offer') {
+    if (db.isPg) {
+      return db.exec('UPDATE service_offers SET is_hidden = $1, updated_at = $2 WHERE id = $3', [hidden, now, targetId]);
+    }
+    db.prepare('UPDATE service_offers SET is_hidden = ?, updated_at = ? WHERE id = ?').run(isHidden, now, targetId);
+    return;
+  }
+  if (targetType === 'request') {
+    if (db.isPg) {
+      return db.exec('UPDATE help_requests SET is_hidden = $1, updated_at = $2 WHERE id = $3', [hidden, now, targetId]);
+    }
+    db.prepare('UPDATE help_requests SET is_hidden = ?, updated_at = ? WHERE id = ?').run(isHidden, now, targetId);
+  }
 }
 
 function resolveReport({ id, adminUserId, notes }) {
@@ -94,4 +147,4 @@ function resolveReport({ id, adminUserId, notes }) {
   `).run(notes || null, adminUserId, id);
 }
 
-module.exports = { createReport, listReports, resolveReport };
+module.exports = { createReport, listReports, resolveReport, getReportById, setContentHidden };

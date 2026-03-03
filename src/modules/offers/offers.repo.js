@@ -23,12 +23,13 @@ function findById(id) {
     return row;
 }
 
-function list({ category, status = 'active', provider_id, limit = 20, offset = 0 }) {
+function list({ category, status = 'active', provider_id, include_hidden = false, limit = 20, offset = 0 }) {
     expireStale();
     if (db.isPg) {
         let i = 1;
         let sql = `${WITH_PROVIDER} WHERE o.status = $${i++}`;
         const params = [status];
+        if (!include_hidden) { sql += ` AND o.is_hidden = FALSE`; }
         if (category) { sql += ` AND o.category = $${i++}`; params.push(category); }
         if (provider_id) { sql += ` AND o.provider_id = $${i++}`; params.push(provider_id); }
         sql += ` ORDER BY o.created_at DESC LIMIT $${i++} OFFSET $${i++}`;
@@ -43,6 +44,7 @@ function list({ category, status = 'active', provider_id, limit = 20, offset = 0
 
     let sql = `${WITH_PROVIDER} WHERE o.status = ?`;
     const params = [status];
+    if (!include_hidden) { sql += ' AND o.is_hidden = 0'; }
     if (category) { sql += ' AND o.category = ?'; params.push(category); }
     if (provider_id) { sql += ' AND o.provider_id = ?'; params.push(provider_id); }
     sql += ' ORDER BY o.created_at DESC LIMIT ? OFFSET ?';

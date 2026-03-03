@@ -118,6 +118,70 @@ function resolveReport(req, res) {
     .catch(() => res.status(500).json({ error: 'Failed to resolve report' }));
 }
 
+function hideReportTarget(req, res) {
+  const id = String(req.params.id);
+  Promise.resolve(reportsRepo.getReportById(id))
+    .then(report => {
+      if (!report) throw httpError(404, 'Report not found');
+      const targetType = String(report.target_type || '').toLowerCase();
+      if (!['offer', 'request'].includes(targetType)) throw httpError(400, 'Unsupported target type');
+      return Promise.resolve(reportsRepo.setContentHidden({ targetType, targetId: String(report.target_id), hidden: true }))
+        .then(() => report);
+    })
+    .then(report => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'report.hide_target',
+      entityType: report.target_type,
+      entityId: report.target_id,
+      beforeJson: null,
+      afterJson: JSON.stringify({ is_hidden: true, report_id: report.id }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }).then(() => report))
+    .then(report => Promise.resolve(eventsRepo.logEvent({
+      type: 'content.hidden',
+      actorUserId: req.user.id,
+      targetType: report.target_type,
+      targetId: report.target_id,
+      meta: { report_id: report.id },
+    })))
+    .then(() => res.json({ ok: true }))
+    .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to hide content' }));
+}
+
+function unhideReportTarget(req, res) {
+  const id = String(req.params.id);
+  Promise.resolve(reportsRepo.getReportById(id))
+    .then(report => {
+      if (!report) throw httpError(404, 'Report not found');
+      const targetType = String(report.target_type || '').toLowerCase();
+      if (!['offer', 'request'].includes(targetType)) throw httpError(400, 'Unsupported target type');
+      return Promise.resolve(reportsRepo.setContentHidden({ targetType, targetId: String(report.target_id), hidden: false }))
+        .then(() => report);
+    })
+    .then(report => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'report.unhide_target',
+      entityType: report.target_type,
+      entityId: report.target_id,
+      beforeJson: null,
+      afterJson: JSON.stringify({ is_hidden: false, report_id: report.id }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }).then(() => report))
+    .then(report => Promise.resolve(eventsRepo.logEvent({
+      type: 'content.unhidden',
+      actorUserId: req.user.id,
+      targetType: report.target_type,
+      targetId: report.target_id,
+      meta: { report_id: report.id },
+    })))
+    .then(() => res.json({ ok: true }))
+    .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to unhide content' }));
+}
+
 function listUsers(req, res) {
   const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '25', 10)));
   const page = Math.max(1, parseInt(req.query.page || '1', 10));
@@ -131,6 +195,76 @@ function getUser(req, res) {
   const u = repo.getUserById(req.params.id);
   if (!u) throw httpError(404, 'User not found');
   res.json({ ok: true, data: safeUser(u) });
+}
+
+function getUserDetail(req, res) {
+  const db = require('../../config/db');
+  const id = String(req.params.id);
+  const fetch = async () => {
+    const user = await Promise.resolve(repo.getUserById(id));
+    if (!user) throw httpError(404, 'User not found');
+
+    if (db.isPg) {
+      const [badges, matches, reports] = await Promise.all([
+        db.many(`
+          SELECT b.slug, b.name, b.icon_url, ub.awarded_at
+          FROM user_badges ub
+          JOIN badges b ON b.id = ub.badge_id
+          WHERE ub.user_id = $1
+          ORDER BY ub.awarded_at DESC
+          LIMIT 50
+        `, [id]),
+        db.many(`
+          SELECT id, status, provider_id, seeker_id, created_at, completed_at
+          FROM matches
+          WHERE provider_id = $1 OR seeker_id = $1
+          ORDER BY created_at DESC
+          LIMIT 50
+        `, [id]),
+        db.many(`
+          SELECT r.id, r.target_type, r.target_id, r.reason, r.status, r.created_at
+          FROM reports r
+          LEFT JOIN service_offers o ON r.target_type = 'offer' AND o.id = r.target_id
+          LEFT JOIN help_requests h ON r.target_type = 'request' AND h.id = r.target_id
+          WHERE o.provider_id = $1 OR h.seeker_id = $1
+          ORDER BY r.created_at DESC
+          LIMIT 50
+        `, [id]),
+      ]);
+      return { user: safeUser(user), badges, matches, reports };
+    }
+
+    const badges = db.prepare(`
+      SELECT b.slug, b.name, b.icon_url, ub.awarded_at
+      FROM user_badges ub
+      JOIN badges b ON b.id = ub.badge_id
+      WHERE ub.user_id = ?
+      ORDER BY ub.awarded_at DESC
+      LIMIT 50
+    `).all(id);
+    const matches = db.prepare(`
+      SELECT id, status, provider_id, seeker_id, created_at, completed_at
+      FROM matches
+      WHERE provider_id = ? OR seeker_id = ?
+      ORDER BY created_at DESC
+      LIMIT 50
+    `).all(id, id);
+    const reports = db.prepare(`
+      SELECT r.id, r.target_type, r.target_id, r.reason, r.status, r.created_at
+      FROM reports r
+      LEFT JOIN service_offers o ON r.target_type = 'offer' AND o.id = r.target_id
+      LEFT JOIN help_requests h ON r.target_type = 'request' AND h.id = r.target_id
+      WHERE o.provider_id = ? OR h.seeker_id = ?
+      ORDER BY r.created_at DESC
+      LIMIT 50
+    `).all(id, id);
+
+    return { user: safeUser(user), badges, matches, reports };
+  };
+
+  Promise.resolve(fetch())
+    .then(data => res.json({ ok: true, data }))
+    .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to load user detail' }));
 }
 
 function patchUser(req, res) {
@@ -234,6 +368,36 @@ function unbanUser(req, res) {
   res.json({ ok: true });
 }
 
+function resetCooldowns(req, res) {
+  const db = require('../../config/db');
+  const id = String(req.params.id);
+  const now = new Date().toISOString();
+
+  const run = async () => {
+    if (db.isPg) {
+      await db.exec('DELETE FROM notification_cooldowns WHERE user_id = $1', [id]);
+      return;
+    }
+    db.prepare('DELETE FROM notification_cooldowns WHERE user_id = ?').run(id);
+  };
+
+  Promise.resolve(run())
+    .then(() => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'user.reset_cooldowns',
+      entityType: 'user',
+      entityId: id,
+      beforeJson: null,
+      afterJson: JSON.stringify({ reset_at: now }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }))
+    .then(() => Promise.resolve(eventsRepo.logEvent({ type: 'user.cooldowns_reset', actorUserId: req.user.id, targetType: 'user', targetId: id, meta: {} })))
+    .then(() => res.json({ ok: true }))
+    .catch(() => res.status(500).json({ error: 'Failed to reset cooldowns' }));
+}
+
 function listAudit(req, res) {
   const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '25', 10)));
   const page = Math.max(1, parseInt(req.query.page || '1', 10));
@@ -284,13 +448,17 @@ module.exports = {
   listEvents,
   listUsers,
   getUser,
+  getUserDetail,
   patchUser,
   banUser,
   unbanUser,
+  resetCooldowns,
   listAudit,
   listReports,
   createReport,
   resolveReport,
+  hideReportTarget,
+  unhideReportTarget,
   getConfig,
   patchConfig,
 };

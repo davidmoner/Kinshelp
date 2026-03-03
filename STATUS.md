@@ -110,15 +110,14 @@ MAIL_FROM=KingsHelp <davidmoner90@gmail.com>
 PUBLIC_BASE_URL=https://kingshelp.es
 ```
 
-### ✅ Paso 4 — Admin: moderación real (parcial) — COMPLETADO fase 1
+### ✅ Paso 4 — Admin: moderación real — COMPLETADO fase 2
 - ✅ Botón "⚑" en tarjetas del feed para reportar contenido (discreto, baja opacidad).
 - ✅ Modal de reporte con selector de motivo (spam / estafa / abuso / inapropiado / otro).
 - ✅ `POST /api/v1/reports` — endpoint público autenticado (`src/modules/reports/reports.routes.js`).
 - ✅ Admin panel ya tenía: listado de reports, resolución, ban/unban, log de auditoría.
-- ⏳ Pendiente fase 2:
-  - Hide/unhide publicaciones reportadas (requiere columna `is_hidden` en offers/requests + migración).
-  - Vista detalle de usuario en admin (historial matches, reportes recibidos, badges).
-  - Reset cooldowns desde admin.
+- ✅ Hide/unhide publicaciones reportadas (columna `is_hidden` en offers/requests + migraciones).
+- ✅ Vista detalle de usuario en admin (matches + reportes recibidos + badges).
+- ✅ Reset cooldowns desde admin (`notification_cooldowns`).
 
 ### 🔜 Paso 5 — OAuth Google/Facebook (cuando haya credenciales)
 - Crear apps en Google Developer Console y Facebook Developers.
@@ -142,10 +141,10 @@ PUBLIC_BASE_URL=https://kingshelp.es
 - ✅ `automatch.repo.js`: `getSettings()`, `upsertSettings()` (ON CONFLICT), `getInvite/OfferInvite`, `markAccepted/Declined`, `expireOtherPending*` — soporte PG.
 - ✅ `automatch.service.js`: `acceptInvite()` y `declineInvite()` convertidas a async, PG compatible.
 
-### 🔜 Paso 7 — Observabilidad
-- Logging estructurado (request-id, user-id, latencia).
-- Health extendido: `GET /health` devuelve estado DB + uptime.
-- Error reporting básico (console.error → Sentry o similar cuando escale).
+### ✅ Paso 7 — Observabilidad (fase 1)
+- ✅ Logging estructurado (request-id, user-id, latencia).
+- ✅ Health extendido: `GET /health` devuelve estado DB + flags de config (email/OAuth).
+- ⏳ Error reporting básico (console.error → Sentry o similar cuando escale).
 
 ### 🔜 Paso 8 — Hero: flags desde admin_config
 - `fx_level` ya existe en admin_config.
@@ -158,10 +157,10 @@ PUBLIC_BASE_URL=https://kingshelp.es
 - KPIs reales desde la API real del servidor.
 - `og:image` real (captura de pantalla de la web).
 
-### 🔜 Paso 10 — CSP Hardening
-- Migrar `onclick=`, `onsubmit=`, `oninput=` de `index.html` a listeners en `js/app.js`.
-- Quitar `'unsafe-inline'` de la Content-Security-Policy.
-- Objetivo: A+ en securityheaders.com.
+### ✅ Paso 10 — CSP Hardening
+- ✅ Migrados `onclick/onsubmit/oninput` a listeners con `data-*` + bindings en `js/app.js`.
+- ✅ CSP sin `'unsafe-inline'`; hashes para JSON-LD + admin script.
+- ✅ Scripts inline movidos a `js/theme-init.js` y `js/base-url.js`.
 
 ## Pendiente (OAuth)
 

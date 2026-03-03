@@ -19,13 +19,17 @@ r.get('/events', controller.listEvents);
 r.get('/reports', controller.listReports);
 r.post('/reports', controller.createReport);
 r.post('/reports/:id/resolve', controller.resolveReport);
+r.post('/reports/:id/hide', controller.hideReportTarget);
+r.post('/reports/:id/unhide', controller.unhideReportTarget);
 
 // Users
 r.get('/users', controller.listUsers);
 r.get('/users/:id', controller.getUser);
+r.get('/users/:id/detail', controller.getUserDetail);
 r.patch('/users/:id', controller.patchUser);
 r.post('/users/:id/ban', controller.banUser);
 r.post('/users/:id/unban', controller.unbanUser);
+r.post('/users/:id/reset-cooldowns', controller.resetCooldowns);
 
 // Audit log
 r.get('/audit', controller.listAudit);

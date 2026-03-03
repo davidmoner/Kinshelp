@@ -47,6 +47,7 @@ async function migrate() {
         lng           double precision,
         expires_at    timestamptz NOT NULL,
         status        text NOT NULL DEFAULT 'active',
+        is_hidden     boolean NOT NULL DEFAULT false,
         boost_48h_used boolean NOT NULL DEFAULT false,
         created_at    timestamptz NOT NULL DEFAULT now(),
         updated_at    timestamptz NOT NULL DEFAULT now()
@@ -70,6 +71,7 @@ async function migrate() {
         lng            double precision,
         expires_at     timestamptz NOT NULL,
         status         text NOT NULL DEFAULT 'open',
+        is_hidden      boolean NOT NULL DEFAULT false,
         boost_48h_used boolean NOT NULL DEFAULT false,
         created_at     timestamptz NOT NULL DEFAULT now(),
         updated_at     timestamptz NOT NULL DEFAULT now()
@@ -77,6 +79,10 @@ async function migrate() {
       CREATE INDEX IF NOT EXISTS idx_requests_seeker ON help_requests(seeker_id);
       CREATE INDEX IF NOT EXISTS idx_requests_category_status ON help_requests(category, status);
     `);
+
+    // Backfill moderation flags on existing installs
+    await client.query(`ALTER TABLE service_offers ADD COLUMN IF NOT EXISTS is_hidden boolean NOT NULL DEFAULT false;`);
+    await client.query(`ALTER TABLE help_requests ADD COLUMN IF NOT EXISTS is_hidden boolean NOT NULL DEFAULT false;`);
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS matches (

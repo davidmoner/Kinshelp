@@ -24,7 +24,9 @@ async function listFeed({ limit = 40, offset = 0 } = {}) {
         u.is_verified AS user_verified
       FROM help_requests r
       JOIN users u ON u.id = r.seeker_id
-      WHERE r.status = 'open' AND r.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
+      WHERE r.status = 'open'
+        AND r.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
+        AND r.is_hidden = ${db.isPg ? 'FALSE' : '0'}
 
       UNION ALL
 
@@ -47,7 +49,9 @@ async function listFeed({ limit = 40, offset = 0 } = {}) {
         u.is_verified AS user_verified
       FROM service_offers o
       JOIN users u ON u.id = o.provider_id
-      WHERE o.status = 'active' AND o.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
+      WHERE o.status = 'active'
+        AND o.expires_at > ${db.isPg ? 'now()' : "datetime('now')"}
+        AND o.is_hidden = ${db.isPg ? 'FALSE' : '0'}
     )
     ORDER BY ${db.isPg ? 'created_at' : 'datetime(created_at)'} DESC
     LIMIT ${db.isPg ? '$1' : '?'} OFFSET ${db.isPg ? '$2' : '?'}
