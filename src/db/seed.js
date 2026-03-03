@@ -140,12 +140,19 @@ console.log(`  ✔  ${badges.length} badges seeded`);
 // ── Award early-adopter badge to all seed users ───────────────────────────────
 const earlyBadge = db.prepare("SELECT id FROM badges WHERE slug = 'early_adopter'").get();
 if (earlyBadge) {
-    const insertUB = db.prepare(`
-    INSERT OR IGNORE INTO user_badges (id, user_id, badge_id, awarded_at)
-    VALUES (?, ?, ?, ?)
-  `);
-    users.forEach(u => insertUB.run(randomUUID(), u.id, earlyBadge.id, now));
-    console.log(`  ✔  early_adopter badge awarded to all seed users`);
+    try {
+        const insertUB = db.prepare(`
+      INSERT OR IGNORE INTO user_badges (id, user_id, badge_id, awarded_at)
+      VALUES (?, ?, ?, ?)
+    `);
+
+        users.forEach(u => insertUB.run(randomUUID(), u.id, earlyBadge.id, now));
+        console.log('  ✔  early_adopter badge awarded to all seed users');
+    } catch (e) {
+        // In some deploy environments (ephemeral DB, partial migrations, FK strictness),
+        // awarding demo badges may fail. Seeding should not block app startup.
+        console.warn('  ⚠  early_adopter award skipped:', e && e.message ? e.message : String(e));
+    }
 }
 
 // ── Service Offers ────────────────────────────────────────────────────────────
