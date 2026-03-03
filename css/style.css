@@ -614,9 +614,19 @@ body {
   justify-self: center;
 }
 
+.nav-search:focus-within {
+  border-color: rgba(42, 91, 206, 0.55);
+  box-shadow: 0 0 0 1px rgba(42, 91, 206, 0.35), 0 8px 20px rgba(8, 12, 22, 0.35);
+}
+
 html[data-theme="light"] .nav-search {
   background: rgba(255, 255, 255, 0.75);
   border-color: rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] .nav-search:focus-within {
+  border-color: rgba(31, 78, 158, 0.45);
+  box-shadow: 0 0 0 1px rgba(31, 78, 158, 0.18), 0 10px 18px rgba(0, 0, 0, 0.12);
 }
 
 .nav-search-ico {
