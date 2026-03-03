@@ -12,13 +12,14 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ── Config ──────────────────────────────────────────── */
-    var BANNER_DURATIONS = [4000, 6000, 4000]; // ms per banner (banner 2 needs +2s)
+    var EXTRA_BANNER_MS = 2000;
+    var BANNER_DURATIONS = [6000, 8000, 6000]; // ms per banner (+2s each)
     var TRANSITION_MS = 550;                // must match CSS
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
     var INTRO_DURATION_MS = 2000;           // total intro duration
     var INTRO_WORD_DELAY_MS = 1100;         // wordmark reveal timing
-    var INTRO_BANNERS_START_MS = 1700;      // banners start behind overlay
     var INTRO_EXIT_MS = 620;                // overlay fade duration
+    var INTRO_BANNERS_START_MS = INTRO_DURATION_MS + INTRO_EXIT_MS;
     var fxLevel = 'wow';
 
     function applyConfig(cfg) {
@@ -41,8 +42,10 @@
         if (cfg.hero_banner_duration) {
             var baseMs = Math.max(3000, Number(cfg.hero_banner_duration) * 1000);
             if (isFinite(baseMs)) {
+                baseMs = baseMs + EXTRA_BANNER_MS;
                 BANNER_DURATIONS = [baseMs, baseMs + 2000, baseMs];
                 setProgress(current);
+                syncPhoneTimeline();
                 resumeIfShould();
             }
         }
@@ -68,10 +71,12 @@
     var stage = document.getElementById('kh-hero-stage');
     var progressEl = document.getElementById('kh-hero-progress');
     var banners, progressSegs;
+    var phoneBanner = null;
 
     if (!stage) return;
 
     banners = Array.from(stage.querySelectorAll('.hero-banner'));
+    phoneBanner = stage.querySelector('.hero-banner[data-banner="1"]');
     progressSegs = progressEl ? Array.from(progressEl.querySelectorAll('.hero-progress-seg')) : [];
 
     if (!banners.length) return;
@@ -104,6 +109,12 @@
         });
     }
 
+    function syncPhoneTimeline() {
+        if (!phoneBanner) return;
+        var dur = BANNER_DURATIONS[1] || 8000;
+        phoneBanner.style.setProperty('--hb2p-dur', dur + 'ms');
+    }
+
     /* ── Show a banner ───────────────────────────────────── */
     function showBanner(idx, fromUser) {
         if (idx === current && !fromUser) return;
@@ -128,6 +139,7 @@
         banners[current].setAttribute('aria-hidden', 'false');
 
         setProgress(current);
+        syncPhoneTimeline();
     }
 
     /* ── Advance one ─────────────────────────────────────── */
@@ -264,6 +276,7 @@
         banners[0].classList.add('hero-banner--active');
         banners[0].setAttribute('aria-hidden', 'false');
         setProgress(0);
+        syncPhoneTimeline();
         if (!prefersReduced) scheduleNext();
     }
 

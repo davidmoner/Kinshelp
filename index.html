@@ -87,13 +87,22 @@
 
     <!-- NAV -->
     <nav class="nav">
-      <div class="nav-brand">
-        <!-- PNG Brand Lockup: crown + wordmark horizontal -->
-        <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
-          <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
-          <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
-        </a>
-        <span class="brand-badge">Incept</span>
+      <div class="nav-left">
+        <div class="nav-brand">
+          <!-- PNG Brand Lockup: crown + wordmark horizontal -->
+          <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
+            <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
+            <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
+          </a>
+          <span class="brand-badge">Incept</span>
+        </div>
+        <span id="kh-theme-slot-landing">
+          <button id="kh-theme-toggle" class="kh-theme-toggle" aria-label="Cambiar a tema claro" aria-pressed="true"
+            type="button">
+            <span id="kh-theme-icon" class="kh-theme-icon" aria-hidden="true">🌙</span>
+            <span id="kh-theme-label" class="kh-theme-label">Oscuro</span>
+          </button>
+        </span>
       </div>
 
       <div class="nav-search" role="search" aria-label="Buscar">
@@ -113,15 +122,6 @@
           <span class="kh-theme-icon" aria-hidden="true">🏆</span>
           <span class="kh-theme-label">Ranking</span>
         </button>
-        <a href="#como-empezar" class="nav-link-manual" id="nav-manual-link">Manual</a>
-        <a href="#faq" class="nav-link-manual" id="nav-faq-link">FAQ</a>
-        <span id="kh-theme-slot-landing">
-          <button id="kh-theme-toggle" class="kh-theme-toggle" aria-label="Cambiar a tema claro" aria-pressed="true"
-            type="button">
-            <span id="kh-theme-icon" class="kh-theme-icon" aria-hidden="true">🌙</span>
-            <span id="kh-theme-label" class="kh-theme-label">Oscuro</span>
-          </button>
-        </span>
         <button id="nav-auth-btn" class="btn btn-ghost btn-auth" data-action="openLogin">Regístrate o inicia
           sesión</button>
         <button id="nav-panel-btn" class="btn btn-ghost hidden" data-action="goDashboard">Panel</button>
@@ -1436,6 +1436,7 @@
         </nav>
 
         <div class="footer-meta">
+          <div class="footer-small">Guía: <a href="#como-empezar">Manual</a> · <a href="#faq">FAQ</a></div>
           <div class="footer-small">Contacto: <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a></div>
           <div class="footer-small">© <span id="footer-year">2026</span> KingsHelp</div>
         </div>
