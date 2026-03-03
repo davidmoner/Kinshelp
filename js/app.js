@@ -2448,27 +2448,65 @@
         feedDetailsRow = row || null;
         const body = $('feed-details-body');
         const btn = $('btn-feed-details-match');
+        const modalTitle = document.querySelector('#modal-feed-details .modal-title');
         if (!body || !btn) return;
 
         const kind = (row && row.kind) === 'offer' ? 'offer' : 'request';
         const title = escapeHtml((row && row.title) || '—');
         const desc = escapeHtml((row && row.description) || '');
-        const cat = escapeHtml(catLabel(row && row.category));
+        const catKey = String((row && row.category) || 'other');
+        const cat = escapeHtml(catLabel(catKey));
         const comp = escapeHtml(compLabel(row && row.compensation_type));
-        const loc = escapeHtml((row && row.location_text) || '—');
+        const locRaw = (row && row.location_text) || '';
+        const loc = escapeHtml(locRaw || '—');
         const user = escapeHtml((row && row.user_name) || '—');
+        const rating = Number((row && row.user_rating) || 0).toFixed(1);
+        const dist = (row && row.distance_km != null) ? `${row.distance_km} km` : '';
+        const media = (row && row.media_urls && row.media_urls[0] && (row.media_urls[0].url || row.media_urls[0])) || '';
+        const aiSrc = aiImageForCategory(catKey);
+        const mediaSrc = media || aiSrc;
+        const mediaStyle = mediaSrc ? ` style="--feed-cover:url('${escapeHtml(String(mediaSrc))}')"` : '';
+        const icon = inviteIcon(catKey);
+        const badgeLabel = (kind === 'offer') ? 'OFERTA' : 'NECESIDAD';
+        if (modalTitle) {
+            modalTitle.textContent = (kind === 'offer') ? 'Detalles de la oferta' : 'Detalles de la solicitud';
+        }
+        const expiry = expiryInfo(row);
+        const expiryHtml = expiry
+            ? `<div class="feed-time" aria-label="${escapeHtml(expiry.label)}">
+                <div class="feed-time-bar"><span class="feed-time-fill" style="--p:${expiry.pct.toFixed(0)}%"></span></div>
+                <div class="feed-time-label">${escapeHtml(expiry.label)}</div>
+              </div>`
+            : '';
 
         body.innerHTML = `
-          <div class="glass-card" style="padding:14px;">
-            <div style="font-weight:900; font-size:18px; letter-spacing:-0.2px;">${title}</div>
-            ${desc ? `<div style="margin-top:8px; opacity:.92; line-height:1.45;">${desc}</div>` : ''}
-            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-              <span class="feed-pill">${cat}</span>
-              <span class="feed-pill">${comp}</span>
-              <span class="feed-pill">📍 ${loc}</span>
+          <div class="feed-details-grid">
+            <div class="feed-details-hero"${mediaStyle}>
+              <div class="feed-details-badge ${kind}">${badgeLabel}</div>
+              ${!mediaSrc ? `<div class="feed-details-hero-icon" aria-hidden="true">${escapeHtml(icon)}</div>` : ''}
+              <div class="feed-details-hero-info">
+                <div class="feed-details-hero-title">${title}</div>
+                <div class="feed-details-hero-sub">${cat} · ${comp}</div>
+              </div>
             </div>
-            <div style="margin-top:12px; opacity:.9;">
-              <button class="feed-pill feed-user" type="button" id="btn-feed-details-user">${user}${row && row.user_verified ? ' ✓' : ''}</button>
+            <div class="feed-details-info">
+              <div class="feed-details-title">${title}</div>
+              ${desc ? `<div class="feed-details-desc">${desc}</div>` : '<div class="feed-details-desc is-empty">Sin descripción disponible.</div>'}
+              <div class="feed-details-chips">
+                <span class="feed-pill">${cat}</span>
+                <span class="feed-pill">${comp}</span>
+                ${locRaw ? `<span class="feed-pill">📍 ${loc}</span>` : ''}
+                ${dist ? `<span class="feed-pill">📏 ${escapeHtml(dist)}</span>` : ''}
+              </div>
+              <div class="feed-details-meta">
+                ${row && row.premium_user ? '<div class="feed-details-meta-item">✨ Publicación Premium</div>' : ''}
+                ${row && row.expires_at ? '<div class="feed-details-meta-item">⏱ Caducidad activa</div>' : ''}
+              </div>
+              <div class="feed-details-user">
+                <button class="feed-pill feed-user" type="button" id="btn-feed-details-user">${user}${row && row.user_verified ? ' ✓' : ''}</button>
+                <div class="feed-details-user-rating">★ ${rating}</div>
+              </div>
+              ${expiryHtml}
             </div>
           </div>
         `;

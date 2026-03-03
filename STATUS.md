@@ -54,6 +54,8 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Admin panel: columna Estado (baneado/activo), botones Ban/Unban con confirmacion por fila.
   - Backend ban/unban, logEvent en register/login/match, markAllRead notifications, bug async offers.service.js corregido.
   - Feed: tabs centrados y cards con marco sutil para delimitar cada solicitud/oferta.
+  - Feed: media con aspect-ratio 16:9 para evitar deformaciones en imagenes.
+  - Feed: modal "Ver detalles" rediseñado con hero grande, layout en dos columnas y data organizada.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
