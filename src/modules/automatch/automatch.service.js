@@ -3,6 +3,8 @@ const db = require('../../config/db');
 const httpError = require('../../shared/http-error');
 const repo = require('./automatch.repo');
 const matchesSvc = require('../matches/matches.service');
+const notifications = require('../notifications/notifications.service');
+const cooldown = require('../../shared/cooldown.service');
 const {
   AUTOMATCH_INVITE_TTL_MINUTES,
   AUTOMATCH_MAX_INVITES_PER_REQUEST,
@@ -123,6 +125,20 @@ function onRequestCreated(requestRow) {
   const ttl = Number(AUTOMATCH_INVITE_TTL_MINUTES || 12);
   const expiresAt = new Date(Date.now() + ttl * 60 * 1000).toISOString();
   repo.insertInvites({ requestId, seekerId, providerIds: filtered, expiresAt });
+  try {
+    filtered.forEach(pid => {
+      Promise.resolve(cooldown.tryNotify(pid, 'automatch_invite'))
+        .then(ok => {
+          if (!ok) return null;
+          return notifications.notify(pid, 'automatch_invite', {
+            title: 'Nueva invitacion AutoMatch',
+            body: 'Tienes una nueva solicitud cerca. Revisa tu panel Premium.',
+            payload: { request_id: requestId, seeker_id: seekerId, category },
+          });
+        })
+        .catch(() => { });
+    });
+  } catch { }
   return { ok: true, invites: filtered.length, expires_at: expiresAt };
 }
 
@@ -157,6 +173,20 @@ function onOfferCreated(offerRow) {
   const ttl = Number(AUTOMATCH_INVITE_TTL_MINUTES || 12);
   const expiresAt = new Date(Date.now() + ttl * 60 * 1000).toISOString();
   repo.insertOfferInvites({ offerId, providerId, seekerIds: filtered, expiresAt });
+  try {
+    filtered.forEach(sid => {
+      Promise.resolve(cooldown.tryNotify(sid, 'automatch_offer_invite'))
+        .then(ok => {
+          if (!ok) return null;
+          return notifications.notify(sid, 'automatch_offer_invite', {
+            title: 'Nueva oferta AutoMatch',
+            body: 'Hay una nueva oferta compatible contigo. Revisa tu panel Premium.',
+            payload: { offer_id: offerId, provider_id: providerId, category },
+          });
+        })
+        .catch(() => { });
+    });
+  } catch { }
   return { ok: true, invites: filtered.length, expires_at: expiresAt };
 }
 

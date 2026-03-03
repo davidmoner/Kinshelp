@@ -277,16 +277,48 @@
 
     /* ── KPI counters on scroll ───────────────────────────────────────────────── */
     function initKpiCounters() {
-        const kpiObs = new IntersectionObserver(entries => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    const target = parseInt(e.target.dataset.target);
-                    animateCounter(e.target, target);
-                    kpiObs.unobserve(e.target);
-                }
+        const items = Array.from(document.querySelectorAll('.kpi-value[data-target]'));
+        if (!items.length) return;
+
+        loadKpiStats().finally(() => {
+            const kpiObs = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        const target = parseInt(e.target.dataset.target);
+                        animateCounter(e.target, target);
+                        kpiObs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            items.forEach(el => kpiObs.observe(el));
+        });
+    }
+
+    async function loadKpiStats() {
+        const note = $('kpi-note');
+        try {
+            const out = await KHApi.getStats();
+            const data = (out && (out.data || out.stats)) || {};
+            const map = {
+                matches_done: 'kpi-matches',
+                badges_awarded: 'kpi-badges',
+                reputation_gained: 'kpi-rep',
+                users_total: 'kpi-users',
+            };
+            Object.keys(map).forEach(key => {
+                const el = $(map[key]);
+                if (!el) return;
+                const val = Number(data[key] || 0);
+                if (!Number.isFinite(val)) return;
+                el.dataset.target = String(val);
             });
-        }, { threshold: 0.5 });
-        document.querySelectorAll('.kpi-value[data-target]').forEach(el => kpiObs.observe(el));
+            if (note) {
+                const when = out && out.ts ? new Date(out.ts) : new Date();
+                note.textContent = `Métricas en vivo · actualizado ${when.toLocaleDateString('es-ES')}`;
+            }
+        } catch {
+            if (note) note.textContent = 'Métricas estimadas (sin conexión a datos en vivo)';
+        }
     }
 
     /* ── Page Navigation ──────────────────────────────────────────────────────── */
@@ -943,12 +975,98 @@
     }
 
     function authProvider(provider) {
-        if (provider === 'google' || provider === 'facebook') {
-            toast('Próximamente. Por ahora, continúa con el email.', 'info');
-            showEmailAuth('register');
+        if (provider === 'google') {
+            if (!window.GOOGLE_CLIENT_ID) {
+                toast('Google no está disponible todavía. Usa email.', 'info');
+                showEmailAuth('register');
+                return;
+            }
+            beginOAuth('google');
+            return;
+        }
+        if (provider === 'facebook') {
+            if (!window.FACEBOOK_APP_ID) {
+                toast('Facebook no está disponible todavía. Usa email.', 'info');
+                showEmailAuth('register');
+                return;
+            }
+            beginOAuth('facebook');
             return;
         }
         showEmailAuth('login');
+    }
+
+    function beginOAuth(provider) {
+        const base = window.PUBLIC_BASE_URL || window.location.origin;
+        const state = `${provider}.${Date.now()}.${Math.random().toString(36).slice(2)}`;
+        try { sessionStorage.setItem('kh_oauth_state', state); } catch { }
+
+        if (provider === 'google') {
+            const redirectUri = `${base}/api/v1/auth/oauth/google/callback`;
+            const qs = new URLSearchParams({
+                client_id: window.GOOGLE_CLIENT_ID,
+                redirect_uri: redirectUri,
+                response_type: 'code',
+                scope: 'openid email profile',
+                prompt: 'select_account',
+                state,
+            });
+            window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${qs.toString()}`;
+            return;
+        }
+
+        if (provider === 'facebook') {
+            const redirectUri = `${base}/api/v1/auth/oauth/facebook/callback`;
+            const qs = new URLSearchParams({
+                client_id: window.FACEBOOK_APP_ID,
+                redirect_uri: redirectUri,
+                response_type: 'code',
+                scope: 'email,public_profile',
+                state,
+            });
+            window.location.href = `https://www.facebook.com/v18.0/dialog/oauth?${qs.toString()}`;
+        }
+    }
+
+    function initOAuthButtons() {
+        const providers = [
+            { id: 'google', enabled: !!window.GOOGLE_CLIENT_ID, label: 'Google' },
+            { id: 'facebook', enabled: !!window.FACEBOOK_APP_ID, label: 'Facebook' },
+        ];
+
+        providers.forEach(p => {
+            const btn = document.querySelector(`button[data-action="authProvider"][data-args="${p.id}"]`);
+            if (!btn) return;
+            if (!p.enabled) {
+                btn.disabled = true;
+                btn.title = `${p.label} no disponible todavía`;
+            } else {
+                btn.disabled = false;
+                btn.title = '';
+            }
+        });
+    }
+
+    function handleOAuthRedirect() {
+        const params = new URLSearchParams(window.location.search);
+        const provider = params.get('oauth');
+        if (!provider) return false;
+        const ok = params.get('ok');
+        if (ok === '1') {
+            const token = params.get('token');
+            if (token) {
+                KHApi.setToken(token);
+                toast(`Sesión iniciada con ${provider} ✓`, 'success');
+            } else {
+                toast('OAuth incompleto. Usa email.', 'error');
+            }
+        } else {
+            const err = params.get('error');
+            toast(err ? `OAuth error: ${err}` : 'No se pudo iniciar sesión', 'error');
+        }
+        const clean = window.location.pathname + (window.location.hash || '');
+        try { window.history.replaceState({}, document.title, clean); } catch { }
+        return true;
     }
 
     /* ── Rating Modal (MVP) ──────────────────────────────────────────────────── */
@@ -2231,18 +2349,7 @@
                     }
                     try {
                         await ensureCurrentUser();
-                        // Minimal match-selectivo: ask user to create a listing first.
-                        if (!lastCreatedRequest || !lastCreatedRequest.id) {
-                            toast('Primero crea una solicitud en "Crear" para poder hacer match selectivo', 'error');
-                            setDashView('crear');
-                            return;
-                        }
-
-                        await createMatchForRequest(lastCreatedRequest, {
-                            id: r.user_id,
-                            display_name: r.user_name,
-                            premium_tier: r.premium_user ? 'premium' : 'free',
-                        });
+                        await createMatchForFeedRow(r);
                     } catch (e) {
                         toast(e.message || 'No se pudo crear el match', 'error');
                     }
@@ -2324,19 +2431,8 @@
             return;
         }
         try {
-            await ensureCurrentUser();
-            if (!lastCreatedRequest || !lastCreatedRequest.id) {
-                toast('Primero crea una solicitud en "Crear" para poder hacer match selectivo', 'error');
-                closeFeedDetails();
-                setDashView('crear');
-                return;
-            }
             closeFeedDetails();
-            await createMatchForRequest(lastCreatedRequest, {
-                id: row.user_id,
-                display_name: row.user_name,
-                premium_tier: row.premium_user ? 'premium' : 'free',
-            });
+            await createMatchForFeedRow(row);
         } catch (e) {
             toast(e.message || 'No se pudo crear el match', 'error');
         }
@@ -3503,15 +3599,51 @@
         return createMatchForRequest(lastCreatedRequest, provider);
     }
 
+    async function createMatchForFeedRow(row) {
+        await ensureCurrentUser();
+        if (!currentUser) throw new Error('No se pudo cargar tu usuario');
+        if (!row || !row.id) throw new Error('Publicación inválida');
+        if (String(row.user_id) === String(currentUser.id)) {
+            toast('No puedes hacer match contigo mismo', 'error');
+            return;
+        }
+
+        const kind = row.kind === 'offer' ? 'offer' : 'request';
+        const body = {
+            initiated_by: kind === 'offer' ? 'seeker' : 'provider',
+            compensation_type: row.compensation_type || 'cash',
+            points_agreed: 0,
+        };
+
+        if (kind === 'offer') {
+            body.offer_id = row.id;
+            body.provider_id = row.user_id;
+            body.seeker_id = currentUser.id;
+        } else {
+            body.request_id = row.id;
+            body.provider_id = currentUser.id;
+            body.seeker_id = row.user_id;
+        }
+
+        const match = await KHApi.createMatch(body);
+        toast('Match creado ✓', 'success');
+        await loadMatches();
+        if (match && match.id) openChat(match.id);
+        return match;
+    }
+
     function actionsForMatch(match) {
         if (!currentUser) return [];
         const isProvider = match.provider_id === currentUser.id;
         const isSeeker = match.seeker_id === currentUser.id;
         const st = match.status;
         const a = [];
-        if (isProvider && st === 'pending') a.push('accept', 'reject');
+        const receiverRole = match.initiated_by === 'provider' ? 'seeker' : 'provider';
+        const initiatorRole = match.initiated_by === 'provider' ? 'provider' : 'seeker';
+        const myRole = isProvider ? 'provider' : (isSeeker ? 'seeker' : null);
+        if (myRole && myRole === receiverRole && st === 'pending') a.push('accept', 'reject');
         if (isProvider && st === 'accepted') a.push('done');
-        if (isSeeker && (st === 'pending' || st === 'accepted')) a.push('cancel');
+        if (myRole && myRole === initiatorRole && (st === 'pending' || st === 'accepted')) a.push('cancel');
         return a;
     }
 
@@ -3999,10 +4131,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         bindDataHandlers();
         bindImageFallbacks();
+        initOAuthButtons();
+        const oauthHandled = handleOAuthRedirect();
         initReveal();
         initKpiCounters();
         relocateThemeToggle('page-landing');
-        tryRestoreSession();
+        if (!oauthHandled) tryRestoreSession();
+        else setTimeout(tryRestoreSession, 80);
         // Sync tabs with persisted view (or default)
         setDashView(getSavedDashView(), { noAutoLoad: true, noScroll: true });
         // Default selection on dashboard create card

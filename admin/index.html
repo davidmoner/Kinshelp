@@ -379,6 +379,14 @@
               <button class="btn primary" data-fx="wow" type="button">wow</button>
             </div>
           </div>
+          <div class="card" style="box-shadow:none;">
+            <div style="font-weight:800;">Hero banner</div>
+            <div class="muted" style="margin-top:6px;">Duracion por banner (segundos).</div>
+            <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+              <input id="heroDurationInput" type="number" min="3" max="20" step="1" placeholder="6" />
+              <button class="btn" id="heroDurationSave" type="button">Guardar</button>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -611,6 +619,23 @@
         });
       }
 
+      function loadConfig() {
+        return api('/config').then(function (j) {
+          var cfg = (j && j.data) || {};
+          var fx = (cfg.fx_level === 'off' || cfg.fx_level === 'subtle' || cfg.fx_level === 'wow') ? cfg.fx_level : 'wow';
+          document.querySelectorAll('button[data-fx]').forEach(function (b) {
+            var v = b.getAttribute('data-fx');
+            b.classList.toggle('primary', v === fx);
+          });
+
+          var input = document.getElementById('heroDurationInput');
+          if (input) {
+            var v = cfg.hero_banner_duration;
+            input.value = (v === null || v === undefined) ? '' : String(v);
+          }
+        });
+      }
+
       function bind() {
         document.querySelectorAll('.nav button').forEach(function (b) {
           b.addEventListener('click', function () {
@@ -700,15 +725,35 @@
           b.addEventListener('click', function () {
             var v = b.getAttribute('data-fx');
             api('/config', { method: 'PATCH', body: JSON.stringify({ fx_level: v }) })
-              .then(function () { toast('Config guardada: fx_level=' + v, true); })
+              .then(function () {
+                toast('Config guardada: fx_level=' + v, true);
+                return loadConfig();
+              })
               .catch(function (err) { toast(err.message || 'Error', false); });
           });
         });
+
+        var heroSave = document.getElementById('heroDurationSave');
+        if (heroSave) {
+          heroSave.addEventListener('click', function () {
+            var input = document.getElementById('heroDurationInput');
+            if (!input) return;
+            var raw = String(input.value || '').trim();
+            var payload = { hero_banner_duration: null };
+            if (raw) {
+              var n = Math.max(3, Math.min(20, parseInt(raw, 10)));
+              payload.hero_banner_duration = n;
+            }
+            api('/config', { method: 'PATCH', body: JSON.stringify(payload) })
+              .then(function () { toast('Config guardada: hero_banner_duration', true); return loadConfig(); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          });
+        }
       }
 
       ensureLogin()
         .then(loadMe)
-        .then(function () { bind(); return loadOverview(); })
+        .then(function () { bind(); return Promise.all([loadOverview(), loadConfig()]); })
         .catch(function (e) {
           toast(e.message || 'Error', false);
         });

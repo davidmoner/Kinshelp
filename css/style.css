@@ -832,6 +832,24 @@ html[data-theme="light"] .auth-provider {
   background: var(--kh-brand-tint-08);
 }
 
+.auth-provider[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme="light"] .auth-provider[disabled] {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.auth-provider[disabled]:hover {
+  transform: none;
+  border-color: var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
 .auth-ico {
   width: 28px;
   height: 28px;

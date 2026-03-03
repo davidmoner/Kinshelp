@@ -236,6 +236,11 @@
         return apiFetch('/feed' + qs);
     }
 
+    /** Public stats */
+    async function getStats() {
+        return apiFetch('/stats');
+    }
+
     /** AutoMatch (Premium) */
     async function automatchGetSettings() {
         return apiFetch('/automatch/settings');
@@ -357,6 +362,7 @@
         listMyBadges,
         listBadgesForUser,
         feed,
+        getStats,
         automatchGetSettings,
         automatchUpdateSettings,
         automatchListInvites,

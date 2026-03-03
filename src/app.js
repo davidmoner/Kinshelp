@@ -89,7 +89,7 @@ app.options('*', cors());
 const cspScriptHashes = [
   "'sha256-SXk7z1QIWnFhmfe1L3zWbBaoIOoy8eRqkbIL09e/eVk='",
   "'sha256-o5jUa2287/3qNrLao2K53IA9k0M3fu/1sqSLdPpmHK4='",
-  "'sha256-JTjyXuayNLBFuWUzYAd9l738VJLG8G6iLww6OlHAPIA='",
+  "'sha256-YQpG8tDKHvf0v0iZSC0Ogp2tLbCPTGBkXaTzbSAmrKs='",
 ];
 
 app.use(helmet({
@@ -194,11 +194,13 @@ api.use('/users', require('./modules/users/users.routes'));
 api.use('/offers', require('./modules/offers/offers.routes'));
 api.use('/requests', require('./modules/requests/requests.routes'));
 api.use('/matches', require('./modules/matches/matches.routes'));
-api.use('/points', require('./modules/points/points.routes'));
-api.use('/badges', require('./modules/badges/badges.routes'));
+  api.use('/points', require('./modules/points/points.routes'));
+  api.use('/badges', require('./modules/badges/badges.routes'));
   api.use('/premium', require('./modules/premium/premium.routes'));
   api.use('/automatch', require('./modules/automatch/automatch.routes'));
   api.use('/feed', require('./modules/feed/feed.routes'));
+  api.use('/config', require('./modules/config/config.routes'));
+  api.use('/stats', require('./modules/stats/stats.routes'));
   api.use('/notifications', require('./modules/notifications/notifications.routes'));
   api.use('/reports', require('./modules/reports/reports.routes'));
 
@@ -208,21 +210,41 @@ api.use('/badges', require('./modules/badges/badges.routes'));
 app.use('/api/v1', apiLimiter, api);
 
 // Serve only public static assets (avoid exposing repo root).
-// Keep the set tight: landing, web SPA pages, legal, and images.
-const webDir = path.resolve(__dirname, '..');
+// Keep the set tight: landing, web SPA pages, legal, admin, and assets.
+const publicRoot = path.resolve(__dirname, '..');
+const staticOpts = {
+  fallthrough: false,
+  maxAge: '1d',
+  setHeaders: (res) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  },
+};
 
-app.use('/web', express.static(path.join(webDir, 'web')));
-app.use('/legal', express.static(path.join(webDir, 'legal')));
-app.use('/img', express.static(path.join(webDir, 'img')));
-app.use('/admin', express.static(path.join(webDir, 'admin')));
+app.use('/web', express.static(path.join(publicRoot, 'web'), staticOpts));
+app.use('/legal', express.static(path.join(publicRoot, 'legal'), staticOpts));
+app.use('/img', express.static(path.join(publicRoot, 'img'), staticOpts));
+app.use('/admin', express.static(path.join(publicRoot, 'admin'), staticOpts));
+app.use('/css', express.static(path.join(publicRoot, 'css'), staticOpts));
+app.use('/js', express.static(path.join(publicRoot, 'js'), staticOpts));
+app.use('/.well-known', express.static(path.join(publicRoot, '.well-known'), staticOpts));
 
-// Landing assets at repo root (only files, no directory listing).
-app.use('/', express.static(webDir, { index: false, extensions: false }));
+function sendStaticFile(res, relPath) {
+  const p = path.join(publicRoot, relPath);
+  if (!fs.existsSync(p)) return res.status(404).end();
+  return res.sendFile(p);
+}
+
+app.get('/robots.txt', (req, res) => sendStaticFile(res, 'robots.txt'));
+app.get('/sitemap.xml', (req, res) => sendStaticFile(res, 'sitemap.xml'));
+app.get('/site.webmanifest', (req, res) => sendStaticFile(res, 'site.webmanifest'));
+app.get('/favicon.svg', (req, res) => sendStaticFile(res, 'favicon.svg'));
+app.get('/favicon.ico', (req, res) => res.redirect(302, '/favicon.svg'));
+app.get('/index.html', (req, res) => sendStaticFile(res, 'index.html'));
 
 // Best-effort SPA entrypoint: only serve index.html if it exists.
 // In some deployments the frontend may not be bundled; avoid ENOENT.
 app.get('/', (req, res, next) => {
-  const p = path.join(webDir, 'index.html');
+  const p = path.join(publicRoot, 'index.html');
   if (fs.existsSync(p)) return res.sendFile(p);
   return next();
 });

@@ -13,6 +13,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Tracker de estado agregado: `STATUS.md`.
 - Premium Stripe (checkout + webhook) con persistencia en tabla `payments`.
 - Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` (WIP triggers).
+- Notificaciones: triggers para mensajes de match y AutoMatch (invitaciones) con cooldown.
 - Postgres hardening: transacciones disponibles via `db.tx()` y points transfer atomico en PG.
 - Auth: tokens persistidos en `auth_tokens` + endpoints `forgot-password`, `reset-password`, `verify-email`.
 - Email: servicio `src/shared/email.service.js` (SendGrid si esta configurado) + `PUBLIC_BASE_URL` para links.
@@ -21,7 +22,9 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Hero (fix): paneles laterales subidos ~10% para alinear con seccion, y corregida ruta de carga de imagenes desde `web/js/` (usa `../img/...`).
 
 - SEO: metadatos (canonical/OG/Twitter/JSON-LD) + `robots.txt` + `sitemap.xml` + `/.well-known/security.txt`.
+- SEO: KPIs en vivo desde `/api/v1/stats` + og:image real apuntando a asset en `/img/retocar.png`.
 - Seguridad: headers via `helmet` + rate limit global; CSP relajada por inline handlers actuales.
+- Seguridad estaticos: Express sirve solo `/web`, `/legal`, `/img`, `/css`, `/js`, `/admin` y archivos raiz permitidos (robots/sitemap/favicon).
 - Fix prod: rate limit aplicado solo a `/api/v1` (no bloquea estaticos como `/img/*`).
 - OAuth: codigo listo para Google/Facebook (backend callbacks + UI), pero queda pendiente credenciales/validacion en produccion.
 
@@ -36,6 +39,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - API protegida: `/api/v1/admin/*` requiere token + `ADMIN_EMAILS`.
   - Tablas: `admin_audit_log`, `admin_config`, `admin_events`, `reports`.
   - Config via API: `fx_level` (y base para mas flags).
+  - Config: `hero_banner_duration` agregado en admin y expuesto en config publico.
 
 - Sprint rendimiento + diseño (mar 2026):
   - Performance: preload CSS critico + logos LCP con `fetchpriority:high`, fuente Manrope weight 900 añadido.
@@ -150,12 +154,15 @@ PUBLIC_BASE_URL=https://kingshelp.es
 - `fx_level` ya existe en admin_config.
 - Hero debería leerlo via API al cargar y ajustar efectos sin redeploy.
 - Añadir `hero_banner_duration` como flag configurable.
+  - ✅ Hero lee config publico (`/api/v1/config`) y aplica `fx_level` + `hero_banner_duration`.
 
 ### 🔜 Paso 9 — SEO + Contenido real
 - FAQ en sitemap.xml (añadir `#faq` o futura `/faq.html`).
 - Contenido real en secciones (no datos de ejemplo tipo "34 servicios completados").
 - KPIs reales desde la API real del servidor.
 - `og:image` real (captura de pantalla de la web).
+  - ✅ KPIs conectadas a `/api/v1/stats`.
+  - ✅ `og:image` actualizado a un asset real.
 
 ### ✅ Paso 10 — CSP Hardening
 - ✅ Migrados `onclick/onsubmit/oninput` a listeners con `data-*` + bindings en `js/app.js`.
@@ -164,11 +171,13 @@ PUBLIC_BASE_URL=https://kingshelp.es
 
 ## Pendiente (OAuth)
 
-- Nota: Login con Google/Facebook queda pendiente de configurar en produccion (apps/credenciales + callbacks). Codigo listo; faltan `GOOGLE_CLIENT_ID/SECRET` y `FACEBOOK_APP_ID/SECRET` en env y validar redirects reales.
+- Nota: Login con Google/Facebook queda pendiente de configurar en produccion (apps/credenciales + callbacks).
+- Web: ya redirige a Google/Facebook cuando hay IDs, y procesa `/?oauth=...&token=...` al volver.
+- Faltan `GOOGLE_CLIENT_ID/SECRET` y `FACEBOOK_APP_ID/SECRET` en env y validar redirects reales.
 
-## Pendiente (Seguridad Web)
+## Seguridad Web (Resuelto)
 
-- Endurecer CSP: eliminar handlers inline (`onclick=`, `onsubmit=`, etc.) en `index.html` moviendo eventos a `web/js/app.js`, para poder quitar `'unsafe-inline'` de CSP.
+- CSP endurecido: handlers inline migrados a listeners con `data-*` y hashes para JSON-LD/admin.
 
 ## Backup / Rollback
 
@@ -176,28 +185,23 @@ PUBLIC_BASE_URL=https://kingshelp.es
 
 ## Plan (Paso a Paso) — Construccion de Todo
 
-1) Seguridad critica de estaticos (NO saltar)
-   - Revisar `src/app.js` para que NO sirva estaticos desde la raiz del repo.
-   - Objetivo: servir solo assets publicos (landing, `web/`, `legal/`, `uploads/` si aplica) y bloquear DB/codigo.
+1) Seguridad critica de estaticos — COMPLETADO
+   - `src/app.js` ya no sirve estaticos desde la raiz del repo.
+   - Solo assets publicos (landing, `web/`, `legal/`, `img/`, `css/`, `js/`, `admin/`, `/.well-known`).
 
-2) SEO de rutas y coherencia de archivos
-   - Asegurar que `/robots.txt`, `/sitemap.xml` y `/.well-known/security.txt` existen en la raiz que Google ve.
-   - Validar que el sitemap incluye landing + legales + futura FAQ.
+2) SEO de rutas y coherencia de archivos — COMPLETADO
+   - `/robots.txt`, `/sitemap.xml` y `/.well-known/security.txt` servidos explicitamente.
+   - Sitemap listo; queda añadir futura FAQ si se hace pagina dedicada.
 
-3) Endurecer CSP (cuando el punto 1 este estable)
-   - Migrar todos los `onclick/onsubmit/oninput/onchange` de `index.html` a listeners en `web/js/app.js`.
-   - Quitar `'unsafe-inline'` de CSP y bloquear `blob:` si no es necesario.
+3) Endurecer CSP — COMPLETADO
+   - Handlers inline migrados; CSP sin `'unsafe-inline'`.
 
-4) OAuth Google/Facebook (pendiente de credenciales)
-   - Crear apps en Google/Facebook.
-   - Setear env vars en prod: `PUBLIC_BASE_URL`, `GOOGLE_CLIENT_ID/SECRET`, `FACEBOOK_APP_ID/SECRET`.
-   - Validar redirect URIs reales y corregir cualquier mismatch de rutas.
-   - Evitar token en URL (ideal: cookie httpOnly).
-   - Botones con logos oficiales en web/mobile (ya en marcha, pero revisar assets finales).
+4) OAuth Google/Facebook — EN PROGRESO
+   - Web redirige a OAuth con `PUBLIC_BASE_URL` y procesa token en retorno.
+   - Pendiente: credenciales reales + validacion redirects.
 
-5) Paridad Postgres vs SQLite
-   - Implementar los 501 pendientes en PG (offers/requests edit, fotos, boost, automatch accept/decline, checks en matches).
-   - Decidir si prod sera PG obligatorio o SQLite con disco persistente.
+5) Paridad Postgres vs SQLite — COMPLETADO
+   - Repos/servicios principales ya compatibles; prod usa PG via `DATABASE_URL`.
 
 6) Bugs funcionales detectados
    - Revisar `offers.service.js`: `requireOffer()` async usado como sync en fotos/boost.

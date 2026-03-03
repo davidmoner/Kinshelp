@@ -17,6 +17,42 @@
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
     var INTRO_HOLD_MS = 820;                // ms KingsHelp intro is shown
     var INTRO_EXIT_MS = 650;                // clip-path ripple duration
+    var fxLevel = 'wow';
+
+    function applyConfig(cfg) {
+        if (!cfg) return;
+        if (cfg.fx_level === 'off' || cfg.fx_level === 'subtle' || cfg.fx_level === 'wow') {
+            fxLevel = cfg.fx_level;
+        }
+        if (fxLevel === 'off') {
+            prefersReduced = true;
+            isPlaying = false;
+            pause();
+        }
+        if (cfg.hero_banner_duration) {
+            var baseMs = Math.max(3000, Number(cfg.hero_banner_duration) * 1000);
+            if (isFinite(baseMs)) {
+                BANNER_DURATIONS = [baseMs, baseMs + 2000, baseMs];
+                setProgress(current);
+                resumeIfShould();
+            }
+        }
+        try { document.documentElement.dataset.fx = fxLevel; } catch (e) { }
+    }
+
+    function fetchPublicConfig() {
+        var base = window.KINGSHELP_BASE_URL || '/api/v1';
+        if (!base) return;
+        if (base.indexOf('/api/v1') === -1) base = base.replace(/\/$/, '') + '/api/v1';
+        var url = base.replace(/\/$/, '') + '/config';
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                var data = (j && (j.data || j.config)) || j;
+                applyConfig(data || {});
+            })
+            .catch(function () { });
+    }
 
     /* ── DOM refs ────────────────────────────────────────── */
     var heroSection = document.querySelector('section.hero');
@@ -30,6 +66,8 @@
     progressSegs = progressEl ? Array.from(progressEl.querySelectorAll('.hero-progress-seg')) : [];
 
     if (!banners.length) return;
+
+    fetchPublicConfig();
 
     /* ── State ───────────────────────────────────────────── */
     var current = 0;

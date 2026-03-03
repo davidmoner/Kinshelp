@@ -35,6 +35,14 @@ function requireParticipant(match, userId) {
     return { isProvider, isSeeker, role: isProvider ? 'provider' : 'seeker' };
 }
 
+function getReceiverRole(match) {
+    return match && match.initiated_by === 'provider' ? 'seeker' : 'provider';
+}
+
+function getInitiatorRole(match) {
+    return match && match.initiated_by === 'provider' ? 'provider' : 'seeker';
+}
+
 function ensureAgreementForDone(match) {
     const comp = match.compensation_type || 'cash';
     if (comp === 'coins' || comp === 'cash') {
@@ -144,9 +152,14 @@ async function create(data) {
 
     const created = await requireMatch(matchId);
     try {
-        notifications.notify(provider_id, 'match_created', {
+        const receiverId = initiated_by === 'provider' ? seeker_id : provider_id;
+        const receiverRole = initiated_by === 'provider' ? 'seeker' : 'provider';
+        const body = receiverRole === 'provider'
+            ? 'Tienes una nueva solicitud de match. Acepta o rechaza desde tu panel.'
+            : 'Un vecino quiere ayudarte. Acepta o rechaza desde tu panel.';
+        notifications.notify(receiverId, 'match_created', {
             title: 'Nuevo match',
-            body: 'Tienes una nueva solicitud de match. Acepta o rechaza desde tu panel.',
+            body,
             payload: { match_id: matchId },
         });
     } catch { }
@@ -159,7 +172,9 @@ async function changeStatus(matchId, actingUserId, action) {
 
     const { role: callerRole } = requireParticipant(match, actingUserId);
 
-    const requiredRole = MATCH_ACTION_PERMISSIONS[action]; // already validated by validators.js
+    let requiredRole = MATCH_ACTION_PERMISSIONS[action]; // already validated by validators.js
+    if (action === 'accept' || action === 'reject') requiredRole = getReceiverRole(match);
+    if (action === 'cancel') requiredRole = getInitiatorRole(match);
     if (callerRole !== requiredRole)
         throw httpError(403, `Only the ${requiredRole} can perform '${action}'`);
 
@@ -179,7 +194,7 @@ async function changeStatus(matchId, actingUserId, action) {
         await ensureAntiFraudForDone(match);
     }
 
-    const seekerCancelledVal = action === 'cancel' ? 1 : match.seeker_cancelled;
+    const seekerCancelledVal = (action === 'cancel' && actingUserId === match.seeker_id) ? 1 : match.seeker_cancelled;
 
     if (db.isPg) {
         // PG: individual awaited calls (no SQLite-style transaction)
@@ -292,6 +307,24 @@ async function postMessage(matchId, actingUserId, message) {
     const match = await requireMatch(matchId);
     requireParticipant(match, actingUserId);
     const id = await Promise.resolve(repo.insertMessage(matchId, actingUserId, message));
+
+    try {
+        const otherId = actingUserId === match.provider_id ? match.seeker_id : match.provider_id;
+        const senderName = actingUserId === match.provider_id
+            ? (match.provider_name || 'Vecino')
+            : (match.seeker_name || 'Vecino');
+        const snippet = String(message || '').trim().slice(0, 120);
+        if (otherId) {
+            const ok = await cooldown.tryNotify(otherId, `match_message_${matchId}`);
+            if (ok) {
+                await notifications.notify(otherId, 'match_message', {
+                    title: 'Nuevo mensaje',
+                    body: snippet ? `${senderName}: ${snippet}` : `${senderName} te escribio en el chat`,
+                    payload: { match_id: matchId },
+                });
+            }
+        }
+    } catch { }
     return { id };
 }
 
