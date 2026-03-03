@@ -1479,8 +1479,6 @@
             aria-expanded="false" data-action="toggleDashMenu" data-args="$event">Cuenta ▾</button>
           <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
             <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="inicio">Inicio</button>
-            <button class="dash-menu-item" type="button" role="menuitem"
               data-action="gotoDashFromMenu" data-args="creaciones">Mis creaciones</button>
             <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
               data-args="matches">Mis
@@ -1502,15 +1500,15 @@
 
     <div class="dash-tabs-wrap" role="navigation" aria-label="Secciones del panel">
       <nav class="dash-tabs" role="tablist" aria-label="Secciones">
-        <button class="dash-tab dash-tab--automatch" type="button" role="tab" aria-selected="false"
-          data-view="automatch" id="dash-primary-automatch" data-action="setDashView" data-args="automatch">
-          <span class="dash-tab-label">AutoMatch</span>
-          <span class="dash-tab-badge hidden" id="am-tab-badge" aria-label="Invitaciones pendientes">0</span>
-        </button>
         <button class="dash-tab dash-tab--active" type="button" role="tab" aria-selected="true" data-view="explorar"
           data-action="setDashView" data-args="explorar">Explorar</button>
         <button class="dash-tab" type="button" role="tab" aria-selected="false" data-view="crear"
-          data-action="setDashView" data-args="crear">Crear</button>
+          data-action="hubStartCreate">Crear</button>
+        <button class="dash-tab dash-tab--automatch" type="button" role="tab" aria-selected="false"
+          data-view="automatch" id="dash-primary-automatch" data-action="hubGoAutoMatch">
+          <span class="dash-tab-label">AutoMatch</span>
+          <span class="dash-tab-badge hidden" id="am-tab-badge" aria-label="Invitaciones pendientes">0</span>
+        </button>
       </nav>
     </div>
 
@@ -1532,50 +1530,7 @@
           </div>
         </div>
 
-        <!-- Hub (Inicio) -->
-        <div class="glass-card card-hub reveal" id="card-hub" data-view="inicio">
-          <div class="card-head">
-            <h3>¿Qué quieres hacer ahora?</h3>
-            <span class="badge-pill" id="hub-badge">—</span>
-          </div>
 
-          <div class="hub-grid">
-            <button class="hub-tile" type="button" data-action="setDashView" data-args="explorar">
-              <div class="hub-media hub-media--explore">
-                <div class="hub-media-k">Muro</div>
-                <div class="hub-media-v">Explorar</div>
-              </div>
-              <div class="hub-body">
-                <div class="hub-title">Ver ofertas y solicitudes</div>
-                <div class="hub-sub">Estilo Wallapop: cards por cercanía y categoria.</div>
-              </div>
-            </button>
-
-            <button class="hub-tile" type="button" data-action="hubStartCreate">
-              <div class="hub-media hub-media--create">
-                <div class="hub-media-k">En 15s</div>
-                <div class="hub-media-v">Crear</div>
-              </div>
-              <div class="hub-body">
-                <div class="hub-title">Pedir u ofrecer ayuda</div>
-                <div class="hub-sub">Publica en 1 minuto y pasa al match.</div>
-              </div>
-            </button>
-
-            <button class="hub-tile" type="button" data-action="hubGoAutoMatch">
-              <div class="hub-media hub-media--auto">
-                <div class="hub-media-k">Premium</div>
-                <div class="hub-media-v">AutoMatch</div>
-                <div class="hub-burst" aria-hidden="true"></div>
-              </div>
-              <div class="hub-body">
-                <div class="hub-title">Aceptar invitaciones</div>
-                <div class="hub-sub" id="hub-automatch-sub">Recibe notificaciones y acepta en segundos.</div>
-                <div class="hub-mini" id="hub-automatch-mini">—</div>
-              </div>
-            </button>
-          </div>
-        </div>
 
         <!-- AutoMatch (Premium) -->
         <div class="glass-card card-automatch reveal" id="card-automatch" data-view="automatch">

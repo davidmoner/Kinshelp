@@ -413,7 +413,7 @@
     /* ── Dashboard views (tabs) ─────────────────────────────────────────────── */
     function normalizeDashView(view) {
         const v = String(view || '').toLowerCase();
-        if (v === 'inicio' || v === 'automatch' || v === 'explorar' || v === 'crear' || v === 'creaciones' || v === 'matches' || v === 'perfil' || v === 'premium') return v;
+        if (v === 'automatch' || v === 'explorar' || v === 'crear' || v === 'creaciones' || v === 'matches' || v === 'perfil' || v === 'premium') return v;
         return 'explorar';
     }
 
@@ -425,7 +425,7 @@
         }
     }
 
-    const dashAutoLoadAt = { inicio: 0, automatch: 0, explorar: 0, crear: 0, creaciones: 0, matches: 0, perfil: 0, premium: 0 };
+    const dashAutoLoadAt = { automatch: 0, explorar: 0, crear: 0, creaciones: 0, matches: 0, perfil: 0, premium: 0 };
 
     let automatchPollTimer = null;
     let automatchCountdownTimer = null;
@@ -459,7 +459,6 @@
         dashAutoLoadAt[v] = now;
 
         if (v === 'explorar') loadFeed();
-        if (v === 'inicio') loadHub();
         if (v === 'automatch') {
             loadAutoMatch();
             automatchPollTimer = setInterval(() => {
@@ -2804,49 +2803,6 @@
         }
     }
 
-    /* ── Hub (Inicio) ─────────────────────────────────────────────────────── */
-    async function loadHub() {
-        if (!KHApi.getToken()) return;
-        const badge = $('hub-badge');
-        if (badge) badge.textContent = isPremiumActive(currentUser) ? 'Premium' : 'Gratis';
-
-        // Default texts
-        const sub = $('hub-automatch-sub');
-        const mini = $('hub-automatch-mini');
-        if (sub) sub.textContent = 'Recibe notificaciones y acepta en segundos.';
-        if (mini) mini.textContent = '—';
-
-        try {
-            const e = await KHApi.premiumEligibility();
-            const premium = !!(e && e.premium_active);
-            if (badge) badge.textContent = premium ? 'Premium activo' : 'Gratis';
-            if (!premium) {
-                const rep = Number(e.reputation || 0);
-                const th = Number(e.threshold || 1000);
-                const partners = Number(e.partners_done_distinct || 0);
-                const partnersReq = Number(e.partners_required || 0);
-                const leftRep = Math.max(0, th - rep);
-                const leftPartners = Math.max(0, partnersReq - partners);
-                if (sub) sub.textContent = 'AutoMatch te avisa cuando una solicitud encaja con lo que ofreces.';
-                if (mini) mini.textContent = `Te faltan ${leftRep} rep y ${leftPartners} vecinos distintos.`;
-                return;
-            }
-
-            // Premium: show pending invites count
-            try {
-                const inv = await KHApi.automatchListInvites({ status: 'pending', limit: 20, offset: 0 });
-                const rows = (inv && inv.data) || [];
-                const reqs = rows.filter(r => (r.kind || 'request') !== 'offer').length;
-                const offs = rows.filter(r => (r.kind || 'request') === 'offer').length;
-                const n = rows.length;
-                if (mini) mini.textContent = n === 0 ? 'No hay invitaciones pendientes.' : `${n} pendientes (solicitudes: ${reqs} · ofertas: ${offs}).`;
-            } catch {
-                if (mini) mini.textContent = 'AutoMatch listo.';
-            }
-        } catch {
-            // ignore
-        }
-    }
 
     function hubStartCreate() {
         setDashView('crear');
@@ -4556,7 +4512,6 @@
         acceptAutoMatch,
         declineAutoMatch,
         setAutoMatchFilter,
-        loadHub,
         hubStartCreate,
         hubGoAutoMatch,
         startPremiumCheckout,
