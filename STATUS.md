@@ -56,6 +56,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Feed: tabs centrados y cards con marco sutil para delimitar cada solicitud/oferta.
   - Feed: media con aspect-ratio 16:9 para evitar deformaciones en imagenes.
   - Feed: modal "Ver detalles" rediseñado con hero grande, layout en dos columnas y data organizada.
+  - Feed: modal "Ver detalles" ahora carga detalle completo (descripcion/fotos) via `/requests/:id` y `/offers/:id`.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):

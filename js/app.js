@@ -2444,8 +2444,26 @@
         feedDetailsRow = null;
     }
 
-    function openFeedDetails(row) {
-        feedDetailsRow = row || null;
+    function normalizeFeedDetails(baseRow, detailRow, kind) {
+        if (!detailRow) return baseRow;
+        const userName = kind === 'offer' ? detailRow.provider_name : detailRow.seeker_name;
+        const userRating = kind === 'offer' ? detailRow.provider_rating : detailRow.seeker_rating;
+        const userTier = kind === 'offer' ? detailRow.provider_tier : detailRow.seeker_tier;
+        const userId = kind === 'offer' ? detailRow.provider_id : detailRow.seeker_id;
+        const premium = userTier && userTier !== 'free';
+        return {
+            ...baseRow,
+            ...detailRow,
+            user_name: userName || baseRow.user_name,
+            user_rating: userRating != null ? userRating : baseRow.user_rating,
+            user_tier: userTier || baseRow.user_tier,
+            user_id: userId || baseRow.user_id,
+            premium_user: premium || baseRow.premium_user,
+            kind: kind,
+        };
+    }
+
+    function renderFeedDetails(row) {
         const body = $('feed-details-body');
         const btn = $('btn-feed-details-match');
         const modalTitle = document.querySelector('#modal-feed-details .modal-title');
@@ -2524,8 +2542,30 @@
         }
 
         btn.querySelector('.btn-label').textContent = (kind === 'offer') ? 'Pedir esta ayuda' : 'Ofrecer mi ayuda';
+    }
 
+    function openFeedDetails(row) {
+        feedDetailsRow = row || null;
+        if (!row) return;
+        renderFeedDetails(row);
         show($('modal-feed-details'));
+
+        const kind = (row && row.kind) === 'offer' ? 'offer' : 'request';
+        const detailUrl = kind === 'offer'
+            ? '/offers/' + encodeURIComponent(row.id)
+            : '/requests/' + encodeURIComponent(row.id);
+        const currentId = row.id;
+
+        KHApi.apiFetch(detailUrl)
+            .then(data => {
+                const detail = data && (data.data || data);
+                if (!detail) return;
+                if (!feedDetailsRow || feedDetailsRow.id !== currentId) return;
+                const merged = normalizeFeedDetails(row, detail, kind);
+                feedDetailsRow = merged;
+                renderFeedDetails(merged);
+            })
+            .catch(() => { });
     }
 
     async function feedDetailsCreateMatch() {

@@ -4647,12 +4647,21 @@ html[data-theme="light"] .dash-menu-sep {
   padding: 26px 26px 22px;
   background: linear-gradient(180deg, rgba(15, 20, 32, 0.98), rgba(10, 14, 22, 0.98));
   border-color: rgba(255, 255, 255, 0.14);
+  max-height: 88vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .feed-details-body {
   display: grid;
   gap: 16px;
   margin-top: 10px;
+  overflow: auto;
+  min-height: 0;
+  flex: 1;
+  padding-right: 2px;
 }
 
 .feed-details-grid {
@@ -4667,11 +4676,13 @@ html[data-theme="light"] .dash-menu-sep {
   border-radius: 18px;
   overflow: hidden;
   min-height: 280px;
+  aspect-ratio: 16 / 9;
   background-image:
-    var(--feed-cover),
+    var(--feed-cover, none),
     radial-gradient(circle at 30% 30%, rgba(82, 49, 148, 0.28), rgba(33, 82, 173, 0.18));
   background-size: cover, auto;
   background-position: center, center;
+  background-repeat: no-repeat;
   box-shadow: 0 22px 46px rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.10);
 }
@@ -4738,6 +4749,7 @@ html[data-theme="light"] .dash-menu-sep {
   margin-top: 6px;
   font-size: 12px;
   opacity: 0.8;
+  text-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
 .feed-details-info {
@@ -4755,6 +4767,7 @@ html[data-theme="light"] .dash-menu-sep {
 .feed-details-desc {
   opacity: 0.92;
   line-height: 1.55;
+  white-space: pre-line;
 }
 
 .feed-details-desc.is-empty {
@@ -4806,6 +4819,10 @@ html[data-theme="light"] .dash-menu-sep {
 
 @media (prefers-reduced-motion: reduce) {
   .feed-details-grid {
+    animation: none;
+  }
+
+  .modal-feed-details-box {
     animation: none;
   }
 }
