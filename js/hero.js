@@ -15,8 +15,9 @@
     var BANNER_DURATIONS = [4000, 6000, 4000]; // ms per banner (banner 2 needs +2s)
     var TRANSITION_MS = 550;                // must match CSS
     var PAUSE_AFTER_INTERACTION_MS = 20000;    // 20s pause after user touch
-    var INTRO_HOLD_MS = 820;                // ms KingsHelp intro is shown
-    var INTRO_EXIT_MS = 650;                // clip-path ripple duration
+    var INTRO_DURATION_MS = 4000;           // total intro duration
+    var INTRO_BURST_MS = 3000;              // particle burst timing
+    var INTRO_EXIT_MS = 620;                // overlay fade duration
     var fxLevel = 'wow';
 
     function applyConfig(cfg) {
@@ -254,10 +255,12 @@
     }
 
     /* ── Init: show banner 0 immediately — but after intro splash ───── */
-    /* ── Intro Overlay (video) ─────────────────────────── */
+    /* ── Intro Overlay (logo image + burst) ─────────────── */
     var overlay = document.getElementById('kh-intro-overlay');
-    var video = document.getElementById('kh-intro-video');
-    var videoWrap = document.getElementById('kh-intro-video-wrap');
+    var burstCanvas = document.getElementById('kh-intro-burst');
+    var logoWrap = document.getElementById('kh-intro-logo-wrap');
+    var burstTimer = null;
+    var burstRaf = null;
 
     function startBanners() {
         banners[0].classList.add('hero-banner--active');
@@ -270,28 +273,116 @@
         if (!overlay) return;
         overlay.classList.add('kh-intro-overlay--exit');
         try { document.body.classList.remove('intro-active'); } catch { }
+        if (burstTimer) clearTimeout(burstTimer);
+        if (burstRaf) cancelAnimationFrame(burstRaf);
         setTimeout(function () {
             if (overlay && overlay.parentNode) {
                 overlay.parentNode.removeChild(overlay);
             }
-        }, 620);
+        }, INTRO_EXIT_MS);
     }
 
-    /* Show intro on each fresh load (skip for reduced motion). */
-    if (!overlay || prefersReduced) {
-        /* Reduced-motion / already seen / no overlay: skip instantly */
-        if (overlay) {
-            overlay.style.display = 'none';
-            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    function startBurst() {
+        if (!burstCanvas || !logoWrap || prefersReduced) return;
+        var ctx = burstCanvas.getContext('2d');
+        if (!ctx) return;
+
+        var rect = burstCanvas.getBoundingClientRect();
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        burstCanvas.width = Math.max(1, Math.floor(rect.width * dpr));
+        burstCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        var logoRect = logoWrap.getBoundingClientRect();
+        var cx = logoRect.left + logoRect.width / 2 - rect.left;
+        var cy = logoRect.top + logoRect.height / 2 - rect.top;
+
+        var colors = ['#7c3aed', '#8b5cf6', '#a855f7'];
+        var count = Math.floor(80 + Math.random() * 60);
+        var particles = [];
+
+        for (var i = 0; i < count; i += 1) {
+            var angle = Math.random() * Math.PI * 2;
+            var speed = 1.8 + Math.random() * 4.2;
+            var size = 1.2 + Math.random() * 2.6;
+            var life = 750 + Math.random() * 350;
+            var color = colors[Math.floor(Math.random() * colors.length)];
+            particles.push({
+                x: cx,
+                y: cy,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: size,
+                life: life,
+                age: 0,
+                color: color,
+                dash: Math.random() < 0.45,
+                glow: 10 + Math.random() * 18
+            });
         }
-        try { document.body.classList.remove('intro-active'); } catch { }
+
+        var start = performance.now();
+        var last = start;
+        ctx.lineCap = 'round';
+
+        function frame(now) {
+            var dt = Math.min(32, now - last);
+            last = now;
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            ctx.globalCompositeOperation = 'lighter';
+
+            var alive = 0;
+            for (var i = 0; i < particles.length; i += 1) {
+                var p = particles[i];
+                p.age += dt;
+                if (p.age >= p.life) continue;
+                alive += 1;
+
+                var t = p.age / p.life;
+                var fade = 1 - t;
+                var step = dt / 16.666;
+
+                p.vx *= 0.985;
+                p.vy *= 0.985;
+                p.x += p.vx * step * 6;
+                p.y += p.vy * step * 6;
+
+                ctx.globalAlpha = fade;
+                ctx.shadowBlur = p.glow * fade;
+                ctx.shadowColor = p.color;
+
+                if (p.dash) {
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = p.size;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.vx * 1.8, p.y - p.vy * 1.8);
+                    ctx.stroke();
+                } else {
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * (0.8 + fade * 0.6), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            if (alive > 0 && now - start < 1400) {
+                burstRaf = requestAnimationFrame(frame);
+            } else {
+                ctx.clearRect(0, 0, rect.width, rect.height);
+            }
+        }
+
+        burstRaf = requestAnimationFrame(frame);
+    }
+
+    /* Show intro on each fresh load. */
+    if (!overlay) {
         startBanners();
     } else {
         try { document.body.classList.add('intro-active'); } catch { }
-        var durationMs = 5000;
         var dismissed = false;
         var dismissTimer = null;
-        var playbackRate = 1.75;
 
         function scheduleDismiss(ms) {
             if (dismissTimer) clearTimeout(dismissTimer);
@@ -302,36 +393,15 @@
             }, ms);
         }
 
-        if (video) {
-            try {
-                video.controls = false;
-                video.loop = false;
-                video.muted = true;
-                video.playbackRate = playbackRate;
-                video.defaultPlaybackRate = playbackRate;
-                if (video.disablePictureInPicture !== undefined) video.disablePictureInPicture = true;
-                if (video.controlsList !== undefined) video.controlsList = 'nodownload noplaybackrate noremoteplayback';
-                try { video.currentTime = 0; } catch { }
-                var playPromise = video.play();
-                if (playPromise && typeof playPromise.catch === 'function') {
-                    playPromise.catch(function () { /* ignore autoplay errors */ });
-                }
-            } catch { }
-
-            video.addEventListener('ended', function () {
-                if (dismissed) return;
-                dismissed = true;
-                dismissOverlay();
-            }, { once: true });
-        }
-
-        if (videoWrap) videoWrap.style.setProperty('--intro-shrink', durationMs + 'ms');
-
         /* Start banners early so they're ready behind overlay */
         setTimeout(startBanners, 1600);
 
-        /* Dismiss after video duration + fade time */
-        scheduleDismiss(durationMs + 700);
+        if (!prefersReduced) {
+            burstTimer = setTimeout(startBurst, INTRO_BURST_MS);
+        }
+
+        /* Dismiss after intro duration */
+        scheduleDismiss(INTRO_DURATION_MS);
     }
 
 })();

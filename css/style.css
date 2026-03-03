@@ -437,7 +437,7 @@ body {
   animation: auroraShift 12s ease-in-out infinite alternate;
 }
 
-/* Reduce background motion during intro video */
+/* Reduce background motion during intro */
 .intro-active .fx-aurora {
   animation-play-state: paused;
   opacity: 0.55;
