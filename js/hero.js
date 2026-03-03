@@ -269,6 +269,7 @@
     function dismissOverlay() {
         if (!overlay) return;
         overlay.classList.add('kh-intro-overlay--exit');
+        try { document.body.classList.remove('intro-active'); } catch { }
         setTimeout(function () {
             if (overlay && overlay.parentNode) {
                 overlay.parentNode.removeChild(overlay);
@@ -283,12 +284,15 @@
             overlay.style.display = 'none';
             if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         }
+        try { document.body.classList.remove('intro-active'); } catch { }
         startBanners();
     } else {
+        try { document.body.classList.add('intro-active'); } catch { }
         var fallbackDuration = 57000;
         var durationMs = fallbackDuration;
         var dismissed = false;
         var dismissTimer = null;
+        var playbackRate = 1.25;
 
         function scheduleDismiss(ms) {
             if (dismissTimer) clearTimeout(dismissTimer);
@@ -304,6 +308,9 @@
                 video.controls = false;
                 video.loop = false;
                 video.muted = true;
+                video.playbackRate = playbackRate;
+                if (video.disablePictureInPicture !== undefined) video.disablePictureInPicture = true;
+                if (video.controlsList !== undefined) video.controlsList = 'nodownload noplaybackrate noremoteplayback';
                 var playPromise = video.play();
                 if (playPromise && typeof playPromise.catch === 'function') {
                     playPromise.catch(function () { /* ignore autoplay errors */ });
@@ -312,7 +319,7 @@
 
             video.addEventListener('loadedmetadata', function () {
                 if (video.duration && isFinite(video.duration)) {
-                    durationMs = Math.max(6000, Math.floor(video.duration * 1000));
+                    durationMs = Math.max(6000, Math.floor((video.duration * 1000) / playbackRate));
                     if (videoWrap) videoWrap.style.setProperty('--intro-shrink', durationMs + 'ms');
                     scheduleDismiss(durationMs + 700);
                 }

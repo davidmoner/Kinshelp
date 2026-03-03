@@ -2488,7 +2488,7 @@ html[data-theme="light"] #kh-particles {
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: scale(1.18);
+    transform: scale(1.12);
     transform-origin: center;
     animation: khIntroVideoShrink var(--intro-shrink, 57000ms) ease-out forwards;
     will-change: transform;
@@ -2526,7 +2526,7 @@ html[data-theme="light"] .kh-intro-video {
 
 @keyframes khIntroVideoShrink {
     from {
-        transform: scale(1.25);
+        transform: scale(1.18);
     }
     to {
         transform: scale(1);
