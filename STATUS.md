@@ -57,6 +57,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Feed: media con aspect-ratio 16:9 para evitar deformaciones en imagenes.
   - Feed: modal "Ver detalles" rediseñado con hero grande, layout en dos columnas y data organizada.
   - Feed: modal "Ver detalles" ahora carga detalle completo (descripcion/fotos) via `/requests/:id` y `/offers/:id`.
+  - ✅ Hero banner 1: zoom focal por movil durante "Enviar solicitud" y "Aceptar" sin romper layout.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
@@ -189,6 +190,7 @@ PUBLIC_BASE_URL=https://kingshelp.es
 ## Backup / Rollback
 
 - Tag de backup antes del rework visual: `backup-pre-antigravity-hero`.
+- Tag de backup para zoom en demo mobiles: `backup-hb2p-zoom-2026-03-03`.
 
 ## Plan (Paso a Paso) — Construccion de Todo
 
