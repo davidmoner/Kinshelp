@@ -2376,7 +2376,7 @@
                 </div>
                 ${expiryHtml}
 
-                <div class="feed-actions" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                <div class="feed-actions">
                   <button class="btn btn-primary btn-sm" type="button" data-feed-match="1">
                     ${kind === 'offer' ? 'Pedir esta ayuda' : 'Ofrecer mi ayuda'}
                   </button>
@@ -2847,18 +2847,18 @@
     }
 
     const AI_CATEGORY_IMAGES = {
-        repairs: 'img/ai/repairs.jpg',
-        packages: 'img/ai/packages.jpg',
-        pets: 'img/ai/pets.jpg',
-        cleaning: 'img/ai/cleaning.jpg',
-        transport: 'img/ai/transport.jpg',
-        tech: 'img/ai/tech.jpg',
-        gardening: 'img/ai/gardening.jpg',
-        care: 'img/ai/care.jpg',
-        tutoring: 'img/ai/tutoring.jpg',
-        creative: 'img/ai/creative.jpg',
-        errands: 'img/ai/errands.jpg',
-        other: 'img/ai/other.jpg',
+        repairs: '/img/ai/repairs.jpg',
+        packages: '/img/ai/packages.jpg',
+        pets: '/img/ai/pets.jpg',
+        cleaning: '/img/ai/cleaning.jpg',
+        transport: '/img/ai/transport.jpg',
+        tech: '/img/ai/tech.jpg',
+        gardening: '/img/ai/gardening.jpg',
+        care: '/img/ai/care.jpg',
+        tutoring: '/img/ai/tutoring.jpg',
+        creative: '/img/ai/creative.jpg',
+        errands: '/img/ai/errands.jpg',
+        other: '/img/ai/other.jpg',
     };
 
     const AI_CATEGORY_PALETTES = {
@@ -2884,7 +2884,8 @@
 
     function aiImageForCategory(cat) {
         if (AI_IMAGE_MODE === 'file') {
-            return AI_CATEGORY_IMAGES[cat] || AI_CATEGORY_IMAGES.other;
+            const src = AI_CATEGORY_IMAGES[cat] || AI_CATEGORY_IMAGES.other;
+            return src ? `${src}?v=ai1` : null;
         }
         return generateAiImage(cat);
     }
