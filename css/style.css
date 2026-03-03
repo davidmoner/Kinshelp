@@ -3545,10 +3545,16 @@ html[data-theme="light"] #card-feed .card-ico {
 }
 
 .feed-tab {
+  --tab-accent: rgba(255, 255, 255, 0.12);
+  --tab-bg: rgba(255, 255, 255, 0.04);
+  --tab-text: var(--text);
+  --tab-active-bg: rgba(82, 49, 148, 0.18);
+  --tab-active-border: rgba(82, 49, 148, 0.45);
+  --tab-active-text: var(--text);
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text);
+  border: 1px solid var(--tab-accent);
+  background: var(--tab-bg);
+  color: var(--tab-text);
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 13px;
@@ -3557,15 +3563,58 @@ html[data-theme="light"] #card-feed .card-ico {
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
+.feed-tab[data-feed-tab="need"] {
+  --tab-accent: rgba(124, 58, 237, 0.25);
+  --tab-bg: rgba(124, 58, 237, 0.08);
+  --tab-text: rgba(237, 233, 254, 0.95);
+  --tab-active-bg: rgba(124, 58, 237, 0.22);
+  --tab-active-border: rgba(124, 58, 237, 0.55);
+  --tab-active-text: #ede9fe;
+}
+
+.feed-tab[data-feed-tab="offer"] {
+  --tab-accent: rgba(16, 185, 129, 0.28);
+  --tab-bg: rgba(16, 185, 129, 0.10);
+  --tab-text: rgba(209, 250, 229, 0.95);
+  --tab-active-bg: rgba(16, 185, 129, 0.22);
+  --tab-active-border: rgba(16, 185, 129, 0.55);
+  --tab-active-text: #d1fae5;
+}
+
+.feed-tab[data-feed-tab="premium"] {
+  --tab-accent: rgba(201, 168, 76, 0.3);
+  --tab-bg: rgba(201, 168, 76, 0.12);
+  --tab-text: rgba(255, 244, 210, 0.95);
+  --tab-active-bg: rgba(201, 168, 76, 0.24);
+  --tab-active-border: rgba(201, 168, 76, 0.6);
+  --tab-active-text: #fff4d2;
+}
+
+html[data-theme="light"] .feed-tab[data-feed-tab="need"] {
+  --tab-text: #3b1d7a;
+  --tab-active-text: #2c145c;
+}
+
+html[data-theme="light"] .feed-tab[data-feed-tab="offer"] {
+  --tab-text: #0f5132;
+  --tab-active-text: #0b3b24;
+}
+
+html[data-theme="light"] .feed-tab[data-feed-tab="premium"] {
+  --tab-text: #7a5a1b;
+  --tab-active-text: #5f4515;
+}
+
 .feed-tab:hover {
   transform: translateY(-1px);
-  border-color: rgba(82, 49, 148, 0.35);
+  border-color: var(--tab-active-border);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
 .feed-tab--active {
-  background: rgba(82, 49, 148, 0.18);
-  border-color: rgba(82, 49, 148, 0.45);
+  background: var(--tab-active-bg);
+  border-color: var(--tab-active-border);
+  color: var(--tab-active-text);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
 }
 
