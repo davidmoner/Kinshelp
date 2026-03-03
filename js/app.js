@@ -2387,7 +2387,7 @@
             `;
             const imgEl = el.querySelector('img.feed-photo');
             if (imgEl) {
-                imgEl.addEventListener('error', () => {
+                const applyFallback = () => {
                     if (imgEl.dataset.aiFallback === '1') {
                         const wrapMedia = imgEl.parentElement;
                         if (!wrapMedia) return;
@@ -2398,9 +2398,15 @@
                     if (fallback) {
                         imgEl.dataset.aiFallback = '1';
                         imgEl.src = fallback;
-                        return;
                     }
-                }, { once: false });
+                };
+
+                imgEl.addEventListener('error', applyFallback, { once: false });
+
+                // If image already failed (cached error), fallback immediately
+                if (imgEl.complete && imgEl.naturalWidth === 0) {
+                    applyFallback();
+                }
             }
             const btnUser = el.querySelector('button[data-user]');
             if (btnUser) {
