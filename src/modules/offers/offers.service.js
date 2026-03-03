@@ -67,7 +67,7 @@ function create(data) {
 }
 
 function update(id, userId, fields) {
-    return Promise.resolve(requireOffer(id)).then(offer => {
+    return Promise.resolve(requireOffer(id)).then(async offer => {
         if (offer.provider_id !== userId) throw httpError(403, 'Forbidden');
         if (offer.status !== OFFER_STATUS.ACTIVE) throw httpError(422, 'Only active offers can be edited');
 
