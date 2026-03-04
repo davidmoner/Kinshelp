@@ -683,13 +683,13 @@ html[data-theme="light"] .hb2p-mini-meta {
     gap: 0;
     z-index: 1;
     position: relative;
-    padding-top: 30px;
+    padding-top: 44px;
     width: calc(280px * var(--hb2p-device-scale));
 }
 
 .hb2p-device-label {
     position: absolute;
-    top: 0;
+    top: -10px;
     left: 50%;
     transform: translateX(-50%);
     display: inline-flex;
@@ -729,7 +729,7 @@ html[data-theme="light"] .hb2p-device-label {
 
 .hero-banner[data-banner="1"] .hb2p-device-label {
     opacity: 0;
-    transform: translateX(-50%) translateY(6px);
+    transform: translateX(-50%) translateY(8px);
     will-change: opacity, transform;
 }
 
@@ -2291,6 +2291,26 @@ html[data-theme="light"] .hb3-ico {
         transform: translateX(-50%) translateY(0) scale(1);
     }
 
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1.02);
+    }
+
+    16% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(var(--hb2p-zoom-left));
+    }
+
+    24% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(var(--hb2p-zoom-left));
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+
     96% {
         opacity: 1;
         transform: translateX(-50%) translateY(0) scale(1);
@@ -2314,6 +2334,26 @@ html[data-theme="light"] .hb3-ico {
     }
 
     38% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    44% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1.02);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(var(--hb2p-zoom-right));
+    }
+
+    58% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(var(--hb2p-zoom-right));
+    }
+
+    62% {
         opacity: 1;
         transform: translateX(-50%) translateY(0) scale(1);
     }

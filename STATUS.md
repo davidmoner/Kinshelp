@@ -69,6 +69,9 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Feed: barra de tiempo con rojo solo al final (más rojo a menos tiempo).
   - Ranking: popup y pagina completa con layout refinado y controles mejor organizados.
   - Nav landing: Tablero visible solo logueado; menú hamburguesa en móvil con accesos completos.
+  - Nav landing: hamburguesa con estilo refinado + menu mobile ordenado.
+  - Hero mobiles: labels más separados y con zoom sincronizado.
+  - Admin: login dedicado con token separado y verificacion de admin.
   - Layout: fondo global con `fondo3.png` y centro con blur transparente; laterales al 50%.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 

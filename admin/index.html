@@ -89,6 +89,47 @@
 
     .main { padding: 22px; }
 
+    .login-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 70% 40% at 20% 0%, rgba(41, 90, 173, 0.16), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 15%, rgba(222, 173, 90, 0.10), transparent 65%),
+        var(--bg);
+      z-index: 999;
+    }
+
+    .login-card {
+      width: min(420px, 92vw);
+      border: 1px solid var(--border);
+      background: rgba(16, 22, 34, 0.85);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .login-card h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      letter-spacing: -0.2px;
+    }
+
+    .login-card p { margin: 0 0 14px; color: var(--muted); }
+
+    .login-card input {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .login-error {
+      font-size: 12px;
+      color: var(--bad);
+      min-height: 16px;
+    }
+
     .top {
       display: flex;
       align-items: center;
@@ -172,6 +213,18 @@
 </head>
 
 <body>
+  <div class="login-screen" id="admin-login" style="display:none;">
+    <div class="login-card">
+      <h2>Acceso admin</h2>
+      <p>Introduce tus credenciales para continuar.</p>
+      <form id="admin-login-form">
+        <input id="admin-email" type="email" placeholder="admin@kingshelp.es" required />
+        <input id="admin-pass" type="password" placeholder="Contraseña" required />
+        <button class="btn primary" id="admin-login-btn" type="submit">Entrar</button>
+      </form>
+      <div class="login-error" id="admin-login-error"></div>
+    </div>
+  </div>
   <div class="wrap">
     <aside class="side">
       <div class="brand">
@@ -458,12 +511,17 @@
         setTimeout(function () { t.className = 'toast'; }, 2400);
       }
 
+      var ADMIN_TOKEN_KEY = 'kh_admin_token';
+
       function getToken() {
-        try { return localStorage.getItem('kh_token') || ''; } catch (e) { return ''; }
+        try { return localStorage.getItem(ADMIN_TOKEN_KEY) || ''; } catch (e) { return ''; }
       }
 
       function setToken(v) {
-        try { localStorage.setItem('kh_token', v); } catch (e) { }
+        try {
+          if (!v) localStorage.removeItem(ADMIN_TOKEN_KEY);
+          else localStorage.setItem(ADMIN_TOKEN_KEY, v);
+        } catch (e) { }
       }
 
       function authHeaders() {
@@ -486,21 +544,31 @@
         });
       }
 
+      function showLogin(show) {
+        var el = document.getElementById('admin-login');
+        var wrap = document.querySelector('.wrap');
+        if (el) el.style.display = show ? 'flex' : 'none';
+        if (wrap) wrap.style.display = show ? 'none' : '';
+      }
+
+      function setLoginError(msg) {
+        var el = document.getElementById('admin-login-error');
+        if (el) el.textContent = msg || '';
+      }
+
       function ensureLogin() {
         var tok = getToken();
-        if (tok) return Promise.resolve();
-
-        var email = prompt('Admin email:');
-        var pass = prompt('Password:');
-        if (!email || !pass) throw new Error('Login cancelado');
-        return fetch('/api/v1/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email, password: pass })
-        }).then(function (r) { return r.json().then(function (j) {
-          if (!r.ok) throw new Error((j && j.error) ? j.error : 'Login fallido');
-          setToken(j.token);
-        });});
+        if (!tok) {
+          showLogin(true);
+          return Promise.reject({ silent: true });
+        }
+        return api('/me').then(function () {
+          showLogin(false);
+        }).catch(function (err) {
+          setToken('');
+          showLogin(true);
+          throw err;
+        });
       }
 
       function showView(name) {
@@ -744,6 +812,31 @@
       }
 
       function bind() {
+        var loginForm = document.getElementById('admin-login-form');
+        if (loginForm) {
+          loginForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            setLoginError('');
+            var email = document.getElementById('admin-email').value || '';
+            var pass = document.getElementById('admin-pass').value || '';
+            if (!email || !pass) { setLoginError('Completa email y contraseña'); return; }
+            fetch('/api/v1/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: email, password: pass })
+            }).then(function (r) { return r.json().then(function (j) {
+              if (!r.ok) throw new Error((j && j.error) ? j.error : 'Login fallido');
+              setToken(j.token);
+              return ensureLogin();
+            });}).then(function () {
+              return Promise.all([loadMe(), loadOverview(), loadConfig()]);
+            }).catch(function (err) {
+              setToken('');
+              setLoginError(err.message || 'Acceso denegado');
+            });
+          });
+        }
+
         document.querySelectorAll('.nav button').forEach(function (b) {
           b.addEventListener('click', function () {
             document.querySelectorAll('.nav button').forEach(function (x) { x.classList.remove('active'); });
@@ -821,7 +914,7 @@
         });
 
         document.getElementById('btnLogout').addEventListener('click', function () {
-          try { localStorage.removeItem('kh_token'); } catch (e) { }
+          setToken('');
           location.reload();
         });
 
@@ -867,6 +960,7 @@
         .then(loadMe)
         .then(function () { bind(); return Promise.all([loadOverview(), loadConfig()]); })
         .catch(function (e) {
+          if (e && e.silent) return;
           toast(e.message || 'Error', false);
         });
     })();
