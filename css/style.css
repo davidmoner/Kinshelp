@@ -4211,8 +4211,8 @@ html[data-theme="light"] .feed-section--premium {
 
 /* ── Ranking modal controls ───────────────────────────── */
 .modal-ranking-box {
-  max-width: min(1100px, 96vw);
-  padding: 22px 22px;
+  max-width: min(1120px, 96vw);
+  padding: 22px 22px 18px;
   display: flex;
   flex-direction: column;
   max-height: calc(100svh - 64px);
@@ -4222,13 +4222,19 @@ html[data-theme="light"] .feed-section--premium {
 
 .ranking-head {
   flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .ranking-list {
   flex: 1 1 auto;
   overflow: auto;
-  padding-right: 2px;
-  margin-top: 12px;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .ranking-list--page {
@@ -4261,17 +4267,17 @@ html[data-theme="light"] .feed-section--premium {
 
 .rank-controls {
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 16px;
-  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 18px;
+  padding: 12px;
 }
 
 .rank-controls-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
-  row-gap: 8px;
+  row-gap: 10px;
 }
 
 .rank-chip {
@@ -4280,7 +4286,7 @@ html[data-theme="light"] .feed-section--premium {
   color: var(--text-soft);
   font-weight: 800;
   font-size: 12px;
-  padding: 7px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   transition: background var(--transition), border-color var(--transition), transform var(--transition);
 }
@@ -4303,7 +4309,7 @@ html[data-theme="light"] .feed-section--premium {
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.03);
   color: var(--text);
-  padding: 0 12px;
+  padding: 0 14px;
   font-weight: 700;
   font-size: 12.5px;
 }
@@ -4314,7 +4320,7 @@ html[data-theme="light"] .feed-section--premium {
 }
 
 .rank-search {
-  flex: 1 1 100%;
+  flex: 1 1 260px;
   min-width: 0;
 }
 
@@ -4325,9 +4331,19 @@ html[data-theme="light"] .feed-section--premium {
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.03);
   color: var(--text);
-  padding: 0 12px;
+  padding: 0 14px;
   font-weight: 650;
   font-size: 12.5px;
+}
+
+html[data-theme="light"] .rank-controls,
+html[data-theme="light"] .ranking-list {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+html[data-theme="light"] .rank-chip {
+  color: rgba(11, 15, 25, 0.78);
 }
 
 .rank-search-input::placeholder {
