@@ -824,7 +824,7 @@ html[data-theme="light"] .btn-auth {
 .floating-create {
   position: fixed;
   right: 28px;
-  top: 32%;
+  top: 0;
   bottom: auto;
   z-index: 120;
   display: inline-flex;
@@ -838,6 +838,7 @@ html[data-theme="light"] .btn-auth {
   font-weight: 800;
   box-shadow: 0 18px 46px rgba(0, 0, 0, 0.45), 0 0 24px rgba(41, 90, 173, 0.32);
   transform: translate3d(0, 0, 0);
+  transform-origin: 50% 50%;
   will-change: transform;
 }
 
@@ -870,7 +871,7 @@ html[data-theme="light"] .btn-auth {
 @media (max-width: 720px) {
   .floating-create {
     right: 18px;
-    top: 40%;
+    top: 0;
     padding: 12px 16px;
   }
 }

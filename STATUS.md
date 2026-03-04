@@ -97,6 +97,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Landing/Dashboard: menú superior refinado, subtítulos motivacionales y explore sin tabs.
 - Ranking: modal ampliado para mejorar legibilidad.
 - Insignias: badges por categoria (2 ayudas), colecciones con bonus de rep y nudge sutil hacia Premium.
+- Floating CTA: animación estilo “hoja al viento” con recorrido vertical amplio y parpadeos suaves.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)

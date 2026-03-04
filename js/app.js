@@ -4904,49 +4904,90 @@
         const btn = document.getElementById('floating-create');
         if (!btn) return;
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-        if (reduceMotion.matches) return;
-
-        const bobAmp = 8;
-        const swayAmp = 6;
-        const bobSpeed = 1.15;
-        const swaySpeed = 0.75;
-        const impulseMax = 18;
-        let impulseX = 0;
-        let impulseY = 0;
-        let lastTime = performance.now();
         const seedA = Math.random() * Math.PI * 2;
         const seedB = Math.random() * Math.PI * 2;
+        const seedC = Math.random() * Math.PI * 2;
+        const seedD = Math.random() * Math.PI * 2;
+        const seedE = Math.random() * Math.PI * 2;
+        const seedF = Math.random() * Math.PI * 2;
+        let lastTime = performance.now();
         let rafId = null;
         let scrollRaf = null;
+        const state = { impulseX: 0, impulseY: 0, velX: 0, velY: 0 };
+        const bounds = { minY: 0, maxY: 0, range: 0 };
 
         function clamp(val, min, max) {
             return Math.min(max, Math.max(min, val));
         }
 
+        function updateBounds() {
+            const vh = Math.max(320, window.innerHeight || 0);
+            const btnH = btn.offsetHeight || 56;
+            const minY = Math.max(16, Math.round(vh * 0.14));
+            const maxY = Math.min(Math.round(vh * 0.82), vh - btnH - 18);
+            bounds.minY = minY;
+            bounds.maxY = Math.max(minY + 80, maxY);
+            bounds.range = Math.max(1, bounds.maxY - bounds.minY);
+        }
+
+        function setStaticPosition() {
+            updateBounds();
+            const mid = bounds.minY + bounds.range * 0.42;
+            btn.style.transform = `translate3d(0, ${mid.toFixed(1)}px, 0) scale(1)`;
+        }
+
         function kickImpulse() {
-            const angle = Math.random() * Math.PI * 2;
-            const mag = 6 + Math.random() * 6;
-            impulseX = clamp(impulseX + Math.cos(angle) * mag, -impulseMax, impulseMax);
-            impulseY = clamp(impulseY + Math.sin(angle) * mag, -impulseMax, impulseMax);
+            const angle = (Math.PI / 2) + (Math.random() * 0.7 - 0.35);
+            const mag = 28 + Math.random() * 20;
+            state.velX += Math.cos(angle) * mag;
+            state.velY += Math.sin(angle) * mag;
         }
 
         function tick(now) {
             const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
             lastTime = now;
 
-            const decay = Math.pow(0.82, dt * 60);
-            impulseX *= decay;
-            impulseY *= decay;
-
             const t = now / 1000;
-            const bob = Math.sin(t * bobSpeed + seedA) * bobAmp;
-            const sway = Math.sin(t * swaySpeed + seedB) * swayAmp;
-            const x = sway + impulseX;
-            const y = bob + impulseY;
+            const sweep = (Math.sin(t * 0.18 + seedA) + 1) / 2;
+            const baseY = bounds.minY + sweep * bounds.range;
+            const driftX = Math.sin(t * 0.55 + seedB) * 12 + Math.sin(t * 0.22 + seedC) * 8;
+            const flutterX = Math.sin(t * 1.35 + seedD) * 2.6;
 
-            btn.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+            const spring = 8.2;
+            const damping = 5.4;
+            const ax = (-spring * state.impulseX) - (damping * state.velX);
+            const ay = (-spring * state.impulseY) - (damping * state.velY);
+            state.velX += ax * dt;
+            state.velY += ay * dt;
+            state.impulseX += state.velX * dt;
+            state.impulseY += state.velY * dt;
+
+            state.impulseX = clamp(state.impulseX, -48, 48);
+            state.impulseY = clamp(state.impulseY, -64, 64);
+
+            let y = baseY + state.impulseY;
+            const x = driftX + flutterX + state.impulseX;
+
+            const clampedY = clamp(y, bounds.minY, bounds.maxY);
+            if (y !== clampedY) {
+                y = clampedY;
+                state.impulseY = clampedY - baseY;
+                state.velY *= -0.3;
+            }
+
+            const zoom = 1
+                + (Math.sin(t * 0.85 + seedE) * 0.012)
+                + (Math.sin(t * 1.55 + seedF) * 0.008);
+
+            btn.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${zoom.toFixed(3)})`;
             rafId = requestAnimationFrame(tick);
         }
+
+        updateBounds();
+
+        window.addEventListener('resize', () => {
+            updateBounds();
+        }, { passive: true });
 
         window.addEventListener('scroll', () => {
             if (scrollRaf) return;
@@ -4956,11 +4997,23 @@
             });
         }, { passive: true });
 
+        if (reduceMotion.matches) {
+            setStaticPosition();
+            return;
+        }
+
         rafId = requestAnimationFrame(tick);
         reduceMotion.addEventListener('change', (evt) => {
-            if (!evt.matches) return;
-            if (rafId) cancelAnimationFrame(rafId);
-            btn.style.transform = 'none';
+            if (evt.matches) {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = null;
+                setStaticPosition();
+                return;
+            }
+            if (!rafId) {
+                lastTime = performance.now();
+                rafId = requestAnimationFrame(tick);
+            }
         });
     }
 
