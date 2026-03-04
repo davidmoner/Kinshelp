@@ -194,18 +194,19 @@ api.use('/users', require('./modules/users/users.routes'));
 api.use('/offers', require('./modules/offers/offers.routes'));
 api.use('/requests', require('./modules/requests/requests.routes'));
 api.use('/matches', require('./modules/matches/matches.routes'));
-  api.use('/points', require('./modules/points/points.routes'));
-  api.use('/badges', require('./modules/badges/badges.routes'));
-  api.use('/premium', require('./modules/premium/premium.routes'));
-  api.use('/automatch', require('./modules/automatch/automatch.routes'));
-  api.use('/feed', require('./modules/feed/feed.routes'));
-  api.use('/config', require('./modules/config/config.routes'));
-  api.use('/stats', require('./modules/stats/stats.routes'));
-  api.use('/notifications', require('./modules/notifications/notifications.routes'));
-  api.use('/reports', require('./modules/reports/reports.routes'));
+api.use('/favorites', require('./modules/favorites/favorites.routes'));
+api.use('/points', require('./modules/points/points.routes'));
+api.use('/badges', require('./modules/badges/badges.routes'));
+api.use('/premium', require('./modules/premium/premium.routes'));
+api.use('/automatch', require('./modules/automatch/automatch.routes'));
+api.use('/feed', require('./modules/feed/feed.routes'));
+api.use('/config', require('./modules/config/config.routes'));
+api.use('/stats', require('./modules/stats/stats.routes'));
+api.use('/notifications', require('./modules/notifications/notifications.routes'));
+api.use('/reports', require('./modules/reports/reports.routes'));
 
-  // Admin (protected by auth + ADMIN_EMAILS)
-  api.use('/admin', require('./modules/admin/admin.routes'));
+// Admin (protected by auth + ADMIN_EMAILS)
+api.use('/admin', require('./modules/admin/admin.routes'));
 
 app.use('/api/v1', apiLimiter, api);
 

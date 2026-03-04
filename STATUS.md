@@ -79,6 +79,9 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Floating CTA: boton +Crear fijo en esquina (solo logueados); crear removido de menus.
   - Explorar: radar 50% mas grande y a 150px de la izquierda, centrado con el titulo.
   - Hero: subtitulo rotativo con transicion suave (cada 3s) y mensaje motivador.
+- Feed: panel de texto destacado por tema + acciones de favorito/reportar.
+- Feed: botones favorito/reportar con hover/focus y transiciones suaves.
+- Favoritos: API + UI en perfil con cards y toggle estrella.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 ### Detalle profesional (resumen tecnico + UX)
@@ -87,6 +90,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Admin panel: login dedicado con token `kh_admin_token`; validacion real via `ADMIN_EMAILS`; acciones activas (ban, verify, reset cooldowns, reports, config).
 - Ranking: popup y pagina completa con layout glass, filtros compactos, lista en tarjeta y meta informativa.
 - Feed: barra de tiempo con rojo solo al final; secciones con gradiente semi-transparente por tema; textos heredan `--text`.
+- Favoritos: toggle estrella (UI) + API backend + sección en Perfil.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)

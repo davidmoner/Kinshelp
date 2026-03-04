@@ -325,6 +325,21 @@
         return apiFetch('/reports', { method: 'POST', body });
     }
 
+    /** Favorites */
+    async function listFavorites(params) {
+        const qs = params ? ('?' + new URLSearchParams(params).toString()) : '';
+        return apiFetch('/favorites' + qs);
+    }
+
+    async function addFavorite(target_type, target_id) {
+        return apiFetch('/favorites', { method: 'POST', body: { target_type, target_id } });
+    }
+
+    async function removeFavorite(target_type, target_id) {
+        const qs = new URLSearchParams({ target_type, target_id }).toString();
+        return apiFetch('/favorites?' + qs, { method: 'DELETE' });
+    }
+
     /* ── Export ─────────────────────────────────────────────────────────────── */
     window.KHApi = {
         setToken,
@@ -378,6 +393,9 @@
         boostRequest48h,
         boostOffer48h,
         createReport,
+        listFavorites,
+        addFavorite,
+        removeFavorite,
     };
 
     // Back-compat: tolerate console checks like `khapi`.

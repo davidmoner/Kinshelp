@@ -381,6 +381,12 @@
         if (floating) floating.classList.toggle('hidden', !logged);
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
         if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
+        if (!logged) {
+            favoritesLoaded = false;
+            favoritesMap = new Map();
+            favoritesList = [];
+            renderFavorites();
+        }
     }
 
     /* ── Dashboard account menu ───────────────────────────────────────────── */
@@ -1526,6 +1532,7 @@
         try {
             const user = await KHApi.getMe();
             loadUserInfo(user);
+            await loadFavoritesSection({ silent: true });
             toast('Perfil actualizado', 'success');
         } catch (err) {
             toast(err.message || 'No se pudo cargar el perfil', 'error');
@@ -2307,6 +2314,69 @@
         return 'Pago en €';
     }
 
+    let favoritesMap = new Map();
+    let favoritesList = [];
+    let favoritesLoaded = false;
+
+    function favKey(type, id) {
+        return `${type}:${id}`;
+    }
+
+    function isFavorite(type, id) {
+        return favoritesMap.has(favKey(type, id));
+    }
+
+    function normalizeFavoriteRows(rows) {
+        return (rows || []).map(r => {
+            const kind = r.kind === 'offer' ? 'offer' : 'request';
+            const id = r.id || r.target_id;
+            return {
+                ...r,
+                id,
+                kind,
+                premium_user: r.user_tier && r.user_tier !== 'free',
+            };
+        });
+    }
+
+    async function loadFavoritesSection(opts = {}) {
+        if (opts && opts.preventDefault) opts.preventDefault();
+        const silent = opts && opts.silent;
+        const btn = $('btn-favorites-reload');
+        if (btn && !silent) setLoading(btn, true);
+        if (!KHApi.getToken()) {
+            favoritesLoaded = false;
+            favoritesMap = new Map();
+            favoritesList = [];
+            renderFavorites();
+            if (btn && !silent) setLoading(btn, false);
+            return;
+        }
+        try {
+            const out = await KHApi.listFavorites({ limit: 80, offset: 0 });
+            favoritesList = normalizeFavoriteRows((out && out.data) || []);
+            favoritesMap = new Map(favoritesList.map(r => [favKey(r.kind === 'offer' ? 'offer' : 'request', r.id), r]));
+            favoritesLoaded = true;
+            renderFavorites();
+        } catch (err) {
+            if (!silent) toast('No se pudieron cargar favoritos', 'error');
+        } finally {
+            if (btn && !silent) setLoading(btn, false);
+        }
+    }
+
+    async function ensureFavoritesLoaded() {
+        if (!KHApi.getToken()) return;
+        if (favoritesLoaded) return;
+        await loadFavoritesSection({ silent: true });
+    }
+
+    function renderFavorites() {
+        const wrap = $('favorites-grid');
+        if (!wrap) return;
+        renderFeedSection(favoritesList, 'favorites-grid', 'No tienes favoritos todavía');
+    }
+
     async function loadFeed() {
         if (!KHApi.getToken()) return;
         if (feedDebounce) clearTimeout(feedDebounce);
@@ -2314,6 +2384,7 @@
             const btn = $('btn-feed-refresh');
             if (btn) setLoading(btn, true);
             try {
+                await ensureFavoritesLoaded();
                 const q = (($('feed-q') && $('feed-q').value) || '').trim().toLowerCase();
                 const out = await KHApi.feed({ limit: 60, offset: 0 });
                 let rows = (out && out.data) || [];
@@ -2419,30 +2490,43 @@
             const mediaStyle = mediaSrc ? ` style="--feed-cover:url('${escapeHtml(String(mediaSrc))}')"` : '';
 
             const mediaClass = `feed-media${isCategoryCover ? ' feed-media--category' : ''}`;
+            const favType = kind === 'offer' ? 'offer' : 'request';
+            const favId = r.id;
+            const favActive = isFavorite(favType, favId);
             el.innerHTML = `
               <div class="${mediaClass}"${mediaStyle}>
                 <span class="feed-badge ${kind}">${kind === 'offer' ? 'OFERTA' : 'NECESIDAD'}</span>
                 ${!mediaSrc ? `<div class="feed-hero" data-cat="${escapeHtml(cat)}"><span aria-hidden="true">${escapeHtml(ico)}</span></div>` : ''}
               </div>
               <div class="feed-body">
-                <div class="feed-title">${escapeHtml(r.title || '—')}</div>
-                <div class="feed-sub">
-                  <span class="feed-pill">${escapeHtml(catLabel(cat))}</span>
-                  <span class="feed-pill">${escapeHtml(compLabel(r.compensation_type))}</span>
-                  <span class="feed-pill">📍 ${escapeHtml(dist)}</span>
+                <div class="feed-body-panel">
+                  <div class="feed-title">${escapeHtml(r.title || '—')}</div>
+                  <div class="feed-sub">
+                    <span class="feed-pill">${escapeHtml(catLabel(cat))}</span>
+                    <span class="feed-pill">${escapeHtml(compLabel(r.compensation_type))}</span>
+                    <span class="feed-pill">📍 ${escapeHtml(dist)}</span>
+                  </div>
+                  <div class="feed-sub" style="margin-top:8px; opacity:.9;">
+                    <button class="feed-pill feed-user" type="button" data-user="1">${escapeHtml(r.user_name || '—')}${r.user_verified ? ' ✓' : ''} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</button>
+                    ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
+                  </div>
+                  ${expiryHtml}
                 </div>
-                <div class="feed-sub" style="margin-top:8px; opacity:.9;">
-                  <button class="feed-pill feed-user" type="button" data-user="1">${escapeHtml(r.user_name || '—')}${r.user_verified ? ' ✓' : ''} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</button>
-                  ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
-                </div>
-                ${expiryHtml}
-
                 <div class="feed-actions">
                   <button class="btn btn-primary btn-sm" type="button" data-feed-match="1">
                     ${kind === 'offer' ? 'Pedir esta ayuda' : 'Ofrecer mi ayuda'}
                   </button>
                   <button class="btn btn-ghost btn-sm" type="button" data-feed-how="1">Ver detalles</button>
-                  <button class="btn btn-ghost btn-sm feed-report-btn" type="button" data-feed-report="1" title="Reportar" aria-label="Reportar este contenido" style="opacity:.5; font-size:11px; padding:4px 8px;">⚑</button>
+                </div>
+                <div class="feed-meta-actions">
+                  <button class="favorite-btn${favActive ? ' is-active' : ''}" type="button" data-fav="1" data-fav-type="${favType}" data-fav-id="${escapeHtml(String(favId))}">
+                    <span class="favorite-icon" aria-hidden="true">${favActive ? '★' : '☆'}</span>
+                    <span>Favorito</span>
+                  </button>
+                  <button class="report-btn" type="button" data-feed-report="1" title="Reportar" aria-label="Reportar este contenido">
+                    <span class="report-icon" aria-hidden="true">✕</span>
+                    <span>Reportar</span>
+                  </button>
                 </div>
               </div>
             `;
@@ -2462,6 +2546,38 @@
             if (btnHow) {
                 btnHow.addEventListener('click', () => {
                     openFeedDetails(r);
+                });
+            }
+
+            const btnFav = el.querySelector('button[data-fav]');
+            if (btnFav) {
+                btnFav.addEventListener('click', async () => {
+                    if (!KHApi.getToken()) {
+                        toast('Inicia sesión para guardar favoritos', 'error');
+                        openLogin();
+                        return;
+                    }
+                    const type = btnFav.getAttribute('data-fav-type');
+                    const id = btnFav.getAttribute('data-fav-id');
+                    const key = favKey(type, id);
+                    const active = favoritesMap.has(key);
+                    try {
+                        if (active) {
+                            await KHApi.removeFavorite(type, id);
+                            favoritesMap.delete(key);
+                        } else {
+                            await KHApi.addFavorite(type, id);
+                            favoritesMap.set(key, { id, kind: type });
+                        }
+                        btnFav.classList.toggle('is-active', !active);
+                        const icon = btnFav.querySelector('.favorite-icon');
+                        if (icon) icon.textContent = active ? '☆' : '★';
+                        if (document.querySelector('.dashboard')?.dataset.view === 'perfil') {
+                            loadFavoritesSection({ silent: true });
+                        }
+                    } catch (err) {
+                        toast('No se pudo actualizar favorito', 'error');
+                    }
                 });
             }
 
@@ -4563,6 +4679,7 @@
         submitLogin,
         submitRegister,
         loadProfile,
+        loadFavoritesSection,
         submitProfile,
         resendVerifyEmail,
         pickProfilePhoto,

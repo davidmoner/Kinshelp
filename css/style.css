@@ -4139,6 +4139,20 @@ html[data-theme="light"] .feed-section--premium {
   color: var(--text);
 }
 
+.feed-body-panel {
+  background: rgba(12, 16, 24, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="light"] .feed-body-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
 .feed-title {
   font-weight: 900;
   letter-spacing: -0.2px;
@@ -4166,6 +4180,79 @@ html[data-theme="light"] .feed-section--premium {
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
+}
+
+.feed-meta-actions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.favorite-btn,
+.report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition), color var(--transition);
+}
+
+.favorite-btn {
+  color: var(--gold-light);
+  border-color: rgba(201, 168, 76, 0.3);
+  background: rgba(201, 168, 76, 0.12);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.favorite-btn:hover,
+.favorite-btn:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(201, 168, 76, 0.5);
+  background: rgba(201, 168, 76, 0.18);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+.favorite-btn.is-active {
+  background: rgba(201, 168, 76, 0.22);
+  border-color: rgba(201, 168, 76, 0.5);
+  animation: favPop 0.45s ease;
+  box-shadow: 0 0 18px rgba(201, 168, 76, 0.35);
+}
+
+.favorite-icon {
+  font-size: 14px;
+}
+
+.report-btn {
+  color: rgba(239, 68, 68, 0.95);
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.report-btn:hover,
+.report-btn:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.12);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+}
+
+.report-icon {
+  font-size: 12px;
+}
+
+@keyframes favPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 
 .feed-badge {

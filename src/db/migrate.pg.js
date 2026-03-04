@@ -109,6 +109,15 @@ async function migrate() {
         created_at       timestamptz NOT NULL DEFAULT now(),
         updated_at       timestamptz NOT NULL DEFAULT now()
       );
+
+      CREATE TABLE IF NOT EXISTS favorites (
+        id          uuid PRIMARY KEY,
+        user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        target_type text NOT NULL,
+        target_id   uuid NOT NULL,
+        created_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_favorites_unique ON favorites(user_id, target_type, target_id);
       CREATE INDEX IF NOT EXISTS idx_matches_provider_status ON matches(provider_id, status);
       CREATE INDEX IF NOT EXISTS idx_matches_seeker ON matches(seeker_id);
       CREATE INDEX IF NOT EXISTS idx_matches_request_id ON matches(request_id);

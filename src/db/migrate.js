@@ -132,6 +132,16 @@ db.exec(`
     UNIQUE(user_id, category)
   );
 
+  -- ── Favorites ─────────────────────────────────────────────────────────────
+  CREATE TABLE IF NOT EXISTS favorites (
+    id          TEXT PRIMARY KEY,
+    user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    target_type TEXT NOT NULL,
+    target_id   TEXT NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_favorites_unique ON favorites(user_id, target_type, target_id);
+
   -- ── Payments / Subscriptions (Stripe) ─────────────────────────────────────
   CREATE TABLE IF NOT EXISTS payments (
     id                 TEXT PRIMARY KEY,

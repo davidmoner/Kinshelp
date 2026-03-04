@@ -1937,6 +1937,29 @@
           </div>
         </div>
 
+        <!-- Favoritos -->
+        <div class="glass-card card-favorites reveal" id="card-favorites" data-view="perfil">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-ico" aria-hidden="true"><span>★</span></div>
+              <div>
+                <h3>Favoritos</h3>
+                <div class="card-sub">Guarda solicitudes y ofertas para volver más tarde.</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="loadFavoritesSection"
+                id="btn-favorites-reload">
+                <span class="btn-label">Recargar</span>
+                <span class="spinner hidden"></span>
+              </button>
+            </div>
+          </div>
+          <div class="feed-grid" id="favorites-grid">
+            <div class="ledger-empty">No tienes favoritos todavía</div>
+          </div>
+        </div>
+
         <!-- API Status -->
         <div class="glass-card card-status reveal" data-view="perfil">
           <div class="card-head">
