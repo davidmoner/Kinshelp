@@ -230,6 +230,9 @@ PUBLIC_BASE_URL=https://kingshelp.es
 - ✅ Acceso demo removido; placeholders neutros.
 - ✅ CTA y microcopy actualizados a claims verificables.
 
+### Plan nocturno — Progreso (final)
+- ✅ Paso 9: QA final + commit/push.
+
 ### ✅ Paso 10 — CSP Hardening
 - ✅ Migrados `onclick/onsubmit/oninput` a listeners con `data-*` + bindings en `js/app.js`.
 - ✅ CSP sin `'unsafe-inline'`; hashes para JSON-LD + admin script.
