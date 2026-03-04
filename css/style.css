@@ -3672,9 +3672,7 @@ html[data-theme="light"] .feed-tab[data-feed-tab="premium"] {
 }
 
 .feed-section--need {
-  background:
-    radial-gradient(120% 140% at 12% 0%, rgba(124, 58, 237, 0.16) 0%, transparent 58%),
-    rgba(255, 255, 255, 0.02);
+  background: rgba(248, 247, 244, 0.96);
   border-color: rgba(124, 58, 237, 0.28);
 }
 
@@ -3689,9 +3687,7 @@ html[data-theme="light"] .feed-tab[data-feed-tab="premium"] {
 }
 
 .feed-section--offer {
-  background:
-    radial-gradient(120% 140% at 12% 0%, rgba(16, 185, 129, 0.16) 0%, transparent 60%),
-    rgba(255, 255, 255, 0.02);
+  background: rgba(246, 249, 247, 0.96);
   border-color: rgba(16, 185, 129, 0.28);
 }
 
@@ -3706,9 +3702,7 @@ html[data-theme="light"] .feed-tab[data-feed-tab="premium"] {
 }
 
 .feed-section--premium {
-  background:
-    radial-gradient(120% 140% at 12% 0%, rgba(201, 168, 76, 0.22) 0%, transparent 60%),
-    rgba(255, 255, 255, 0.02);
+  background: rgba(249, 247, 241, 0.96);
   border-color: rgba(201, 168, 76, 0.32);
 }
 

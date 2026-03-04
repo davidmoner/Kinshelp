@@ -65,6 +65,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Explorar: imagen de cabecera ampliada y titulo/subtitulo centrados y mas llamativos.
   - UI: imagenes responsive con escala fluida en resize.
   - Explorar: titulo con efecto typewrite centrado + icono animado; secciones con colores coherentes.
+  - Feed: secciones con fondo blanco roto (sin gradientes).
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
