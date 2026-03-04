@@ -131,6 +131,35 @@
           <span class="btn-plus" aria-hidden="true">＋</span>
           Crear
         </button>
+        <div class="nav-menu">
+          <button id="nav-burger" class="btn btn-ghost nav-burger" type="button" aria-label="Abrir menú"
+            aria-expanded="false" data-action="toggleLandingMenu">☰</button>
+          <div class="dash-menu-pop nav-menu-pop hidden" id="nav-menu-pop" role="menu" aria-label="Menú principal">
+            <button class="dash-menu-item guest-only" type="button" role="menuitem" data-action="showEmailAuth"
+              data-args="login">Iniciar sesión</button>
+            <button class="dash-menu-item guest-only" type="button" role="menuitem" data-action="showEmailAuth"
+              data-args="register">Crear cuenta</button>
+            <div class="dash-menu-sep guest-only" aria-hidden="true"></div>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboard">Tablero</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="explorar">Explorar</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="crear">Crear</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="automatch">AutoMatch</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="creaciones">Mis creaciones</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="matches">Mis matches</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="perfil">Perfil</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
+              data-args="premium">Premium</button>
+            <div class="dash-menu-sep auth-only" aria-hidden="true"></div>
+            <button class="dash-menu-item auth-only danger" type="button" role="menuitem" data-action="logout">Salir</button>
+          </div>
+        </div>
       </div>
     </nav>
 

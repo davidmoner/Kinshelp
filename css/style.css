@@ -643,6 +643,18 @@ body {
   justify-self: end;
 }
 
+.nav-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-burger {
+  display: none;
+  font-size: 16px;
+  padding: 8px 12px;
+}
+
 /* Center search (Wallapop-like) */
 .nav-search {
   max-width: 720px;
@@ -732,6 +744,14 @@ html[data-theme="light"] .btn-auth {
 
   .btn-auth {
     padding: 9px 14px;
+  }
+
+  .nav-actions > button {
+    display: none;
+  }
+
+  .nav-burger {
+    display: inline-flex;
   }
 }
 

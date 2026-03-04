@@ -369,11 +369,16 @@
         const panel = document.getElementById('nav-panel-btn');
         const out = document.getElementById('nav-logout-btn');
         const rank = document.getElementById('nav-ranking-btn');
+        const menu = document.getElementById('nav-menu-pop');
+        const authOnly = menu ? menu.querySelectorAll('.auth-only') : [];
+        const guestOnly = menu ? menu.querySelectorAll('.guest-only') : [];
         const logged = !!(user && user.id);
         if (auth) auth.classList.toggle('hidden', logged);
-        if (panel) panel.classList.remove('hidden');
+        if (panel) panel.classList.toggle('hidden', !logged);
         if (out) out.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
+        if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
+        if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
     }
 
     /* ── Dashboard account menu ───────────────────────────────────────────── */
@@ -403,6 +408,35 @@
         if (pop) pop.classList.add('hidden');
         if (btn) btn.setAttribute('aria-expanded', 'false');
         if (burger) burger.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleLandingMenu(event) {
+        if (event && event.preventDefault) event.preventDefault();
+        if (event && event.stopPropagation) event.stopPropagation();
+        const pop = document.getElementById('nav-menu-pop');
+        const btn = document.getElementById('nav-burger');
+        if (!pop || !btn) return;
+        const open = pop.classList.contains('hidden');
+        if (open) {
+            pop.classList.remove('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+        } else {
+            pop.classList.add('hidden');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    }
+
+    function closeLandingMenu() {
+        const pop = document.getElementById('nav-menu-pop');
+        const btn = document.getElementById('nav-burger');
+        if (pop) pop.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function goDashboardFromLanding(view) {
+        closeLandingMenu();
+        goDashboard();
+        setDashView(view, { noScroll: true });
     }
 
     function goCreateFromMenu() {
@@ -1825,6 +1859,7 @@
 
     async function openRankingPage(event) {
         if (event && event.preventDefault) event.preventDefault();
+        closeLandingMenu();
 
         if (!KHApi.getToken()) {
             toast('Inicia sesion para ver el ranking', 'info');
@@ -4252,6 +4287,7 @@
             closeRankingModal();
             closeUserCard();
             closeDashMenu();
+            closeLandingMenu();
         }
     });
 
@@ -4452,6 +4488,15 @@
             if (pop.contains(e.target) || (btn && btn.contains(e.target))) return;
             closeDashMenu();
         });
+
+        // Close landing menu on outside click
+        document.addEventListener('click', (e) => {
+            const pop = document.getElementById('nav-menu-pop');
+            const btn = document.getElementById('nav-burger');
+            if (!pop || pop.classList.contains('hidden')) return;
+            if (pop.contains(e.target) || (btn && btn.contains(e.target))) return;
+            closeLandingMenu();
+        });
     });
 
     /* ── Report modal ────────────────────────────────────────────────────────── */
@@ -4551,6 +4596,9 @@
         openRanking,
         openRankingPage,
         closeRankingModal,
+        toggleLandingMenu,
+        closeLandingMenu,
+        goDashboardFromLanding,
         goCreateFromMenu,
         goAutoMatchFromMenu,
         rankingLoadMore,
