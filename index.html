@@ -142,8 +142,6 @@
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="explorar">Explorar</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
-              data-args="crear">Crear</button>
-            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="automatch">AutoMatch</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
@@ -1511,7 +1509,6 @@
           <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
             <button class="dash-menu-item" type="button" role="menuitem"
               data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>
-            <button class="dash-menu-item" type="button" role="menuitem" data-action="goCreateFromMenu">Crear</button>
             <button class="dash-menu-item" type="button" role="menuitem" data-action="goAutoMatchFromMenu">AutoMatch</button>
             <button class="dash-menu-item" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
             <div class="dash-menu-sep" aria-hidden="true"></div>
@@ -2528,6 +2525,12 @@
       </div>
     </main>
   </div><!-- /page-dashboard -->
+
+  <button id="floating-create" class="floating-create hidden" type="button" data-action="goDashboardFromLanding"
+    data-args="crear" aria-label="Crear solicitud o oferta">
+    <span class="floating-create-plus" aria-hidden="true">＋</span>
+    <span class="floating-create-label">Crear</span>
+  </button>
 
   <!-- ── LOGIN MODAL ────────────────────────────────────────────────── -->
   <div id="modal-login" class="modal-overlay hidden" data-action="closeLogin" data-args="$event">

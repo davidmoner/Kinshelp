@@ -369,6 +369,7 @@
         const panel = document.getElementById('nav-panel-btn');
         const out = document.getElementById('nav-logout-btn');
         const rank = document.getElementById('nav-ranking-btn');
+        const floating = document.getElementById('floating-create');
         const menu = document.getElementById('nav-menu-pop');
         const authOnly = menu ? menu.querySelectorAll('.auth-only') : [];
         const guestOnly = menu ? menu.querySelectorAll('.guest-only') : [];
@@ -377,6 +378,7 @@
         if (panel) panel.classList.toggle('hidden', !logged);
         if (out) out.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
+        if (floating) floating.classList.toggle('hidden', !logged);
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
         if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
     }
@@ -437,11 +439,6 @@
         closeLandingMenu();
         goDashboard();
         setDashView(view, { noScroll: true });
-    }
-
-    function goCreateFromMenu() {
-        closeDashMenu();
-        hubStartCreate();
     }
 
     function goAutoMatchFromMenu() {
@@ -4599,7 +4596,6 @@
         toggleLandingMenu,
         closeLandingMenu,
         goDashboardFromLanding,
-        goCreateFromMenu,
         goAutoMatchFromMenu,
         rankingLoadMore,
         setRankingScope,
