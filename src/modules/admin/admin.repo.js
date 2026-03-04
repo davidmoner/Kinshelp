@@ -143,6 +143,72 @@ function listOffers({ query, limit, offset }) {
   ).all(limit, offset);
 }
 
+function listMatches({ query, limit, offset }) {
+  const q = query ? `%${String(query).toLowerCase()}%` : null;
+  if (db.isPg) {
+    if (q) {
+      return db.many(
+        `SELECT m.id, m.status, m.compensation_type, m.created_at, m.updated_at,
+                p.display_name AS provider_name, s.display_name AS seeker_name,
+                r.title AS request_title, o.title AS offer_title
+         FROM matches m
+         JOIN users p ON p.id = m.provider_id
+         JOIN users s ON s.id = m.seeker_id
+         LEFT JOIN help_requests r ON r.id = m.request_id
+         LEFT JOIN service_offers o ON o.id = m.offer_id
+         WHERE lower(p.display_name) LIKE $1 OR lower(s.display_name) LIKE $1
+            OR lower(r.title) LIKE $1 OR lower(o.title) LIKE $1 OR cast(m.id as text) LIKE $1
+         ORDER BY m.created_at DESC
+         LIMIT $2 OFFSET $3`,
+        [q, limit, offset]
+      );
+    }
+    return db.many(
+      `SELECT m.id, m.status, m.compensation_type, m.created_at, m.updated_at,
+              p.display_name AS provider_name, s.display_name AS seeker_name,
+              r.title AS request_title, o.title AS offer_title
+       FROM matches m
+       JOIN users p ON p.id = m.provider_id
+       JOIN users s ON s.id = m.seeker_id
+       LEFT JOIN help_requests r ON r.id = m.request_id
+       LEFT JOIN service_offers o ON o.id = m.offer_id
+       ORDER BY m.created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+  }
+
+  if (q) {
+    return db.prepare(
+      `SELECT m.id, m.status, m.compensation_type, m.created_at, m.updated_at,
+              p.display_name AS provider_name, s.display_name AS seeker_name,
+              r.title AS request_title, o.title AS offer_title
+       FROM matches m
+       JOIN users p ON p.id = m.provider_id
+       JOIN users s ON s.id = m.seeker_id
+       LEFT JOIN help_requests r ON r.id = m.request_id
+       LEFT JOIN service_offers o ON o.id = m.offer_id
+       WHERE lower(p.display_name) LIKE ? OR lower(s.display_name) LIKE ?
+          OR lower(r.title) LIKE ? OR lower(o.title) LIKE ? OR m.id LIKE ?
+       ORDER BY m.created_at DESC
+       LIMIT ? OFFSET ?`
+    ).all(q, q, q, q, q, limit, offset);
+  }
+
+  return db.prepare(
+    `SELECT m.id, m.status, m.compensation_type, m.created_at, m.updated_at,
+            p.display_name AS provider_name, s.display_name AS seeker_name,
+            r.title AS request_title, o.title AS offer_title
+     FROM matches m
+     JOIN users p ON p.id = m.provider_id
+     JOIN users s ON s.id = m.seeker_id
+     LEFT JOIN help_requests r ON r.id = m.request_id
+     LEFT JOIN service_offers o ON o.id = m.offer_id
+     ORDER BY m.created_at DESC
+     LIMIT ? OFFSET ?`
+  ).all(limit, offset);
+}
+
 function ensureTables() {
   if (db.isPg) return;
   db.exec(`
@@ -244,6 +310,7 @@ module.exports = {
   getUserById,
   listRequests,
   listOffers,
+  listMatches,
   insertAudit,
   listAudit,
   getConfig,

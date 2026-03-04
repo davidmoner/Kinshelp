@@ -111,7 +111,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - ✅ Paso 5: limpieza de hub/inicio y refactor ranking sin romper.
 - ✅ Paso 6: seguridad en registro/login (validacion + normalizacion).
 - ✅ Paso 7: marketing landing (copy y claims reforzados).
-- ✅ Paso 8: admin con vista de creaciones reales (solicitudes/ofertas).
+- ✅ Paso 8: admin con vista de creaciones reales + matches.
 
 ### ✅ Ya resuelto (no tocar)
 - Bug async `offers.service.js` (addPhoto/deletePhoto/boost48h).

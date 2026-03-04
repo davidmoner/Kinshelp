@@ -209,6 +209,15 @@ function listOffers(req, res) {
   res.json({ ok: true, data: rows, meta: { page, limit, count: rows.length } });
 }
 
+function listMatches(req, res) {
+  const limit = Math.max(1, Math.min(100, parseInt(req.query.limit || '25', 10)));
+  const page = Math.max(1, parseInt(req.query.page || '1', 10));
+  const offset = (page - 1) * limit;
+  const query = req.query.query ? String(req.query.query) : '';
+  const rows = repo.listMatches({ query, limit, offset });
+  res.json({ ok: true, data: rows, meta: { page, limit, count: rows.length } });
+}
+
 function getUser(req, res) {
   const u = repo.getUserById(req.params.id);
   if (!u) throw httpError(404, 'User not found');
@@ -467,6 +476,7 @@ module.exports = {
   listUsers,
   listRequests,
   listOffers,
+  listMatches,
   getUser,
   getUserDetail,
   patchUser,

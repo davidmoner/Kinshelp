@@ -186,6 +186,7 @@
         <button class="active" data-view="overview" type="button">Overview</button>
         <button data-view="users" type="button">Usuarios</button>
         <button data-view="content" type="button">Creaciones</button>
+        <button data-view="matches" type="button">Matches</button>
         <button data-view="events" type="button">Actividad</button>
         <button data-view="reports" type="button">Moderacion</button>
         <button data-view="audit" type="button">Auditoria</button>
@@ -328,6 +329,30 @@
               </tr>
             </thead>
             <tbody id="contentTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-matches" class="card" style="display:none;">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+          <input id="matchQuery" placeholder="Buscar por usuario, titulo o id" />
+          <button class="btn primary" id="btnMatchSearch" type="button">Buscar</button>
+        </div>
+        <div class="muted" id="matchesMeta" style="margin-bottom:10px;"></div>
+        <div style="overflow:auto;">
+          <table aria-label="Matches">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Estado</th>
+                <th>Comp.</th>
+                <th>Proveedor</th>
+                <th>Solicitante</th>
+                <th>Asunto</th>
+                <th>Creado</th>
+              </tr>
+            </thead>
+            <tbody id="matchesTbody"></tbody>
           </table>
         </div>
       </section>
@@ -479,13 +504,14 @@
       }
 
       function showView(name) {
-        var ids = ['overview', 'users', 'content', 'events', 'reports', 'audit', 'config'];
+        var ids = ['overview', 'users', 'content', 'matches', 'events', 'reports', 'audit', 'config'];
         ids.forEach(function (k) {
           document.getElementById('view-' + k).style.display = (k === name) ? '' : 'none';
         });
         document.getElementById('title').textContent = name === 'overview' ? 'Overview' :
           name === 'users' ? 'Usuarios' :
           name === 'content' ? 'Creaciones' :
+          name === 'matches' ? 'Matches' :
           name === 'events' ? 'Actividad' :
           name === 'reports' ? 'Moderacion' :
           name === 'audit' ? 'Auditoria' : 'Config';
@@ -644,6 +670,30 @@
         });
       }
 
+      function loadMatches() {
+        var q = document.getElementById('matchQuery').value || '';
+        var url = '/matches?limit=40&page=1' + (q ? '&query=' + encodeURIComponent(q) : '');
+        return api(url).then(function (j) {
+          document.getElementById('matchesMeta').textContent = 'Mostrando ' + j.meta.count + ' matches';
+          var tb = document.getElementById('matchesTbody');
+          tb.innerHTML = '';
+          j.data.forEach(function (m) {
+            var tr = document.createElement('tr');
+            var id = (m.id || '').slice(0, 8);
+            var subject = (m.request_title || m.offer_title || '-');
+            tr.innerHTML =
+              '<td><code>' + id + '</code></td>' +
+              '<td>' + (m.status || '-') + '</td>' +
+              '<td>' + (m.compensation_type || '-') + '</td>' +
+              '<td>' + (m.provider_name || '-') + '</td>' +
+              '<td>' + (m.seeker_name || '-') + '</td>' +
+              '<td>' + subject + '</td>' +
+              '<td>' + (m.created_at || '-') + '</td>';
+            tb.appendChild(tr);
+          });
+        });
+      }
+
       function showUserDetail(data) {
         var card = document.getElementById('userDetailCard');
         var pre = document.getElementById('userDetailPre');
@@ -703,6 +753,7 @@
             if (v === 'overview') loadOverview();
             if (v === 'users') loadUsers();
             if (v === 'content') loadContent();
+            if (v === 'matches') loadMatches();
             if (v === 'events') loadEvents();
             if (v === 'reports') loadReports();
             if (v === 'audit') loadAudit();
@@ -711,6 +762,7 @@
 
         document.getElementById('btnUserSearch').addEventListener('click', loadUsers);
         document.getElementById('btnContentSearch').addEventListener('click', loadContent);
+        document.getElementById('btnMatchSearch').addEventListener('click', loadMatches);
         document.getElementById('btnEventSearch').addEventListener('click', loadEvents);
         document.getElementById('btnReportSearch').addEventListener('click', loadReports);
         document.getElementById('contentKind').addEventListener('change', loadContent);
