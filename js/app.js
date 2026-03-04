@@ -339,6 +339,7 @@
         window.scrollTo(0, 0);
 
         relocateThemeToggle(pageId);
+        syncFloatingCreateVisibility();
 
         if (pageId === 'page-landing') {
             onLandingShown();
@@ -368,7 +369,6 @@
         const auth = document.getElementById('nav-auth-btn');
         const panel = document.getElementById('nav-panel-btn');
         const rank = document.getElementById('nav-ranking-btn');
-        const floating = document.getElementById('floating-create');
         const menu = document.getElementById('nav-menu-pop');
         const authOnly = menu ? menu.querySelectorAll('.auth-only') : [];
         const guestOnly = menu ? menu.querySelectorAll('.guest-only') : [];
@@ -376,7 +376,7 @@
         if (auth) auth.classList.toggle('hidden', logged);
         if (panel) panel.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
-        if (floating) floating.classList.toggle('hidden', !logged);
+        syncFloatingCreateVisibility();
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
         if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
         if (!logged) {
@@ -385,6 +385,15 @@
             favoritesList = [];
             renderFavorites();
         }
+    }
+
+    function syncFloatingCreateVisibility() {
+        const floating = document.getElementById('floating-create');
+        if (!floating) return;
+        const landing = document.getElementById('page-landing');
+        const onLanding = landing && !landing.classList.contains('hidden');
+        const logged = !!(currentUser && currentUser.id);
+        floating.classList.toggle('hidden', !logged || onLanding);
     }
 
     /* ── Dashboard account menu ───────────────────────────────────────────── */

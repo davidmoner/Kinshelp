@@ -196,6 +196,16 @@ html[data-theme="dark"] .kh-ios-sub {
     }
 }
 
+.hero-banner:not(.hero-banner--active) .hero-sub-cycle .hero-sub-line {
+    animation: none;
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.hero-banner.hero-banner--active .hero-sub-cycle .hero-sub-line {
+    animation: heroSubSwap 6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .hero-sub-cycle .hero-sub-line {
         position: static;
@@ -552,6 +562,12 @@ html[data-theme="dark"] .kh-ios-sub {
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     overflow: hidden;
+}
+
+.hero-sub.hero-sub-cycle {
+    display: block;
+    -webkit-line-clamp: initial;
+    overflow: visible;
 }
 
 .hero-sub--center {
@@ -2404,6 +2420,8 @@ html[data-theme="light"] .hb3-ico {
     background: rgba(255, 255, 255, 0.18);
     overflow: hidden;
     position: relative;
+    color: transparent;
+    font-size: 0;
 }
 
 @keyframes hb2pLabelLeft {
@@ -2497,7 +2515,7 @@ html[data-theme="light"] .hb3-ico {
 
 .hero-progress-seg--active {
     border-color: rgba(124, 58, 237, 0.55);
-    background: rgba(124, 58, 237, 0.14);
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.38), rgba(33, 82, 173, 0.18));
     box-shadow: none;
 }
 
@@ -2519,7 +2537,7 @@ html[data-theme="light"] .hero-progress {
 
 html[data-theme="light"] .hero-progress-seg--active {
     border-color: rgba(124, 58, 237, 0.5);
-    background: rgba(124, 58, 237, 0.12);
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.28), rgba(33, 82, 173, 0.12));
     box-shadow: none;
 }
 

@@ -797,6 +797,12 @@ html[data-theme="light"] .btn-auth {
   }
 }
 
+@media (min-width: 721px) {
+  .nav-menu-pop .nav-only-mobile {
+    display: none;
+  }
+}
+
 /* ── Buttons ──────────────────────────────────────────── */
 .btn {
   display: inline-flex;
