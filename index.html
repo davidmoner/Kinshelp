@@ -123,7 +123,7 @@
         </button>
         <button id="nav-auth-btn" class="btn btn-ghost btn-auth" data-action="openLogin">Regístrate o inicia
           sesión</button>
-        <button id="nav-panel-btn" class="btn btn-ghost" data-action="goDashboard">Explorar</button>
+        <button id="nav-panel-btn" class="btn btn-ghost hidden" data-action="goDashboard">Explorar</button>
         <button class="btn btn-primary btn-create" data-action="startFirstMatch">
           <span class="btn-plus" aria-hidden="true">＋</span>
           Crear
@@ -2641,10 +2641,16 @@
     </main>
   </div><!-- /page-dashboard -->
 
-  <button id="floating-create" class="floating-create hidden" type="button" data-action="goDashboardFromLanding"
-    data-args="crear" aria-label="Crear solicitud o oferta">
+  <button id="floating-create" class="floating-create hidden" type="button" data-action="goCreateFromFab"
+    aria-label="Crear solicitud o oferta">
     <span class="floating-create-plus" aria-hidden="true">＋</span>
     <span class="floating-create-label">Crear</span>
+  </button>
+
+  <button id="floating-virtud" class="floating-create floating-virtud hidden" type="button" data-action="goCreateFromFab"
+    aria-label="Crear solicitud o oferta">
+    <span class="floating-create-plus" aria-hidden="true">＋</span>
+    <span class="floating-create-label">Virtud</span>
   </button>
 
   <!-- ── LOGIN MODAL ────────────────────────────────────────────────── -->

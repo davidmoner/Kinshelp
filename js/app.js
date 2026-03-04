@@ -389,11 +389,29 @@
 
     function syncFloatingCreateVisibility() {
         const floating = document.getElementById('floating-create');
-        if (!floating) return;
+        const floatingVirtue = document.getElementById('floating-virtud');
         const landing = document.getElementById('page-landing');
         const onLanding = landing && !landing.classList.contains('hidden');
         const logged = !!(currentUser && currentUser.id);
-        floating.classList.toggle('hidden', !logged || onLanding);
+        if (floating) floating.classList.toggle('hidden', !logged || onLanding);
+        if (floatingVirtue) floatingVirtue.classList.toggle('hidden', !logged || onLanding);
+    }
+
+    async function goCreateFromFab() {
+        if (!KHApi.getToken()) {
+            openLogin();
+            return;
+        }
+        const u = await ensureCurrentUser();
+        if (!u || !u.id) {
+            openLogin();
+            return;
+        }
+        const dash = document.getElementById('page-dashboard');
+        if (!dash || dash.classList.contains('hidden')) {
+            showPage('page-dashboard');
+        }
+        setDashView('crear');
     }
 
     /* ── Dashboard account menu ───────────────────────────────────────────── */
@@ -448,9 +466,11 @@
         if (btn) btn.setAttribute('aria-expanded', 'false');
     }
 
-    function goDashboardFromLanding(view) {
+    async function goDashboardFromLanding(view) {
         closeLandingMenu();
-        goDashboard();
+        await goDashboard();
+        const dash = document.getElementById('page-dashboard');
+        if (!dash || dash.classList.contains('hidden')) return;
         setDashView(view, { noScroll: true });
     }
 
@@ -1033,6 +1053,8 @@
     }
 
     function showEmailAuth(tab) {
+        closeLandingMenu();
+        show($('modal-login'));
         hide($('auth-chooser'));
         show($('auth-email'));
 
@@ -3654,6 +3676,7 @@
     function renderNext() {
         const card = $('dash-next');
         if (!card) return;
+        const wasHidden = card.classList.contains('hidden');
 
         const dismissed = (() => {
             try {
@@ -3680,6 +3703,12 @@
         }
 
         show(card);
+        if (wasHidden) {
+            card.classList.remove('card-next--enter');
+            void card.offsetWidth;
+            card.classList.add('card-next--enter');
+            setTimeout(() => card.classList.remove('card-next--enter'), 480);
+        }
         if (nextState.kind === 'agreement') {
             title.textContent = 'Falta un acuerdo';
             desc.textContent = 'Tienes un match aceptado. Abre el chat y acordad el pago, el trueque o si es altruista.';
@@ -4910,8 +4939,9 @@
     }
 
     function initFloatingCreate() {
-        const btn = document.getElementById('floating-create');
-        if (!btn) return;
+        const btnA = document.getElementById('floating-create');
+        const btnB = document.getElementById('floating-virtud');
+        if (!btnA && !btnB) return;
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         const seedA = Math.random() * Math.PI * 2;
         const seedB = Math.random() * Math.PI * 2;
@@ -4919,11 +4949,15 @@
         const seedD = Math.random() * Math.PI * 2;
         const seedE = Math.random() * Math.PI * 2;
         const seedF = Math.random() * Math.PI * 2;
+        const seedG = Math.random() * Math.PI * 2;
         let lastTime = performance.now();
         let rafId = null;
         let scrollRaf = null;
-        const state = { impulseX: 0, impulseY: 0, velX: 0, velY: 0 };
         const bounds = { minY: 0, maxY: 0, range: 0 };
+        const minDist = 130;
+
+        const stateA = { impulseX: 0, impulseY: 0, velX: 0, velY: 0 };
+        const stateB = { impulseX: 0, impulseY: 0, velX: 0, velY: 0 };
 
         function clamp(val, min, max) {
             return Math.min(max, Math.max(min, val));
@@ -4931,37 +4965,32 @@
 
         function updateBounds() {
             const vh = Math.max(320, window.innerHeight || 0);
-            const btnH = btn.offsetHeight || 56;
+            const btnH = Math.max(btnA ? btnA.offsetHeight : 0, btnB ? btnB.offsetHeight : 0, 56);
             const minY = Math.max(16, Math.round(vh * 0.14));
-            const maxY = Math.min(Math.round(vh * 0.82), vh - btnH - 18);
+            const maxY = Math.min(Math.round(vh * 0.84), vh - btnH - 18);
             bounds.minY = minY;
-            bounds.maxY = Math.max(minY + 80, maxY);
+            bounds.maxY = Math.max(minY + 100, maxY);
             bounds.range = Math.max(1, bounds.maxY - bounds.minY);
         }
 
         function setStaticPosition() {
             updateBounds();
-            const mid = bounds.minY + bounds.range * 0.42;
-            btn.style.transform = `translate3d(0, ${mid.toFixed(1)}px, 0) scale(1)`;
+            const yA = bounds.minY + bounds.range * 0.32;
+            const yB = bounds.minY + bounds.range * 0.68;
+            if (btnA) btnA.style.transform = `translate3d(0, ${yA.toFixed(1)}px, 0) scale(1)`;
+            if (btnB) btnB.style.transform = `translate3d(0, ${yB.toFixed(1)}px, 0) scale(1)`;
         }
 
         function kickImpulse() {
             const angle = (Math.PI / 2) + (Math.random() * 0.7 - 0.35);
             const mag = 28 + Math.random() * 20;
-            state.velX += Math.cos(angle) * mag;
-            state.velY += Math.sin(angle) * mag;
+            stateA.velX += Math.cos(angle) * mag;
+            stateA.velY += Math.sin(angle) * mag;
+            stateB.velX += Math.cos(angle + Math.PI) * mag;
+            stateB.velY += Math.sin(angle + Math.PI) * mag;
         }
 
-        function tick(now) {
-            const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
-            lastTime = now;
-
-            const t = now / 1000;
-            const sweep = (Math.sin(t * 0.18 + seedA) + 1) / 2;
-            const baseY = bounds.minY + sweep * bounds.range;
-            const driftX = Math.sin(t * 0.55 + seedB) * 12 + Math.sin(t * 0.22 + seedC) * 8;
-            const flutterX = Math.sin(t * 1.35 + seedD) * 2.6;
-
+        function stepState(state, dt) {
             const spring = 8.2;
             const damping = 5.4;
             const ax = (-spring * state.impulseX) - (damping * state.velX);
@@ -4970,25 +4999,53 @@
             state.velY += ay * dt;
             state.impulseX += state.velX * dt;
             state.impulseY += state.velY * dt;
+            state.impulseX = clamp(state.impulseX, -54, 54);
+            state.impulseY = clamp(state.impulseY, -70, 70);
+        }
 
-            state.impulseX = clamp(state.impulseX, -48, 48);
-            state.impulseY = clamp(state.impulseY, -64, 64);
+        function tick(now) {
+            const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
+            lastTime = now;
 
-            let y = baseY + state.impulseY;
-            const x = driftX + flutterX + state.impulseX;
+            const t = now / 1000;
+            const sweep = (Math.sin(t * 0.18 + seedA) + 1) / 2;
+            const baseY1 = bounds.minY + sweep * bounds.range;
+            const baseY2 = bounds.minY + (1 - sweep) * bounds.range;
 
-            const clampedY = clamp(y, bounds.minY, bounds.maxY);
-            if (y !== clampedY) {
-                y = clampedY;
-                state.impulseY = clampedY - baseY;
-                state.velY *= -0.3;
+            const driftX = Math.sin(t * 0.55 + seedB) * 12 + Math.sin(t * 0.22 + seedC) * 8;
+            const flutterX = Math.sin(t * 1.35 + seedD) * 2.6;
+            const driftX2 = -(Math.sin(t * 0.48 + seedE) * 12 + Math.sin(t * 0.26 + seedF) * 7.5);
+            const flutterX2 = Math.sin(t * 1.15 + seedG) * 2.4;
+
+            stepState(stateA, dt);
+            stepState(stateB, dt);
+
+            let x1 = driftX + flutterX + stateA.impulseX;
+            let y1 = baseY1 + stateA.impulseY;
+            let x2 = driftX2 + flutterX2 + stateB.impulseX;
+            let y2 = baseY2 + stateB.impulseY;
+
+            y1 = clamp(y1, bounds.minY, bounds.maxY);
+            y2 = clamp(y2, bounds.minY, bounds.maxY);
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const dist = Math.hypot(dx, dy) || 1;
+            if (dist < minDist) {
+                const push = (minDist - dist) * 0.5;
+                const nx = dx / dist;
+                const ny = dy / dist;
+                x1 -= nx * push;
+                y1 -= ny * push;
+                x2 += nx * push;
+                y2 += ny * push;
             }
 
-            const zoom = 1
-                + (Math.sin(t * 0.85 + seedE) * 0.012)
-                + (Math.sin(t * 1.55 + seedF) * 0.008);
+            const zoom1 = 1 + (Math.sin(t * 0.85 + seedE) * 0.012) + (Math.sin(t * 1.55 + seedF) * 0.008);
+            const zoom2 = 1 + (Math.sin(t * 0.95 + seedG) * 0.012) + (Math.sin(t * 1.25 + seedA) * 0.008);
 
-            btn.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${zoom.toFixed(3)})`;
+            if (btnA) btnA.style.transform = `translate3d(${x1.toFixed(2)}px, ${y1.toFixed(2)}px, 0) scale(${zoom1.toFixed(3)})`;
+            if (btnB) btnB.style.transform = `translate3d(${x2.toFixed(2)}px, ${y2.toFixed(2)}px, 0) scale(${zoom2.toFixed(3)})`;
             rafId = requestAnimationFrame(tick);
         }
 
@@ -5179,6 +5236,7 @@
         submitRegister,
         loadProfile,
         loadFavoritesSection,
+        goCreateFromFab,
         scrollToProfileSection,
         submitProfile,
         resendVerifyEmail,

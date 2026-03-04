@@ -99,6 +99,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Insignias: badges por categoria (2 ayudas), colecciones con bonus de rep y nudge sutil hacia Premium.
 - Floating CTA: animación estilo “hoja al viento” con recorrido vertical amplio y parpadeos suaves.
 - Hero: subtitulos visibles con animacion estable y selector activo en gradiente.
+- CTA flotantes: segundo botón “Virtud” verde con trayectoria opuesta y sin solaparse.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)
