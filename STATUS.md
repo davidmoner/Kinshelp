@@ -77,6 +77,14 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Layout: fondo global con `fondo3.png` y centro con blur transparente; laterales al 50%.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
+### Detalle profesional (resumen tecnico + UX)
+- Nav landing + hamburguesa (movil): header limpio y legible; boton con estilo glass; menu con items por estado (guest/auth), cierre por click fuera y ESC.
+- Demo mobiles (Elena/Maria): labels subidos y separados; z-index alto; zoom sincronizado con cada movil; respeta reduced motion.
+- Admin panel: login dedicado con token `kh_admin_token`; validacion real via `ADMIN_EMAILS`; acciones activas (ban, verify, reset cooldowns, reports, config).
+- Ranking: popup y pagina completa con layout glass, filtros compactos, lista en tarjeta y meta informativa.
+- Feed: barra de tiempo con rojo solo al final; secciones con gradiente semi-transparente por tema; textos heredan `--text`.
+- Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
+
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
   - Preview inline antes de publicar: al pulsar "Publicar solicitud/oferta →" se muestra un panel de revisión con título, chips (categoría, zona, cuándo, compensación), descripción y fotos staged; dos botones: "← Editar" (vuelve al form) y "Confirmar y publicar" (llama a la API).
   - Variables de estado: `pendingDraft` almacena el borrador hasta confirmación; `showCreatePreview()`, `backToEdit()`, `confirmCreate()` son las nuevas funciones exportadas a `KHApp`.
