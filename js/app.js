@@ -2380,7 +2380,7 @@
             const expiry = expiryInfo(r);
             const expiryHtml = expiry
                 ? `<div class="feed-time" aria-label="${escapeHtml(expiry.label)}">
-                    <div class="feed-time-bar"><span class="feed-time-fill" style="--p:${expiry.pct.toFixed(0)}%"></span></div>
+                    <div class="feed-time-bar"><span class="feed-time-fill" style="--p:${expiry.pct.toFixed(0)}%; --danger-start:${expiry.dangerStart.toFixed(0)}%; --warn-start:${expiry.warnStart.toFixed(0)}%"></span></div>
                     <div class="feed-time-label">${escapeHtml(expiry.label)}</div>
                   </div>`
                 : '';
@@ -3029,8 +3029,12 @@
         const totalMs = createdTs ? Math.max(1, expiresTs - createdTs) : (7 * 24 * 60 * 60 * 1000);
         const remainingMs = expiresTs - now;
         const pct = Math.max(0, Math.min(100, (remainingMs / totalMs) * 100));
+        const dangerStart = Math.max(0, Math.min(100, pct - 12));
+        const warnStart = Math.max(0, Math.min(100, dangerStart + 8));
         return {
             pct,
+            dangerStart,
+            warnStart,
             label: formatRemaining(remainingMs),
         };
     }
