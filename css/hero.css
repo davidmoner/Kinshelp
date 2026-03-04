@@ -551,6 +551,45 @@ html[data-theme="dark"] .kh-ios-sub {
     overflow: hidden;
 }
 
+.hb2p-sub.hb2p-sub-cycle {
+    position: relative;
+    display: block;
+    -webkit-line-clamp: initial;
+    overflow: visible;
+    min-height: calc(1.6em * 2);
+}
+
+.hb2p-sub-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    opacity: 0;
+    max-height: calc(1.6em * 2);
+    overflow: hidden;
+    animation: hb2pSubSwap 8s ease-in-out infinite;
+}
+
+.hb2p-sub-line:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.hb2p-sub-line:nth-child(2) {
+    animation-delay: 4s;
+}
+
+@keyframes hb2pSubSwap {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    45% { opacity: 1; }
+    55% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.hero-banner:not(.hero-banner--active) .hb2p-sub-line {
+    animation: none;
+    opacity: 0;
+}
+
 .hero-sub {
     color: var(--text-soft);
     font-size: clamp(14px, 1.3vw, 16px);

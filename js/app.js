@@ -369,6 +369,7 @@
         const auth = document.getElementById('nav-auth-btn');
         const panel = document.getElementById('nav-panel-btn');
         const rank = document.getElementById('nav-ranking-btn');
+        const navMenu = document.querySelector('.nav-menu');
         const menu = document.getElementById('nav-menu-pop');
         const authOnly = menu ? menu.querySelectorAll('.auth-only') : [];
         const guestOnly = menu ? menu.querySelectorAll('.guest-only') : [];
@@ -376,6 +377,7 @@
         if (auth) auth.classList.toggle('hidden', logged);
         if (panel) panel.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
+        if (navMenu) navMenu.classList.toggle('hidden', !logged);
         syncFloatingCreateVisibility();
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
         if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
