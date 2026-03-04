@@ -85,6 +85,125 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Feed: barra de tiempo con rojo solo al final; secciones con gradiente semi-transparente por tema; textos heredan `--text`.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
+### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)
+
+**Objetivo**
+- AutoMatch premium conecta automáticamente a quien necesita ayuda con quien la ofrece.
+- Ambos reciben invitación, ven reputación/insignias, y **solo con doble aceptación** se abre el chat premium.
+
+**Identidad KingsHelp (diseño/tono)**
+- Glass suave, acentos dorados, morado/azul de marca, tipografía Manrope.
+- Lenguaje cercano, seguro y claro (“vecindario”, “verificado”, “reputación real”).
+- UX coherente con `index.html` y el dashboard actual.
+
+---
+
+#### 1) Modelo de datos (backend)
+**Tabla `automatch_preferences`**
+- `id`, `user_id`
+- `kind` (request/offer)
+- `categories` (JSON array)
+- `compensation_types` (cash/barter/volunteer)
+- `keywords` (JSON array)
+- `radius_km`
+- `location_lat/lng`
+- `time_windows` (JSON por día + rangos)
+- `min_rating`
+- `required_badges` (JSON array)
+- `max_daily_invites`
+- `pause` (bool)
+- `channels` (push/email/inapp)
+- `created_at`, `updated_at`
+
+**Tabla `automatch_invites`**
+- `id`, `match_id`
+- `request_id` / `offer_id`
+- `target_user_id`
+- `status` (pending/accepted/declined/expired)
+- `score`
+- `created_at`, `expires_at`
+
+---
+
+#### 2) Motor de matching (eficiencia + eficacia)
+**Trigger**: al crear solicitud/oferta → ejecutar matching job.
+**Filtro estricto**:
+- categoría, radio, franja horaria
+- compensación
+- keywords
+- reputación mínima + badges
+- verificación (opcional)
+**Score**:
+- distancia + rating + keywords + recencia
+**Límites**:
+- `max_daily_invites`, cooldown por rechazo, no duplicados.
+
+---
+
+#### 3) Seguridad y antifraude
+- No mostrar info completa antes de aceptación (opción).
+- Cooldown tras rechazo para evitar spam.
+- Límite de invitaciones por anuncio/usuario.
+- Registro de decisiones para auditoría/admin.
+
+---
+
+#### 4) Flujo UX (web + app)
+**Config Premium**
+- Sección “AutoMatch” con filtros, mapa, horario, canales.
+- Botón “Activar / Pausar AutoMatch”.
+
+**Invitaciones**
+- Card con: nombre, rating, badges, distancia, categoría, tiempo restante.
+- CTA: **Aceptar / Rechazar**.
+
+**Doble aceptación**
+- `match.status = accepted`
+- se crea chat premium automático
+- mensaje del sistema: “Acordad compensación y detalles”.
+
+---
+
+#### 5) UI Web (diseño KingsHelp)
+- Panel AutoMatch en dashboard.
+- Estilo glass + acento gold.
+- Filtros con chips y sliders.
+- Lista de invitaciones con barra de caducidad.
+
+#### 6) UI App (móvil)
+- Pantalla “AutoMatch Premium”.
+- Tabs: Preferencias / Invitaciones.
+- CTA principal “Guardar Preferencias”.
+- Notificaciones push/email según canales.
+
+---
+
+#### 7) Observabilidad
+- Log de invitaciones enviadas, aceptadas, rechazadas.
+- Tiempo medio de respuesta.
+- Dashboard admin con métricas AutoMatch.
+
+---
+
+#### 8) Implementación por fases
+**Fase 1 (MVP)**
+- Categoría + radio + horario + compensación
+- Invitaciones automáticas + chat con doble aceptación
+
+**Fase 2**
+- Keywords + badges + reputación mínima
+
+**Fase 3**
+- Canales de alerta (push/email)
+- Estadísticas avanzadas
+
+---
+
+#### 9) Preguntas a confirmar
+- ¿Mostrar nombre completo antes de aceptar?
+- Límite diario de invitaciones premium?
+- Canales de alerta: in-app + email o también push/SMS?
+
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
   - Preview inline antes de publicar: al pulsar "Publicar solicitud/oferta →" se muestra un panel de revisión con título, chips (categoría, zona, cuándo, compensación), descripción y fotos staged; dos botones: "← Editar" (vuelve al form) y "Confirmar y publicar" (llama a la API).
   - Variables de estado: `pendingDraft` almacena el borrador hasta confirmación; `showCreatePreview()`, `backToEdit()`, `confirmCreate()` son las nuevas funciones exportadas a `KHApp`.
