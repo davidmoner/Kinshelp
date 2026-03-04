@@ -213,11 +213,24 @@ app.use('/api/v1', apiLimiter, api);
 // Serve only public static assets (avoid exposing repo root).
 // Keep the set tight: landing, web SPA pages, legal, admin, and assets.
 const publicRoot = path.resolve(__dirname, '..');
+const CACHE_ASSET = 'public, max-age=604800, stale-while-revalidate=86400';
+const CACHE_HTML = 'no-cache';
+
+function applyStaticHeaders(res, filePath) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  const ext = path.extname(filePath || '').toLowerCase();
+  if (ext === '.html' || ext === '.json' || ext === '.webmanifest') {
+    res.setHeader('Cache-Control', CACHE_HTML);
+    return;
+  }
+  res.setHeader('Cache-Control', CACHE_ASSET);
+}
+
 const staticOpts = {
   fallthrough: false,
   maxAge: '1d',
-  setHeaders: (res) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
+  setHeaders: (res, filePath) => {
+    applyStaticHeaders(res, filePath);
   },
 };
 
@@ -232,6 +245,7 @@ app.use('/.well-known', express.static(path.join(publicRoot, '.well-known'), sta
 function sendStaticFile(res, relPath) {
   const p = path.join(publicRoot, relPath);
   if (!fs.existsSync(p)) return res.status(404).end();
+  applyStaticHeaders(res, p);
   return res.sendFile(p);
 }
 
