@@ -94,6 +94,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Matches: controller async await para respuestas consistentes en flujos de smoke tests.
 - Floating CTA: botón +Crear flota por margen derecho y reacciona al scroll con impulsos sutiles.
 - Perfil: nueva tarjeta hero con reputación, nivel, insignias y actividad reciente enlazada.
+- Landing/Dashboard: menú superior refinado, subtítulos motivacionales y explore sin tabs.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)

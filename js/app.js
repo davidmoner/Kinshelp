@@ -367,7 +367,6 @@
     function setLandingSessionUI(user) {
         const auth = document.getElementById('nav-auth-btn');
         const panel = document.getElementById('nav-panel-btn');
-        const out = document.getElementById('nav-logout-btn');
         const rank = document.getElementById('nav-ranking-btn');
         const floating = document.getElementById('floating-create');
         const menu = document.getElementById('nav-menu-pop');
@@ -376,7 +375,6 @@
         const logged = !!(user && user.id);
         if (auth) auth.classList.toggle('hidden', logged);
         if (panel) panel.classList.toggle('hidden', !logged);
-        if (out) out.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
         if (floating) floating.classList.toggle('hidden', !logged);
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));

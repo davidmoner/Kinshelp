@@ -123,22 +123,24 @@
         </button>
         <button id="nav-auth-btn" class="btn btn-ghost btn-auth" data-action="openLogin">Regístrate o inicia
           sesión</button>
-        <button id="nav-panel-btn" class="btn btn-ghost" data-action="goDashboard">Tablero</button>
-        <button id="nav-logout-btn" class="btn btn-ghost hidden" data-action="logout">Salir</button>
+        <button id="nav-panel-btn" class="btn btn-ghost" data-action="goDashboard">Explorar</button>
         <button class="btn btn-primary btn-create" data-action="startFirstMatch">
           <span class="btn-plus" aria-hidden="true">＋</span>
           Crear
         </button>
         <div class="nav-menu">
           <button id="nav-burger" class="btn btn-ghost nav-burger" type="button" aria-label="Abrir menú"
-            aria-expanded="false" data-action="toggleLandingMenu">☰</button>
+            aria-expanded="false" data-action="toggleLandingMenu">
+            <span class="nav-burger-ico" aria-hidden="true">☰</span>
+            <span class="nav-burger-label">Cuenta</span>
+            <span class="nav-burger-caret" aria-hidden="true">▾</span>
+          </button>
           <div class="dash-menu-pop nav-menu-pop hidden" id="nav-menu-pop" role="menu" aria-label="Menú principal">
             <button class="dash-menu-item guest-only" type="button" role="menuitem" data-action="showEmailAuth"
               data-args="login">Iniciar sesión</button>
             <button class="dash-menu-item guest-only" type="button" role="menuitem" data-action="showEmailAuth"
               data-args="register">Crear cuenta</button>
             <div class="dash-menu-sep guest-only" aria-hidden="true"></div>
-            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboard">Tablero</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="explorar">Explorar</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
@@ -501,9 +503,8 @@
                 <span class="kh-type kh-type--line2 gradient-text">o altruista.</span>
               </h2>
 
-              <p style="color:var(--text-soft);font-size:16px;max-width:460px;margin:0 auto 8px;">
-                Cada match en KingsHelp genera reputación para ambas partes.
-                Tú decides el tipo de acuerdo. Siempre.
+              <p class="hero-sub hero-sub--center">
+                Cada acuerdo suma confianza real en tu barrio. Tú decides cómo ayudar.
               </p>
 
               <div class="hb3-reward-row">
@@ -599,9 +600,8 @@
 
           <h2 class="demo-title">Haz barrio.<br />Suma reputación.</h2>
 
-          <p class="demo-subtitle">
-            Insignias, ranking vecinal y reputación por ayudar de verdad.
-            Tu historial te acompaña.
+          <p class="demo-subtitle hero-sub hero-sub--compact">
+            Ayudar en tu zona crea confianza real. Tu historial habla por ti.
           </p>
 
           <ul class="demo-bullets">
@@ -1529,20 +1529,6 @@
       </div>
     </header>
 
-    <div class="dash-tabs-wrap" role="navigation" aria-label="Secciones del panel">
-      <nav class="dash-tabs" role="tablist" aria-label="Secciones">
-        <button class="dash-tab dash-tab--active" type="button" role="tab" aria-selected="true" data-view="explorar"
-          data-action="setDashView" data-args="explorar">Explorar</button>
-        <button class="dash-tab" type="button" role="tab" aria-selected="false" data-view="crear"
-          data-action="hubStartCreate">Crear</button>
-        <button class="dash-tab dash-tab--automatch" type="button" role="tab" aria-selected="false"
-          data-view="automatch" id="dash-primary-automatch" data-action="hubGoAutoMatch">
-          <span class="dash-tab-label">AutoMatch</span>
-          <span class="dash-tab-badge hidden" id="am-tab-badge" aria-label="Invitaciones pendientes">0</span>
-        </button>
-      </nav>
-    </div>
-
     <main class="dashboard" data-view="explorar">
       <div class="dash-grid">
 
@@ -1721,7 +1707,7 @@
             <div class="card-title">
               <div>
                 <div class="explore-title-row">
-                  <h3 class="explore-title kh-type kh-type--line1">Explorar</h3>
+                  <h3 class="explore-title kh-type kh-type--line1">Explora tu zona</h3>
                   <span class="explore-radar" aria-hidden="true">
                     <span class="explore-radar-sweep"></span>
                     <span class="explore-radar-dot explore-radar-dot--a"></span>
@@ -1729,7 +1715,7 @@
                     <span class="explore-radar-dot explore-radar-dot--c"></span>
                   </span>
                 </div>
-                <div class="card-sub">Ayuda real, cerca de ti. Mira qué se mueve en tu zona.</div>
+                <div class="card-sub hero-sub hero-sub--compact">Ayuda real, cerca de ti. Conecta con vecinos y suma confianza en tu zona.</div>
               </div>
             </div>
             <button class="btn btn-ghost btn-sm" type="button" data-action="loadFeed" id="btn-feed-refresh">

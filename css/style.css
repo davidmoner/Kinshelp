@@ -650,13 +650,31 @@ body {
 }
 
 .nav-burger {
-  display: none;
-  font-size: 16px;
-  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.06);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.nav-burger-ico {
+  display: none;
+  font-size: 16px;
+}
+
+.nav-burger-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-burger-caret {
+  opacity: 0.7;
+  font-size: 12px;
 }
 
 .nav-burger:hover {
@@ -767,6 +785,15 @@ html[data-theme="light"] .btn-auth {
 
   .nav-burger {
     display: inline-flex;
+  }
+
+  .nav-burger-ico {
+    display: inline-flex;
+  }
+
+  .nav-burger-label,
+  .nav-burger-caret {
+    display: none;
   }
 }
 
@@ -3103,7 +3130,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   gap: 10px;
   justify-content: center;
   --kh-type-dur1: 1050ms;
-  --kh-type-steps1: 8;
+  --kh-type-steps1: 12;
   position: relative;
   padding: 8px 0;
 }
