@@ -2226,11 +2226,29 @@ html[data-theme="light"] .site-footer {
 @media (max-width: 820px) {
 
   /* Mobile header: keep it calm; move account into burger */
+  .dash-header .nav-brand {
+    display: none;
+  }
+
+  .dash-left {
+    flex: 1;
+  }
+
+  .dash-user .user-avatar,
+  .dash-user .user-info,
+  .dash-user .verified-badge {
+    display: none;
+  }
+
   .dash-user .kh-pill {
     display: none;
   }
 
   .dash-user .dash-menu {
+    display: block;
+  }
+
+  .dash-menu #dash-menu-btn {
     display: none;
   }
 

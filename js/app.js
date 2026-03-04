@@ -405,6 +405,16 @@
         if (burger) burger.setAttribute('aria-expanded', 'false');
     }
 
+    function goCreateFromMenu() {
+        closeDashMenu();
+        hubStartCreate();
+    }
+
+    function goAutoMatchFromMenu() {
+        closeDashMenu();
+        hubGoAutoMatch();
+    }
+
     function gotoDashFromMenu(view) {
         closeDashMenu();
         setDashView(view);
@@ -4537,6 +4547,8 @@
         openRanking,
         openRankingPage,
         closeRankingModal,
+        goCreateFromMenu,
+        goAutoMatchFromMenu,
         rankingLoadMore,
         setRankingScope,
         setRankingRadius,

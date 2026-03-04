@@ -112,6 +112,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - ✅ Paso 6: seguridad en registro/login (validacion + normalizacion).
 - ✅ Paso 7: marketing landing (copy y claims reforzados).
 - ✅ Paso 8: admin con vista de creaciones reales + matches.
+- ✅ Paso 9: menu movil simplificado (tema + hamburguesa) con accesos completos.
 
 ### ✅ Ya resuelto (no tocar)
 - Bug async `offers.service.js` (addPhoto/deletePhoto/boost48h).
