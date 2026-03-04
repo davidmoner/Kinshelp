@@ -210,6 +210,7 @@ PUBLIC_BASE_URL=https://kingshelp.es
 - `og:image` real (captura de pantalla de la web).
   - ✅ KPIs conectadas a `/api/v1/stats`.
   - ✅ `og:image` actualizado a un asset real.
+  - ✅ FAQ + Manual añadidos a sitemap.
 
 ### ✅ Paso 10 — CSP Hardening
 - ✅ Migrados `onclick/onsubmit/oninput` a listeners con `data-*` + bindings en `js/app.js`.
