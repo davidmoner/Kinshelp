@@ -9,13 +9,13 @@ function isConfigured() {
   return false;
 }
 
-async function send({ to, subject, text }) {
+async function send({ to, subject, text, html }) {
   if (!to) throw new Error('Missing to');
   if (!subject) throw new Error('Missing subject');
   if (!text) throw new Error('Missing text');
 
   if (!isConfigured()) {
-    return { ok: false, implemented: false, message: 'Email provider not configured', preview: { to, subject, text } };
+    return { ok: false, implemented: false, message: 'Email provider not configured', preview: { to, subject, text, html } };
   }
 
   const provider = String(EMAIL_PROVIDER || '').trim().toLowerCase();
@@ -27,7 +27,7 @@ async function send({ to, subject, text }) {
     // Normalize sender: allow passing either "Name <email@domain>" or plain "email@domain".
     const from = String(MAIL_FROM || '').trim();
     const fromEmail = from.includes('<') && from.includes('>') ? from : `<${from}>`;
-    await sg.send({ to, from: fromEmail, subject, text });
+    await sg.send({ to, from: fromEmail, subject, text, html });
     return { ok: true, implemented: true };
   }
 

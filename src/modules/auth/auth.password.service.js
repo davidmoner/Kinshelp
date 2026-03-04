@@ -68,10 +68,72 @@ async function requestVerifyEmail({ userId, email, isVerified }) {
 
   const t = await tokens.createToken({ userId, type: 'verify_email', ttlMinutes: 24 * 60 });
   const link = emailSvc.buildLink(`/api/v1/auth/verify-email?token=${encodeURIComponent(t.token)}`);
+  const logo = emailSvc.buildLink('/img/LOGO_2.png');
+  const html = `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KingsHelp — Verificación de email</title>
+  </head>
+  <body style="margin:0; padding:0; background:#0b0f19; color:#edf0f8; font-family:Manrope, Arial, sans-serif;">
+    <div style="padding:28px 12px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+          <td align="center">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="560" style="max-width:560px; width:100%; background:rgba(16,22,34,0.92); border:1px solid rgba(255,255,255,0.12); border-radius:20px; overflow:hidden;">
+              <tr>
+                <td style="padding:22px 24px 8px; text-align:center;">
+                  <img src="${logo}" alt="KingsHelp" width="180" style="display:block; margin:0 auto 8px;" />
+                  <div style="font-size:12px; letter-spacing:1px; text-transform:uppercase; color:rgba(201,168,76,0.9);">Bienvenido/a</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:6px 24px 18px; text-align:center;">
+                  <h1 style="margin:0 0 10px; font-size:24px; letter-spacing:-0.3px;">Verifica tu email</h1>
+                  <p style="margin:0; color:rgba(237,240,248,0.78); font-size:15px; line-height:1.6;">
+                    Para activar tu cuenta y proteger a tu vecindario, confirma tu email con el botón de abajo.
+                    El enlace es válido 24 horas.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:0 24px 18px;">
+                  <a href="${link}" style="display:inline-block; padding:12px 22px; border-radius:999px; background:linear-gradient(135deg,#2a5bce,#7c3aed); color:#fff; text-decoration:none; font-weight:700;">
+                    Verificar mi email
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 24px 18px; color:rgba(237,240,248,0.62); font-size:12px; line-height:1.5;">
+                  Si el botón no funciona, copia y pega este enlace en tu navegador:<br />
+                  <a href="${link}" style="color:#c9a84c; text-decoration:underline; word-break:break-all;">${link}</a>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 24px 20px;">
+                  <div style="border-radius:14px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); padding:12px 14px; font-size:12.5px; color:rgba(237,240,248,0.7);">
+                    ¿No fuiste tú? Ignora este mensaje y tu cuenta no se activará.
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 24px 22px; font-size:12px; color:rgba(237,240,248,0.5); text-align:center;">
+                  KingsHelp · Ayuda real, cerca de ti.
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>`;
   const out = await emailSvc.send({
     to: email,
     subject: 'KingsHelp — Verifica tu email',
-    text: `Hola,\n\nPara verificar tu email en KingsHelp, abre este enlace (válido 24 horas):\n\n${link}\n\nSi no has creado una cuenta en KingsHelp, ignora este mensaje.\n\nEl equipo de KingsHelp`,
+    text: `Hola,\n\nBienvenido/a a KingsHelp. Para verificar tu email, abre este enlace (válido 24 horas):\n\n${link}\n\nSi no has creado una cuenta en KingsHelp, ignora este mensaje.\n\nEl equipo de KingsHelp`,
+    html,
   });
 
   return { implemented: !!out.implemented, email_sent: !!out.ok };
