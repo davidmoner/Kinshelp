@@ -72,10 +72,29 @@ async function seed() {
     await client.query('BEGIN');
 
     // Badges basicos (mismos slugs que en SQLite).
-    await ensureBadge(client, 'rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', null, 0);
-    await ensureBadge(client, 'rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', null, 0);
-    await ensureBadge(client, 'rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', null, 0);
-    await ensureBadge(client, 'rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', null, 0);
+    await ensureBadge(client, 'rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', '🧱', 0);
+    await ensureBadge(client, 'rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', '🏡', 0);
+    await ensureBadge(client, 'rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', '🛡️', 0);
+    await ensureBadge(client, 'rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', '🏛️', 0);
+
+    await ensureBadge(client, 'svc_repairs', 'Manitas del barrio', 'Completaste 2 servicios de reparaciones.', '🔧', 25);
+    await ensureBadge(client, 'svc_packages', 'Mensajero vecinal', 'Completaste 2 servicios de paquetes.', '📦', 25);
+    await ensureBadge(client, 'svc_pets', 'Amigo de las mascotas', 'Completaste 2 servicios de mascotas.', '🐕', 25);
+    await ensureBadge(client, 'svc_cleaning', 'Orden y limpieza', 'Completaste 2 servicios de limpieza.', '🧹', 25);
+    await ensureBadge(client, 'svc_transport', 'Transporte solidario', 'Completaste 2 servicios de transporte.', '🚗', 25);
+    await ensureBadge(client, 'svc_tech', 'Tech de confianza', 'Completaste 2 servicios de tecnologia.', '💻', 25);
+    await ensureBadge(client, 'svc_gardening', 'Jardinero urbano', 'Completaste 2 servicios de jardineria.', '🌿', 25);
+    await ensureBadge(client, 'svc_care', 'Acompanamiento', 'Completaste 2 servicios de acompanamiento.', '👴', 25);
+    await ensureBadge(client, 'svc_tutoring', 'Profe del barrio', 'Completaste 2 servicios de clases.', '📚', 25);
+    await ensureBadge(client, 'svc_creative', 'Creatividad', 'Completaste 2 servicios creativos.', '🎨', 25);
+    await ensureBadge(client, 'svc_errands', 'Recados express', 'Completaste 2 servicios de recados.', '🧾', 25);
+    await ensureBadge(client, 'svc_other', 'Multiusos', 'Completaste 2 servicios de otros.', '✨', 25);
+
+    await ensureBadge(client, 'col_vecino_total', 'Vecino Total', 'Consigue 4 insignias de categorias distintas.', '🏅', 120);
+    await ensureBadge(client, 'col_barrio_solidario', 'Barrio Solidario', 'Completa acompanamiento, recados y clases.', '🤝', 90);
+    await ensureBadge(client, 'col_mano_hogar', 'Manitas y Hogar', 'Completa reparaciones, limpieza y jardineria.', '🧰', 90);
+    await ensureBadge(client, 'col_movilidad_rapida', 'Movilidad Rapida', 'Completa transporte y paquetes.', '🚀', 60);
+    await ensureBadge(client, 'col_super_vecino', 'Super Vecino', 'Consigue 8 insignias de categorias distintas.', '👑', 250);
 
     // Demo users.
     const demoPassword = 'password123';

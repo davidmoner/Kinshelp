@@ -83,6 +83,30 @@ async function hasAllBadgeSlugs(userId, slugs) {
     return ((row && row.n) || 0) === want.length;
 }
 
+async function countBadgeSlugs(userId, slugs) {
+    const want = Array.isArray(slugs) ? slugs.filter(Boolean) : [];
+    if (!want.length) return 0;
+    if (db.isPg) {
+        const row = await db.one(
+            `SELECT COUNT(DISTINCT b.slug) AS n
+             FROM user_badges ub
+             JOIN badges b ON b.id = ub.badge_id
+             WHERE ub.user_id = $1 AND b.slug = ANY($2::text[])`,
+            [userId, want]
+        );
+        return Number((row && row.n) || 0);
+    }
+
+    const placeholders = want.map(() => '?').join(',');
+    const row = db.prepare(`
+      SELECT COUNT(DISTINCT b.slug) AS n
+      FROM user_badges ub
+      JOIN badges b ON b.id = ub.badge_id
+      WHERE ub.user_id = ? AND b.slug IN (${placeholders})
+    `).get(userId, ...want);
+    return (row && row.n) || 0;
+}
+
 async function addBoostTokens(userId, n) {
     const delta = Math.max(0, Number(n || 0));
     if (!delta) return;
@@ -118,4 +142,16 @@ const EMBLEM_WEIGHT = {
     'kh_emblem_leyenda': 3,
 };
 
-module.exports = { findAll, findForUser, getBySlug, hasAwarded, award, getUserStats, hasBadgeSlug, hasAllBadgeSlugs, addBoostTokens, setEmblemIfBetter };
+module.exports = {
+    findAll,
+    findForUser,
+    getBySlug,
+    hasAwarded,
+    award,
+    getUserStats,
+    hasBadgeSlug,
+    hasAllBadgeSlugs,
+    countBadgeSlugs,
+    addBoostTokens,
+    setEmblemIfBetter,
+};

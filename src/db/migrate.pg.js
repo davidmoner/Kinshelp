@@ -1,4 +1,5 @@
 'use strict';
+const { randomUUID } = require('crypto');
 const { getPool } = require('../config/postgres');
 
 async function migrate() {
@@ -158,6 +159,43 @@ async function migrate() {
       );
       CREATE INDEX IF NOT EXISTS idx_user_badges_user ON user_badges(user_id);
     `);
+
+    const badgeSeeds = [
+      ['rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', '🧱', 0],
+      ['rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', '🏡', 0],
+      ['rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', '🛡️', 0],
+      ['rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', '🏛️', 0],
+      ['svc_repairs', 'Manitas del barrio', 'Completaste 2 servicios de reparaciones.', '🔧', 25],
+      ['svc_packages', 'Mensajero vecinal', 'Completaste 2 servicios de paquetes.', '📦', 25],
+      ['svc_pets', 'Amigo de las mascotas', 'Completaste 2 servicios de mascotas.', '🐕', 25],
+      ['svc_cleaning', 'Orden y limpieza', 'Completaste 2 servicios de limpieza.', '🧹', 25],
+      ['svc_transport', 'Transporte solidario', 'Completaste 2 servicios de transporte.', '🚗', 25],
+      ['svc_tech', 'Tech de confianza', 'Completaste 2 servicios de tecnologia.', '💻', 25],
+      ['svc_gardening', 'Jardinero urbano', 'Completaste 2 servicios de jardineria.', '🌿', 25],
+      ['svc_care', 'Acompanamiento', 'Completaste 2 servicios de acompanamiento.', '👴', 25],
+      ['svc_tutoring', 'Profe del barrio', 'Completaste 2 servicios de clases.', '📚', 25],
+      ['svc_creative', 'Creatividad', 'Completaste 2 servicios creativos.', '🎨', 25],
+      ['svc_errands', 'Recados express', 'Completaste 2 servicios de recados.', '🧾', 25],
+      ['svc_other', 'Multiusos', 'Completaste 2 servicios de otros.', '✨', 25],
+      ['col_vecino_total', 'Vecino Total', 'Consigue 4 insignias de categorias distintas.', '🏅', 120],
+      ['col_barrio_solidario', 'Barrio Solidario', 'Completa acompanamiento, recados y clases.', '🤝', 90],
+      ['col_mano_hogar', 'Manitas y Hogar', 'Completa reparaciones, limpieza y jardineria.', '🧰', 90],
+      ['col_movilidad_rapida', 'Movilidad Rapida', 'Completa transporte y paquetes.', '🚀', 60],
+      ['col_super_vecino', 'Super Vecino', 'Consigue 8 insignias de categorias distintas.', '👑', 250],
+    ];
+
+    for (const [slug, name, description, iconUrl, pointsBonus] of badgeSeeds) {
+      await client.query(
+        `INSERT INTO badges (id, slug, name, description, icon_url, points_bonus, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6, now())
+         ON CONFLICT (slug) DO UPDATE SET
+           name = EXCLUDED.name,
+           description = EXCLUDED.description,
+           icon_url = EXCLUDED.icon_url,
+           points_bonus = EXCLUDED.points_bonus`,
+        [randomUUID(), slug, name, description, iconUrl, pointsBonus]
+      );
+    }
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS notification_cooldowns (

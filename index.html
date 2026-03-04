@@ -2147,15 +2147,15 @@
         </div>
 
         <!-- Colecciones y perks -->
-        <div class="glass-card card-collections reveal" id="card-collections" data-view="premium">
+        <div class="glass-card card-collections reveal" id="card-collections" data-view="premium perfil">
           <div class="card-head">
             <h3>Colecciones</h3>
             <span class="badge-pill" id="perk-boost">—</span>
           </div>
           <div class="collections-body" id="collections-body">
-            <div class="ledger-empty">Completa insignias de servicio para desbloquear logos, puntos y boosts de 48h.
-            </div>
+            <div class="ledger-empty">Completa 2 ayudas por categoria para desbloquear insignias y sumar reputacion.</div>
           </div>
+          <div class="collections-foot">Cada coleccion suma rep extra y acelera tu acceso a Premium.</div>
         </div>
 
         <!-- Badges -->
@@ -2913,6 +2913,37 @@
           <span class="btn-label">Ver requisitos</span>
         </button>
         <button class="btn btn-ghost btn-block" type="button" data-action="closeUpgradeModal">
+          <span class="btn-label">Ahora no</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BADGE NUDGE (colecciones → premium) ─────────────────────────────── -->
+  <div id="modal-badge-nudge" class="modal-overlay hidden" data-action="closeBadgeNudge" data-args="$event">
+    <div class="modal-box modal-badge-box">
+      <button class="modal-close" data-action="closeBadgeNudge">✕</button>
+      <div class="upgrade-top">
+        <div class="upgrade-k">Insignias</div>
+        <div class="upgrade-v">Colecciona y suma reputación</div>
+        <div class="upgrade-sub">Completa 2 ayudas por categoría, desbloquea insignias y acelera tu Premium con
+          reputación real.</div>
+      </div>
+
+      <div class="premium-modal-mini badge-nudge-mini">
+        <div class="pmini-row"><span class="pmini-ico">🏅</span><span>2 ayudas por categoría = insignia</span></div>
+        <div class="pmini-row"><span class="pmini-ico">🎁</span><span>Colecciones completas = bonus de rep</span></div>
+        <div class="pmini-row"><span class="pmini-ico">⚡</span><span>Más rep = AutoMatch Premium más rápido</span></div>
+      </div>
+
+      <div class="premium-modal-actions">
+        <button class="btn btn-gold btn-block" type="button" data-action="goCollectionsFromNudge">
+          <span class="btn-label">Ver colecciones</span>
+        </button>
+        <button class="btn btn-ghost btn-block" type="button" data-action="goBadgesFromNudge">
+          <span class="btn-label">Ver insignias</span>
+        </button>
+        <button class="btn btn-ghost btn-block" type="button" data-action="closeBadgeNudge">
           <span class="btn-label">Ahora no</span>
         </button>
       </div>

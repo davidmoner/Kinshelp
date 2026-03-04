@@ -476,6 +476,7 @@
     let automatchCountdownTimer = null;
     let feedDebounce = null;
     let premiumNudgeTimer = null;
+    let badgeNudgeTimer = null;
 
     function setDashView(view, opts = {}) {
         const v = normalizeDashView(view);
@@ -491,6 +492,9 @@
         try { localStorage.setItem('kh_dash_view', v); } catch { }
 
         if (!opts.noScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (badgeNudgeTimer) { clearTimeout(badgeNudgeTimer); badgeNudgeTimer = null; }
+        if (v === 'premium' || v === 'automatch') scheduleBadgeNudge(v);
 
         if (opts.noAutoLoad) return;
 
@@ -521,7 +525,7 @@
         if (v === 'creaciones') loadCreations();
         if (v === 'matches') loadMatches();
         if (v === 'perfil') { loadProfile(); }
-        if (v === 'premium') { loadPremiumProgress(); loadLeaderboard(); }
+        if (v === 'premium') { loadPremiumProgress(); loadLeaderboard(); loadBadgesMine(); }
     }
 
     function goLanding(event) {
@@ -593,6 +597,63 @@
                 // ignore
             }
         }, 5000);
+    }
+
+    function scheduleBadgeNudge(view) {
+        if (badgeNudgeTimer) { clearTimeout(badgeNudgeTimer); badgeNudgeTimer = null; }
+        if (!KHApi.getToken()) return;
+        if (isPremiumActive(currentUser)) return;
+        try {
+            const last = Number(localStorage.getItem('kh_badge_nudge_ts') || 0);
+            if (Date.now() - last < 7 * 24 * 3600 * 1000) return;
+        } catch { }
+
+        badgeNudgeTimer = setTimeout(() => {
+            const root = document.querySelector('main.dashboard');
+            if (!root) return;
+            if (root.dataset.view !== view) return;
+            if (document.getElementById('modal-badge-nudge') && !document.getElementById('modal-badge-nudge').classList.contains('hidden')) return;
+            if (document.getElementById('modal-login') && !document.getElementById('modal-login').classList.contains('hidden')) return;
+            if (document.getElementById('modal-premium') && !document.getElementById('modal-premium').classList.contains('hidden')) return;
+            if (document.getElementById('modal-upgrade') && !document.getElementById('modal-upgrade').classList.contains('hidden')) return;
+            openBadgeNudge();
+            try { localStorage.setItem('kh_badge_nudge_ts', String(Date.now())); } catch { }
+        }, 15000);
+    }
+
+    function openBadgeNudge() {
+        const m = document.getElementById('modal-badge-nudge');
+        if (!m) return;
+        m.classList.remove('hidden');
+        setTimeout(() => {
+            const btn = m.querySelector('button');
+            if (btn) btn.focus();
+        }, 80);
+    }
+
+    function closeBadgeNudge(event) {
+        const m = document.getElementById('modal-badge-nudge');
+        if (!m) return;
+        if (event && event.target !== m) return;
+        m.classList.add('hidden');
+    }
+
+    function scrollToDashCard(id) {
+        if (!id) return;
+        const el = document.getElementById(id);
+        if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function goCollectionsFromNudge() {
+        closeBadgeNudge();
+        setDashView('premium', { noScroll: true });
+        setTimeout(() => scrollToDashCard('card-collections'), 120);
+    }
+
+    function goBadgesFromNudge() {
+        closeBadgeNudge();
+        setDashView('perfil', { noScroll: true });
+        setTimeout(() => scrollToDashCard('card-badges'), 120);
     }
 
     function openUpgradeModal(e) {
@@ -3424,12 +3485,129 @@
         });
     }
 
+    const CATEGORY_BADGE_SLUGS = [
+        'svc_repairs',
+        'svc_packages',
+        'svc_pets',
+        'svc_cleaning',
+        'svc_transport',
+        'svc_tech',
+        'svc_gardening',
+        'svc_care',
+        'svc_tutoring',
+        'svc_creative',
+        'svc_errands',
+        'svc_other',
+    ];
+
+    const COLLECTION_RULES = [
+        {
+            slug: 'col_vecino_total',
+            name: 'Vecino Total',
+            desc: 'Consigue 4 insignias de categorias distintas.',
+            reward: 120,
+            type: 'count',
+            count: 4,
+        },
+        {
+            slug: 'col_barrio_solidario',
+            name: 'Barrio Solidario',
+            desc: 'Acompanamiento, recados y clases.',
+            reward: 90,
+            type: 'all',
+            required: ['svc_care', 'svc_errands', 'svc_tutoring'],
+        },
+        {
+            slug: 'col_mano_hogar',
+            name: 'Manitas y Hogar',
+            desc: 'Reparaciones, limpieza y jardineria.',
+            reward: 90,
+            type: 'all',
+            required: ['svc_repairs', 'svc_cleaning', 'svc_gardening'],
+        },
+        {
+            slug: 'col_movilidad_rapida',
+            name: 'Movilidad Rapida',
+            desc: 'Transporte y paquetes.',
+            reward: 60,
+            type: 'all',
+            required: ['svc_transport', 'svc_packages'],
+        },
+        {
+            slug: 'col_super_vecino',
+            name: 'Super Vecino',
+            desc: 'Consigue 8 insignias de categorias distintas.',
+            reward: 250,
+            type: 'count',
+            count: 8,
+        },
+    ];
+
+    function renderCollectionsFromBadges(rows) {
+        const wrap = $('collections-body');
+        if (!wrap) return;
+        const list = Array.isArray(rows) ? rows : [];
+        const slugs = new Set(list.map(b => b.slug));
+        const categoryOwned = CATEGORY_BADGE_SLUGS.filter(s => slugs.has(s));
+
+        let completed = 0;
+        let earnedRep = 0;
+        wrap.innerHTML = '';
+
+        COLLECTION_RULES.forEach(rule => {
+            let progress = 0;
+            let total = 0;
+            let done = false;
+            if (rule.type === 'all') {
+                total = rule.required.length;
+                progress = rule.required.filter(s => slugs.has(s)).length;
+                done = progress >= total;
+            } else {
+                total = Number(rule.count || 0);
+                progress = Math.min(categoryOwned.length, total);
+                done = categoryOwned.length >= total;
+            }
+
+            if (done) {
+                completed += 1;
+                earnedRep += Number(rule.reward || 0);
+            }
+
+            const card = document.createElement('div');
+            card.className = 'collection-card' + (done ? ' is-complete' : '');
+            card.innerHTML = `
+              <div class="collection-left">
+                <div class="collection-title">${escapeHtml(rule.name)}</div>
+                <div class="collection-desc">${escapeHtml(rule.desc)}</div>
+                <div class="collection-progress">${progress}/${total} insignias</div>
+              </div>
+              <div class="collection-right">
+                <div class="collection-reward">+${Number(rule.reward || 0)} rep</div>
+                <div class="collection-pill${done ? ' done' : ''}">${done ? 'Completada' : 'En progreso'}</div>
+              </div>
+            `;
+            wrap.appendChild(card);
+        });
+
+        if (!COLLECTION_RULES.length) {
+            wrap.innerHTML = '<div class="ledger-empty">Sin colecciones activas</div>';
+        }
+
+        const perk = $('perk-boost');
+        if (perk) {
+            perk.textContent = completed
+                ? `${completed} completas · +${earnedRep} rep`
+                : '0 colecciones';
+        }
+    }
+
     async function loadBadgesMine() {
         if (!KHApi.getToken()) return;
         try {
             const data = await KHApi.listMyBadges();
             const rows = (data && data.data) || (Array.isArray(data) ? data : []);
             renderProfileHeroBadges(rows);
+            renderCollectionsFromBadges(rows);
             const grid = $('badges-grid');
             if (!grid) return;
             grid.innerHTML = '';
@@ -4589,6 +4767,7 @@
             closeChat();
             closeRankingModal();
             closeUserCard();
+            closeBadgeNudge();
             closeDashMenu();
             closeLandingMenu();
         }
@@ -4921,6 +5100,9 @@
         closeUpgradeModal,
         openPremiumFromNudge,
         goPremiumTab,
+        closeBadgeNudge,
+        goCollectionsFromNudge,
+        goBadgesFromNudge,
         selectCreateKind,
         selectComp,
         clearFieldError,

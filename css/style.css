@@ -2725,6 +2725,8 @@ html[data-theme="light"] .dash-menu-sep {
 .dashboard[data-view="matches"] #card-mvp-matches,
 .dashboard[data-view="premium"] #card-premium-progress,
 .dashboard[data-view="premium"] #card-leaderboard,
+.dashboard[data-view="premium"] #card-collections,
+.dashboard[data-view="perfil"] #card-collections,
 .dashboard[data-view="perfil"] #card-profile-hero,
 .dashboard[data-view="perfil"] #card-profile {
   grid-column: 1 / -1;
@@ -3506,6 +3508,91 @@ html[data-theme="light"] .rep-act-pts.neg {
 .badge-item.earned {
   background: linear-gradient(135deg, rgba(82, 49, 148, 0.10), rgba(33, 82, 173, 0.08));
   border-color: rgba(82, 49, 148, 0.26);
+}
+
+/* Collections */
+.collections-body {
+  display: grid;
+  gap: 12px;
+}
+
+.collection-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.collection-card.is-complete {
+  border-color: rgba(201, 168, 76, 0.45);
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.14), rgba(33, 82, 173, 0.10));
+  box-shadow: 0 10px 30px rgba(201, 168, 76, 0.15);
+}
+
+.collection-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.collection-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.collection-desc {
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.collection-progress {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+.collection-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.collection-reward {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--gold-light);
+}
+
+.collection-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.collection-pill.done {
+  border-color: rgba(201, 168, 76, 0.45);
+  color: var(--gold-light);
+  background: rgba(201, 168, 76, 0.10);
+}
+
+.collections-foot {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-soft);
 }
 
 /* ── AutoMatch (premium experience) ───────────────────── */
@@ -4773,7 +4860,7 @@ html[data-theme="light"] .feed-body-panel {
 
 /* ── Ranking modal controls ───────────────────────────── */
 .modal-ranking-box {
-  max-width: min(1120px, 96vw);
+  max-width: min(1340px, 98vw);
   padding: 22px 22px 18px;
   display: flex;
   flex-direction: column;
@@ -5923,6 +6010,22 @@ html[data-theme="light"] .rank-chip {
     rgba(15, 20, 32, 0.96);
 }
 
+/* Badge nudge modal */
+.modal-badge-box {
+  max-width: 420px;
+  padding: 26px 22px 22px;
+  border-radius: 22px;
+  border-color: rgba(201, 168, 76, 0.24);
+  background:
+    radial-gradient(120% 140% at 20% 0%, rgba(201, 168, 76, 0.18) 0%, transparent 60%),
+    radial-gradient(120% 140% at 88% 10%, rgba(33, 82, 173, 0.12) 0%, transparent 56%),
+    rgba(15, 20, 32, 0.96);
+}
+
+.badge-nudge-mini .pmini-row span:last-child {
+  font-weight: 600;
+}
+
 .upgrade-top {
   text-align: left;
 }
@@ -5965,6 +6068,11 @@ html[data-theme="light"] .rank-chip {
 
 @media (max-width: 420px) {
   .modal-upgrade-box {
+    max-width: 340px;
+    padding: 24px 18px 18px;
+  }
+
+  .modal-badge-box {
     max-width: 340px;
     padding: 24px 18px 18px;
   }

@@ -110,24 +110,26 @@ const badges = [
     { id: randomUUID(), slug: 'rep_500', name: 'Reputacion 500', description: 'Alcanzaste 500 de reputacion.', icon_url: '⚡', points_bonus: 25 },
     { id: randomUUID(), slug: 'rep_1000', name: 'Reputacion 1000', description: 'Alcanzaste 1000 de reputacion.', icon_url: '⚡', points_bonus: 40 },
 
-    // Service-type badges (one per category)
-    { id: randomUUID(), slug: 'svc_repairs', name: 'Manitas del barrio', description: 'Completaste un servicio de reparaciones.', icon_url: '🔧', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_packages', name: 'Mensajero vecinal', description: 'Completaste un servicio de paquetes.', icon_url: '📦', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_pets', name: 'Amigo de las mascotas', description: 'Completaste un servicio de mascotas.', icon_url: '🐕', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_cleaning', name: 'Orden y limpieza', description: 'Completaste un servicio de limpieza.', icon_url: '🧹', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_transport', name: 'Transporte solidario', description: 'Completaste un servicio de transporte.', icon_url: '🚗', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_tech', name: 'Tech de confianza', description: 'Completaste un servicio de tecnologia.', icon_url: '💻', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_gardening', name: 'Jardinero urbano', description: 'Completaste un servicio de jardineria.', icon_url: '🌿', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_care', name: 'Acompanamiento', description: 'Completaste un servicio de acompanamiento.', icon_url: '👴', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_tutoring', name: 'Profe del barrio', description: 'Completaste un servicio de clases.', icon_url: '📚', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_creative', name: 'Creatividad', description: 'Completaste un servicio creativo.', icon_url: '🎨', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_errands', name: 'Recados express', description: 'Completaste un servicio de recados.', icon_url: '🧾', points_bonus: 10 },
-    { id: randomUUID(), slug: 'svc_other', name: 'Multiusos', description: 'Completaste un servicio de otros.', icon_url: '✨', points_bonus: 10 },
+    // Service-type badges (one per category, 2 ayudas)
+    { id: randomUUID(), slug: 'svc_repairs', name: 'Manitas del barrio', description: 'Completaste 2 servicios de reparaciones.', icon_url: '🔧', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_packages', name: 'Mensajero vecinal', description: 'Completaste 2 servicios de paquetes.', icon_url: '📦', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_pets', name: 'Amigo de las mascotas', description: 'Completaste 2 servicios de mascotas.', icon_url: '🐕', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_cleaning', name: 'Orden y limpieza', description: 'Completaste 2 servicios de limpieza.', icon_url: '🧹', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_transport', name: 'Transporte solidario', description: 'Completaste 2 servicios de transporte.', icon_url: '🚗', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_tech', name: 'Tech de confianza', description: 'Completaste 2 servicios de tecnologia.', icon_url: '💻', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_gardening', name: 'Jardinero urbano', description: 'Completaste 2 servicios de jardineria.', icon_url: '🌿', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_care', name: 'Acompanamiento', description: 'Completaste 2 servicios de acompanamiento.', icon_url: '👴', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_tutoring', name: 'Profe del barrio', description: 'Completaste 2 servicios de clases.', icon_url: '📚', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_creative', name: 'Creatividad', description: 'Completaste 2 servicios creativos.', icon_url: '🎨', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_errands', name: 'Recados express', description: 'Completaste 2 servicios de recados.', icon_url: '🧾', points_bonus: 25 },
+    { id: randomUUID(), slug: 'svc_other', name: 'Multiusos', description: 'Completaste 2 servicios de otros.', icon_url: '✨', points_bonus: 25 },
 
-    // Collections (award points + perks)
-    { id: randomUUID(), slug: 'col_barrio_pack', name: 'Coleccion Barrio', description: 'Consigue 5 insignias de servicio (pack inicial).', icon_url: '🏅', points_bonus: 120 },
-    { id: randomUUID(), slug: 'col_corona_pack', name: 'Coleccion Corona', description: 'Consigue todas las insignias de servicio.', icon_url: '👑', points_bonus: 250 },
-    { id: randomUUID(), slug: 'col_leyenda_pack', name: 'Coleccion Leyenda', description: 'Rep 1000 + Pilar del barrio + Cinco estrellas.', icon_url: '🏆', points_bonus: 300 },
+    // Collections (award points to accelerate premium)
+    { id: randomUUID(), slug: 'col_vecino_total', name: 'Vecino Total', description: 'Consigue 4 insignias de categorias distintas.', icon_url: '🏅', points_bonus: 120 },
+    { id: randomUUID(), slug: 'col_barrio_solidario', name: 'Barrio Solidario', description: 'Completa acompanamiento, recados y clases.', icon_url: '🤝', points_bonus: 90 },
+    { id: randomUUID(), slug: 'col_mano_hogar', name: 'Manitas y Hogar', description: 'Completa reparaciones, limpieza y jardineria.', icon_url: '🧰', points_bonus: 90 },
+    { id: randomUUID(), slug: 'col_movilidad_rapida', name: 'Movilidad Rapida', description: 'Completa transporte y paquetes.', icon_url: '🚀', points_bonus: 60 },
+    { id: randomUUID(), slug: 'col_super_vecino', name: 'Super Vecino', description: 'Consigue 8 insignias de categorias distintas.', icon_url: '👑', points_bonus: 250 },
 ];
 
 const insertBadge = db.prepare(`

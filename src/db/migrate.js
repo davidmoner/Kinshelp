@@ -399,24 +399,47 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_match_messages_match ON match_messages(match_id, created_at);
 `);
 
-// Seed core badges (idempotent) — so new installs get the gamification.
-function ensureBadge(slug, name, description, icon, pointsBonus) {
+// Seed core badges (idempotent + update) — so new installs get the gamification.
+function upsertBadge(slug, name, description, icon, pointsBonus) {
   try {
     const row = db.prepare('SELECT id FROM badges WHERE slug = ?').get(slug);
-    if (row) return;
-    const { randomUUID } = require('crypto');
     const now = new Date().toISOString();
-    db.prepare('INSERT INTO badges (id, slug, name, description, icon_url, points_bonus, created_at) VALUES (?,?,?,?,?,?,?)')
-      .run(randomUUID(), slug, name, description, icon, pointsBonus, now);
+    if (!row) {
+      const { randomUUID } = require('crypto');
+      db.prepare('INSERT INTO badges (id, slug, name, description, icon_url, points_bonus, created_at) VALUES (?,?,?,?,?,?,?)')
+        .run(randomUUID(), slug, name, description, icon, pointsBonus, now);
+      return;
+    }
+    db.prepare('UPDATE badges SET name = ?, description = ?, icon_url = ?, points_bonus = ? WHERE slug = ?')
+      .run(name, description, icon, pointsBonus, slug);
   } catch {
     // ignore
   }
 }
 
-ensureBadge('rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', '🧱', 0);
-ensureBadge('rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', '🏡', 0);
-ensureBadge('rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', '🛡️', 0);
-ensureBadge('rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', '🏛️', 0);
+upsertBadge('rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', '🧱', 0);
+upsertBadge('rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', '🏡', 0);
+upsertBadge('rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', '🛡️', 0);
+upsertBadge('rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', '🏛️', 0);
+
+upsertBadge('svc_repairs', 'Manitas del barrio', 'Completaste 2 servicios de reparaciones.', '🔧', 25);
+upsertBadge('svc_packages', 'Mensajero vecinal', 'Completaste 2 servicios de paquetes.', '📦', 25);
+upsertBadge('svc_pets', 'Amigo de las mascotas', 'Completaste 2 servicios de mascotas.', '🐕', 25);
+upsertBadge('svc_cleaning', 'Orden y limpieza', 'Completaste 2 servicios de limpieza.', '🧹', 25);
+upsertBadge('svc_transport', 'Transporte solidario', 'Completaste 2 servicios de transporte.', '🚗', 25);
+upsertBadge('svc_tech', 'Tech de confianza', 'Completaste 2 servicios de tecnologia.', '💻', 25);
+upsertBadge('svc_gardening', 'Jardinero urbano', 'Completaste 2 servicios de jardineria.', '🌿', 25);
+upsertBadge('svc_care', 'Acompanamiento', 'Completaste 2 servicios de acompanamiento.', '👴', 25);
+upsertBadge('svc_tutoring', 'Profe del barrio', 'Completaste 2 servicios de clases.', '📚', 25);
+upsertBadge('svc_creative', 'Creatividad', 'Completaste 2 servicios creativos.', '🎨', 25);
+upsertBadge('svc_errands', 'Recados express', 'Completaste 2 servicios de recados.', '🧾', 25);
+upsertBadge('svc_other', 'Multiusos', 'Completaste 2 servicios de otros.', '✨', 25);
+
+upsertBadge('col_vecino_total', 'Vecino Total', 'Consigue 4 insignias de categorias distintas.', '🏅', 120);
+upsertBadge('col_barrio_solidario', 'Barrio Solidario', 'Completa acompanamiento, recados y clases.', '🤝', 90);
+upsertBadge('col_mano_hogar', 'Manitas y Hogar', 'Completa reparaciones, limpieza y jardineria.', '🧰', 90);
+upsertBadge('col_movilidad_rapida', 'Movilidad Rapida', 'Completa transporte y paquetes.', '🚀', 60);
+upsertBadge('col_super_vecino', 'Super Vecino', 'Consigue 8 insignias de categorias distintas.', '👑', 250);
 
 console.log('✅  Migration complete — all tables and indexes created.');
 process.exit(0);

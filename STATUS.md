@@ -95,6 +95,8 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Floating CTA: botón +Crear flota por margen derecho y reacciona al scroll con impulsos sutiles.
 - Perfil: nueva tarjeta hero con reputación, nivel, insignias y actividad reciente enlazada.
 - Landing/Dashboard: menú superior refinado, subtítulos motivacionales y explore sin tabs.
+- Ranking: modal ampliado para mejorar legibilidad.
+- Insignias: badges por categoria (2 ayudas), colecciones con bonus de rep y nudge sutil hacia Premium.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)
