@@ -76,6 +76,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Email: plantilla HTML de verificacion con branding + preview en `web/preview/verify-email.html`.
   - Layout: fondo global con `fondo3.png` y centro con blur transparente; laterales al 50%.
   - Explorar: radar animado a la izquierda con separacion; lupa removida.
+  - Explorar: radar 50% mas grande y a 150px de la izquierda, centrado con el titulo.
   - Hero: subtitulo rotativo con transicion suave (cada 3s) y mensaje motivador.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 

@@ -2783,11 +2783,12 @@ html[data-theme="light"] .dash-menu-sep {
   --kh-type-dur1: 1050ms;
   --kh-type-steps1: 8;
   position: relative;
+  padding: 8px 0;
 }
 
 .explore-radar {
-  width: 56px;
-  height: 56px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
   position: relative;
   display: inline-flex;
@@ -2803,14 +2804,14 @@ html[data-theme="light"] .dash-menu-sep {
 
 #card-feed .explore-radar {
   position: absolute;
-  left: -250px;
+  left: -150px;
   top: 50%;
   transform: translateY(-50%);
 }
 
 @media (max-width: 980px) {
   #card-feed .explore-radar {
-    left: -180px;
+    left: -110px;
   }
 }
 
@@ -2825,13 +2826,13 @@ html[data-theme="light"] .dash-menu-sep {
 .explore-radar::after {
   content: '';
   position: absolute;
-  inset: 7px;
+  inset: 10px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.28);
 }
 
 .explore-radar::after {
-  inset: 16px;
+  inset: 22px;
   border-color: rgba(255, 255, 255, 0.18);
 }
 
