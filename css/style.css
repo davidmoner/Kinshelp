@@ -2871,7 +2871,7 @@ html[data-theme="light"] .dash-menu-sep {
 }
 
 #card-feed .card-title h3 {
-  font-size: clamp(20px, 2.2vw, 28px);
+  font-size: clamp(30px, 3.3vw, 42px);
   font-weight: 900;
   letter-spacing: -0.4px;
 }

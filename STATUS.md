@@ -72,6 +72,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Nav landing: hamburguesa con estilo refinado + menu mobile ordenado.
   - Hero mobiles: labels más separados y con zoom sincronizado.
   - Admin: login dedicado con token separado y verificacion de admin.
+  - Explorar: titulo 50% mas grande.
   - Layout: fondo global con `fondo3.png` y centro con blur transparente; laterales al 50%.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
