@@ -3804,12 +3804,14 @@ html[data-theme="light"] .feed-tab[data-feed-tab="premium"] {
   display: flex;
   flex-direction: column;
   flex: 1;
+  color: var(--text);
 }
 
 .feed-title {
   font-weight: 900;
   letter-spacing: -0.2px;
   line-height: 1.25;
+  color: var(--text);
   min-height: 40px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -3864,10 +3866,12 @@ html[data-theme="light"] .feed-tab[data-feed-tab="premium"] {
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.03);
   font-size: 11px;
+  color: var(--text);
 }
 
 .feed-user {
   cursor: pointer;
+  color: var(--text);
 }
 
 .feed-user:hover {
