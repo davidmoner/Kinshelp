@@ -2703,7 +2703,7 @@ html[data-theme="light"] .dash-menu-sep {
   background-image: url("/img/explora2.png");
   background-repeat: no-repeat;
   background-position: 18px 16px;
-  background-size: clamp(200px, 35vw, 360px) auto;
+  background-size: clamp(160px, 28vw, 288px) auto;
   opacity: 1;
   pointer-events: none;
   z-index: 0;
