@@ -1857,6 +1857,112 @@
           </div>
         </div>
 
+        <!-- Perfil hero -->
+        <div class="glass-card card-profile-hero reveal" id="card-profile-hero" data-view="perfil">
+          <div class="profile-hero-grid">
+            <div class="profile-hero-card">
+              <div class="profile-hero-head">
+                <div class="profile-hero-avatar" id="profile-hero-avatar" aria-hidden="true">—</div>
+                <div class="profile-hero-meta">
+                  <div class="profile-hero-name-row">
+                    <div class="profile-hero-name" id="profile-hero-name">—</div>
+                    <span class="verified-badge hidden" id="profile-hero-verified" aria-label="Usuario verificado">✓</span>
+                  </div>
+                  <div class="profile-hero-sub" id="profile-hero-sub">—</div>
+                  <div class="profile-hero-tier" id="profile-hero-tier">—</div>
+                </div>
+                <div class="profile-hero-seal" aria-label="Nivel de reputación">
+                  <div class="profile-hero-seal-k">Nivel</div>
+                  <div class="profile-hero-seal-v" id="profile-hero-level">—</div>
+                </div>
+              </div>
+
+              <div class="profile-hero-stats">
+                <div class="profile-hero-stat">
+                  <div class="profile-hero-stat-k">Reputación</div>
+                  <div class="profile-hero-stat-v" id="profile-hero-rep">—</div>
+                </div>
+                <div class="profile-hero-stat">
+                  <div class="profile-hero-stat-k">Valoración</div>
+                  <div class="profile-hero-stat-v"><span id="profile-hero-rating">—</span><span class="profile-hero-stat-s">/5</span></div>
+                </div>
+                <div class="profile-hero-stat">
+                  <div class="profile-hero-stat-k">Reviews</div>
+                  <div class="profile-hero-stat-v" id="profile-hero-rating-count">—</div>
+                </div>
+                <div class="profile-hero-stat">
+                  <div class="profile-hero-stat-k">Insignias</div>
+                  <div class="profile-hero-stat-v" id="profile-hero-badge-count">—</div>
+                </div>
+              </div>
+
+              <div class="profile-hero-actions">
+                <button class="btn btn-primary btn-sm" type="button" data-action="scrollToProfileSection"
+                  data-args="card-profile">Editar perfil</button>
+                <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking"
+                  data-args="$event">Ver ranking</button>
+                <button class="btn btn-ghost btn-sm" type="button" data-action="scrollToProfileSection"
+                  data-args="card-ledger">Ver historial</button>
+              </div>
+            </div>
+
+            <div class="rep-card rep-card--profile" aria-label="Mi reputación">
+              <div class="rep-head">
+                <div class="rep-title">
+                  <span class="rep-crown" aria-hidden="true">♛</span>
+                  <span>Mi reputación</span>
+                </div>
+                <span class="rep-pill" id="profile-hero-verify-pill">—</span>
+              </div>
+
+              <div class="rep-grid">
+                <div class="rep-col rep-col--left">
+                  <div class="rep-score">
+                    <div class="rep-score-main">
+                      <span class="rep-score-val" id="profile-hero-rep-score">—</span>
+                      <span class="rep-score-unit">rep</span>
+                    </div>
+                    <div class="rep-score-sub" id="profile-hero-rank">Ranking vecinal: —</div>
+                  </div>
+
+                  <div class="rep-progress">
+                    <div class="rep-progress-head">
+                      <span>Progreso a Premium</span>
+                      <span class="rep-mini" id="profile-hero-premium-mini">—</span>
+                    </div>
+                    <div class="rep-bar">
+                      <div class="rep-bar-fill" id="profile-hero-premium-fill" style="width:0%"></div>
+                    </div>
+                    <div class="rep-progress-foot" id="profile-hero-premium-foot">—</div>
+                  </div>
+
+                  <div class="rep-activity">
+                    <div class="rep-activity-head">
+                      <span>Últimas ayudas</span>
+                      <span class="rep-mini" id="profile-hero-activity-meta">Actualizado</span>
+                    </div>
+                    <div id="profile-hero-activity">
+                      <div class="ledger-empty">Sin actividad aún</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rep-col rep-col--right">
+                  <div class="rep-badges">
+                    <div class="rep-badges-head">
+                      <span>Insignias</span>
+                      <span class="rep-mini" id="profile-hero-badges-count">—</span>
+                    </div>
+                    <div class="rep-badges-grid" id="profile-hero-badges">
+                      <div class="ledger-empty">Aún no hay insignias</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Perfil -->
         <div class="glass-card card-profile reveal" id="card-profile" data-view="perfil">
           <div class="card-head">

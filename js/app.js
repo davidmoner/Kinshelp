@@ -522,7 +522,7 @@
         }
         if (v === 'creaciones') loadCreations();
         if (v === 'matches') loadMatches();
-        if (v === 'perfil') { loadProfile(); loadBadgesMine(); }
+        if (v === 'perfil') { loadProfile(); }
         if (v === 'premium') { loadPremiumProgress(); loadLeaderboard(); }
     }
 
@@ -1345,18 +1345,78 @@
         }
         if ($('profile-rating-count')) $('profile-rating-count').textContent = (user.rating_count != null) ? String(user.rating_count) : '—';
 
+        renderProfileHero(user);
         renderProfilePhotos(user.profile_photos);
+    }
+
+    function normalizeProfilePhotos(raw) {
+        if (Array.isArray(raw)) return raw;
+        if (!raw) return [];
+        try {
+            const p = JSON.parse(String(raw));
+            return Array.isArray(p) ? p : [];
+        } catch {
+            return [];
+        }
+    }
+
+    function renderProfileHero(user) {
+        if (!user) return;
+        const name = user.display_name || '—';
+        const loc = String(user.location_text || '').trim();
+        const rep = (user.points_balance != null) ? Number(user.points_balance) : null;
+        const rating = user.rating_avg;
+        const ratingCount = user.rating_count;
+        const lvl = repLevelLabel(rep || 0);
+        const verified = user.is_verified === true || user.is_verified === 1;
+
+        const avatarEl = $('profile-hero-avatar');
+        if (avatarEl) {
+            const photos = normalizeProfilePhotos(user.profile_photos);
+            const photo = photos.find(p => p && p.url);
+            const url = (photo && photo.url) ? String(photo.url) : (user.avatar_url ? String(user.avatar_url) : '');
+            if (url) {
+                avatarEl.innerHTML = `<img src="${escapeHtml(url)}" alt="" loading="lazy" />`;
+            } else {
+                avatarEl.textContent = initialsForName(name);
+            }
+        }
+
+        if ($('profile-hero-name')) $('profile-hero-name').textContent = name;
+        if ($('profile-hero-sub')) $('profile-hero-sub').textContent = loc || 'Zona pendiente';
+        const tierEl = $('profile-hero-tier');
+        if (tierEl) {
+            tierEl.innerHTML = '';
+            const tierPill = document.createElement('span');
+            tierPill.className = 'profile-hero-pill';
+            tierPill.textContent = tierLabel(user.premium_tier);
+            const lvlPill = document.createElement('span');
+            lvlPill.className = 'profile-hero-pill';
+            lvlPill.textContent = lvl;
+            tierEl.appendChild(tierPill);
+            tierEl.appendChild(lvlPill);
+        }
+
+        if ($('profile-hero-level')) $('profile-hero-level').textContent = lvl;
+        if ($('profile-hero-rep')) $('profile-hero-rep').textContent = (rep == null) ? '—' : String(rep);
+        if ($('profile-hero-rep-score')) $('profile-hero-rep-score').textContent = (rep == null) ? '—' : String(rep);
+        if ($('profile-hero-rating')) $('profile-hero-rating').textContent = (rating == null) ? '—' : Number(rating).toFixed(1);
+        if ($('profile-hero-rating-count')) $('profile-hero-rating-count').textContent = (ratingCount == null) ? '—' : String(ratingCount);
+
+        const verifiedBadge = $('profile-hero-verified');
+        if (verifiedBadge) verifiedBadge.classList.toggle('hidden', !verified);
+
+        const verifyPill = $('profile-hero-verify-pill');
+        if (verifyPill) {
+            verifyPill.textContent = verified ? 'Verificada' : 'Pendiente';
+            verifyPill.classList.toggle('warn', !verified);
+        }
     }
 
     function renderProfilePhotos(raw) {
         const wrap = $('profile-photos-grid');
         if (!wrap) return;
-        let photos = [];
-        if (Array.isArray(raw)) photos = raw;
-        else if (raw) {
-            try { const p = JSON.parse(String(raw)); photos = Array.isArray(p) ? p : []; }
-            catch { photos = []; }
-        }
+        const photos = normalizeProfilePhotos(raw);
 
         wrap.innerHTML = '';
         if (!photos.length) {
@@ -1533,12 +1593,52 @@
             const user = await KHApi.getMe();
             loadUserInfo(user);
             await loadFavoritesSection({ silent: true });
+            loadBadgesMine();
+            loadPremiumProgress();
+            loadProfileHeroRank();
+            loadProfileHeroActivity();
             toast('Perfil actualizado', 'success');
         } catch (err) {
             toast(err.message || 'No se pudo cargar el perfil', 'error');
         } finally {
             if (btn) setLoading(btn, false);
         }
+    }
+
+    async function loadProfileHeroRank() {
+        const el = $('profile-hero-rank');
+        if (!el || !KHApi.getToken()) return;
+        try {
+            const me = await KHApi.leaderboardMe({});
+            if (me && me.rank && me.total) {
+                el.textContent = `Ranking vecinal: #${me.rank} de ${me.total}`;
+            } else {
+                el.textContent = 'Ranking vecinal: —';
+            }
+        } catch {
+            el.textContent = 'Ranking vecinal: —';
+        }
+    }
+
+    async function loadProfileHeroActivity() {
+        if (!KHApi.getToken()) return;
+        try {
+            const out = await KHApi.getMyPoints();
+            renderProfileHeroActivity(out && out.ledger, out && out.balance);
+        } catch {
+            const wrap = $('profile-hero-activity');
+            if (wrap) wrap.innerHTML = '<div class="ledger-empty">Sin actividad aún</div>';
+        }
+    }
+
+    function scrollToProfileSection(id) {
+        if (!id) return;
+        const root = document.querySelector('main.dashboard');
+        if (root && root.dataset.view !== 'perfil') {
+            setDashView('perfil', { noScroll: true });
+        }
+        const el = document.getElementById(id);
+        if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     async function submitProfile(event) {
@@ -1660,6 +1760,9 @@
             $('premium-progress-badge').textContent = e.premium_active ? 'Premium activo' : (pct + '%');
         }
 
+        if ($('profile-hero-premium-mini')) $('profile-hero-premium-mini').textContent = `${rep}/${th}`;
+        if ($('profile-hero-premium-fill')) $('profile-hero-premium-fill').style.width = pct + '%';
+
         const btn = $('btn-premium-unlock');
         if (btn) {
             btn.disabled = !e.eligible || e.premium_active;
@@ -1678,6 +1781,22 @@
                     $('premium-progress-foot').textContent = left === 0
                         ? 'Listo para desbloquear Premium.'
                         : `Te faltan ${left} de reputación para desbloquear Premium.`;
+                }
+            }
+        }
+
+        if ($('profile-hero-premium-foot')) {
+            if (e.premium_active) {
+                $('profile-hero-premium-foot').textContent = 'Premium activo. Tus publicaciones se renuevan solas.';
+            } else {
+                const left = Math.max(0, th - rep);
+                const partsLeft = Math.max(0, partnersReq - partners);
+                if (partsLeft > 0) {
+                    $('profile-hero-premium-foot').textContent = `Faltan ${left} de reputación y ${partsLeft} vecinos distintos.`;
+                } else {
+                    $('profile-hero-premium-foot').textContent = left === 0
+                        ? 'Listo para desbloquear Premium.'
+                        : `Faltan ${left} de reputación para desbloquear Premium.`;
                 }
             }
         }
@@ -3282,11 +3401,37 @@
         }
     }
 
+    function renderProfileHeroBadges(rows) {
+        const list = Array.isArray(rows) ? rows : [];
+        const grid = $('profile-hero-badges');
+        if (!grid) return;
+        const countEl = $('profile-hero-badges-count');
+        if (countEl) countEl.textContent = list.length ? `${list.length} total` : '—';
+        const miniCount = $('profile-hero-badge-count');
+        if (miniCount) miniCount.textContent = list.length ? String(list.length) : '—';
+
+        grid.innerHTML = '';
+        if (!list.length) {
+            grid.innerHTML = '<div class="ledger-empty">Aún no hay insignias</div>';
+            return;
+        }
+
+        list.slice(0, 6).forEach(b => {
+            const el = document.createElement('div');
+            el.className = 'badge-item earned';
+            const icon = b.icon_url || '🏅';
+            el.title = b.description || b.name || '';
+            el.innerHTML = `${escapeHtml(icon)}<span>${escapeHtml(b.name || '')}</span>`;
+            grid.appendChild(el);
+        });
+    }
+
     async function loadBadgesMine() {
         if (!KHApi.getToken()) return;
         try {
             const data = await KHApi.listMyBadges();
             const rows = (data && data.data) || (Array.isArray(data) ? data : []);
+            renderProfileHeroBadges(rows);
             const grid = $('badges-grid');
             if (!grid) return;
             grid.innerHTML = '';
@@ -4352,6 +4497,8 @@
             // Update pill
             $('ledger-badge').textContent = balance + ' rep';
 
+            renderProfileHeroActivity(ledger, balance);
+
             // Render transactions
             if (!ledger || ledger.length === 0) {
                 list.innerHTML = '<div class="ledger-empty">Sin transacciones aún</div>';
@@ -4389,6 +4536,51 @@
             refund: '↩️ Reembolso',
         };
         return map[reason] || reason;
+    }
+
+    function formatReasonParts(reason) {
+        const label = formatReason(reason);
+        const match = String(label || '').match(/^(\S+)\s+(.*)$/);
+        if (match) return { icon: match[1], text: match[2] };
+        return { icon: '⚡', text: String(label || '') };
+    }
+
+    function renderProfileHeroActivity(ledger, balance) {
+        const wrap = $('profile-hero-activity');
+        if (!wrap) return;
+        const meta = $('profile-hero-activity-meta');
+        if (meta) meta.textContent = 'Actualizado';
+
+        if (balance != null) {
+            if ($('profile-hero-rep-score')) $('profile-hero-rep-score').textContent = String(balance);
+            if ($('profile-hero-rep')) $('profile-hero-rep').textContent = String(balance);
+        }
+
+        wrap.innerHTML = '';
+        if (!ledger || ledger.length === 0) {
+            wrap.innerHTML = '<div class="ledger-empty">Sin actividad aún</div>';
+            return;
+        }
+
+        const show = ledger.slice(0, 3);
+        if (meta) meta.textContent = `${show.length} últimas`;
+
+        show.forEach(entry => {
+            const { icon, text } = formatReasonParts(entry.reason);
+            const delta = Number(entry.delta || 0);
+            const sign = delta > 0 ? '+' : '';
+            const time = entry.created_at ? fmtShortDate(entry.created_at) : '';
+            const label = time ? `${text} · ${time}` : text;
+
+            const row = document.createElement('div');
+            row.className = 'rep-act-row';
+            row.innerHTML = `
+              <span class="rep-act-ico">${escapeHtml(icon)}</span>
+              <span class="rep-act-txt">${escapeHtml(label)}</span>
+              <span class="rep-act-pts${delta < 0 ? ' neg' : ''}">${sign}${delta} rep</span>
+            `;
+            wrap.appendChild(row);
+        });
     }
 
     /* ── Keyboard shortcuts ───────────────────────────────────────────────────── */
@@ -4745,6 +4937,7 @@
         submitRegister,
         loadProfile,
         loadFavoritesSection,
+        scrollToProfileSection,
         submitProfile,
         resendVerifyEmail,
         pickProfilePhoto,
