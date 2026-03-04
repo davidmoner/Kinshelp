@@ -81,6 +81,32 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 
 ## Siguiente (Prioridad Alta) — Próxima sesión
 
+### Plan nocturno (5h) — Prompt maestro
+- Objetivo: sesión larga sin preguntas con commits y push final.
+- Alcance:
+  - Conexion entre usuarios + chat funcional tras aceptacion mutua.
+  - Rediseño de titulos/subtitulos por seccion (jerarquia visual coherente con landing).
+  - Ranking: popup mas ancho + pagina completa con filtros avanzados y accesos desde popup y menu hamburguesa.
+  - Limpieza/refactor seguro (borrar codigo muerto, reordenar sin romper).
+  - Seguridad: validaciones de registro, controles antifraude/manipulacion de usuarios.
+  - Marketing: mensajes de valor, prueba social, CTA mas fuerte en landing.
+  - Admin: datos reales (usuarios/creaciones/actividad) y completar secciones utiles.
+
+### Plan nocturno — Paso a paso
+1) Auditoria de flujo de matches/acceptance y endpoints chat.
+2) Chat tras aceptacion mutua (backend + UI + entrypoints).
+3) Titulo/subtitulo de secciones con mejor jerarquia visual.
+4) Ranking: popup mas ancho + pagina completa con filtros; accesos desde popup + menu.
+5) Limpieza de codigo muerto + refactor seguro.
+6) Seguridad: registro + manipulación de usuarios + antifraude basico.
+7) Marketing landing: copy, CTA, prueba social.
+8) Admin real: usuarios/creaciones/actividad y opciones utiles.
+9) QA final + commit/push.
+
+### Plan nocturno — Progreso
+- ✅ Paso 1: auditoria matches/chat/ranking/admin completada.
+- ✅ Paso 2: chat abierto automaticamente al aceptar match + mensaje sistema.
+
 ### ✅ Ya resuelto (no tocar)
 - Bug async `offers.service.js` (addPhoto/deletePhoto/boost48h).
 - Admin ban/unban (backend + UI admin panel).

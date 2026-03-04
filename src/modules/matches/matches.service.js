@@ -274,6 +274,13 @@ async function changeStatus(matchId, actingUserId, action) {
     // After status updates, encourage agreement via chat
     if (newStatus === 'accepted') {
         const updated = await requireMatch(matchId);
+        try {
+            const msgCount = await Promise.resolve(repo.countMessages(matchId));
+            if (msgCount === 0) {
+                await Promise.resolve(repo.insertMessage(matchId, actingUserId,
+                    '[SYSTEM] Match aceptado. Ya podéis chatear para concretar el acuerdo.'));
+            }
+        } catch { }
         if (!isAgreementComplete(updated)) {
             await Promise.resolve(repo.insertMessage(matchId, actingUserId,
                 '[SYSTEM] Para continuar: acordad la compensación en el chat (pago en EUR, trueque o altruista). El pago en EUR se realiza fuera de KingsHelp.'));

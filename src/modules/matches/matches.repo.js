@@ -257,6 +257,18 @@ function countNonSystemMessages(matchId, userId) {
     return (row && row.n) || 0;
 }
 
+function countMessages(matchId) {
+    if (db.isPg) {
+        return db.one(
+            'SELECT COUNT(*)::int AS n FROM match_messages WHERE match_id = $1',
+            [matchId]
+        ).then(r => (r && r.n) || 0);
+    }
+
+    const row = db.prepare('SELECT COUNT(*) AS n FROM match_messages WHERE match_id = ?').get(matchId);
+    return (row && row.n) || 0;
+}
+
 function countDoneBetweenUsersWithinDays(userA, userB, days) {
     if (db.isPg) {
         return db.one(
@@ -308,5 +320,6 @@ module.exports.listMessages = listMessages;
 module.exports.insertMessage = insertMessage;
 module.exports.setAgreement = setAgreement;
 module.exports.countNonSystemMessages = countNonSystemMessages;
+module.exports.countMessages = countMessages;
 module.exports.countDoneBetweenUsersWithinDays = countDoneBetweenUsersWithinDays;
 module.exports.countDistinctDonePartners = countDistinctDonePartners;

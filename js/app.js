@@ -3922,15 +3922,9 @@
                 return;
             }
 
-            // If a match is accepted but missing agreement, bring chat once
+            // Auto-open chat on first accepted match (once per match)
             if (!chatMatchId) {
-                const need = filtered.find(m => {
-                    const comp = (m.compensation_type === 'coins') ? 'cash' : (m.compensation_type || 'cash');
-                    const ok = comp === 'cash'
-                        ? (+m.points_agreed || 0) >= 1
-                        : (comp === 'barter' ? String(m.barter_terms || '').trim().length > 0 : true);
-                    return m.status === 'accepted' && !ok && !autoChatOpened.has(m.id);
-                });
+                const need = filtered.find(m => m.status === 'accepted' && !autoChatOpened.has(m.id));
                 if (need && need.id) {
                     autoChatOpened.add(need.id);
                     openChat(need.id);
@@ -4090,12 +4084,16 @@
             await loadLedger();
             await loadMatches();
 
-            // If agreement missing, bring users to chat
+            // Bring users to chat after acceptance or pending agreement
             if (updated && updated.id) {
                 const comp = (updated.compensation_type === 'coins') ? 'cash' : (updated.compensation_type || 'cash');
                 const agreedOk = comp === 'cash'
                     ? (+updated.points_agreed || 0) >= 1
                     : (comp === 'barter' ? String(updated.barter_terms || '').trim().length > 0 : true);
+                if (updated.status === 'accepted' && !autoChatOpened.has(updated.id)) {
+                    autoChatOpened.add(updated.id);
+                    openChat(updated.id);
+                }
                 if (!agreedOk && (updated.status === 'pending' || updated.status === 'accepted')) {
                     openChat(updated.id);
                 }
