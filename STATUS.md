@@ -212,6 +212,24 @@ PUBLIC_BASE_URL=https://kingshelp.es
   - ✅ `og:image` actualizado a un asset real.
   - ✅ FAQ + Manual añadidos a sitemap.
 
+### Contenido real — Prompt maestro
+- Objetivo: reemplazar textos/ejemplos genéricos por contenido real y coherente con datos (sin inventar métricas falsas).
+- Alcance: secciones de landing con claims, KPIs, testimonios/beneficios, etiquetas de ejemplo y placeholders.
+- Regla: si no hay dato real, usar copy neutro (sin cifras) o referencia a crecimiento "en vivo".
+
+### Contenido real — Paso a paso
+1) Auditar `index.html` para encontrar textos y cifras de ejemplo.
+2) Identificar qué métricas vienen de `/api/v1/stats` y usarlas donde aplique.
+3) Sustituir claims numéricos por copy verificable o neutro.
+4) Actualizar microcopy de CTAs, badges y etiquetas para coherencia real.
+5) Revisar SEO/OG/FAQ para que no haya cifras falsas.
+6) Commit + push.
+
+### Contenido real — Progreso
+- ✅ Textos demo con cifras reales eliminadas (reputación/servicios/tiempos).
+- ✅ Acceso demo removido; placeholders neutros.
+- ✅ CTA y microcopy actualizados a claims verificables.
+
 ### ✅ Paso 10 — CSP Hardening
 - ✅ Migrados `onclick/onsubmit/oninput` a listeners con `data-*` + bindings en `js/app.js`.
 - ✅ CSP sin `'unsafe-inline'`; hashes para JSON-LD + admin script.
