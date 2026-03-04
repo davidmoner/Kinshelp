@@ -2746,7 +2746,7 @@ html[data-theme="light"] #kh-particles {
 
 /* ── Crown image — zoom-out entrance ──────────────────── */
 .kh-intro-crown-img {
-    width: clamp(220px, 28vw, 320px);
+    width: clamp(165px, 21vw, 240px);
     height: auto;
     display: block;
     image-rendering: -webkit-optimize-contrast;
