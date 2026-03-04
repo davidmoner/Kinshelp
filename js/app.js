@@ -4531,6 +4531,70 @@
         });
     }
 
+    function initFloatingCreate() {
+        const btn = document.getElementById('floating-create');
+        if (!btn) return;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (reduceMotion.matches) return;
+
+        const bobAmp = 8;
+        const swayAmp = 6;
+        const bobSpeed = 1.15;
+        const swaySpeed = 0.75;
+        const impulseMax = 18;
+        let impulseX = 0;
+        let impulseY = 0;
+        let lastTime = performance.now();
+        const seedA = Math.random() * Math.PI * 2;
+        const seedB = Math.random() * Math.PI * 2;
+        let rafId = null;
+        let scrollRaf = null;
+
+        function clamp(val, min, max) {
+            return Math.min(max, Math.max(min, val));
+        }
+
+        function kickImpulse() {
+            const angle = Math.random() * Math.PI * 2;
+            const mag = 6 + Math.random() * 6;
+            impulseX = clamp(impulseX + Math.cos(angle) * mag, -impulseMax, impulseMax);
+            impulseY = clamp(impulseY + Math.sin(angle) * mag, -impulseMax, impulseMax);
+        }
+
+        function tick(now) {
+            const dt = Math.min(0.05, Math.max(0.001, (now - lastTime) / 1000));
+            lastTime = now;
+
+            const decay = Math.pow(0.82, dt * 60);
+            impulseX *= decay;
+            impulseY *= decay;
+
+            const t = now / 1000;
+            const bob = Math.sin(t * bobSpeed + seedA) * bobAmp;
+            const sway = Math.sin(t * swaySpeed + seedB) * swayAmp;
+            const x = sway + impulseX;
+            const y = bob + impulseY;
+
+            btn.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+            rafId = requestAnimationFrame(tick);
+        }
+
+        window.addEventListener('scroll', () => {
+            if (scrollRaf) return;
+            scrollRaf = requestAnimationFrame(() => {
+                scrollRaf = null;
+                kickImpulse();
+            });
+        }, { passive: true });
+
+        rafId = requestAnimationFrame(tick);
+        reduceMotion.addEventListener('change', (evt) => {
+            if (!evt.matches) return;
+            if (rafId) cancelAnimationFrame(rafId);
+            btn.style.transform = 'none';
+        });
+    }
+
     /* ── Auto-restore session ─────────────────────────────────────────────────── */
     async function tryRestoreSession() {
         if (!KHApi.getToken()) return;
@@ -4555,6 +4619,7 @@
         bindImageFallbacks();
         bindFeedTabs();
         initOAuthButtons();
+        initFloatingCreate();
         const oauthHandled = handleOAuthRedirect();
         initReveal();
         initKpiCounters();

@@ -92,6 +92,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Feed: barra de tiempo con rojo solo al final; secciones con gradiente semi-transparente por tema; textos heredan `--text`.
 - Favoritos: toggle estrella (UI) + API backend + sección en Perfil.
 - Matches: controller async await para respuestas consistentes en flujos de smoke tests.
+- Floating CTA: botón +Crear flota por margen derecho y reacciona al scroll con impulsos sutiles.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)

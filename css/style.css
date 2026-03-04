@@ -797,7 +797,8 @@ html[data-theme="light"] .btn-auth {
 .floating-create {
   position: fixed;
   right: 28px;
-  bottom: 28px;
+  top: 32%;
+  bottom: auto;
   z-index: 120;
   display: inline-flex;
   align-items: center;
@@ -809,7 +810,8 @@ html[data-theme="light"] .btn-auth {
   color: #fff;
   font-weight: 800;
   box-shadow: 0 18px 46px rgba(0, 0, 0, 0.45), 0 0 24px rgba(41, 90, 173, 0.32);
-  animation: createFloat 3.8s ease-in-out infinite;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
 }
 
 .floating-create::before {
@@ -832,11 +834,6 @@ html[data-theme="light"] .btn-auth {
   letter-spacing: -0.2px;
 }
 
-@keyframes createFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
 @keyframes createPulse {
   0% { transform: scale(1); opacity: 0.6; }
   60% { transform: scale(1.06); opacity: 0.15; }
@@ -846,7 +843,7 @@ html[data-theme="light"] .btn-auth {
 @media (max-width: 720px) {
   .floating-create {
     right: 18px;
-    bottom: 18px;
+    top: 40%;
     padding: 12px 16px;
   }
 }
@@ -855,6 +852,7 @@ html[data-theme="light"] .btn-auth {
   .floating-create,
   .floating-create::before {
     animation: none;
+    transform: none;
   }
 }
 
