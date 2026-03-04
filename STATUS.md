@@ -66,6 +66,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - UI: imagenes responsive con escala fluida en resize.
   - Explorar: titulo con efecto typewrite centrado + icono animado; secciones con colores coherentes.
   - Feed: secciones con fondo blanco roto (sin gradientes).
+  - Layout: fondo global con `fondo3.png` y centro con blur transparente; laterales al 50%.
   - Tag git `backup-pre-redesign-2026-03-03` creado antes de los cambios.
 
 - Paso 1 — UX Crear solicitud/oferta (mar 2026):
