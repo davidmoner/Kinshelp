@@ -5,21 +5,9 @@
  */
 (function () {
     'use strict';
-
-    /* ── Respetar prefers-reduced-motion ─────────────────────── */
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    /* ── Crear canvas ─────────────────────────────────────────── */
-    const canvas = document.createElement('canvas');
-    canvas.id = 'kh-particles';
-    canvas.setAttribute('aria-hidden', 'true');
-    canvas.style.cssText = [
-        'position:fixed', 'inset:0', 'width:100%', 'height:100%',
-        'pointer-events:none', 'z-index:0'
-    ].join(';');
-    document.body.prepend(canvas);
-
-    const ctx = canvas.getContext('2d');
+    let started = false;
+    let canvas = null;
+    let ctx = null;
 
     /* ── Config ───────────────────────────────────────────────── */
     const CFG = {
@@ -154,15 +142,53 @@
     const themeObs = new MutationObserver(() => { /* palette se lee en tick */ });
     themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-    /* ── Start ────────────────────────────────────────────────── */
-    window.addEventListener('resize', resize, { passive: true });
-    window.addEventListener('pointermove', (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-        mouse.active = true;
-    }, { passive: true });
-    window.addEventListener('pointerleave', () => { mouse.active = false; }, { passive: true });
-    init();
-    raf = requestAnimationFrame(tick);
+    function startParticles() {
+        if (started) return;
+        started = true;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        canvas = document.createElement('canvas');
+        canvas.id = 'kh-particles';
+        canvas.setAttribute('aria-hidden', 'true');
+        canvas.style.cssText = [
+            'position:fixed', 'inset:0', 'width:100%', 'height:100%',
+            'pointer-events:none', 'z-index:0'
+        ].join(';');
+        document.body.prepend(canvas);
+        ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        window.addEventListener('resize', resize, { passive: true });
+        window.addEventListener('pointermove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            mouse.active = true;
+        }, { passive: true });
+        window.addEventListener('pointerleave', () => { mouse.active = false; }, { passive: true });
+        init();
+        raf = requestAnimationFrame(tick);
+    }
+
+    function initWhenVisible() {
+        const hero = document.getElementById('kh-hero');
+        if (!hero || !('IntersectionObserver' in window)) {
+            startParticles();
+            return;
+        }
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                io.disconnect();
+                startParticles();
+            });
+        }, { threshold: 0.12 });
+        io.observe(hero);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initWhenVisible);
+    } else {
+        initWhenVisible();
+    }
 
 })();
