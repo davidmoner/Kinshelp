@@ -2696,26 +2696,47 @@ html[data-theme="light"] .dash-menu-sep {
   overflow: hidden;
 }
 
-#card-feed::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("/img/explora2.png");
-  background-repeat: no-repeat;
-  background-position: 18px 16px;
-  background-size: clamp(160px, 28vw, 288px) auto;
-  opacity: 1;
-  pointer-events: none;
-  z-index: 0;
-}
-
-html[data-theme="light"] #card-feed::before {
-  opacity: 1;
-}
-
 #card-feed > * {
   position: relative;
   z-index: 1;
+}
+
+.explore-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.explore-anim-ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(16, 185, 129, 0.16));
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  animation: explorePulse 2.6s ease-in-out infinite;
+}
+
+@keyframes explorePulse {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.04);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-anim-ico {
+    animation: none;
+  }
 }
 
 #card-feed .card-head {
