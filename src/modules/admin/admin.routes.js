@@ -24,6 +24,8 @@ r.post('/reports/:id/unhide', controller.unhideReportTarget);
 
 // Users
 r.get('/users', controller.listUsers);
+r.get('/requests', controller.listRequests);
+r.get('/offers', controller.listOffers);
 r.get('/users/:id', controller.getUser);
 r.get('/users/:id/detail', controller.getUserDetail);
 r.patch('/users/:id', controller.patchUser);

@@ -185,6 +185,7 @@
       <div class="nav" role="navigation" aria-label="Admin">
         <button class="active" data-view="overview" type="button">Overview</button>
         <button data-view="users" type="button">Usuarios</button>
+        <button data-view="content" type="button">Creaciones</button>
         <button data-view="events" type="button">Actividad</button>
         <button data-view="reports" type="button">Moderacion</button>
         <button data-view="audit" type="button">Auditoria</button>
@@ -301,6 +302,33 @@
             <button class="btn" id="btnUserDetailClose" type="button">Cerrar</button>
           </div>
           <pre id="userDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
+        </div>
+      </section>
+
+      <section id="view-content" class="card" style="display:none;">
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+          <select id="contentKind" class="btn" aria-label="Tipo de contenido">
+            <option value="requests">Solicitudes</option>
+            <option value="offers">Ofertas</option>
+          </select>
+          <input id="contentQuery" placeholder="Buscar por titulo, usuario o id" />
+          <button class="btn primary" id="btnContentSearch" type="button">Buscar</button>
+        </div>
+        <div class="muted" id="contentMeta" style="margin-bottom:10px;"></div>
+        <div style="overflow:auto;">
+          <table aria-label="Creaciones">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Titulo</th>
+                <th>Categoria</th>
+                <th>Estado</th>
+                <th>Usuario</th>
+                <th>Creado</th>
+              </tr>
+            </thead>
+            <tbody id="contentTbody"></tbody>
+          </table>
         </div>
       </section>
 
@@ -451,12 +479,13 @@
       }
 
       function showView(name) {
-        var ids = ['overview', 'users', 'events', 'reports', 'audit', 'config'];
+        var ids = ['overview', 'users', 'content', 'events', 'reports', 'audit', 'config'];
         ids.forEach(function (k) {
           document.getElementById('view-' + k).style.display = (k === name) ? '' : 'none';
         });
         document.getElementById('title').textContent = name === 'overview' ? 'Overview' :
           name === 'users' ? 'Usuarios' :
+          name === 'content' ? 'Creaciones' :
           name === 'events' ? 'Actividad' :
           name === 'reports' ? 'Moderacion' :
           name === 'audit' ? 'Auditoria' : 'Config';
@@ -582,6 +611,34 @@
                 '<button class="btn" data-id="' + u.id + '" data-verify="' + (u.is_verified ? '0' : '1') + '">' + (u.is_verified ? 'Desverificar' : 'Verificar') + '</button>' +
                 '<button class="' + banBtnClass + '" data-id="' + u.id + '" data-ban-action="' + (banned ? 'unban' : 'ban') + '">' + banBtnLabel + '</button>' +
               '</td>';
+          tb.appendChild(tr);
+        });
+      });
+    }
+
+      function loadContent() {
+        var kind = document.getElementById('contentKind').value || 'requests';
+        var q = document.getElementById('contentQuery').value || '';
+        var base = (kind === 'offers') ? '/offers' : '/requests';
+        var url = base + '?limit=30&page=1' + (q ? '&query=' + encodeURIComponent(q) : '');
+        return api(url).then(function (j) {
+          document.getElementById('contentMeta').textContent = 'Mostrando ' + j.meta.count + ' elementos';
+          var tb = document.getElementById('contentTbody');
+          tb.innerHTML = '';
+          j.data.forEach(function (r) {
+            var tr = document.createElement('tr');
+            var id = (r.id || '').slice(0, 8);
+            var title = r.title || '-';
+            var cat = r.category || '-';
+            var status = (r.status || '-') + (r.is_hidden ? ' · oculto' : '');
+            var user = (r.seeker_name || r.provider_name || '-') + ' · ' + (r.seeker_email || r.provider_email || '-');
+            tr.innerHTML =
+              '<td><code>' + id + '</code></td>' +
+              '<td>' + title + '</td>' +
+              '<td>' + cat + '</td>' +
+              '<td>' + status + '</td>' +
+              '<td>' + user + '</td>' +
+              '<td>' + (r.created_at || '-') + '</td>';
             tb.appendChild(tr);
           });
         });
@@ -645,6 +702,7 @@
             showView(v);
             if (v === 'overview') loadOverview();
             if (v === 'users') loadUsers();
+            if (v === 'content') loadContent();
             if (v === 'events') loadEvents();
             if (v === 'reports') loadReports();
             if (v === 'audit') loadAudit();
@@ -652,8 +710,10 @@
         });
 
         document.getElementById('btnUserSearch').addEventListener('click', loadUsers);
+        document.getElementById('btnContentSearch').addEventListener('click', loadContent);
         document.getElementById('btnEventSearch').addEventListener('click', loadEvents);
         document.getElementById('btnReportSearch').addEventListener('click', loadReports);
+        document.getElementById('contentKind').addEventListener('change', loadContent);
 
         document.body.addEventListener('click', function (e) {
           var t = e.target;

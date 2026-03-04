@@ -22,9 +22,10 @@ function sanitize(user) {
 }
 
 async function register({ display_name, email, password, bio, location_text }) {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
     const existing = db.isPg
-        ? await db.one('SELECT id FROM users WHERE email = $1', [email])
-        : db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+        ? await db.one('SELECT id FROM users WHERE email = $1', [normalizedEmail])
+        : db.prepare('SELECT id FROM users WHERE email = ?').get(normalizedEmail);
     if (existing) throw httpError(409, 'Email already registered');
 
     const id = randomUUID();
@@ -35,33 +36,34 @@ async function register({ display_name, email, password, bio, location_text }) {
         await db.exec(
             `INSERT INTO users (id, display_name, email, password_hash, bio, location_text, created_at, updated_at)
              VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-            [id, display_name, email, passHash, bio || null, location_text || null, now, now]
+            [id, display_name, normalizedEmail, passHash, bio || null, location_text || null, now, now]
         );
         const user = await db.one('SELECT * FROM users WHERE id = $1', [id]);
         const token = jwt.sign({ sub: id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-        try { logEvent({ type: 'user.register', actorUserId: id, targetType: 'user', targetId: id, meta: { email } }); } catch { }
+        try { logEvent({ type: 'user.register', actorUserId: id, targetType: 'user', targetId: id, meta: { email: normalizedEmail } }); } catch { }
         return { user: sanitize(user), token };
     }
 
     db.prepare(`
     INSERT INTO users (id, display_name, email, password_hash, bio, location_text, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(id, display_name, email, passHash, bio || null, location_text || null, now, now);
+    `).run(id, display_name, normalizedEmail, passHash, bio || null, location_text || null, now, now);
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(id);
     const token = jwt.sign({ sub: id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-    try { logEvent({ type: 'user.register', actorUserId: id, targetType: 'user', targetId: id, meta: { email } }); } catch { }
+    try { logEvent({ type: 'user.register', actorUserId: id, targetType: 'user', targetId: id, meta: { email: normalizedEmail } }); } catch { }
     return { user: sanitize(user), token };
 }
 
 async function login({ email, password }) {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
     const user = db.isPg
-        ? await db.one('SELECT * FROM users WHERE email = $1', [email])
-        : db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+        ? await db.one('SELECT * FROM users WHERE email = $1', [normalizedEmail])
+        : db.prepare('SELECT * FROM users WHERE email = ?').get(normalizedEmail);
     if (!user || !user.password_hash || !bcrypt.compareSync(password, user.password_hash))
         throw httpError(401, 'Invalid email or password');
     if (user.is_banned) throw httpError(403, 'Account suspended');
-    try { logEvent({ type: 'user.login', actorUserId: user.id, targetType: 'user', targetId: user.id, meta: { email } }); } catch { }
+    try { logEvent({ type: 'user.login', actorUserId: user.id, targetType: 'user', targetId: user.id, meta: { email: normalizedEmail } }); } catch { }
     return { user: sanitize(user), token: jwt.sign({ sub: user.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN }) };
 }
 

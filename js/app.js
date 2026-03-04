@@ -413,7 +413,7 @@
     /* ── Dashboard views (tabs) ─────────────────────────────────────────────── */
     function normalizeDashView(view) {
         const v = String(view || '').toLowerCase();
-        if (v === 'automatch' || v === 'explorar' || v === 'crear' || v === 'creaciones' || v === 'matches' || v === 'perfil' || v === 'premium') return v;
+        if (v === 'automatch' || v === 'explorar' || v === 'crear' || v === 'creaciones' || v === 'matches' || v === 'perfil' || v === 'premium' || v === 'ranking') return v;
         return 'explorar';
     }
 
@@ -425,7 +425,7 @@
         }
     }
 
-    const dashAutoLoadAt = { automatch: 0, explorar: 0, crear: 0, creaciones: 0, matches: 0, perfil: 0, premium: 0 };
+    const dashAutoLoadAt = { automatch: 0, explorar: 0, crear: 0, creaciones: 0, matches: 0, perfil: 0, premium: 0, ranking: 0 };
 
     let automatchPollTimer = null;
     let automatchCountdownTimer = null;
@@ -459,6 +459,7 @@
         dashAutoLoadAt[v] = now;
 
         if (v === 'explorar') loadFeed();
+        if (v === 'ranking') loadRankingPage({ reset: true });
         if (v === 'automatch') {
             loadAutoMatch();
             automatchPollTimer = setInterval(() => {
@@ -491,41 +492,9 @@
         catch { return false; }
     }
 
-    function shouldShowHub(user) {
-        const premium = isPremiumActive(user);
-        if (premium) {
-            try { return localStorage.getItem('kh_hub_seen_premium') !== '1'; } catch { return true; }
-        }
-        try {
-            const last = Number(localStorage.getItem('kh_hub_last_shown') || 0);
-            return (Date.now() - last) > 24 * 3600 * 1000;
-        } catch {
-            return true;
-        }
-    }
-
-    function markHubShown(user) {
-        const premium = isPremiumActive(user);
-        try {
-            if (premium) localStorage.setItem('kh_hub_seen_premium', '1');
-            else localStorage.setItem('kh_hub_last_shown', String(Date.now()));
-            // Si mostramos Hub, no necesitamos el nudge hoy.
-            localStorage.setItem('kh_premium_nudge_ts', String(Date.now()));
-        } catch { }
-    }
-
     function enterDashboardDefault(user) {
-        const premium = isPremiumActive(user);
-        // Hub rule (opcion 2): premium 1 vez (por navegador); no-premium 1 vez al dia.
-        if (shouldShowHub(user)) {
-            markHubShown(user);
-            setDashView('inicio', { noScroll: true });
-            return;
-        }
-
-        const initial = premium ? 'automatch' : 'explorar';
-        setDashView(initial, { noScroll: true });
-        if (!premium) schedulePremiumNudge();
+        setDashView('explorar', { noScroll: true });
+        if (!isPremiumActive(user)) schedulePremiumNudge();
     }
 
     async function goDashboard(event) {
@@ -1814,6 +1783,14 @@
         rankingTrapHandler = null;
     }
 
+    function initRankingState() {
+        loadRankingPrefs();
+        rankingOrigin = loadRankingOriginFromSession();
+        if (rankingScope === 'near' && !rankingOrigin) rankingScope = 'global';
+        rankingOffset = 0;
+        rankingHasMore = false;
+    }
+
     function openRanking(event) {
         if (event && event.preventDefault) event.preventDefault();
 
@@ -1825,13 +1802,7 @@
 
         rankingLastFocus = document.activeElement;
 
-        // Restore last used filters.
-        loadRankingPrefs();
-        rankingOrigin = loadRankingOriginFromSession();
-        if (rankingScope === 'near' && !rankingOrigin) rankingScope = 'global';
-
-        rankingOffset = 0;
-        rankingHasMore = false;
+        initRankingState();
         syncRankingControls();
         show($('modal-ranking'));
         trapFocusInModal($('modal-ranking'));
@@ -1840,6 +1811,24 @@
             const btn = document.querySelector('#modal-ranking .modal-close');
             if (btn) btn.focus();
         }, 60);
+    }
+
+    async function openRankingPage(event) {
+        if (event && event.preventDefault) event.preventDefault();
+
+        if (!KHApi.getToken()) {
+            toast('Inicia sesion para ver el ranking', 'info');
+            openLogin();
+            return;
+        }
+
+        await ensureCurrentUser();
+        showPage('page-dashboard');
+        initRankingState();
+        syncRankingControls();
+        setDashView('ranking', { noScroll: true, noAutoLoad: true });
+        loadRankingPage({ reset: true });
+        closeRankingModal();
     }
 
     function closeRankingModal(event) {
@@ -1861,28 +1850,45 @@
             b.classList.toggle('rank-chip--active', active);
             b.setAttribute('aria-pressed', String(active));
         });
-        const sel = $('rank-radius-modal');
-        if (sel) sel.value = String(rankingRadiusKm);
+        const selModal = $('rank-radius-modal');
+        if (selModal) selModal.value = String(rankingRadiusKm);
+        const selPage = $('rank-radius-page');
+        if (selPage) selPage.value = String(rankingRadiusKm);
 
-        const lvl = $('rank-level-modal');
-        if (lvl) lvl.value = String(rankingMinLevel || 'all');
+        const lvlModal = $('rank-level-modal');
+        if (lvlModal) lvlModal.value = String(rankingMinLevel || 'all');
+        const lvlPage = $('rank-level-page');
+        if (lvlPage) lvlPage.value = String(rankingMinLevel || 'all');
 
-        const q = $('rank-q-modal');
-        if (q && q.value !== String(rankingQuery || '')) q.value = String(rankingQuery || '');
+        const qModal = $('rank-q-modal');
+        if (qModal && qModal.value !== String(rankingQuery || '')) qModal.value = String(rankingQuery || '');
+        const qPage = $('rank-q-page');
+        if (qPage && qPage.value !== String(rankingQuery || '')) qPage.value = String(rankingQuery || '');
     }
 
-    function setRankingLevel(v, { modal } = {}) {
-        if (!modal) return;
+    function getRankingEls(ctx) {
+        const isPage = ctx === 'page';
+        return {
+            wrap: $(isPage ? 'leaderboard-list-page' : 'leaderboard-list-modal'),
+            moreWrap: $(isPage ? 'ranking-more-wrap-page' : 'ranking-more-wrap'),
+            moreBtn: $(isPage ? 'btn-ranking-more-page' : 'btn-ranking-more'),
+            meBox: $(isPage ? 'ranking-me-page' : 'ranking-me'),
+        };
+    }
+
+    function setRankingLevel(v, opts = {}) {
+        const ctx = opts.page ? 'page' : 'modal';
         rankingMinLevel = String(v || 'all');
         rankingOffset = 0;
         rankingHasMore = false;
         saveRankingPrefs();
         syncRankingControls();
-        loadRankingModal({ reset: true });
+        if (ctx === 'page') loadRankingPage({ reset: true });
+        else loadRankingModal({ reset: true });
     }
 
-    function setRankingQuery(v, { modal } = {}) {
-        if (!modal) return;
+    function setRankingQuery(v, opts = {}) {
+        const ctx = opts.page ? 'page' : 'modal';
         rankingQuery = String(v || '');
         saveRankingPrefs();
         if (rankingQueryTimer) { clearTimeout(rankingQueryTimer); rankingQueryTimer = null; }
@@ -1890,45 +1896,50 @@
             rankingOffset = 0;
             rankingHasMore = false;
             syncRankingControls();
-            loadRankingModal({ reset: true });
+            if (ctx === 'page') loadRankingPage({ reset: true });
+            else loadRankingModal({ reset: true });
         }, 220);
     }
 
-    function setRankingScope(scope, { modal } = {}) {
-        if (!modal) return;
+    function setRankingScope(scope, opts = {}) {
+        const ctx = opts.page ? 'page' : 'modal';
         rankingScope = (scope === 'near') ? 'near' : 'global';
         rankingOffset = 0;
         rankingHasMore = false;
         saveRankingPrefs();
         syncRankingControls();
         if (rankingScope === 'near' && !rankingOrigin) {
-            const wrap = $('leaderboard-list-modal');
+            const wrap = getRankingEls(ctx).wrap;
             if (wrap) wrap.innerHTML = '<div class="ledger-empty">Pulsa “Ubicación” para ver el ranking cerca de ti</div>';
-            const more = $('ranking-more-wrap');
+            const more = getRankingEls(ctx).moreWrap;
             if (more) more.style.display = 'none';
             return;
         }
-        loadRankingModal({ reset: true });
+        if (ctx === 'page') loadRankingPage({ reset: true });
+        else loadRankingModal({ reset: true });
     }
 
-    function setRankingRadius(v, { modal } = {}) {
-        if (!modal) return;
+    function setRankingRadius(v, opts = {}) {
+        const ctx = opts.page ? 'page' : 'modal';
         const n = Math.max(1, Math.min(10, Number(v || 5)));
         rankingRadiusKm = n;
         rankingOffset = 0;
         rankingHasMore = false;
         saveRankingPrefs();
         syncRankingControls();
-        if (rankingScope === 'near' && rankingOrigin) loadRankingModal({ reset: true });
+        if (rankingScope === 'near' && rankingOrigin) {
+            if (ctx === 'page') loadRankingPage({ reset: true });
+            else loadRankingModal({ reset: true });
+        }
     }
 
-    function useMyLocation({ modal } = {}) {
-        if (!modal) return;
+    function useMyLocation(opts = {}) {
+        const ctx = opts.page ? 'page' : 'modal';
         if (!('geolocation' in navigator)) {
             toast('Tu navegador no soporta ubicación', 'error');
             return;
         }
-        const wrap = $('leaderboard-list-modal');
+        const wrap = getRankingEls(ctx).wrap;
         if (wrap) wrap.innerHTML = '<div class="ledger-empty">Obteniendo ubicación…</div>';
 
         navigator.geolocation.getCurrentPosition(
@@ -1940,7 +1951,8 @@
                 rankingHasMore = false;
                 saveRankingPrefs();
                 syncRankingControls();
-                loadRankingModal({ reset: true });
+                if (ctx === 'page') loadRankingPage({ reset: true });
+                else loadRankingModal({ reset: true });
             },
             err => {
                 rankingOrigin = null;
@@ -1953,11 +1965,9 @@
         );
     }
 
-    async function loadRankingModal({ reset = false } = {}) {
-        const wrap = $('leaderboard-list-modal');
+    async function loadRanking(ctx, { reset = false } = {}) {
+        const { wrap, moreWrap, moreBtn, meBox } = getRankingEls(ctx);
         if (!wrap) return;
-        const moreWrap = $('ranking-more-wrap');
-        const moreBtn = $('btn-ranking-more');
 
         if (rankingLoading) return;
         rankingLoading = true;
@@ -1996,7 +2006,6 @@
 
             // If logged in, show exact rank.
             try {
-                const meBox = $('ranking-me');
                 if (meBox) {
                     if (reset && currentUser && currentUser.id && KHApi.getToken()) {
                         const qs = {};
@@ -2018,7 +2027,6 @@
                     }
                 }
             } catch {
-                const meBox = $('ranking-me');
                 if (meBox) meBox.style.display = 'none';
             }
 
@@ -2049,9 +2057,18 @@
         }
     }
 
-    function rankingLoadMore() {
+    function loadRankingModal(opts) {
+        return loadRanking('modal', opts);
+    }
+
+    function loadRankingPage(opts) {
+        return loadRanking('page', opts);
+    }
+
+    function rankingLoadMore(ctx) {
         if (!rankingHasMore) return;
-        loadRankingModal({ reset: false });
+        if (ctx === 'page') loadRankingPage({ reset: false });
+        else loadRankingModal({ reset: false });
     }
 
     /* ── User card (mini profile) ───────────────────────────────────────── */
@@ -4357,7 +4374,7 @@
         try {
             const user = await KHApi.getMe();
             loadUserInfo(user);
-            // Mantener la pagina de inicio como default incluso logueado.
+            // Mantener la landing como default incluso logueado.
             showPage('page-landing');
             // Precarga ligera: eligibility para nudges/labels; evita cargar todo el dashboard.
             loadPremiumProgress();
@@ -4518,6 +4535,7 @@
         loadPremiumProgress,
         loadLeaderboard,
         openRanking,
+        openRankingPage,
         closeRankingModal,
         rankingLoadMore,
         setRankingScope,

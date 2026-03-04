@@ -178,9 +178,9 @@
                 <span class="kh-type kh-type--line2 gradient-text">entre vecinos.</span>
               </h1>
 
-              <p class="hero-sub">Pide ayuda u ofrécela. KingsHelp conecta en segundos.</p>
+              <p class="hero-sub">Pide ayuda u ofrécela. Match local y verificado en segundos, sin comisiones.</p>
 
-              <p class="hb0-tagline" aria-hidden="true">Potencia tu don ayudando.</p>
+              <p class="hb0-tagline" aria-hidden="true">Convierte tu ayuda en reputación real.</p>
 
               <!-- (mode toggle removed from hero) -->
 
@@ -748,9 +748,9 @@
     <section class="features" id="how">
       <div class="container">
         <div class="section-header reveal">
-          <span class="section-eyebrow">Proceso</span>
-          <h2>Simple de principio a fin</h2>
-          <p>Solicita o ofrece. El match ocurre solo, sin llamadas ni esperas.</p>
+          <span class="section-eyebrow">En 3 pasos</span>
+          <h2>Rápido, local y seguro</h2>
+          <p>Publica, haz match y concreta en el chat. Todo en minutos.</p>
         </div>
         <div class="features-grid">
           <div class="feature-card reveal">
@@ -919,6 +919,7 @@
         <div class="section-header reveal">
           <span class="section-eyebrow">Confianza</span>
           <h2>Una plataforma en la que confiar</h2>
+          <p>Verificación, reputación y moderación activa para proteger a tu barrio.</p>
         </div>
         <div class="trust-grid">
           <div class="trust-card reveal">
@@ -1486,7 +1487,9 @@
             <button class="dash-menu-item" type="button" role="menuitem"
               data-action="gotoDashFromMenu" data-args="perfil">Perfil</button>
             <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="openRanking" data-args="$event">Ranking</button>
+              data-action="openRanking" data-args="$event">Ranking (popup)</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              data-action="setDashView" data-args="ranking">Ranking completo</button>
             <button class="dash-menu-item" type="button" role="menuitem"
               data-action="gotoDashFromMenu" data-args="premium">Premium</button>
             <div class="dash-menu-sep" aria-hidden="true"></div>
@@ -1755,6 +1758,64 @@
                 <div class="ledger-empty">Cargando...</div>
               </div>
             </section>
+          </div>
+        </div>
+
+        <!-- Ranking completo -->
+        <div class="glass-card card-ranking reveal" id="card-ranking" data-view="ranking">
+          <div class="card-head">
+            <div class="card-title">
+              <div class="card-ico" aria-hidden="true"><span>🏆</span></div>
+              <div>
+                <h3>Ranking vecinal</h3>
+                <div class="card-sub">Tu barrio en directo con filtros avanzados.</div>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking" data-args="$event">Abrir popup</button>
+            </div>
+          </div>
+
+          <div class="rank-controls" style="margin-top:14px;">
+            <div class="rank-controls-row">
+              <div class="rank-search" role="search" aria-label="Buscar vecino">
+                <input class="rank-search-input" id="rank-q-page" type="search" placeholder="Buscar vecino o zona"
+                  autocomplete="off" data-input="setRankingQuery" data-input-args="$value|obj:page=true" />
+              </div>
+              <button class="rank-chip" type="button" data-scope="global"
+                data-action="setRankingScope" data-args="global|obj:page=true">Global</button>
+              <button class="rank-chip" type="button" data-scope="near"
+                data-action="setRankingScope" data-args="near|obj:page=true">Cerca de mi</button>
+              <select class="rank-select" id="rank-radius-page"
+                data-change="setRankingRadius" data-change-args="$value|obj:page=true" aria-label="Radio">
+                <option value="1">1 km</option>
+                <option value="3">3 km</option>
+                <option value="5" selected>5 km</option>
+                <option value="10">10 km</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" type="button" data-action="useMyLocation" data-args="obj:page=true">Ubicacion</button>
+              <select class="rank-select" id="rank-level-page"
+                data-change="setRankingLevel" data-change-args="$value|obj:page=true" aria-label="Nivel minimo">
+                <option value="all" selected>Todos</option>
+                <option value="incept">Incept (0+)</option>
+                <option value="bronze">Bronce (100+)</option>
+                <option value="silver">Plata (250+)</option>
+                <option value="gold">Oro (500+)</option>
+                <option value="legend">Leyenda (1000+)</option>
+              </select>
+            </div>
+            <div class="rank-meta" id="ranking-me-page" style="margin-top:10px; display:none;"></div>
+          </div>
+
+          <div class="leaderboard-list ranking-list ranking-list--page" id="leaderboard-list-page">
+            <div class="ledger-empty">Pulsa “Ubicacion” o usa Global</div>
+          </div>
+
+          <div class="premium-modal-actions" id="ranking-more-wrap-page" style="margin-top:12px; display:none;">
+            <button class="btn btn-ghost btn-block" id="btn-ranking-more-page" type="button" data-action="rankingLoadMore" data-args="page">
+              <span class="btn-label">Cargar mas</span>
+              <span class="spinner hidden"></span>
+            </button>
           </div>
         </div>
 
@@ -2759,6 +2820,9 @@
       </div>
 
       <div class="premium-modal-actions" style="margin-top:12px;">
+        <button class="btn btn-ghost btn-block" type="button" data-action="openRankingPage">
+          <span class="btn-label">Ver ranking completo</span>
+        </button>
         <button class="btn btn-ghost btn-block" type="button" data-action="closeRankingModal">
           <span class="btn-label">Cerrar</span>
         </button>

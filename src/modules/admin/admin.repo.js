@@ -47,6 +47,102 @@ function getUserById(id) {
   return db.prepare('SELECT * FROM users WHERE id = ?').get(id);
 }
 
+function listRequests({ query, limit, offset }) {
+  const q = query ? `%${String(query).toLowerCase()}%` : null;
+  if (db.isPg) {
+    if (q) {
+      return db.many(
+        `SELECT r.id, r.title, r.category, r.status, r.is_hidden, r.created_at, r.updated_at,
+                r.seeker_id, u.display_name AS seeker_name, u.email AS seeker_email
+         FROM help_requests r
+         JOIN users u ON u.id = r.seeker_id
+         WHERE lower(r.title) LIKE $1 OR lower(u.display_name) LIKE $1 OR lower(u.email) LIKE $1 OR cast(r.id as text) LIKE $1
+         ORDER BY r.created_at DESC
+         LIMIT $2 OFFSET $3`,
+        [q, limit, offset]
+      );
+    }
+    return db.many(
+      `SELECT r.id, r.title, r.category, r.status, r.is_hidden, r.created_at, r.updated_at,
+              r.seeker_id, u.display_name AS seeker_name, u.email AS seeker_email
+       FROM help_requests r
+       JOIN users u ON u.id = r.seeker_id
+       ORDER BY r.created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+  }
+
+  if (q) {
+    return db.prepare(
+      `SELECT r.id, r.title, r.category, r.status, r.is_hidden, r.created_at, r.updated_at,
+              r.seeker_id, u.display_name AS seeker_name, u.email AS seeker_email
+       FROM help_requests r
+       JOIN users u ON u.id = r.seeker_id
+       WHERE lower(r.title) LIKE ? OR lower(u.display_name) LIKE ? OR lower(u.email) LIKE ? OR r.id LIKE ?
+       ORDER BY r.created_at DESC
+       LIMIT ? OFFSET ?`
+    ).all(q, q, q, q, limit, offset);
+  }
+
+  return db.prepare(
+    `SELECT r.id, r.title, r.category, r.status, r.is_hidden, r.created_at, r.updated_at,
+            r.seeker_id, u.display_name AS seeker_name, u.email AS seeker_email
+     FROM help_requests r
+     JOIN users u ON u.id = r.seeker_id
+     ORDER BY r.created_at DESC
+     LIMIT ? OFFSET ?`
+  ).all(limit, offset);
+}
+
+function listOffers({ query, limit, offset }) {
+  const q = query ? `%${String(query).toLowerCase()}%` : null;
+  if (db.isPg) {
+    if (q) {
+      return db.many(
+        `SELECT o.id, o.title, o.category, o.status, o.is_hidden, o.created_at, o.updated_at,
+                o.provider_id, u.display_name AS provider_name, u.email AS provider_email
+         FROM service_offers o
+         JOIN users u ON u.id = o.provider_id
+         WHERE lower(o.title) LIKE $1 OR lower(u.display_name) LIKE $1 OR lower(u.email) LIKE $1 OR cast(o.id as text) LIKE $1
+         ORDER BY o.created_at DESC
+         LIMIT $2 OFFSET $3`,
+        [q, limit, offset]
+      );
+    }
+    return db.many(
+      `SELECT o.id, o.title, o.category, o.status, o.is_hidden, o.created_at, o.updated_at,
+              o.provider_id, u.display_name AS provider_name, u.email AS provider_email
+       FROM service_offers o
+       JOIN users u ON u.id = o.provider_id
+       ORDER BY o.created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+  }
+
+  if (q) {
+    return db.prepare(
+      `SELECT o.id, o.title, o.category, o.status, o.is_hidden, o.created_at, o.updated_at,
+              o.provider_id, u.display_name AS provider_name, u.email AS provider_email
+       FROM service_offers o
+       JOIN users u ON u.id = o.provider_id
+       WHERE lower(o.title) LIKE ? OR lower(u.display_name) LIKE ? OR lower(u.email) LIKE ? OR o.id LIKE ?
+       ORDER BY o.created_at DESC
+       LIMIT ? OFFSET ?`
+    ).all(q, q, q, q, limit, offset);
+  }
+
+  return db.prepare(
+    `SELECT o.id, o.title, o.category, o.status, o.is_hidden, o.created_at, o.updated_at,
+            o.provider_id, u.display_name AS provider_name, u.email AS provider_email
+     FROM service_offers o
+     JOIN users u ON u.id = o.provider_id
+     ORDER BY o.created_at DESC
+     LIMIT ? OFFSET ?`
+  ).all(limit, offset);
+}
+
 function ensureTables() {
   if (db.isPg) return;
   db.exec(`
@@ -146,6 +242,8 @@ function upsertConfig(key, valueJson) {
 module.exports = {
   listUsers,
   getUserById,
+  listRequests,
+  listOffers,
   insertAudit,
   listAudit,
   getConfig,
