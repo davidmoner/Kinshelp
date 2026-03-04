@@ -2782,6 +2782,7 @@ html[data-theme="light"] .dash-menu-sep {
   justify-content: center;
   --kh-type-dur1: 1050ms;
   --kh-type-steps1: 8;
+  position: relative;
 }
 
 .explore-radar {
@@ -2798,6 +2799,26 @@ html[data-theme="light"] .dash-menu-sep {
   border: 3px solid rgba(64, 128, 214, 0.6);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
   overflow: hidden;
+}
+
+#card-feed .explore-radar {
+  position: absolute;
+  left: -250px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 980px) {
+  #card-feed .explore-radar {
+    left: -180px;
+  }
+}
+
+@media (max-width: 720px) {
+  #card-feed .explore-radar {
+    position: static;
+    transform: none;
+  }
 }
 
 .explore-radar::before,
