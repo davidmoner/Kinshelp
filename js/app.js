@@ -2689,7 +2689,7 @@
             const cat = String(r.category || 'other');
             const ico = inviteIcon(cat);
             const aiSrc = aiImageForCategory(cat);
-            const mediaSrc = media || aiSrc;
+            const mediaSrc = media || (aiSrc && aiSrc.jpg);
             const isCategoryCover = !media && !!aiSrc;
             const expiry = expiryInfo(r);
             const expiryHtml = expiry
@@ -2698,7 +2698,16 @@
                     <div class="feed-time-label">${escapeHtml(expiry.label)}</div>
                   </div>`
                 : '';
-            const mediaStyle = mediaSrc ? ` style="--feed-cover:url('${escapeHtml(String(mediaSrc))}')"` : '';
+            let mediaStyle = '';
+            if (mediaSrc) {
+                const jpg = escapeHtml(String(mediaSrc));
+                let style = `--feed-cover:url('${jpg}')`;
+                if (isCategoryCover && aiSrc && aiSrc.webp) {
+                    const webp = escapeHtml(String(aiSrc.webp));
+                    style += `; --feed-cover-webp:image-set(url('${webp}') type('image/webp'), url('${jpg}') type('image/jpeg'))`;
+                }
+                mediaStyle = ` style="${style}"`;
+            }
 
             const mediaClass = `feed-media${isCategoryCover ? ' feed-media--category' : ''}`;
             const favType = kind === 'offer' ? 'offer' : 'request';
@@ -2867,8 +2876,17 @@
         const dist = (row && row.distance_km != null) ? `${row.distance_km} km` : '';
         const media = (row && row.media_urls && row.media_urls[0] && (row.media_urls[0].url || row.media_urls[0])) || '';
         const aiSrc = aiImageForCategory(catKey);
-        const mediaSrc = media || aiSrc;
-        const mediaStyle = mediaSrc ? ` style="--feed-cover:url('${escapeHtml(String(mediaSrc))}')"` : '';
+        const mediaSrc = media || (aiSrc && aiSrc.jpg);
+        let mediaStyle = '';
+        if (mediaSrc) {
+            const jpg = escapeHtml(String(mediaSrc));
+            let style = `--feed-cover:url('${jpg}')`;
+            if (!media && aiSrc && aiSrc.webp) {
+                const webp = escapeHtml(String(aiSrc.webp));
+                style += `; --feed-cover-webp:image-set(url('${webp}') type('image/webp'), url('${jpg}') type('image/jpeg'))`;
+            }
+            mediaStyle = ` style="${style}"`;
+        }
         const icon = inviteIcon(catKey);
         const badgeLabel = (kind === 'offer') ? 'OFERTA' : 'NECESIDAD';
         if (modalTitle) {
@@ -3252,7 +3270,7 @@
         return hit ? hit.icon : '⚡';
     }
 
-    const AI_CATEGORY_IMAGES = {
+    const AI_CATEGORY_IMAGES_JPG = {
         repairs: '/img/ai/repairs.jpg',
         packages: '/img/ai/packages.jpg',
         pets: '/img/ai/pets.jpg',
@@ -3265,6 +3283,21 @@
         creative: '/img/ai/creative.jpg',
         errands: '/img/ai/errands.jpg',
         other: '/img/ai/other.jpg',
+    };
+
+    const AI_CATEGORY_IMAGES_WEBP = {
+        repairs: '/img/ai/repairs.webp',
+        packages: '/img/ai/packages.webp',
+        pets: '/img/ai/pets.webp',
+        cleaning: '/img/ai/cleaning.webp',
+        transport: '/img/ai/transport.webp',
+        tech: '/img/ai/tech.webp',
+        gardening: '/img/ai/gardening.webp',
+        care: '/img/ai/care.webp',
+        tutoring: '/img/ai/tutoring.webp',
+        creative: '/img/ai/creative.webp',
+        errands: '/img/ai/errands.webp',
+        other: '/img/ai/other.webp',
     };
 
     const AI_CATEGORY_PALETTES = {
@@ -3290,10 +3323,15 @@
 
     function aiImageForCategory(cat) {
         if (AI_IMAGE_MODE === 'file') {
-            const src = AI_CATEGORY_IMAGES[cat] || AI_CATEGORY_IMAGES.other;
-            return src ? `${src}?v=ai1` : null;
+            const jpg = AI_CATEGORY_IMAGES_JPG[cat] || AI_CATEGORY_IMAGES_JPG.other;
+            const webp = AI_CATEGORY_IMAGES_WEBP[cat] || AI_CATEGORY_IMAGES_WEBP.other;
+            return {
+                jpg: jpg ? `${jpg}?v=ai1` : null,
+                webp: webp ? `${webp}?v=ai1` : null,
+            };
         }
-        return generateAiImage(cat);
+        const generated = generateAiImage(cat);
+        return generated ? { jpg: generated, webp: null } : null;
     }
 
     function generateAiImage(cat) {

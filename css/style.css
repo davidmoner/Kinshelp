@@ -471,6 +471,24 @@ body {
   opacity: 0.5;
 }
 
+@supports (background-image: image-set(url("/img/fondo3.webp") type("image/webp"))) {
+  .fx-photo {
+    background: image-set(
+        url("/img/fondo3.webp") type("image/webp"),
+        url("/img/fondo3.png") type("image/png")
+      ) center/cover no-repeat;
+  }
+}
+
+@supports (background-image: -webkit-image-set(url("/img/fondo3.webp") type("image/webp"))) {
+  .fx-photo {
+    background: -webkit-image-set(
+        url("/img/fondo3.webp") type("image/webp"),
+        url("/img/fondo3.png") type("image/png")
+      ) center/cover no-repeat;
+  }
+}
+
 .fx-aurora {
   position: fixed;
   inset: 0;
@@ -4446,6 +4464,18 @@ html[data-theme="light"] .feed-section--premium {
   background-repeat: no-repeat;
   opacity: 1;
   z-index: 0;
+}
+
+@supports (background-image: image-set(url("/img/ai/repairs.webp") type("image/webp"))) {
+  .feed-media::before {
+    background-image: var(--feed-cover-webp, var(--feed-cover));
+  }
+}
+
+@supports (background-image: -webkit-image-set(url("/img/ai/repairs.webp") type("image/webp"))) {
+  .feed-media::before {
+    background-image: var(--feed-cover-webp, var(--feed-cover));
+  }
 }
 
 .feed-media--category::before {
