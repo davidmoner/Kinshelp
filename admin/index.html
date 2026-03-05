@@ -778,9 +778,12 @@
               '<td><span style="' + (banned ? 'color:var(--bad);font-weight:700;' : 'color:var(--ok);') + '">' + banLabel + '</span></td>' +
               '<td style="display:flex;gap:6px;">' +
                 '<button class="btn" data-id="' + u.id + '" data-detail="1">Detalle</button>' +
+                '<button class="btn" data-id="' + u.id + '" data-reset-points="1">Reset puntos</button>' +
                 '<button class="btn" data-id="' + u.id + '" data-reset-cooldowns="1">Reset cooldowns</button>' +
                 '<button class="btn" data-id="' + u.id + '" data-verify="' + (u.is_verified ? '0' : '1') + '">' + (u.is_verified ? 'Desverificar' : 'Verificar') + '</button>' +
                 '<button class="' + banBtnClass + '" data-id="' + u.id + '" data-ban-action="' + (banned ? 'unban' : 'ban') + '">' + banBtnLabel + '</button>' +
+                '<button class="btn" data-id="' + u.id + '" data-gdpr-export="1">GDPR export</button>' +
+                '<button class="btn danger" data-id="' + u.id + '" data-gdpr-delete="1">GDPR delete</button>' +
               '</td>';
           tb.appendChild(tr);
         });
@@ -1046,6 +1049,30 @@
             if (!window.confirm('¿Resetear cooldowns de notificaciones para este usuario?')) return;
             api('/users/' + encodeURIComponent(id) + '/reset-cooldowns', { method: 'POST', body: JSON.stringify({}) })
               .then(function () { toast('Cooldowns reseteados', true); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+          // Reset points
+          if (t.matches('button[data-reset-points]')) {
+            if (!window.confirm('¿Resetear reputacion/puntos de este usuario?')) return;
+            api('/users/' + encodeURIComponent(id) + '/reset-points', { method: 'POST', body: JSON.stringify({}) })
+              .then(function () { toast('Puntos reseteados', true); return loadUsers(); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+          // GDPR export
+          if (t.matches('button[data-gdpr-export]')) {
+            api('/users/' + encodeURIComponent(id) + '/gdpr/export', { method: 'POST', body: JSON.stringify({}) })
+              .then(function (j) {
+                showUserDetail(j.data || {});
+                toast('Export listo', true);
+              })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+          // GDPR delete
+          if (t.matches('button[data-gdpr-delete]')) {
+            var confirmText = window.prompt('Escribe ELIMINAR para confirmar (irreversible):') || '';
+            if (confirmText !== 'ELIMINAR') return;
+            api('/users/' + encodeURIComponent(id) + '/gdpr/delete', { method: 'POST', body: JSON.stringify({}) })
+              .then(function () { toast('Usuario anonimizado', true); return loadUsers(); })
               .catch(function (err) { toast(err.message || 'Error', false); });
           }
         });
