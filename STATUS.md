@@ -40,6 +40,10 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Admin panel (mar 2026):
   - UI: `GET /admin/` (static) con Overview/Usuarios/Actividad/Moderacion/Auditoria/Config.
   - API protegida: `/api/v1/admin/*` requiere token + `ADMIN_EMAILS`.
+  - Auth admin dedicado: `/api/v1/admin/auth/login|me|logout` con cookie httpOnly `admin_token`.
+  - Gate de `/admin/*`: redirige a `/admin/login` si no hay sesion admin.
+  - Cache admin: HTML de `/admin` con `Cache-Control: no-store` para evitar stale.
+  - Rate limit en login admin para evitar brute force.
   - Tablas: `admin_audit_log`, `admin_config`, `admin_events`, `reports`.
   - Config via API: `fx_level` (y base para mas flags).
   - Config: `hero_banner_duration` agregado en admin y expuesto en config publico.
@@ -87,7 +91,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 ### Detalle profesional (resumen tecnico + UX)
 - Nav landing + hamburguesa (movil): header limpio y legible; boton con estilo glass; menu con items por estado (guest/auth), cierre por click fuera y ESC.
 - Demo mobiles (Elena/Maria): labels subidos y separados; z-index alto; zoom sincronizado con cada movil; respeta reduced motion.
-- Admin panel: login dedicado con token `kh_admin_token`; validacion real via `ADMIN_EMAILS`; acciones activas (ban, verify, reset cooldowns, reports, config).
+- Admin panel: login dedicado con cookie httpOnly `admin_token` y validacion por `ADMIN_EMAILS`/`ADMIN_EMAIL`; acciones activas (ban, verify, reset cooldowns, reports, config).
 - Admin panel: vistas funcionales con detalles, moderacion de contenido y modo legal configurable.
 - Ranking: popup y pagina completa con layout glass, filtros compactos, lista en tarjeta y meta informativa.
 - Feed: barra de tiempo con rojo solo al final; secciones con gradiente semi-transparente por tema; textos heredan `--text`.
@@ -317,6 +321,15 @@ EMAIL_PROVIDER=sendgrid
 SENDGRID_API_KEY=<tu key>
 MAIL_FROM=KingsHelp <davidmoner90@gmail.com>
 PUBLIC_BASE_URL=https://kingshelp.es
+```
+
+### Admin (env vars)
+```
+ADMIN_PASSWORD_HASH=<bcrypt hash>
+ADMIN_EMAIL=<email principal>
+# Alternativas:
+ADMIN_EMAILS=admin1@dominio.com,admin2@dominio.com
+ADMIN_STAFF_EMAILS=staff1@dominio.com,staff2@dominio.com
 ```
 
 ### ✅ Paso 4 — Admin: moderación real — COMPLETADO fase 2

@@ -37,6 +37,12 @@ Este proyecto se despliega desde GitHub a Render.
 - No subir secretos: `.env`, keys, credenciales.
 - Si aparece un archivo raro sin trackear (ej. `nul`), no lo subas.
 
+## Admin (env vars)
+
+- `ADMIN_PASSWORD_HASH` (bcrypt del password admin)
+- `ADMIN_EMAIL` o `ADMIN_EMAILS` (lista separada por comas)
+- `ADMIN_STAFF_EMAILS` (opcional, para staff con acceso admin)
+
 ## Ultimos cambios (referencia rapida)
 
 - Si arreglas un bug en produccion: confirma en Network/DevTools que los `api/v1/*` dejan de dar 500.
