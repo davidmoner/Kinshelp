@@ -6684,7 +6684,7 @@ html[data-theme="light"] .quick-match {
 
 #card-feed .explore-radar {
   position: absolute;
-  left: 16px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   margin: 0;
@@ -6764,7 +6764,7 @@ html[data-theme="light"] .quick-match {
   flex-wrap: wrap;
   gap: 12px;
   position: relative;
-  padding: 8px 0 8px 96px;
+  padding: 8px 96px 8px 0;
 }
 
 .explore-title {
@@ -7187,12 +7187,12 @@ button, a, input, select, textarea {
   }
 
   #card-feed .explore-radar {
-    left: 12px;
+    right: 12px;
     margin-left: 0;
   }
 
   .explore-title-row {
-    padding-left: 72px;
+    padding-right: 72px;
   }
 
   .explore-title {

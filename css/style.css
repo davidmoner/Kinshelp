@@ -3553,7 +3553,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   --kh-type-dur1: 1050ms;
   --kh-type-steps1: 12;
   position: relative;
-  padding: 8px 0 8px 96px;
+  padding: 8px 96px 8px 0;
 }
 
 .explore-radar {
@@ -3574,7 +3574,7 @@ html[data-theme="light"] .rep-act-pts.neg {
 
 #card-feed .explore-radar {
   position: absolute;
-  left: 16px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   margin: 0;
@@ -3584,25 +3584,25 @@ html[data-theme="light"] .rep-act-pts.neg {
 
 @media (max-width: 980px) {
   #card-feed .explore-radar {
-    left: 14px;
+    right: 14px;
     width: 72px;
     height: 72px;
   }
 
   .explore-title-row {
-    padding-left: 84px;
+    padding-right: 84px;
   }
 }
 
 @media (max-width: 720px) {
   #card-feed .explore-radar {
-    left: 12px;
+    right: 12px;
     width: 60px;
     height: 60px;
   }
 
   .explore-title-row {
-    padding-left: 72px;
+    padding-right: 72px;
   }
 }
 
