@@ -1382,6 +1382,7 @@
     }
 
     let postLoginAction = null; // e.g. 'first_match'
+    let pendingSearchQuery = null;
 
     function openFirstMatchFlow() {
         showPage('page-dashboard');
@@ -1455,6 +1456,15 @@
             loadPremiumProgress();
             loadBadgesMine();
             loadLeaderboard();
+
+            if (postLoginAction === 'nav_search' && pendingSearchQuery) {
+                const q = pendingSearchQuery;
+                pendingSearchQuery = null;
+                postLoginAction = null;
+                setDashView('explorar');
+                applyFeedSearch(q, { scroll: true });
+                return;
+            }
 
             if (postLoginAction === 'first_match') {
                 postLoginAction = null;
@@ -2460,7 +2470,17 @@
 
             if (reset) wrap.innerHTML = '';
             if (reset && !rows.length) {
-                wrap.innerHTML = '<div class="ledger-empty">Aún no hay ranking en este radio</div>';
+                const q = String(rankingQuery || '').trim();
+                let emptyMsg = rankingScope === 'near'
+                    ? 'Aún no hay ranking en este radio'
+                    : 'Aún no hay ranking global';
+                if (q) {
+                    const qSafe = escapeHtml(q);
+                    emptyMsg = rankingScope === 'near'
+                        ? `Sin resultados para "${qSafe}" en este radio`
+                        : `Sin resultados para "${qSafe}"`;
+                }
+                wrap.innerHTML = `<div class="ledger-empty">${emptyMsg}</div>`;
                 if (moreWrap) moreWrap.style.display = 'none';
                 return;
             }
@@ -2756,6 +2776,17 @@
         renderFeedSection(favoritesList, 'favorites-grid', 'No tienes favoritos todavía');
     }
 
+    function applyFeedSearch(query, opts = {}) {
+        const q = String(query || '').trim();
+        const input = $('feed-q');
+        if (input) input.value = q;
+        if (opts && opts.scroll) {
+            const card = $('card-feed');
+            if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        loadFeed();
+    }
+
     async function loadFeed() {
         if (!KHApi.getToken()) return;
         if (feedDebounce) clearTimeout(feedDebounce);
@@ -2775,7 +2806,7 @@
                         || String(r.user_name || '').toLowerCase().includes(q)
                     );
                 }
-                renderFeed(rows);
+                renderFeed(rows, q);
                 setFeedTab(activeFeedTab);
             } catch (err) {
                 ['feed-need', 'feed-offer', 'feed-premium'].forEach(id => {
@@ -2828,23 +2859,28 @@
         setFeedTab(getSavedFeedTab());
     }
 
-    function renderFeed(rows) {
+    function renderFeed(rows, q) {
         if (!rows) rows = [];
         const premium = rows.filter(r => r.premium_user);
         const need = rows.filter(r => r.kind !== 'offer' && !r.premium_user);
         const offer = rows.filter(r => r.kind === 'offer' && !r.premium_user);
 
-        renderFeedSection(need.slice(0, 30), 'feed-need', 'No hay solicitudes todavía');
-        renderFeedSection(offer.slice(0, 30), 'feed-offer', 'No hay ofertas todavía');
-        renderFeedSection(premium.slice(0, 18), 'feed-premium', 'No hay anuncios premium en este momento');
+        renderFeedSection(need.slice(0, 30), 'feed-need', 'No hay solicitudes todavía', q);
+        renderFeedSection(offer.slice(0, 30), 'feed-offer', 'No hay ofertas todavía', q);
+        renderFeedSection(premium.slice(0, 18), 'feed-premium', 'No hay anuncios premium en este momento', q);
     }
 
-    function renderFeedSection(rows, wrapId, emptyMsg) {
+    function renderFeedSection(rows, wrapId, emptyMsg, q) {
         const wrap = $(wrapId);
         if (!wrap) return;
         wrap.innerHTML = '';
         if (!rows || !rows.length) {
-            wrap.innerHTML = `<div class="ledger-empty">${emptyMsg || 'No hay resultados'}</div>`;
+            const query = String(q || '').trim();
+            if (query) {
+                wrap.innerHTML = `<div class="ledger-empty">Sin resultados para "${escapeHtml(query)}"</div>`;
+            } else {
+                wrap.innerHTML = `<div class="ledger-empty">${emptyMsg || 'No hay resultados'}</div>`;
+            }
             return;
         }
 
@@ -5347,15 +5383,30 @@
         // Header search: jump to quick demo (landing)
         const navQ = document.getElementById('nav-search');
         if (navQ) {
-            navQ.addEventListener('keydown', e => {
+            navQ.addEventListener('keydown', async e => {
                 if (e.key !== 'Enter') return;
                 e.preventDefault();
-                const target = $('quick-title') || document.getElementById('how');
-                if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                if ($('quick-title')) {
-                    $('quick-title').value = navQ.value;
-                    setTimeout(() => $('quick-title').focus(), 60);
+                const q = String(navQ.value || '').trim();
+                if (!q) {
+                    const target = $('quick-title') || document.getElementById('how');
+                    if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if ($('quick-title')) {
+                        $('quick-title').value = navQ.value;
+                        setTimeout(() => $('quick-title').focus(), 60);
+                    }
+                    return;
                 }
+
+                if (!KHApi.getToken()) {
+                    pendingSearchQuery = q;
+                    postLoginAction = 'nav_search';
+                    toast('Inicia sesión para ver resultados', 'info');
+                    openLogin();
+                    return;
+                }
+
+                await goDashboardFromLanding('explorar');
+                applyFeedSearch(q, { scroll: true });
             });
         }
 
