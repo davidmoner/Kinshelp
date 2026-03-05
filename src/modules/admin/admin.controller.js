@@ -3,6 +3,9 @@ const { randomUUID } = require('crypto');
 const repo = require('./admin.repo');
 const eventsRepo = require('./admin.events.repo');
 const reportsRepo = require('./admin.reports.repo');
+const db = require('../../config/db');
+const pointsRepo = require('../points/points.repo');
+const { OFFER_STATUS, REQUEST_STATUS, PREMIUM_TIER } = require('../../config/constants');
 const httpError = require('../../shared/http-error');
 
 function safeUser(user) {
@@ -19,8 +22,6 @@ function me(req, res) {
 function overview(req, res) {
   // Keep MVP minimal and safe. Expand later.
   // For now: total users + last 24h registrations.
-  const db = require('../../config/db');
-
   const get = async () => {
     if (db.isPg) {
       const [a, b, reqOpen, mPend, mDone, prem] = await Promise.all([
@@ -285,7 +286,6 @@ function getUser(req, res) {
 }
 
 function getUserDetail(req, res) {
-  const db = require('../../config/db');
   const id = String(req.params.id);
   const fetch = async () => {
     const user = await Promise.resolve(repo.getUserById(id));
@@ -354,9 +354,196 @@ function getUserDetail(req, res) {
     .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to load user detail' }));
 }
 
+function listCreations(req, res) {
+  const kind = String(req.query.kind || req.query.type || 'requests');
+  if (kind === 'offers') return listOffers(req, res);
+  return listRequests(req, res);
+}
+
+function getCreationDetail(req, res) {
+  const id = String(req.params.id);
+  const kind = String(req.query.kind || req.query.type || 'requests');
+  if (kind === 'offers') {
+    const row = repo.getOfferById(id);
+    if (!row) throw httpError(404, 'Offer not found');
+    return res.json({ ok: true, data: row });
+  }
+  const row = repo.getRequestById(id);
+  if (!row) throw httpError(404, 'Request not found');
+  return res.json({ ok: true, data: row });
+}
+
+function patchCreation(req, res) {
+  const id = String(req.params.id);
+  const kind = String(req.query.kind || req.query.type || 'requests');
+  const body = req.body || {};
+  const isOffer = kind === 'offers';
+  const table = isOffer ? 'service_offers' : 'help_requests';
+  const allowedStatus = isOffer ? OFFER_STATUS : REQUEST_STATUS;
+
+  const before = isOffer ? repo.getOfferById(id) : repo.getRequestById(id);
+  if (!before) throw httpError(404, 'Content not found');
+
+  const updates = {};
+  if (body.status) {
+    const st = String(body.status);
+    if (!allowedStatus.includes(st)) throw httpError(400, 'Invalid status');
+    updates.status = st;
+  }
+  if (body.is_hidden !== undefined) updates.is_hidden = body.is_hidden ? 1 : 0;
+
+  const keys = Object.keys(updates);
+  if (!keys.length) throw httpError(400, 'No fields to update');
+
+  const now = new Date().toISOString();
+  if (db.isPg) {
+    const setSql = keys.map((k, i) => `${k} = $${i + 1}`).join(', ');
+    const vals = keys.map(k => updates[k]);
+    db.exec(`UPDATE ${table} SET ${setSql}, updated_at = $${keys.length + 1} WHERE id = $${keys.length + 2}`,
+      [...vals, now, id])
+      .then(() => repo.insertAudit({
+        id: randomUUID(),
+        adminUserId: req.user.id,
+        action: 'content.patch',
+        entityType: isOffer ? 'offer' : 'request',
+        entityId: id,
+        beforeJson: JSON.stringify({ status: before.status, is_hidden: before.is_hidden }),
+        afterJson: JSON.stringify(updates),
+        ip: req.ip,
+        userAgent: req.headers['user-agent'] || null,
+      }))
+      .then(() => res.json({ ok: true }))
+      .catch(() => res.status(500).json({ error: 'Failed to update content' }));
+    return;
+  }
+
+  const setSql = keys.map(k => `${k} = ?`).join(', ');
+  const vals = keys.map(k => updates[k]);
+  db.prepare(`UPDATE ${table} SET ${setSql}, updated_at = ? WHERE id = ?`).run(...vals, now, id);
+  repo.insertAudit({
+    id: randomUUID(),
+    adminUserId: req.user.id,
+    action: 'content.patch',
+    entityType: isOffer ? 'offer' : 'request',
+    entityId: id,
+    beforeJson: JSON.stringify({ status: before.status, is_hidden: before.is_hidden }),
+    afterJson: JSON.stringify(updates),
+    ip: req.ip,
+    userAgent: req.headers['user-agent'] || null,
+  });
+  res.json({ ok: true });
+}
+
+function resetPoints(req, res) {
+  const id = String(req.params.id);
+  const now = new Date().toISOString();
+  Promise.resolve(pointsRepo.getBalance(id))
+    .then((bal) => {
+      const balance = Number(bal || 0);
+      if (balance === 0) return { balance: 0 };
+      if (db.isPg) {
+        return db.exec('UPDATE users SET points_balance = $1, updated_at = $2 WHERE id = $3', [0, now, id])
+          .then(() => db.exec(
+            'INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+            [randomUUID(), id, null, -balance, 'admin_reset', 0, now]
+          ))
+          .then(() => ({ balance }));
+      }
+      db.prepare('UPDATE users SET points_balance = ?, updated_at = ? WHERE id = ?').run(0, now, id);
+      db.prepare('INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES (?,?,?,?,?,?,?)')
+        .run(randomUUID(), id, null, -balance, 'admin_reset', 0, now);
+      return { balance };
+    })
+    .then((out) => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'user.reset_points',
+      entityType: 'user',
+      entityId: id,
+      beforeJson: JSON.stringify({ balance_before: out.balance }),
+      afterJson: JSON.stringify({ balance_after: 0 }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }))
+    .then(() => res.json({ ok: true }))
+    .catch(() => res.status(500).json({ error: 'Failed to reset points' }));
+}
+
+function gdprExport(req, res) {
+  const id = String(req.params.id);
+  const run = async () => {
+    const user = await Promise.resolve(repo.getUserById(id));
+    if (!user) throw httpError(404, 'User not found');
+    if (db.isPg) {
+      const [requests, offers, matches, reports, ledger] = await Promise.all([
+        db.many('SELECT * FROM help_requests WHERE seeker_id = $1', [id]),
+        db.many('SELECT * FROM service_offers WHERE provider_id = $1', [id]),
+        db.many('SELECT * FROM matches WHERE provider_id = $1 OR seeker_id = $1', [id]),
+        db.many('SELECT * FROM reports WHERE reporter_id = $1', [id]),
+        db.many('SELECT * FROM points_ledger WHERE user_id = $1 ORDER BY created_at DESC', [id]),
+      ]);
+      return { user: safeUser(user), requests, offers, matches, reports, ledger };
+    }
+    const requests = db.prepare('SELECT * FROM help_requests WHERE seeker_id = ?').all(id);
+    const offers = db.prepare('SELECT * FROM service_offers WHERE provider_id = ?').all(id);
+    const matches = db.prepare('SELECT * FROM matches WHERE provider_id = ? OR seeker_id = ?').all(id, id);
+    const reports = db.prepare('SELECT * FROM reports WHERE reporter_id = ?').all(id);
+    const ledger = db.prepare('SELECT * FROM points_ledger WHERE user_id = ? ORDER BY created_at DESC').all(id);
+    return { user: safeUser(user), requests, offers, matches, reports, ledger };
+  };
+
+  Promise.resolve(run())
+    .then(data => res.json({ ok: true, data }))
+    .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to export' }));
+}
+
+function gdprDelete(req, res) {
+  const id = String(req.params.id);
+  const now = new Date().toISOString();
+  const run = async () => {
+    const user = await Promise.resolve(repo.getUserById(id));
+    if (!user) throw httpError(404, 'User not found');
+
+    const deletedEmail = `deleted+${id}@kingshelp.invalid`;
+    if (db.isPg) {
+      await db.exec(
+        `UPDATE users SET email = $1, display_name = $2, bio = NULL, location_text = NULL,
+         is_verified = FALSE, is_banned = TRUE, premium_tier = 'free', premium_until = NULL,
+         profile_photos = '[]', points_balance = 0, updated_at = $3 WHERE id = $4`,
+        [deletedEmail, 'Usuario eliminado', now, id]
+      );
+      await db.exec(
+        'INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+        [randomUUID(), id, null, -Number(user.points_balance || 0), 'admin_gdpr_delete', 0, now]
+      );
+    } else {
+      db.prepare(`UPDATE users SET email = ?, display_name = ?, bio = NULL, location_text = NULL,
+        is_verified = 0, is_banned = 1, premium_tier = 'free', premium_until = NULL,
+        profile_photos = '[]', points_balance = 0, updated_at = ? WHERE id = ?`).run(deletedEmail, 'Usuario eliminado', now, id);
+      db.prepare('INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES (?,?,?,?,?,?,?)')
+        .run(randomUUID(), id, null, -Number(user.points_balance || 0), 'admin_gdpr_delete', 0, now);
+    }
+    return user;
+  };
+
+  Promise.resolve(run())
+    .then(before => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'user.gdpr_delete',
+      entityType: 'user',
+      entityId: id,
+      beforeJson: JSON.stringify({ email: before.email, display_name: before.display_name, points_balance: before.points_balance }),
+      afterJson: JSON.stringify({ email: `deleted+${id}@kingshelp.invalid`, display_name: 'Usuario eliminado', points_balance: 0 }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }))
+    .then(() => res.json({ ok: true }))
+    .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to delete user' }));
+}
+
 function patchUser(req, res) {
-  // Minimal, safe patch: allow toggling is_verified only for now.
-  const db = require('../../config/db');
+  // Minimal, safe patch: allow toggling flags and premium tier.
 
   const id = req.params.id;
   const before = repo.getUserById(id);
@@ -365,6 +552,12 @@ function patchUser(req, res) {
   const fields = {};
   if (req.body.is_verified !== undefined) fields.is_verified = req.body.is_verified ? 1 : 0;
   if (req.body.is_banned !== undefined) fields.is_banned = req.body.is_banned ? 1 : 0;
+  if (req.body.premium_tier !== undefined) {
+    const t = String(req.body.premium_tier || '').trim();
+    if (!PREMIUM_TIER.includes(t)) throw httpError(400, 'Invalid premium_tier');
+    fields.premium_tier = t;
+    if (t === 'free') fields.premium_until = null;
+  }
 
   const keys = Object.keys(fields);
   if (!keys.length) throw httpError(400, 'No fields to update');
@@ -533,15 +726,21 @@ module.exports = {
   me,
   overview,
   listEvents,
+  listCreations,
   listUsers,
   listRequests,
   listOffers,
   listMatches,
+  getCreationDetail,
+  patchCreation,
   getRequestDetail,
   getOfferDetail,
   getMatchDetail,
   getUser,
   getUserDetail,
+  resetPoints,
+  gdprExport,
+  gdprDelete,
   patchUser,
   banUser,
   unbanUser,
