@@ -3217,8 +3217,9 @@
         const sel = new Set(Array.isArray(selected) ? selected : []);
         wrap.innerHTML = '';
         AM_CATS.forEach(c => {
+            const isActive = sel.has(c.id);
             const el = document.createElement('label');
-            el.className = 'am-cat';
+            el.className = `am-cat${isActive ? ' am-cat--active' : ''}`;
             el.innerHTML = `
               <input type="checkbox" value="${escapeHtml(c.id)}" ${sel.has(c.id) ? 'checked' : ''} ${disabled ? 'disabled' : ''} />
               <span aria-hidden="true">${c.icon}</span>
@@ -3229,7 +3230,11 @@
 
         if (!disabled) {
             wrap.querySelectorAll('input[type="checkbox"]').forEach(i => {
-                i.addEventListener('change', () => saveAutoMatchSettings());
+                i.addEventListener('change', () => {
+                    const row = i.closest('.am-cat');
+                    if (row) row.classList.toggle('am-cat--active', i.checked);
+                    saveAutoMatchSettings();
+                });
             });
         }
     }
@@ -3651,7 +3656,6 @@
         let i = 0;
         rows.forEach(r => {
             const el = document.createElement('div');
-            el.className = 'am-invite';
             el.style.animationDelay = (i * 40) + 'ms';
             const media = r.media_urls || [];
             const img = (media && media[0] && (media[0].url || media[0])) || '';
@@ -3663,6 +3667,8 @@
             const kind = r.kind === 'offer' ? 'offer' : 'request';
             const who = r.other_name ? `${r.other_name}${r.other_verified ? ' ✓' : ''} · ★ ${(Number(r.other_rating || 0)).toFixed(1)}` : '';
             const st = String(r.status || 'pending');
+            const stClass = ['pending', 'accepted', 'declined', 'expired'].includes(st) ? st : 'pending';
+            el.className = `am-invite am-invite--${stClass}`;
             const stLabel = st === 'accepted' ? 'Aceptada' : (st === 'expired' ? 'Caducada' : (st === 'declined' ? 'Rechazada' : null));
             const showActions = st === 'pending';
             el.innerHTML = `
