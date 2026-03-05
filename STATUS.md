@@ -82,7 +82,9 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
   - Explorar: radar animado a la izquierda con separacion; lupa removida.
   - Floating CTA: boton +Crear fijo en esquina (solo logueados); crear removido de menus.
   - Explorar: radar 50% mas grande y a 150px de la izquierda, centrado con el titulo.
-  - Hero: subtitulo rotativo con transicion suave (cada 3s) y mensaje motivador.
+- Hero: subtitulo rotativo con transicion suave (cada 3s) y mensaje motivador.
+- Dashboard: emblemas animados por seccion + halo en avatar del perfil; radar de Explorar alineado al titulo con margenes.
+- Smoke tests: notificaciones in-app cubiertas (match_message, automatch_invite).
 - Feed: panel de texto destacado por tema + acciones de favorito/reportar.
 - Feed: botones favorito/reportar con hover/focus y transiciones suaves.
 - Favoritos: API + UI en perfil con cards y toggle estrella.
@@ -476,7 +478,6 @@ ADMIN_STAFF_EMAILS=staff1@dominio.com,staff2@dominio.com
 - Hay notificaciones push?
 - Como verifico mi email o recupero mi contrasena?
 - Que hago si hay abuso/estafa/contenido peligroso?
-- Notificaciones in-app: sumar smoke coverage (match_message, automatch_invite) y validacion UI basica.
 
 ## Estado (mar 2026)
 

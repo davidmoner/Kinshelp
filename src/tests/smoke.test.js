@@ -8,11 +8,13 @@ const http = require('http');
 const { URL } = require('url');
 
 const app = require('../app');
+const db = require('../config/db');
 
 let BASE = process.env.API_URL || null;
 let BASE_URL = null;
 let server = null;
 let passed = 0, failed = 0;
+const isLocal = !process.env.API_URL;
 
 function requestJson(method, path, { token, payload } = {}) {
   return new Promise((resolve, reject) => {
@@ -53,6 +55,16 @@ function assert(condition, label) {
     console.error(`  ❌  ${label}`);
     failed++;
   }
+}
+
+function hasNotif(list, kind, matchId) {
+  const rows = Array.isArray(list) ? list : [];
+  return rows.some(n => {
+    if (!n || n.kind !== kind) return false;
+    if (!matchId) return true;
+    const p = n.payload || {};
+    return p.match_id === matchId || p.matchId === matchId;
+  });
 }
 
 async function run() {
@@ -329,11 +341,20 @@ async function run() {
         payload: { message: 'Perfecto, quedamos a las 18:00.' },
       });
       assert(msgA.status === 201, 'POST /matches/:id/messages (alice) → 201');
+
+      const notifP = await requestJson('GET', '/api/v1/notifications?limit=20&offset=0', { token: tokenP });
+      assert(notifP.status === 200, 'GET /api/v1/notifications (provider) → 200');
+      assert(hasNotif(notifP.body && notifP.body.data, 'match_message', matchId), 'notifications: match_message (provider)');
+
       const msgB = await requestJson('POST', `/api/v1/matches/${matchId}/messages`, {
         token: tokenP,
         payload: { message: 'Genial, llevo furgoneta. Nos vemos.' },
       });
       assert(msgB.status === 201, 'POST /matches/:id/messages (bob) → 201');
+
+      const notifS = await requestJson('GET', '/api/v1/notifications?limit=20&offset=0', { token: tokenA });
+      assert(notifS.status === 200, 'GET /api/v1/notifications (seeker) → 200');
+      assert(hasNotif(notifS.body && notifS.body.data, 'match_message', matchId), 'notifications: match_message (seeker)');
 
       const done = await requestJson('PATCH', `/api/v1/matches/${matchId}/status`, {
         token: tokenP,
@@ -437,6 +458,65 @@ async function run() {
       const pAward2 = pLed2.find(e => e.match_id === matchId2 && e.reason === 'match_completed' && e.delta > 0);
       assert(!!sAward2, 'ledger: barter awards reputation (seeker)');
       assert(!!pAward2, 'ledger: barter awards reputation (provider)');
+
+      /* ── 5c. AutoMatch invite → notification (local SQLite only) ─────── */
+      if (isLocal && !db.isPg) {
+        const rid3 = `${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+        const regP3 = await requestJson('POST', '/api/v1/auth/register', {
+          payload: { display_name: `Smoke Auto Provider ${rid3}`, email: `smoke.auto.provider.${rid3}@example.com`, password: 'password123' },
+        });
+        const tokenP3 = regP3.body && regP3.body.token;
+        const provider3 = regP3.body && regP3.body.user;
+
+        const regS3 = await requestJson('POST', '/api/v1/auth/register', {
+          payload: { display_name: `Smoke Auto Seeker ${rid3}`, email: `smoke.auto.seeker.${rid3}@example.com`, password: 'password123' },
+        });
+        const tokenS3 = regS3.body && regS3.body.token;
+
+        assert(!!tokenP3 && !!provider3, 'automatch: provider created');
+        assert(!!tokenS3, 'automatch: seeker created');
+
+        db.prepare('UPDATE users SET premium_tier = ?, premium_until = NULL WHERE id = ?').run('gold', provider3.id);
+
+        const setAm = await requestJson('PUT', '/api/v1/automatch/settings', {
+          token: tokenP3,
+          payload: { enabled: true, categories: ['tech'] },
+        });
+        assert(setAm.status === 200, 'PUT /automatch/settings (provider premium) → 200');
+
+        const offer = await requestJson('POST', '/api/v1/offers', {
+          token: tokenP3,
+          payload: {
+            title: 'AutoMatch offer',
+            category: 'tech',
+            compensation_type: 'cash',
+            description: 'offer for automatch',
+            location_text: 'Centro',
+          },
+        });
+        assert(offer.status === 201, 'POST /api/v1/offers (automatch) → 201');
+
+        const req3 = await requestJson('POST', '/api/v1/requests', {
+          token: tokenS3,
+          payload: {
+            title: 'AutoMatch request',
+            category: 'tech',
+            points_offered: 0,
+            compensation_type: 'cash',
+            description: 'request for automatch',
+            location_text: 'Centro',
+            when: 'asap',
+          },
+        });
+        assert(req3.status === 201, 'POST /api/v1/requests (automatch) → 201');
+
+        const notifAuto = await requestJson('GET', '/api/v1/notifications?limit=20&offset=0', { token: tokenP3 });
+        assert(notifAuto.status === 200, 'GET /api/v1/notifications (automatch provider) → 200');
+        const hasAuto = (notifAuto.body && notifAuto.body.data || []).some(n => n && n.kind === 'automatch_invite');
+        assert(hasAuto, 'notifications: automatch_invite');
+      } else {
+        assert(true, 'automatch: skipped (non-local or PG)');
+      }
     } catch (e) {
       console.error(`  ❌  MVP flow failed: ${e.message}`);
       failed++;
