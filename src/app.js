@@ -165,6 +165,54 @@ async function ensureAdminSchema() {
 
 ensureAdminSchema();
 
+// Auto-create admin user in users table on startup so login works without manual seed.
+async function ensureAdminUser() {
+  const adminEmails = [
+    ...((env.ADMIN_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)),
+    ...((env.ADMIN_EMAIL || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)),
+  ];
+  const adminHash = env.ADMIN_PASSWORD_HASH;
+  if (!adminEmails.length || !adminHash) return;
+
+  const now = new Date().toISOString();
+  const seen = new Set();
+  for (const email of adminEmails) {
+    if (seen.has(email)) continue;
+    seen.add(email);
+    try {
+      if (db.isPg) {
+        const existing = await db.one('SELECT id FROM users WHERE email = $1', [email]);
+        if (!existing) {
+          const { randomUUID } = require('crypto');
+          await db.exec(
+            `INSERT INTO users (id, display_name, email, password_hash, bio, location_text,
+             points_balance, rating_avg, rating_count, premium_tier, is_verified,
+             created_at, updated_at, profile_photos, boost_48h_tokens)
+             VALUES ($1,$2,$3,$4,NULL,NULL,0,0.0,0,'free',TRUE,$5,$5,'[]',0)`,
+            [randomUUID(), 'Admin', email, adminHash, now]
+          );
+          console.log('[admin] auto-created admin user:', email);
+        }
+      } else {
+        const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+        if (!existing) {
+          const { randomUUID } = require('crypto');
+          db.prepare(
+            `INSERT INTO users (id, display_name, email, password_hash, bio, location_text,
+             points_balance, rating_avg, rating_count, premium_tier, is_verified,
+             created_at, updated_at, profile_photos, boost_48h_tokens)
+             VALUES (?,?,?,?,NULL,NULL,0,0.0,0,'free',1,?,?,'[]',0)`
+          ).run(randomUUID(), 'Admin', email, adminHash, now, now);
+          console.log('[admin] auto-created admin user:', email);
+        }
+      }
+    } catch (err) {
+      console.warn('[admin] ensureAdminUser failed for', email, ':', err && err.message ? err.message : err);
+    }
+  }
+}
+ensureAdminUser();
+
 async function healthPayload() {
   let dbStatus = { ok: false, type: db.isPg ? 'postgres' : 'sqlite' };
   try { dbStatus = await checkDb(); } catch (e) { dbStatus = { ok: false, type: db.isPg ? 'postgres' : 'sqlite', error: e && e.message ? e.message : String(e) }; }

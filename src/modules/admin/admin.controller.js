@@ -24,17 +24,18 @@ function overview(req, res) {
   // For now: total users + last 24h registrations.
   const get = async () => {
     if (db.isPg) {
-      const [a, b, reqOpen, mPend, mDone, prem] = await Promise.all([
+      const [a, b, reqOpen, offOpen, mPend, mDone, prem] = await Promise.all([
         db.one('SELECT COUNT(*)::int AS n FROM users', []),
         db.one("SELECT COUNT(*)::int AS n FROM users WHERE created_at >= (now() - interval '1 day')", []),
         db.one("SELECT COUNT(*)::int AS n FROM help_requests WHERE status = 'open'", []),
+        db.one("SELECT COUNT(*)::int AS n FROM service_offers WHERE status = 'open'", []),
         db.one("SELECT COUNT(*)::int AS n FROM matches WHERE status = 'pending'", []),
         db.one("SELECT COUNT(*)::int AS n FROM matches WHERE status = 'done'", []),
         db.one("SELECT COUNT(*)::int AS n FROM users WHERE premium_tier <> 'free'", []),
       ]);
       return {
         users: { total: a.n, last_24h: b.n },
-        requests: { open: reqOpen.n },
+        requests: { open: reqOpen.n, offers_open: offOpen.n },
         matches: { pending: mPend.n, done: mDone.n },
         premium: { active_users: prem.n },
       };
@@ -43,12 +44,13 @@ function overview(req, res) {
     const totalUsers = db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
     const last24h = db.prepare("SELECT COUNT(*) AS n FROM users WHERE created_at >= datetime('now','-1 day')").get().n;
     const reqOpen = db.prepare("SELECT COUNT(*) AS n FROM help_requests WHERE status = 'open'").get().n;
+    const offOpen = db.prepare("SELECT COUNT(*) AS n FROM service_offers WHERE status = 'open'").get().n;
     const mPend = db.prepare("SELECT COUNT(*) AS n FROM matches WHERE status = 'pending'").get().n;
     const mDone = db.prepare("SELECT COUNT(*) AS n FROM matches WHERE status = 'done'").get().n;
     const prem = db.prepare("SELECT COUNT(*) AS n FROM users WHERE premium_tier <> 'free'").get().n;
     return {
       users: { total: totalUsers, last_24h: last24h },
-      requests: { open: reqOpen },
+      requests: { open: reqOpen, offers_open: offOpen },
       matches: { pending: mPend, done: mDone },
       premium: { active_users: prem },
     };

@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,1263 +8,1500 @@
   <style>
     :root {
       --bg: #070A10;
-      --panel: rgba(16, 22, 34, 0.78);
-      --panel2: rgba(255, 255, 255, 0.06);
+      --panel: rgba(16, 22, 34, 0.88);
+      --panel2: rgba(255, 255, 255, 0.05);
       --text: #EDF0F8;
-      --muted: rgba(237, 240, 248, 0.62);
-      --border: rgba(255, 255, 255, 0.12);
+      --muted: rgba(237, 240, 248, 0.55);
+      --border: rgba(255, 255, 255, 0.10);
       --brand: #295AAD;
       --gold: #DEAD5A;
       --ok: #22C55E;
+      --warn: #F59E0B;
       --bad: #EF4444;
       --shadow: 0 18px 60px rgba(0,0,0,0.55);
-      --radius: 16px;
+      --radius: 14px;
       --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
-
-    html, body { height: 100%; }
+    html, body { height: 100%; margin: 0; }
     body {
-      margin: 0;
-      background:
-        radial-gradient(ellipse 70% 40% at 20% 0%, rgba(41, 90, 173, 0.14), transparent 60%),
-        radial-gradient(ellipse 55% 45% at 85% 15%, rgba(222, 173, 90, 0.08), transparent 65%),
-        var(--bg);
+      background: radial-gradient(ellipse 70% 40% at 20% 0%, rgba(41,90,173,0.14), transparent 60%),
+                  radial-gradient(ellipse 55% 45% at 85% 15%, rgba(222,173,90,0.08), transparent 65%),
+                  var(--bg);
       color: var(--text);
       font-family: var(--font);
+      font-size: 14px;
     }
+    *, *::before, *::after { box-sizing: border-box; }
 
-    .wrap {
-      display: grid;
-      grid-template-columns: 260px 1fr;
-      min-height: 100vh;
-    }
-
+    /* Layout */
+    .wrap { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
     .side {
-      position: sticky;
-      top: 0;
-      height: 100vh;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
       border-right: 1px solid var(--border);
-      background: rgba(10, 14, 22, 0.72);
-      backdrop-filter: blur(18px) saturate(140%);
-      padding: 18px;
-      box-sizing: border-box;
+      background: rgba(8,12,20,0.82);
+      backdrop-filter: blur(20px) saturate(140%);
+      padding: 16px 12px;
+      display: flex; flex-direction: column; gap: 4px;
     }
-
-    .brand {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 16px;
+    .brand { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; padding: 0 4px; }
+    .brand b { font-size: 15px; letter-spacing: -0.3px; }
+    .badge-role {
+      font-size: 10px; padding: 3px 7px; border-radius: 999px;
+      color: rgba(222,173,90,0.95); border: 1px solid rgba(222,173,90,0.3);
+      background: rgba(222,173,90,0.10);
     }
-    .brand b { letter-spacing: -0.4px; }
-    .badge {
-      font-size: 11px;
-      padding: 4px 8px;
-      border: 1px solid rgba(222, 173, 90, 0.26);
-      border-radius: 999px;
-      color: rgba(231, 181, 82, 0.95);
-      background: rgba(222, 173, 90, 0.10);
+    .session-pill {
+      font-size: 11px; color: var(--muted); padding: 6px 8px;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      margin-bottom: 6px; word-break: break-all;
     }
-
-    .nav {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 14px;
-    }
+    .nav-sep { font-size: 10px; color: var(--muted); padding: 10px 8px 4px; text-transform: uppercase; letter-spacing: 0.8px; }
     .nav button {
-      width: 100%;
-      text-align: left;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 650;
+      width: 100%; text-align: left; padding: 9px 10px;
+      border-radius: 10px; border: 1px solid transparent;
+      background: transparent; color: var(--text);
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      transition: background 0.15s, border-color 0.15s;
     }
-    .nav button:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); }
-    .nav button.active { background: rgba(41, 90, 173, 0.14); border-color: rgba(41, 90, 173, 0.25); }
+    .nav button:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.07); }
+    .nav button.active { background: rgba(41,90,173,0.18); border-color: rgba(41,90,173,0.28); }
+    .nav button .ico { font-size: 15px; width: 18px; text-align: center; }
+    .side-footer { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .side-footer a, .side-footer button {
+      text-align: center; padding: 8px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+      color: var(--text); text-decoration: none; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+    }
+    .side-footer button:hover { background: rgba(239,68,68,0.10); border-color: rgba(239,68,68,0.2); }
 
-    .main { padding: 22px; }
-
+    /* Login */
     .login-screen {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background:
-        radial-gradient(ellipse 70% 40% at 20% 0%, rgba(41, 90, 173, 0.16), transparent 60%),
-        radial-gradient(ellipse 55% 45% at 85% 15%, rgba(222, 173, 90, 0.10), transparent 65%),
-        var(--bg);
-      z-index: 999;
+      position: fixed; inset: 0; display: none;
+      align-items: center; justify-content: center;
+      background: radial-gradient(ellipse 70% 40% at 20% 0%, rgba(41,90,173,0.18), transparent 60%),
+                  radial-gradient(ellipse 55% 45% at 85% 15%, rgba(222,173,90,0.10), transparent 65%),
+                  var(--bg);
+      z-index: 9999;
     }
-
     .login-card {
-      width: min(420px, 92vw);
+      width: min(400px, 92vw);
       border: 1px solid var(--border);
-      background: rgba(16, 22, 34, 0.85);
+      background: rgba(14,20,32,0.92);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 18px;
+      padding: 28px 24px;
     }
+    .login-card h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.4px; }
+    .login-card p { margin: 0 0 18px; color: var(--muted); font-size: 13px; }
+    .login-error { font-size: 12px; color: var(--bad); min-height: 18px; margin-top: 6px; }
 
-    .login-card h2 {
-      margin: 0 0 4px;
-      font-size: 20px;
-      letter-spacing: -0.2px;
-    }
+    /* Main */
+    .main { padding: 20px 24px; min-width: 0; }
+    .page-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+    .page-title { font-size: 24px; font-weight: 900; letter-spacing: -0.6px; margin: 0; }
+    .page-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
-    .login-card p { margin: 0 0 14px; color: var(--muted); }
-
-    .login-card input {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-
-    .login-error {
-      font-size: 12px;
-      color: var(--bad);
-      min-height: 16px;
-    }
-
-    .top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
+    /* Cards */
     .card {
       border: 1px solid var(--border);
       background: var(--panel2);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
+      padding: 16px;
     }
+    .card + .card, .mt { margin-top: 14px; }
 
-    .banner {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(239, 68, 68, 0.35);
-      background: rgba(239, 68, 68, 0.12);
+    /* KPI grid */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+    .kpi-val { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1; }
+    .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+    /* Two-col */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Forms / Inputs */
+    input, select, textarea {
+      padding: 9px 12px; border-radius: 10px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.11);
+      color: var(--text); outline: none; width: 100%; font-size: 13px;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: rgba(41,90,173,0.5); }
+    select { cursor: pointer; }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 13px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: var(--text); cursor: pointer; font-size: 12px; font-weight: 700;
+      white-space: nowrap; transition: background 0.14s;
+    }
+    .btn:hover { background: rgba(255,255,255,0.09); }
+    .btn.primary { background: rgba(41,90,173,0.22); border-color: rgba(41,90,173,0.35); }
+    .btn.primary:hover { background: rgba(41,90,173,0.32); }
+    .btn.danger { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.28); color: #fca5a5; }
+    .btn.danger:hover { background: rgba(239,68,68,0.20); }
+    .btn.gold { background: rgba(222,173,90,0.14); border-color: rgba(222,173,90,0.3); color: var(--gold); }
+    .btn.gold:hover { background: rgba(222,173,90,0.22); }
+    .btn.sm { padding: 5px 9px; font-size: 11px; border-radius: 8px; }
+    .btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 12px; vertical-align: middle; }
+    th { text-align: left; color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td code { color: rgba(222,173,90,0.9); font-size: 11px; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Status pills */
+    .pill {
+      display: inline-block; padding: 3px 8px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; border: 1px solid;
+    }
+    .pill.ok { color: var(--ok); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.10); }
+    .pill.bad { color: #fca5a5; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.10); }
+    .pill.warn { color: #fcd34d; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.10); }
+    .pill.muted { color: var(--muted); border-color: var(--border); background: rgba(255,255,255,0.04); }
+    .pill.gold { color: var(--gold); border-color: rgba(222,173,90,0.3); background: rgba(222,173,90,0.10); }
+
+    /* Toolbar */
+    .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+    .toolbar input { max-width: 260px; }
+    .toolbar select { max-width: 180px; }
+    .meta-row { font-size: 11px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+
+    /* Pagination */
+    .pagination { display: flex; gap: 6px; align-items: center; margin-top: 12px; }
+    .pagination .page-info { font-size: 12px; color: var(--muted); }
+
+    /* Error banner */
+    .banner-err {
+      display: none; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 14px; border-radius: 10px;
+      border: 1px solid rgba(239,68,68,0.35); background: rgba(239,68,68,0.10);
       margin-bottom: 14px;
     }
-    .banner.show { display: flex; }
+    .banner-err.show { display: flex; }
 
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .kpi { display: flex; flex-direction: column; gap: 6px; }
-    .kpi .label { color: var(--muted); font-size: 12px; }
-    .kpi .val { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; }
-
-    .muted { color: var(--muted); }
-    .pill {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 8px 10px;
-      background: rgba(255,255,255,0.04);
-    }
-
-    input {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
-      color: var(--text);
-      outline: none;
-    }
-
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 13px; }
-    th { text-align: left; color: var(--muted); font-weight: 700; }
-    td code { color: rgba(231, 181, 82, 0.95); }
-    .btn {
-      padding: 9px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.04);
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 700;
-    }
-    .btn.primary { background: rgba(41, 90, 173, 0.18); border-color: rgba(41, 90, 173, 0.28); }
-    .btn.danger { background: rgba(239, 68, 68, 0.10); border-color: rgba(239, 68, 68, 0.22); }
-
+    /* Toast */
     .toast {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      padding: 10px 12px;
-      border-radius: 12px;
+      position: fixed; right: 18px; bottom: 18px;
+      padding: 10px 16px; border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(10,14,22,0.86);
-      color: var(--text);
-      box-shadow: var(--shadow);
-      display: none;
+      background: rgba(10,14,22,0.92); color: var(--text);
+      box-shadow: var(--shadow); display: none; font-size: 13px; font-weight: 600;
+      z-index: 9998;
     }
     .toast.show { display: block; }
-    .toast.ok { border-color: rgba(34,197,94,0.35); }
-    .toast.bad { border-color: rgba(239,68,68,0.35); }
+    .toast.ok { border-color: rgba(34,197,94,0.4); }
+    .toast.bad { border-color: rgba(239,68,68,0.4); }
 
-    @media (max-width: 920px) {
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 8000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      width: min(720px, 100%); max-height: 90vh; overflow-y: auto;
+      background: rgba(12,18,30,0.98); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 20px 22px;
+    }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .modal-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+
+    /* Detail sections in modal */
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .detail-field label { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px; }
+    .detail-field span { font-size: 13px; font-weight: 600; word-break: break-all; }
+    .detail-section { margin-top: 14px; }
+    .detail-section-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+    /* Config */
+    .cfg-row { display: grid; gap: 10px; max-width: 680px; }
+    .cfg-card { border: 1px solid var(--border); background: rgba(255,255,255,0.03); border-radius: 12px; padding: 14px 16px; }
+    .cfg-title { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+    .cfg-sub { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+
+    /* Misc */
+    .muted { color: var(--muted); }
+    .text-sm { font-size: 12px; }
+    .gap-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+    .empty-row { text-align: center; padding: 24px 0 !important; color: var(--muted); font-size: 12px; }
+
+    @media (max-width: 960px) {
       .wrap { grid-template-columns: 1fr; }
-      .side { position: relative; height: auto; }
-      .row { grid-template-columns: 1fr; }
+      .side { position: relative; height: auto; flex-direction: row; flex-wrap: wrap; padding: 12px; }
+      .side-footer { margin-top: 0; flex-direction: row; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-
 <body>
-  <div class="login-screen" id="admin-login" style="display:none;">
-    <div class="login-card">
-      <h2>Acceso admin</h2>
-      <p>Introduce tus credenciales para continuar.</p>
-      <form id="admin-login-form">
-        <input id="admin-email" type="email" placeholder="admin@kingshelp.es" required />
-        <input id="admin-pass" type="password" placeholder="Contraseña" required />
-        <button class="btn primary" id="admin-login-btn" type="submit">Entrar</button>
-      </form>
-      <div class="login-error" id="admin-login-error"></div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="admin-login">
+  <div class="login-card">
+    <div style="font-size:28px; margin-bottom:12px;">&#128081;</div>
+    <h2>KingsHelp Admin</h2>
+    <p>Acceso restringido. Introduce tus credenciales.</p>
+    <form id="admin-login-form">
+      <input id="admin-email" type="email" placeholder="tu@email.com" autocomplete="email" required style="margin-bottom:10px;" />
+      <input id="admin-pass" type="password" placeholder="Contrasena" autocomplete="current-password" required style="margin-bottom:12px;" />
+      <button class="btn primary" id="admin-login-btn" type="submit" style="width:100%; padding:11px;">Entrar</button>
+    </form>
+    <div class="login-error" id="admin-login-error"></div>
+  </div>
+</div>
+
+<!-- MODAL: user detail -->
+<div class="modal-overlay" id="modalUser">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="modalUserTitle">Detalle de usuario</div>
+      <button class="btn sm" id="modalUserClose">Cerrar</button>
     </div>
+    <div id="modalUserBody"></div>
   </div>
-  <div class="wrap">
-    <aside class="side">
-      <div class="brand">
-        <b>KingsHelp</b>
-        <span class="badge">Admin</span>
-      </div>
-      <div class="pill">
-        <span class="muted">Sesion:</span>
-        <span id="meEmail">-</span>
-      </div>
-      <div class="nav" role="navigation" aria-label="Admin">
-        <button class="active" data-view="overview" type="button">Overview</button>
-        <button data-view="users" type="button">Usuarios</button>
-        <button data-view="content" type="button">Creaciones</button>
-        <button data-view="matches" type="button">Matches</button>
-        <button data-view="events" type="button">Actividad</button>
-        <button data-view="reports" type="button">Moderacion</button>
-        <button data-view="audit" type="button">Auditoria</button>
-        <button data-view="config" type="button">Config</button>
-      </div>
-      <div style="margin-top:14px; display:flex; gap:10px;">
-        <button class="btn" id="btnLogout" type="button">Salir</button>
-        <a class="btn primary" href="/" style="text-decoration:none; display:inline-flex; align-items:center;">Web</a>
-      </div>
-    </aside>
+</div>
 
-    <main class="main">
-        <div class="top">
-          <div>
-            <div class="muted" id="subtitle">Panel administrativo</div>
-            <div class="muted" id="buildStamp">ADMIN BUILD: 2026-03-05 15:13 / 7a6ee8c</div>
-            <div class="muted" id="apiVersion">API VERSION: -</div>
-            <div style="font-size:26px; font-weight:900; letter-spacing:-0.7px;" id="title">Overview</div>
-          </div>
-        <div style="min-width: 280px;" id="searchWrap" class="hidden"></div>
-      </div>
-
-      <section id="view-overview" class="card">
-        <div class="banner" id="apiErrorBanner">
-          <div>
-            <strong>Error de API</strong>
-            <div class="muted" id="apiErrorText">No se pudo cargar el overview.</div>
-          </div>
-          <button class="btn" id="apiRetry" type="button">Reintentar</button>
-        </div>
-        <div class="row">
-          <div class="card" style="box-shadow:none;">
-            <div class="kpi">
-              <div class="label">Usuarios (total)</div>
-              <div class="val" id="kpiUsersTotal">-</div>
-            </div>
-          </div>
-          <div class="card" style="box-shadow:none;">
-            <div class="kpi">
-              <div class="label">Usuarios (ultimas 24h)</div>
-              <div class="val" id="kpiUsers24">-</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:14px;">
-          <div class="card" style="box-shadow:none;">
-            <div class="kpi">
-              <div class="label">Requests abiertas</div>
-              <div class="val" id="kpiReqOpen">-</div>
-            </div>
-          </div>
-          <div class="card" style="box-shadow:none;">
-            <div class="kpi">
-              <div class="label">Premium activos</div>
-              <div class="val" id="kpiPremActive">-</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:14px;">
-          <div class="card" style="box-shadow:none;">
-            <div class="muted" style="margin-bottom:10px;">Actividad reciente</div>
-            <div style="overflow:auto; max-height: 320px;">
-              <table aria-label="Eventos">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Tipo</th>
-                    <th>Actor</th>
-                    <th>Target</th>
-                  </tr>
-                </thead>
-                <tbody id="eventsTbody"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="card" style="box-shadow:none;">
-            <div class="muted" style="margin-bottom:10px;">Moderacion (open)</div>
-            <div style="overflow:auto; max-height: 320px;">
-              <table aria-label="Reports">
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Target</th>
-                    <th>Motivo</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="reportsTbody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-users" class="card" style="display:none;">
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
-          <input id="userQuery" placeholder="Buscar por email, nombre o id" />
-          <button class="btn primary" id="btnUserSearch" type="button">Buscar</button>
-        </div>
-        <div class="muted" id="usersMeta" style="margin-bottom:10px;"></div>
-        <div style="overflow:auto;">
-          <table aria-label="Usuarios">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Reputacion</th>
-                <th>Premium</th>
-                <th>Verificado</th>
-                <th>Estado</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="usersTbody"></tbody>
-          </table>
-        </div>
-        <div class="card" id="userDetailCard" style="box-shadow:none; margin-top:12px; display:none;">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <div style="font-weight:800;">Detalle usuario</div>
-            <button class="btn" id="btnUserDetailClose" type="button">Cerrar</button>
-          </div>
-          <pre id="userDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
-        </div>
-      </section>
-
-      <section id="view-content" class="card" style="display:none;">
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
-          <select id="contentKind" class="btn" aria-label="Tipo de contenido">
-            <option value="requests">Solicitudes</option>
-            <option value="offers">Ofertas</option>
-          </select>
-          <input id="contentQuery" placeholder="Buscar por titulo, usuario o id" />
-          <button class="btn primary" id="btnContentSearch" type="button">Buscar</button>
-        </div>
-        <div class="muted" id="contentMeta" style="margin-bottom:10px;"></div>
-        <div style="overflow:auto;">
-          <table aria-label="Creaciones">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Titulo</th>
-                <th>Categoria</th>
-                <th>Estado</th>
-                <th>Usuario</th>
-                <th>Creado</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="contentTbody"></tbody>
-          </table>
-        </div>
-        <div class="card" id="contentDetailCard" style="box-shadow:none; margin-top:12px; display:none;">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <div style="font-weight:800;">Detalle contenido</div>
-            <button class="btn" id="btnContentDetailClose" type="button">Cerrar</button>
-          </div>
-          <pre id="contentDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
-        </div>
-      </section>
-
-      <section id="view-matches" class="card" style="display:none;">
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
-          <input id="matchQuery" placeholder="Buscar por usuario, titulo o id" />
-          <button class="btn primary" id="btnMatchSearch" type="button">Buscar</button>
-        </div>
-        <div class="muted" id="matchesMeta" style="margin-bottom:10px;"></div>
-        <div style="overflow:auto;">
-          <table aria-label="Matches">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Estado</th>
-                <th>Comp.</th>
-                <th>Proveedor</th>
-                <th>Solicitante</th>
-                <th>Asunto</th>
-                <th>Creado</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="matchesTbody"></tbody>
-          </table>
-        </div>
-        <div class="card" id="matchDetailCard" style="box-shadow:none; margin-top:12px; display:none;">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <div style="font-weight:800;">Detalle match</div>
-            <button class="btn" id="btnMatchDetailClose" type="button">Cerrar</button>
-          </div>
-          <pre id="matchDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
-        </div>
-      </section>
-
-      <section id="view-audit" class="card" style="display:none;">
-        <div class="muted" style="margin-bottom:10px;">Ultimas acciones admin</div>
-        <div style="overflow:auto;">
-          <table aria-label="Auditoria">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Admin</th>
-                <th>Accion</th>
-                <th>Entidad</th>
-                <th>IP</th>
-              </tr>
-            </thead>
-            <tbody id="auditTbody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="view-events" class="card" style="display:none;">
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
-          <input id="eventType" placeholder="Filtrar por type (opcional)" />
-          <button class="btn primary" id="btnEventSearch" type="button">Filtrar</button>
-        </div>
-        <div class="muted" id="eventsMeta" style="margin-bottom:10px;"></div>
-        <div style="overflow:auto;">
-          <table aria-label="Eventos">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Tipo</th>
-                <th>Actor</th>
-                <th>Target</th>
-                <th>Meta</th>
-              </tr>
-            </thead>
-            <tbody id="eventsTbodyFull"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="view-reports" class="card" style="display:none;">
-        <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
-          <input id="reportStatus" placeholder="status (open/resolved)" value="open" />
-          <button class="btn primary" id="btnReportSearch" type="button">Cargar</button>
-        </div>
-        <div class="muted" id="reportsMeta" style="margin-bottom:10px;"></div>
-        <div style="overflow:auto;">
-          <table aria-label="Reports">
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Status</th>
-                <th>Target</th>
-                <th>Motivo</th>
-                <th>Notes</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody id="reportsTbodyFull"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="view-config" class="card" style="display:none;">
-        <div class="muted" style="margin-bottom:10px;">Feature flags / ajustes</div>
-        <div style="display:grid; gap:10px; max-width: 720px;">
-          <div class="card" style="box-shadow:none;">
-            <div style="font-weight:800;">FX Level</div>
-            <div class="muted" style="margin-top:6px;">Control rapido de efectos visuales.</div>
-            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
-              <button class="btn" data-fx="off" type="button">off</button>
-              <button class="btn" data-fx="subtle" type="button">subtle</button>
-              <button class="btn primary" data-fx="wow" type="button">wow</button>
-            </div>
-          </div>
-          <div class="card" style="box-shadow:none;">
-            <div style="font-weight:800;">Hero banner</div>
-            <div class="muted" style="margin-top:6px;">Duracion por banner (segundos).</div>
-            <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
-              <input id="heroDurationInput" type="number" min="3" max="20" step="1" placeholder="6" />
-              <button class="btn" id="heroDurationSave" type="button">Guardar</button>
-            </div>
-          </div>
-          <div class="card" style="box-shadow:none;">
-            <div style="font-weight:800;">Modo legal</div>
-            <div class="muted" style="margin-top:6px;">Activa avisos legales y refuerzo de cumplimiento.</div>
-            <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-              <label class="pill" style="cursor:pointer;">
-                <input id="legalModeToggle" type="checkbox" style="width:auto; margin:0 6px 0 0;" />
-                <span>Legal activo</span>
-              </label>
-              <button class="btn" id="legalModeSave" type="button">Guardar</button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+<!-- MODAL: content detail -->
+<div class="modal-overlay" id="modalContent">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="modalContentTitle">Detalle de publicacion</div>
+      <button class="btn sm" id="modalContentClose">Cerrar</button>
+    </div>
+    <div id="modalContentBody"></div>
   </div>
+</div>
 
-  <div class="toast" id="toast"></div>
+<!-- MODAL: match detail -->
+<div class="modal-overlay" id="modalMatch">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="modalMatchTitle">Detalle de match</div>
+      <button class="btn sm" id="modalMatchClose">Cerrar</button>
+    </div>
+    <div id="modalMatchBody"></div>
+  </div>
+</div>
 
-  <script>
-    (function () {
-      'use strict';
+<!-- MAIN APP -->
+<div class="wrap" id="adminWrap" style="display:none;">
+  <aside class="side">
+    <div class="brand">
+      <b>KingsHelp</b>
+      <span class="badge-role" id="roleLabel">Admin</span>
+    </div>
+    <div class="session-pill" id="meEmail">-</div>
+    <div class="nav-sep">Principal</div>
+    <div class="nav">
+      <button class="active" data-view="overview"><span class="ico">&#128200;</span>Overview</button>
+      <button data-view="users"><span class="ico">&#128101;</span>Usuarios</button>
+      <button data-view="content"><span class="ico">&#128196;</span>Publicaciones</button>
+      <button data-view="matches"><span class="ico">&#129309;</span>Matches</button>
+    </div>
+    <div class="nav-sep">Gestion</div>
+    <div class="nav">
+      <button data-view="reports"><span class="ico">&#128681;</span>Moderacion</button>
+      <button data-view="events"><span class="ico">&#128336;</span>Actividad</button>
+      <button data-view="audit"><span class="ico">&#128269;</span>Auditoria</button>
+      <button data-view="config"><span class="ico">&#9881;&#65039;</span>Config</button>
+    </div>
+    <div class="side-footer">
+      <a href="/" class="btn primary">Ver web</a>
+      <button id="btnLogout">Cerrar sesion</button>
+    </div>
+  </aside>
 
-      function toast(msg, ok) {
-        var t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast show ' + (ok ? 'ok' : 'bad');
-        setTimeout(function () { t.className = 'toast'; }, 2400);
-      }
+  <main class="main">
+    <div class="page-top">
+      <div>
+        <div class="page-sub" id="buildStamp"></div>
+        <h1 class="page-title" id="pageTitle">Overview</h1>
+      </div>
+      <div id="pageActions" style="display:flex; gap:8px; align-items:center;"></div>
+    </div>
 
-      function renderEmptyRow(tb, cols, label) {
-        if (!tb) return;
-        tb.innerHTML = '<tr><td colspan="' + cols + '" class="muted">' + label + '</td></tr>';
-      }
+    <!-- OVERVIEW -->
+    <div class="section-view active" id="view-overview">
+      <div class="banner-err" id="apiErrorBanner">
+        <div><strong>Error de API</strong> <span class="muted" id="apiErrorText">No se pudo cargar el overview.</span></div>
+        <button class="btn sm" id="apiRetry">Reintentar</button>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Usuarios</div>
+          <div class="kpi-val" id="kpiUsersTotal">-</div>
+          <div class="kpi-sub" id="kpiUsers24">-</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Solicitudes abiertas</div>
+          <div class="kpi-val" id="kpiReqOpen">-</div>
+          <div class="kpi-sub" id="kpiOffersOpen">- ofertas activas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Matches</div>
+          <div class="kpi-val" id="kpiMatchPend">-</div>
+          <div class="kpi-sub" id="kpiMatchDone">- completados</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Premium activos</div>
+          <div class="kpi-val" id="kpiPremActive">-</div>
+          <div class="kpi-sub">usuarios con plan premium</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="muted text-sm" style="margin-bottom:10px;">Actividad reciente</div>
+          <div class="table-wrap" style="max-height:300px; overflow-y:auto;">
+            <table>
+              <thead><tr><th>Hora</th><th>Tipo</th><th>Actor</th><th>Target</th></tr></thead>
+              <tbody id="eventsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="muted text-sm" style="margin-bottom:10px;">Reportes abiertos</div>
+          <div class="table-wrap" style="max-height:300px; overflow-y:auto;">
+            <table>
+              <thead><tr><th>Hora</th><th>Target</th><th>Motivo</th><th></th></tr></thead>
+              <tbody id="reportsTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      function setApiVersion(text) {
-        var el = document.getElementById('apiVersion');
-        if (el) el.textContent = text;
-      }
+    <!-- USUARIOS -->
+    <div class="section-view" id="view-users">
+      <div class="toolbar">
+        <input id="userQuery" placeholder="Buscar por email, nombre o id" />
+        <button class="btn primary" id="btnUserSearch">Buscar</button>
+        <button class="btn" id="btnUserRefresh">Actualizar</button>
+      </div>
+      <div class="meta-row">
+        <span id="usersMeta">-</span>
+        <span id="usersPagInfo" class="page-info"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Nombre</th><th>Email</th><th>Rep.</th>
+              <th>Premium</th><th>Verif.</th><th>Estado</th><th>Registro</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="usersTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn sm" id="usersPrev" disabled>Anterior</button>
+        <span class="page-info" id="usersPageLabel">Pag. 1</span>
+        <button class="btn sm" id="usersNext">Siguiente</button>
+      </div>
+    </div>
 
-      function loadVersion() {
-        return fetch('/api/v1/version', { credentials: 'include' })
-          .then(function (r) { return r.json(); })
-          .then(function (j) {
-            var git = j && j.gitSha ? j.gitSha : '-';
-            var env = j && j.env ? j.env : '-';
-            var bt = j && j.buildTime ? j.buildTime : '-';
-            setApiVersion('API VERSION: ' + git + ' · ' + env + ' · ' + bt);
-          })
-          .catch(function () {
-            setApiVersion('API VERSION: unavailable');
-          });
-      }
+    <!-- PUBLICACIONES -->
+    <div class="section-view" id="view-content">
+      <div class="toolbar">
+        <select id="contentKind">
+          <option value="requests">Solicitudes</option>
+          <option value="offers">Ofertas</option>
+        </select>
+        <input id="contentQuery" placeholder="Buscar por titulo, usuario o id" />
+        <button class="btn primary" id="btnContentSearch">Buscar</button>
+      </div>
+      <div class="meta-row"><span id="contentMeta">-</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Titulo</th><th>Cat.</th><th>Estado</th>
+              <th>Usuario</th><th>Creado</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="contentTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn sm" id="contentPrev" disabled>Anterior</button>
+        <span class="page-info" id="contentPageLabel">Pag. 1</span>
+        <button class="btn sm" id="contentNext">Siguiente</button>
+      </div>
+    </div>
 
-      var ADMIN_TOKEN_KEY = 'kh_admin_token';
+    <!-- MATCHES -->
+    <div class="section-view" id="view-matches">
+      <div class="toolbar">
+        <input id="matchQuery" placeholder="Buscar por usuario, titulo o id" />
+        <button class="btn primary" id="btnMatchSearch">Buscar</button>
+      </div>
+      <div class="meta-row"><span id="matchesMeta">-</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Estado</th><th>Comp.</th><th>Proveedor</th>
+              <th>Solicitante</th><th>Asunto</th><th>Creado</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="matchesTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn sm" id="matchesPrev" disabled>Anterior</button>
+        <span class="page-info" id="matchesPageLabel">Pag. 1</span>
+        <button class="btn sm" id="matchesNext">Siguiente</button>
+      </div>
+    </div>
 
-      function getToken() {
-        try { return localStorage.getItem(ADMIN_TOKEN_KEY) || ''; } catch (e) { return ''; }
-      }
+    <!-- MODERACION -->
+    <div class="section-view" id="view-reports">
+      <div class="toolbar">
+        <select id="reportStatus">
+          <option value="">Todos</option>
+          <option value="open" selected>Abiertos</option>
+          <option value="resolved">Resueltos</option>
+        </select>
+        <button class="btn primary" id="btnReportSearch">Cargar</button>
+      </div>
+      <div class="meta-row"><span id="reportsMeta">-</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Status</th><th>Target</th><th>Motivo</th><th>Notes</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="reportsTbodyFull"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn sm" id="reportsPrev" disabled>Anterior</button>
+        <span class="page-info" id="reportsPageLabel">Pag. 1</span>
+        <button class="btn sm" id="reportsNext">Siguiente</button>
+      </div>
+    </div>
 
-      function setToken(v) {
-        try {
-          if (!v) localStorage.removeItem(ADMIN_TOKEN_KEY);
-          else localStorage.setItem(ADMIN_TOKEN_KEY, v);
-        } catch (e) { }
-      }
+    <!-- ACTIVIDAD -->
+    <div class="section-view" id="view-events">
+      <div class="toolbar">
+        <input id="eventType" placeholder="Filtrar por tipo (ej: user.ban)" />
+        <button class="btn primary" id="btnEventSearch">Filtrar</button>
+      </div>
+      <div class="meta-row"><span id="eventsMeta">-</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Tipo</th><th>Actor</th><th>Target</th><th>Meta</th></tr>
+          </thead>
+          <tbody id="eventsTbodyFull"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn sm" id="eventsPrev" disabled>Anterior</button>
+        <span class="page-info" id="eventsPageLabel">Pag. 1</span>
+        <button class="btn sm" id="eventsNext">Siguiente</button>
+      </div>
+    </div>
 
-      function authHeaders() {
-        var tok = getToken();
-        return tok ? { 'Authorization': 'Bearer ' + tok } : {};
-      }
+    <!-- AUDITORIA -->
+    <div class="section-view" id="view-audit">
+      <div class="meta-row"><span class="muted">Ultimas acciones de administradores</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Admin</th><th>Accion</th><th>Entidad</th><th>IP</th></tr>
+          </thead>
+          <tbody id="auditTbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn sm" id="auditPrev" disabled>Anterior</button>
+        <span class="page-info" id="auditPageLabel">Pag. 1</span>
+        <button class="btn sm" id="auditNext">Siguiente</button>
+      </div>
+    </div>
 
-      function api(path, opts) {
-        opts = opts || {};
-        opts.headers = Object.assign({ 'Content-Type': 'application/json' }, authHeaders(), (opts.headers || {}));
-        opts.credentials = 'include';
-        return fetch('/api/v1/admin' + path, opts).then(function (r) {
-          return r.json().then(function (j) {
-            if (!r.ok) {
-              var e = new Error((j && j.error) ? j.error : 'Request failed');
-              e.status = r.status;
-              if (r.status === 401 || r.status === 403) {
-                setToken('');
-                showLogin(true);
-                if (location.pathname.indexOf('/admin/login') !== 0) {
-                  location.href = '/admin/login';
-                }
-              }
-              throw e;
-            }
-            return j;
-          });
-        });
-      }
+    <!-- CONFIG -->
+    <div class="section-view" id="view-config">
+      <div class="cfg-row">
+        <div class="cfg-card">
+          <div class="cfg-title">Efectos visuales (FX Level)</div>
+          <div class="cfg-sub">Controla la intensidad de partículas y animaciones del hero.</div>
+          <div class="btn-row">
+            <button class="btn sm" data-fx="off">off</button>
+            <button class="btn sm" data-fx="subtle">subtle</button>
+            <button class="btn sm primary" data-fx="wow">wow</button>
+          </div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title">Duracion de banners hero (segundos)</div>
+          <div class="cfg-sub">Tiempo que se muestra cada banner antes de rotar. Recomendado: 6-10.</div>
+          <div class="gap-row" style="margin-top:8px;">
+            <input id="heroDurationInput" type="number" min="3" max="20" step="1" placeholder="6" style="max-width:120px;" />
+            <button class="btn sm primary" id="heroDurationSave">Guardar</button>
+          </div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title">Modo mantenimiento</div>
+          <div class="cfg-sub">Muestra un aviso de mantenimiento en la web. No bloquea la API.</div>
+          <div class="gap-row" style="margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input id="maintenanceModeToggle" type="checkbox" style="width:auto;" />
+              <span>Activar mantenimiento</span>
+            </label>
+            <button class="btn sm" id="maintenanceModeSave">Guardar</button>
+          </div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title">Registro de nuevos usuarios</div>
+          <div class="cfg-sub">Permite o bloquea el registro de nuevas cuentas en la plataforma.</div>
+          <div class="gap-row" style="margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input id="registrationOpenToggle" type="checkbox" style="width:auto;" checked />
+              <span>Registro abierto</span>
+            </label>
+            <button class="btn sm" id="registrationOpenSave">Guardar</button>
+          </div>
+        </div>
+        <div class="cfg-card">
+          <div class="cfg-title">Modo legal</div>
+          <div class="cfg-sub">Activa avisos legales reforzados y textos de cumplimiento.</div>
+          <div class="gap-row" style="margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input id="legalModeToggle" type="checkbox" style="width:auto;" />
+              <span>Legal activo</span>
+            </label>
+            <button class="btn sm" id="legalModeSave">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-      function showLogin(show) {
-        var el = document.getElementById('admin-login');
-        var wrap = document.querySelector('.wrap');
-        if (el) el.style.display = show ? 'flex' : 'none';
-        if (wrap) wrap.style.display = show ? 'none' : '';
-      }
+  </main>
+</div>
 
-      function resetAdminUI() {
-        var ids = ['eventsTbody', 'reportsTbody', 'usersTbody', 'contentTbody', 'matchesTbody', 'eventsTbodyFull', 'reportsTbodyFull', 'auditTbody'];
-        ids.forEach(function (id) {
-          var el = document.getElementById(id);
-          if (el) el.innerHTML = '';
-        });
-        var cards = ['userDetailCard', 'contentDetailCard', 'matchDetailCard'];
-        cards.forEach(function (id) {
-          var el = document.getElementById(id);
-          if (el) el.style.display = 'none';
-        });
-        document.getElementById('meEmail').textContent = '-';
-      }
+<div class="toast" id="toast"></div>
 
-      function setLoginError(msg) {
-        var el = document.getElementById('admin-login-error');
-        if (el) el.textContent = msg || '';
-      }
+<script>
+(function () {
+  'use strict';
 
-      function showApiError(msg) {
-        var el = document.getElementById('apiErrorBanner');
-        if (!el) return;
-        el.classList.add('show');
-        var textEl = document.getElementById('apiErrorText');
-        if (textEl) textEl.textContent = msg || 'No se pudo cargar el overview.';
-      }
+  // ── Utilidades ────────────────────────────────────────────────────────────
 
-      function clearApiError() {
-        var el = document.getElementById('apiErrorBanner');
-        if (!el) return;
-        el.classList.remove('show');
-      }
+  function toast(msg, ok) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (ok ? 'ok' : 'bad');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(function () { t.className = 'toast'; }, 2800);
+  }
 
-      function ensureLogin() {
-        var tok = getToken();
-        if (!tok) {
-          // Still allow cookie-based admin sessions.
-          return api('/auth/me').then(function () {
-            showLogin(false);
-          }).catch(function () {
+  function fmtDate(str) {
+    if (!str) return '-';
+    try {
+      var d = new Date(str);
+      return d.toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return str; }
+  }
+
+  function fmtDateShort(str) {
+    if (!str) return '-';
+    try {
+      var d = new Date(str);
+      return d.toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return str; }
+  }
+
+  function esc(str) {
+    if (str === null || str === undefined) return '-';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function shortId(id) {
+    return id ? String(id).slice(0, 8) : '-';
+  }
+
+  function statusPill(status) {
+    var s = String(status || '-').toLowerCase();
+    var cls = s === 'open' || s === 'active' || s === 'accepted' ? 'ok'
+            : s === 'done' || s === 'resolved' ? 'muted'
+            : s === 'pending' ? 'warn'
+            : s === 'closed' || s === 'cancelled' ? 'bad'
+            : 'muted';
+    return '<span class="pill ' + cls + '">' + esc(status) + '</span>';
+  }
+
+  // ── Auth (cookie-based, no localStorage) ──────────────────────────────────
+
+  function api(path, opts) {
+    opts = opts || {};
+    var isFormData = opts.body instanceof FormData;
+    var headers = { 'Content-Type': 'application/json' };
+    if (isFormData) delete headers['Content-Type'];
+    opts.headers = Object.assign(headers, opts.headers || {});
+    opts.credentials = 'include';
+    return fetch('/api/v1/admin' + path, opts).then(function (r) {
+      if (r.status === 204) return { ok: true };
+      return r.json().then(function (j) {
+        if (!r.ok) {
+          if (r.status === 401 || r.status === 403) {
             showLogin(true);
-            resetAdminUI();
-            return Promise.reject({ silent: true });
-          });
+          }
+          var e = new Error((j && j.error) ? j.error : 'Request failed (' + r.status + ')');
+          e.status = r.status;
+          throw e;
         }
-        return api('/auth/me').then(function () {
-          showLogin(false);
-        }).catch(function (err) {
-          setToken('');
-          showLogin(true);
-          resetAdminUI();
-          throw err;
-        });
-      }
-
-      function showView(name) {
-        var ids = ['overview', 'users', 'content', 'matches', 'events', 'reports', 'audit', 'config'];
-        ids.forEach(function (k) {
-          document.getElementById('view-' + k).style.display = (k === name) ? '' : 'none';
-        });
-        document.getElementById('title').textContent = name === 'overview' ? 'Overview' :
-          name === 'users' ? 'Usuarios' :
-          name === 'content' ? 'Creaciones' :
-          name === 'matches' ? 'Matches' :
-          name === 'events' ? 'Actividad' :
-          name === 'reports' ? 'Moderacion' :
-          name === 'audit' ? 'Auditoria' : 'Config';
-      }
-
-      function loadMe() {
-        return api('/auth/me').then(function (j) {
-          var role = j.role || (j.user && j.user.role) || 'admin';
-          var email = (j.user && j.user.email) ? j.user.email : '-';
-          document.getElementById('meEmail').textContent = email + ' · ' + role;
-        });
-      }
-
-      function loadOverview() {
-        clearApiError();
-        return api('/stats/overview').then(function (j) {
-          var d = j.data || {};
-          document.getElementById('kpiUsersTotal').textContent = (d.users && d.users.total) || 0;
-          document.getElementById('kpiUsers24').textContent = (d.users && d.users.last_24h) || 0;
-          document.getElementById('kpiReqOpen').textContent = (d.requests && d.requests.open) || 0;
-          document.getElementById('kpiPremActive').textContent = (d.premium && d.premium.active_users) || 0;
-
-          var etb = document.getElementById('eventsTbody');
-          etb.innerHTML = '';
-          var evs = d.recent_events || [];
-          if (!evs.length) {
-            renderEmptyRow(etb, 4, 'Sin eventos recientes');
-          }
-          evs.forEach(function (e) {
-            var tr = document.createElement('tr');
-            tr.innerHTML =
-              '<td>' + (e.created_at || '-') + '</td>' +
-              '<td>' + (e.type || '-') + '</td>' +
-              '<td><code>' + ((e.actor_user_id || '').slice(0, 8)) + '</code></td>' +
-              '<td>' + (e.target_type || '-') + (e.target_id ? (':' + (String(e.target_id).slice(0, 8))) : '') + '</td>';
-            etb.appendChild(tr);
-          });
-
-          var rtb = document.getElementById('reportsTbody');
-          rtb.innerHTML = '';
-          var reps = d.open_reports || [];
-          if (!reps.length) {
-            renderEmptyRow(rtb, 4, 'Sin reportes abiertos');
-          }
-          reps.forEach(function (r) {
-            var tr2 = document.createElement('tr');
-            var isHidden = r.target_hidden == 1 || r.target_hidden === true;
-            var canHide = r.target_type === 'offer' || r.target_type === 'request';
-            var hideBtn = canHide
-              ? ('<button class="btn" data-' + (isHidden ? 'unhide-report' : 'hide-report') + '="' + r.id + '">' + (isHidden ? 'Mostrar' : 'Ocultar') + '</button>')
-              : '';
-            tr2.innerHTML =
-              '<td>' + (r.created_at || '-') + '</td>' +
-              '<td>' + (r.target_type || '-') + ':' + (String(r.target_id || '').slice(0, 8)) + '</td>' +
-              '<td>' + (r.reason || '-') + '</td>' +
-              '<td style="display:flex; gap:6px;">' + hideBtn + '<button class="btn" data-resolve-report="' + r.id + '">Resolver</button></td>';
-            rtb.appendChild(tr2);
-          });
-        }).catch(function (err) {
-          if (err && (err.status === 401 || err.status === 403)) return;
-          showApiError('Error de API al cargar el overview.');
-        });
-      }
-
-      function loadEvents() {
-        var t = document.getElementById('eventType').value || '';
-        var url = '/events?limit=40&page=1' + (t ? '&type=' + encodeURIComponent(t) : '');
-        return api(url).then(function (j) {
-          document.getElementById('eventsMeta').textContent = 'Mostrando ' + j.meta.count + ' eventos';
-          var tb = document.getElementById('eventsTbodyFull');
-          tb.innerHTML = '';
-          if (!j.data.length) {
-            renderEmptyRow(tb, 5, 'Sin eventos');
-          }
-          j.data.forEach(function (e) {
-            var meta = '';
-            try { meta = JSON.stringify(e.meta_json || {}).slice(0, 140); } catch (err) { meta = '-'; }
-            var tr = document.createElement('tr');
-            tr.innerHTML =
-              '<td>' + (e.created_at || '-') + '</td>' +
-              '<td>' + (e.type || '-') + '</td>' +
-              '<td><code>' + ((e.actor_user_id || '').slice(0, 8)) + '</code></td>' +
-              '<td>' + (e.target_type || '-') + (e.target_id ? (':' + (String(e.target_id).slice(0, 8))) : '') + '</td>' +
-              '<td class="muted">' + meta.replace(/</g, '&lt;') + '</td>';
-            tb.appendChild(tr);
-          });
-        });
-      }
-
-      function loadReports() {
-        var s = document.getElementById('reportStatus').value || '';
-        var url = '/reports?limit=40&page=1' + (s ? '&status=' + encodeURIComponent(s) : '');
-        return api(url).then(function (j) {
-          document.getElementById('reportsMeta').textContent = 'Mostrando ' + j.meta.count + ' reports';
-          var tb = document.getElementById('reportsTbodyFull');
-          tb.innerHTML = '';
-          if (!j.data.length) {
-            renderEmptyRow(tb, 6, 'Sin reportes');
-          }
-          j.data.forEach(function (r) {
-            var tr = document.createElement('tr');
-            var isHidden = r.target_hidden == 1 || r.target_hidden === true;
-            var canHide = r.target_type === 'offer' || r.target_type === 'request';
-            var hideBtn = canHide
-              ? ('<button class="btn" data-' + (isHidden ? 'unhide-report' : 'hide-report') + '="' + r.id + '">' + (isHidden ? 'Mostrar' : 'Ocultar') + '</button>')
-              : '';
-            tr.innerHTML =
-              '<td>' + (r.created_at || '-') + '</td>' +
-              '<td>' + (r.status || '-') + (isHidden ? ' · oculto' : '') + '</td>' +
-              '<td>' + (r.target_type || '-') + ':' + (String(r.target_id || '').slice(0, 8)) + '</td>' +
-              '<td>' + (r.reason || '-') + '</td>' +
-              '<td class="muted">' + ((r.notes || '-') + '').replace(/</g, '&lt;') + '</td>' +
-              '<td style="display:flex; gap:6px;">' + hideBtn + (r.status === 'open' ? ('<button class="btn" data-resolve-report="' + r.id + '">Resolver</button>') : '') + '</td>';
-            tb.appendChild(tr);
-          });
-        });
-      }
-
-      function loadUsers() {
-        var q = document.getElementById('userQuery').value || '';
-        var url = '/users?limit=25&page=1' + (q ? '&query=' + encodeURIComponent(q) : '');
-        return api(url).then(function (j) {
-          document.getElementById('usersMeta').textContent = 'Mostrando ' + j.meta.count + ' usuarios';
-          var tb = document.getElementById('usersTbody');
-          tb.innerHTML = '';
-          if (!j.data.length) {
-            renderEmptyRow(tb, 8, 'Sin usuarios');
-          }
-          j.data.forEach(function (u) {
-            var tr = document.createElement('tr');
-            var banned = u.is_banned == 1 || u.is_banned === true;
-            var banLabel = banned ? '\u2716 Baneado' : 'Activo';
-            var banBtnLabel = banned ? 'Desbanear' : 'Banear';
-            var banBtnClass = banned ? 'btn primary' : 'btn danger';
-            tr.innerHTML =
-              '<td><code>' + (u.id || '').slice(0, 8) + '</code></td>' +
-              '<td>' + (u.display_name || '-') + '</td>' +
-              '<td>' + (u.email || '-') + '</td>' +
-              '<td>' + (u.points_balance || 0) + '</td>' +
-              '<td>' + (u.premium_tier || '-') + '</td>' +
-              '<td>' + (u.is_verified ? 'si' : 'no') + '</td>' +
-              '<td><span style="' + (banned ? 'color:var(--bad);font-weight:700;' : 'color:var(--ok);') + '">' + banLabel + '</span></td>' +
-              '<td style="display:flex;gap:6px;">' +
-                '<button class="btn" data-id="' + u.id + '" data-detail="1">Detalle</button>' +
-                '<button class="btn" data-id="' + u.id + '" data-reset-points="1">Reset puntos</button>' +
-                '<button class="btn" data-id="' + u.id + '" data-reset-cooldowns="1">Reset cooldowns</button>' +
-                '<button class="btn" data-id="' + u.id + '" data-verify="' + (u.is_verified ? '0' : '1') + '">' + (u.is_verified ? 'Desverificar' : 'Verificar') + '</button>' +
-                '<button class="' + banBtnClass + '" data-id="' + u.id + '" data-ban-action="' + (banned ? 'unban' : 'ban') + '">' + banBtnLabel + '</button>' +
-                '<button class="btn" data-id="' + u.id + '" data-gdpr-export="1">GDPR export</button>' +
-                '<button class="btn danger" data-id="' + u.id + '" data-gdpr-delete="1">GDPR delete</button>' +
-              '</td>';
-          tb.appendChild(tr);
-        });
+        return j;
       });
+    });
+  }
+
+  function showLogin(show) {
+    var loginEl = document.getElementById('admin-login');
+    var wrapEl = document.getElementById('adminWrap');
+    if (loginEl) loginEl.style.display = show ? 'flex' : 'none';
+    if (wrapEl) wrapEl.style.display = show ? 'none' : '';
+  }
+
+  // ── Login form ────────────────────────────────────────────────────────────
+
+  var loginForm = document.getElementById('admin-login-form');
+  loginForm && loginForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('admin-email').value.trim();
+    var pass = document.getElementById('admin-pass').value;
+    var errEl = document.getElementById('admin-login-error');
+    var btn = document.getElementById('admin-login-btn');
+    errEl.textContent = '';
+    btn.disabled = true; btn.textContent = 'Entrando...';
+    api('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: email, password: pass }),
+    }).then(function () {
+      showLogin(false);
+      initApp();
+    }).catch(function (err) {
+      errEl.textContent = err && err.message ? err.message : 'Error de autenticacion';
+    }).finally(function () {
+      btn.disabled = false; btn.textContent = 'Entrar';
+    });
+  });
+
+  document.getElementById('btnLogout') && document.getElementById('btnLogout').addEventListener('click', function () {
+    api('/auth/logout', { method: 'POST' }).catch(function(){}).finally(function () {
+      showLogin(true);
+    });
+  });
+
+  // ── View switching ────────────────────────────────────────────────────────
+
+  var VIEWS = ['overview', 'users', 'content', 'matches', 'reports', 'events', 'audit', 'config'];
+  var TITLES = {
+    overview: 'Overview',
+    users: 'Usuarios',
+    content: 'Publicaciones',
+    matches: 'Matches',
+    reports: 'Moderacion',
+    events: 'Actividad',
+    audit: 'Auditoria',
+    config: 'Configuracion',
+  };
+  var currentView = 'overview';
+
+  function showView(name) {
+    if (!VIEWS.includes(name)) return;
+    currentView = name;
+    VIEWS.forEach(function (v) {
+      var el = document.getElementById('view-' + v);
+      if (el) el.classList.toggle('active', v === name);
+    });
+    document.querySelectorAll('.nav button[data-view]').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-view') === name);
+    });
+    document.getElementById('pageTitle').textContent = TITLES[name] || name;
+    if (name === 'overview') loadOverview();
+    else if (name === 'users') { usersPage = 1; loadUsers(); }
+    else if (name === 'content') { contentPage = 1; loadContent(); }
+    else if (name === 'matches') { matchesPage = 1; loadMatches(); }
+    else if (name === 'reports') { reportsPage = 1; loadReports(); }
+    else if (name === 'events') { eventsPage = 1; loadEvents(); }
+    else if (name === 'audit') { auditPage = 1; loadAudit(); }
+    else if (name === 'config') loadConfig();
+  }
+
+  document.querySelectorAll('.nav button[data-view]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      showView(btn.getAttribute('data-view'));
+    });
+  });
+
+  // ── Overview ──────────────────────────────────────────────────────────────
+
+  function showApiError(msg) {
+    var el = document.getElementById('apiErrorBanner');
+    if (el) { el.classList.add('show'); document.getElementById('apiErrorText').textContent = msg; }
+  }
+  function clearApiError() {
+    var el = document.getElementById('apiErrorBanner');
+    if (el) el.classList.remove('show');
+  }
+
+  document.getElementById('apiRetry') && document.getElementById('apiRetry').addEventListener('click', loadOverview);
+
+  function loadOverview() {
+    clearApiError();
+    api('/stats/overview').then(function (j) {
+      var d = j.data || {};
+      var u = d.users || {}; var req = d.requests || {}; var m = d.matches || {}; var pr = d.premium || {};
+      document.getElementById('kpiUsersTotal').textContent = u.total || 0;
+      document.getElementById('kpiUsers24').textContent = '+' + (u.last_24h || 0) + ' en ultimas 24h';
+      document.getElementById('kpiReqOpen').textContent = req.open || 0;
+      document.getElementById('kpiOffersOpen').textContent = (req.offers_open || 0) + ' ofertas activas';
+      document.getElementById('kpiMatchPend').textContent = m.pending || 0;
+      document.getElementById('kpiMatchDone').textContent = (m.done || 0) + ' completados';
+      document.getElementById('kpiPremActive').textContent = pr.active_users || 0;
+
+      // Events mini table
+      var etb = document.getElementById('eventsTbody');
+      etb.innerHTML = '';
+      var evs = d.recent_events || [];
+      if (!evs.length) {
+        etb.innerHTML = '<tr><td colspan="4" class="empty-row">Sin eventos recientes</td></tr>';
+      } else {
+        evs.forEach(function (e) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td class="muted">' + fmtDateShort(e.created_at) + '</td>' +
+            '<td>' + esc(e.type) + '</td>' +
+            '<td><code>' + shortId(e.actor_user_id) + '</code></td>' +
+            '<td>' + esc(e.target_type || '-') + (e.target_id ? ':' + shortId(e.target_id) : '') + '</td>';
+          etb.appendChild(tr);
+        });
+      }
+
+      // Reports mini table
+      var rtb = document.getElementById('reportsTbody');
+      rtb.innerHTML = '';
+      var reps = d.open_reports || [];
+      if (!reps.length) {
+        rtb.innerHTML = '<tr><td colspan="4" class="empty-row">Sin reportes abiertos</td></tr>';
+      } else {
+        reps.forEach(function (r) {
+          var tr = document.createElement('tr');
+          var isHidden = r.target_hidden == 1 || r.target_hidden === true;
+          var canHide = r.target_type === 'offer' || r.target_type === 'request';
+          var hideBtn = canHide
+            ? '<button class="btn sm" data-' + (isHidden ? 'unhide-report' : 'hide-report') + '="' + r.id + '">' + (isHidden ? 'Mostrar' : 'Ocultar') + '</button>'
+            : '';
+          tr.innerHTML = '<td class="muted">' + fmtDateShort(r.created_at) + '</td>' +
+            '<td>' + esc(r.target_type) + ':' + shortId(r.target_id) + '</td>' +
+            '<td>' + esc(r.reason) + '</td>' +
+            '<td class="btn-row">' + hideBtn + '<button class="btn sm" data-resolve-report="' + r.id + '">Resolver</button></td>';
+          rtb.appendChild(tr);
+        });
+      }
+    }).catch(function () { showApiError('No se pudo cargar el overview.'); });
+  }
+
+  // ── Users ─────────────────────────────────────────────────────────────────
+
+  var usersPage = 1;
+  var usersLimit = 20;
+  var usersHasMore = false;
+
+  function loadUsers() {
+    var q = document.getElementById('userQuery').value.trim();
+    var url = '/users?limit=' + (usersLimit + 1) + '&page=' + usersPage + (q ? '&query=' + encodeURIComponent(q) : '');
+    api(url).then(function (j) {
+      var rows = Array.isArray(j.data) ? j.data : [];
+      usersHasMore = rows.length > usersLimit;
+      if (usersHasMore) rows = rows.slice(0, usersLimit);
+      document.getElementById('usersMeta').textContent = rows.length + ' usuarios (pag. ' + usersPage + ')';
+      document.getElementById('usersPageLabel').textContent = 'Pag. ' + usersPage;
+      document.getElementById('usersPrev').disabled = usersPage <= 1;
+      document.getElementById('usersNext').disabled = !usersHasMore;
+      var tb = document.getElementById('usersTbody');
+      tb.innerHTML = '';
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="9" class="empty-row">Sin usuarios</td></tr>';
+        return;
+      }
+      rows.forEach(function (u) {
+        var banned = u.is_banned == 1 || u.is_banned === true;
+        var verified = u.is_verified == 1 || u.is_verified === true;
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td><code>' + shortId(u.id) + '</code></td>' +
+          '<td>' + esc(u.display_name || '-') + '</td>' +
+          '<td>' + esc(u.email || '-') + '</td>' +
+          '<td>' + (u.points_balance || 0) + '</td>' +
+          '<td>' + (u.premium_tier === 'free' || !u.premium_tier ? '<span class="muted">free</span>' : '<span class="pill gold">' + esc(u.premium_tier) + '</span>') + '</td>' +
+          '<td>' + (verified ? '<span class="pill ok">si</span>' : '<span class="pill muted">no</span>') + '</td>' +
+          '<td>' + (banned ? '<span class="pill bad">Baneado</span>' : '<span class="pill ok">Activo</span>') + '</td>' +
+          '<td class="muted">' + fmtDateShort(u.created_at) + '</td>' +
+          '<td><div class="btn-row">' +
+            '<button class="btn sm primary" data-user-detail="' + u.id + '">Detalle</button>' +
+            (banned
+              ? '<button class="btn sm" data-unban="' + u.id + '">Desbanear</button>'
+              : '<button class="btn sm danger" data-ban="' + u.id + '">Banear</button>') +
+          '</div></td>';
+        tb.appendChild(tr);
+      });
+    }).catch(function (e) { toast(e.message || 'Error cargando usuarios', false); });
+  }
+
+  document.getElementById('btnUserSearch') && document.getElementById('btnUserSearch').addEventListener('click', function () { usersPage = 1; loadUsers(); });
+  document.getElementById('btnUserRefresh') && document.getElementById('btnUserRefresh').addEventListener('click', function () { usersPage = 1; loadUsers(); });
+  document.getElementById('userQuery') && document.getElementById('userQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { usersPage = 1; loadUsers(); } });
+  document.getElementById('usersPrev') && document.getElementById('usersPrev').addEventListener('click', function () { if (usersPage > 1) { usersPage--; loadUsers(); } });
+  document.getElementById('usersNext') && document.getElementById('usersNext').addEventListener('click', function () { if (usersHasMore) { usersPage++; loadUsers(); } });
+
+  // ── User Detail Modal ─────────────────────────────────────────────────────
+
+  function openUserModal(userId) {
+    api('/users/' + encodeURIComponent(userId) + '/detail').then(function (j) {
+      var d = j.data || {};
+      var u = d.user || {};
+      var badges = Array.isArray(d.badges) ? d.badges : [];
+      var matches = Array.isArray(d.matches) ? d.matches : [];
+      var reports = Array.isArray(d.reports) ? d.reports : [];
+      var banned = u.is_banned == 1 || u.is_banned === true;
+      var verified = u.is_verified == 1 || u.is_verified === true;
+
+      document.getElementById('modalUserTitle').textContent = u.display_name || u.email || 'Usuario';
+
+      var html = '<div class="detail-grid">';
+      html += '<div class="detail-field"><label>ID</label><span><code>' + esc(u.id) + '</code></span></div>';
+      html += '<div class="detail-field"><label>Email</label><span>' + esc(u.email) + '</span></div>';
+      html += '<div class="detail-field"><label>Nombre</label><span>' + esc(u.display_name || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Zona</label><span>' + esc(u.location_text || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Reputacion</label><span>' + (u.points_balance || 0) + ' pts</span></div>';
+      html += '<div class="detail-field"><label>Rating</label><span>' + (u.rating_avg ? Number(u.rating_avg).toFixed(2) : '-') + ' (' + (u.rating_count || 0) + ' votos)</span></div>';
+      html += '<div class="detail-field"><label>Premium</label><span>' + esc(u.premium_tier || 'free') + (u.premium_until ? ' hasta ' + fmtDateShort(u.premium_until) : '') + '</span></div>';
+      html += '<div class="detail-field"><label>Registro</label><span>' + fmtDate(u.created_at) + '</span></div>';
+      html += '<div class="detail-field"><label>Verificado</label><span>' + (verified ? '<span class="pill ok">si</span>' : '<span class="pill muted">no</span>') + '</span></div>';
+      html += '<div class="detail-field"><label>Estado</label><span>' + (banned ? '<span class="pill bad">Baneado</span>' : '<span class="pill ok">Activo</span>') + '</span></div>';
+      html += '</div>';
+
+      // Actions
+      html += '<div class="btn-row" style="margin-bottom:14px;">';
+      if (banned) {
+        html += '<button class="btn sm primary" data-modal-unban="' + esc(u.id) + '">Desbanear</button>';
+      } else {
+        html += '<button class="btn sm danger" data-modal-ban="' + esc(u.id) + '">Banear</button>';
+      }
+      if (!verified) {
+        html += '<button class="btn sm" data-modal-verify="' + esc(u.id) + '">Verificar email</button>';
+      } else {
+        html += '<button class="btn sm" data-modal-unverify="' + esc(u.id) + '">Quitar verificacion</button>';
+      }
+      html += '<button class="btn sm" data-modal-reset-points="' + esc(u.id) + '">Reset puntos</button>';
+      html += '<button class="btn sm" data-modal-reset-cooldowns="' + esc(u.id) + '">Reset cooldowns</button>';
+      html += '<button class="btn sm gold" data-modal-gdpr-export="' + esc(u.id) + '">GDPR export</button>';
+      html += '<button class="btn sm danger" data-modal-gdpr-delete="' + esc(u.id) + '" title="Anonimiza la cuenta (irreversible)">GDPR delete</button>';
+      html += '</div>';
+
+      // Premium tier change
+      html += '<div class="cfg-card" style="margin-bottom:14px;">';
+      html += '<div class="cfg-title" style="font-size:13px; margin-bottom:6px;">Cambiar plan premium</div>';
+      html += '<div class="btn-row">';
+      ['free','basic','pro'].forEach(function(t) {
+        var active = u.premium_tier === t;
+        html += '<button class="btn sm ' + (active ? 'gold' : '') + '" data-modal-set-premium="' + esc(u.id) + '" data-tier="' + t + '">' + t + (active ? ' (actual)' : '') + '</button>';
+      });
+      html += '</div></div>';
+
+      // Badges
+      html += '<div class="detail-section">';
+      html += '<div class="detail-section-title">Insignias (' + badges.length + ')</div>';
+      if (badges.length) {
+        html += '<div class="btn-row">';
+        badges.forEach(function (b) {
+          html += '<span class="pill muted">' + esc(b.slug || b.name) + '</span>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="muted text-sm">Sin insignias</div>';
+      }
+      html += '</div>';
+
+      // Recent matches
+      html += '<div class="detail-section">';
+      html += '<div class="detail-section-title">Matches recientes (' + Math.min(matches.length, 10) + ')</div>';
+      if (matches.length) {
+        html += '<div class="table-wrap"><table><thead><tr><th>ID</th><th>Estado</th><th>Proveedor</th><th>Solicitante</th><th>Fecha</th></tr></thead><tbody>';
+        matches.slice(0,10).forEach(function (m) {
+          html += '<tr><td><code>' + shortId(m.id) + '</code></td><td>' + statusPill(m.status) + '</td><td><code>' + shortId(m.provider_id) + '</code></td><td><code>' + shortId(m.seeker_id) + '</code></td><td class="muted">' + fmtDateShort(m.created_at) + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      } else {
+        html += '<div class="muted text-sm">Sin matches</div>';
+      }
+      html += '</div>';
+
+      // Reports received
+      html += '<div class="detail-section">';
+      html += '<div class="detail-section-title">Reportes recibidos (' + reports.length + ')</div>';
+      if (reports.length) {
+        html += '<div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Motivo</th><th>Estado</th><th>Fecha</th></tr></thead><tbody>';
+        reports.forEach(function (r) {
+          html += '<tr><td>' + esc(r.target_type) + '</td><td>' + esc(r.reason) + '</td><td>' + statusPill(r.status) + '</td><td class="muted">' + fmtDateShort(r.created_at) + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      } else {
+        html += '<div class="muted text-sm">Sin reportes recibidos</div>';
+      }
+      html += '</div>';
+
+      document.getElementById('modalUserBody').innerHTML = html;
+      document.getElementById('modalUser').classList.add('open');
+    }).catch(function (e) { toast(e.message || 'Error cargando usuario', false); });
+  }
+
+  document.getElementById('modalUserClose') && document.getElementById('modalUserClose').addEventListener('click', function () {
+    document.getElementById('modalUser').classList.remove('open');
+  });
+  document.getElementById('modalUser') && document.getElementById('modalUser').addEventListener('click', function (e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+
+  // ── Content ───────────────────────────────────────────────────────────────
+
+  var contentPage = 1;
+  var contentLimit = 20;
+  var contentHasMore = false;
+
+  function loadContent() {
+    var kind = document.getElementById('contentKind').value || 'requests';
+    var q = document.getElementById('contentQuery').value.trim();
+    var base = kind === 'offers' ? '/offers' : '/requests';
+    var url = base + '?limit=' + (contentLimit + 1) + '&page=' + contentPage + (q ? '&query=' + encodeURIComponent(q) : '');
+    api(url).then(function (j) {
+      var rows = Array.isArray(j.data) ? j.data : [];
+      contentHasMore = rows.length > contentLimit;
+      if (contentHasMore) rows = rows.slice(0, contentLimit);
+      document.getElementById('contentMeta').textContent = rows.length + ' elementos (pag. ' + contentPage + ')';
+      document.getElementById('contentPageLabel').textContent = 'Pag. ' + contentPage;
+      document.getElementById('contentPrev').disabled = contentPage <= 1;
+      document.getElementById('contentNext').disabled = !contentHasMore;
+      var tb = document.getElementById('contentTbody');
+      tb.innerHTML = '';
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="7" class="empty-row">Sin contenido</td></tr>';
+        return;
+      }
+      rows.forEach(function (r) {
+        var hidden = r.is_hidden == 1 || r.is_hidden === true;
+        var user = esc(r.seeker_name || r.provider_name || '-') + ' <span class="muted">(' + esc(r.seeker_email || r.provider_email || '-') + ')</span>';
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td><code>' + shortId(r.id) + '</code></td>' +
+          '<td>' + esc(r.title || '-') + '</td>' +
+          '<td><span class="pill muted">' + esc(r.category || '-') + '</span></td>' +
+          '<td>' + statusPill(r.status) + (hidden ? ' <span class="pill bad" style="font-size:10px;">oculto</span>' : '') + '</td>' +
+          '<td>' + user + '</td>' +
+          '<td class="muted">' + fmtDateShort(r.created_at) + '</td>' +
+          '<td><div class="btn-row">' +
+            '<button class="btn sm primary" data-content-detail="' + r.id + '" data-content-kind="' + kind + '">Detalle</button>' +
+            '<button class="btn sm ' + (hidden ? '' : 'danger') + '" data-' + (hidden ? 'content-unhide' : 'content-hide') + '="' + r.id + '" data-content-type="' + (kind === 'offers' ? 'offer' : 'request') + '">' + (hidden ? 'Mostrar' : 'Ocultar') + '</button>' +
+          '</div></td>';
+        tb.appendChild(tr);
+      });
+    }).catch(function (e) { toast(e.message || 'Error cargando contenido', false); });
+  }
+
+  document.getElementById('btnContentSearch') && document.getElementById('btnContentSearch').addEventListener('click', function () { contentPage = 1; loadContent(); });
+  document.getElementById('contentQuery') && document.getElementById('contentQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { contentPage = 1; loadContent(); } });
+  document.getElementById('contentKind') && document.getElementById('contentKind').addEventListener('change', function () { contentPage = 1; loadContent(); });
+  document.getElementById('contentPrev') && document.getElementById('contentPrev').addEventListener('click', function () { if (contentPage > 1) { contentPage--; loadContent(); } });
+  document.getElementById('contentNext') && document.getElementById('contentNext').addEventListener('click', function () { if (contentHasMore) { contentPage++; loadContent(); } });
+
+  function openContentModal(kind, id) {
+    var base = kind === 'offers' ? '/offers/' : '/requests/';
+    api(base + encodeURIComponent(id)).then(function (j) {
+      var r = j.data || {};
+      var hidden = r.is_hidden == 1 || r.is_hidden === true;
+      var html = '<div class="detail-grid">';
+      html += '<div class="detail-field"><label>ID</label><span><code>' + esc(r.id) + '</code></span></div>';
+      html += '<div class="detail-field"><label>Titulo</label><span>' + esc(r.title || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Categoria</label><span>' + esc(r.category || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Estado</label><span>' + statusPill(r.status) + '</span></div>';
+      html += '<div class="detail-field"><label>Visible</label><span>' + (hidden ? '<span class="pill bad">Oculto</span>' : '<span class="pill ok">Visible</span>') + '</span></div>';
+      html += '<div class="detail-field"><label>Compensacion</label><span>' + esc(r.compensation_type || r.service_type || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Usuario</label><span>' + esc(r.seeker_name || r.provider_name || '-') + '<br><span class="muted">' + esc(r.seeker_email || r.provider_email || '-') + '</span></span></div>';
+      html += '<div class="detail-field"><label>Creado</label><span>' + fmtDate(r.created_at) + '</span></div>';
+      if (r.expires_at) html += '<div class="detail-field"><label>Expira</label><span>' + fmtDate(r.expires_at) + '</span></div>';
+      html += '</div>';
+      if (r.description) {
+        html += '<div class="detail-section"><div class="detail-section-title">Descripcion</div><div style="font-size:13px; line-height:1.5;">' + esc(r.description) + '</div></div>';
+      }
+      html += '<div class="btn-row" style="margin-top:14px;">';
+      html += '<button class="btn sm ' + (hidden ? '' : 'danger') + '" data-content-' + (hidden ? 'unhide' : 'hide') + '="' + esc(r.id) + '" data-content-type="' + (kind === 'offers' ? 'offer' : 'request') + '">' + (hidden ? 'Mostrar contenido' : 'Ocultar contenido') + '</button>';
+      html += '</div>';
+
+      document.getElementById('modalContentTitle').textContent = r.title || 'Publicacion';
+      document.getElementById('modalContentBody').innerHTML = html;
+      document.getElementById('modalContent').classList.add('open');
+    }).catch(function (e) { toast(e.message || 'Error cargando detalle', false); });
+  }
+
+  document.getElementById('modalContentClose') && document.getElementById('modalContentClose').addEventListener('click', function () { document.getElementById('modalContent').classList.remove('open'); });
+  document.getElementById('modalContent') && document.getElementById('modalContent').addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+
+  // ── Matches ───────────────────────────────────────────────────────────────
+
+  var matchesPage = 1;
+  var matchesLimit = 20;
+  var matchesHasMore = false;
+
+  function loadMatches() {
+    var q = document.getElementById('matchQuery').value.trim();
+    var url = '/matches?limit=' + (matchesLimit + 1) + '&page=' + matchesPage + (q ? '&query=' + encodeURIComponent(q) : '');
+    api(url).then(function (j) {
+      var rows = Array.isArray(j.data) ? j.data : [];
+      matchesHasMore = rows.length > matchesLimit;
+      if (matchesHasMore) rows = rows.slice(0, matchesLimit);
+      document.getElementById('matchesMeta').textContent = rows.length + ' matches (pag. ' + matchesPage + ')';
+      document.getElementById('matchesPageLabel').textContent = 'Pag. ' + matchesPage;
+      document.getElementById('matchesPrev').disabled = matchesPage <= 1;
+      document.getElementById('matchesNext').disabled = !matchesHasMore;
+      var tb = document.getElementById('matchesTbody');
+      tb.innerHTML = '';
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="8" class="empty-row">Sin matches</td></tr>';
+        return;
+      }
+      rows.forEach(function (m) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td><code>' + shortId(m.id) + '</code></td>' +
+          '<td>' + statusPill(m.status) + '</td>' +
+          '<td><span class="pill muted">' + esc(m.compensation_type || '-') + '</span></td>' +
+          '<td>' + esc(m.provider_name || '-') + '</td>' +
+          '<td>' + esc(m.seeker_name || '-') + '</td>' +
+          '<td>' + esc(m.request_title || m.offer_title || '-') + '</td>' +
+          '<td class="muted">' + fmtDateShort(m.created_at) + '</td>' +
+          '<td><button class="btn sm primary" data-match-detail="' + m.id + '">Detalle</button></td>';
+        tb.appendChild(tr);
+      });
+    }).catch(function (e) { toast(e.message || 'Error cargando matches', false); });
+  }
+
+  document.getElementById('btnMatchSearch') && document.getElementById('btnMatchSearch').addEventListener('click', function () { matchesPage = 1; loadMatches(); });
+  document.getElementById('matchQuery') && document.getElementById('matchQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { matchesPage = 1; loadMatches(); } });
+  document.getElementById('matchesPrev') && document.getElementById('matchesPrev').addEventListener('click', function () { if (matchesPage > 1) { matchesPage--; loadMatches(); } });
+  document.getElementById('matchesNext') && document.getElementById('matchesNext').addEventListener('click', function () { if (matchesHasMore) { matchesPage++; loadMatches(); } });
+
+  function openMatchModal(id) {
+    api('/matches/' + encodeURIComponent(id)).then(function (j) {
+      var m = j.data || {};
+      var html = '<div class="detail-grid">';
+      html += '<div class="detail-field"><label>ID</label><span><code>' + esc(m.id) + '</code></span></div>';
+      html += '<div class="detail-field"><label>Estado</label><span>' + statusPill(m.status) + '</span></div>';
+      html += '<div class="detail-field"><label>Compensacion</label><span>' + esc(m.compensation_type || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Proveedor</label><span>' + esc(m.provider_name || '-') + '<br><span class="muted">' + esc(m.provider_email || '-') + '</span></span></div>';
+      html += '<div class="detail-field"><label>Solicitante</label><span>' + esc(m.seeker_name || '-') + '<br><span class="muted">' + esc(m.seeker_email || '-') + '</span></span></div>';
+      html += '<div class="detail-field"><label>Asunto</label><span>' + esc(m.request_title || m.offer_title || '-') + '</span></div>';
+      html += '<div class="detail-field"><label>Creado</label><span>' + fmtDate(m.created_at) + '</span></div>';
+      if (m.completed_at) html += '<div class="detail-field"><label>Completado</label><span>' + fmtDate(m.completed_at) + '</span></div>';
+      if (m.agreement) html += '<div class="detail-field"><label>Acuerdo</label><span>' + esc(m.agreement) + '</span></div>';
+      html += '</div>';
+      document.getElementById('modalMatchTitle').textContent = 'Match: ' + shortId(m.id);
+      document.getElementById('modalMatchBody').innerHTML = html;
+      document.getElementById('modalMatch').classList.add('open');
+    }).catch(function (e) { toast(e.message || 'Error cargando match', false); });
+  }
+
+  document.getElementById('modalMatchClose') && document.getElementById('modalMatchClose').addEventListener('click', function () { document.getElementById('modalMatch').classList.remove('open'); });
+  document.getElementById('modalMatch') && document.getElementById('modalMatch').addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+
+  // ── Reports ───────────────────────────────────────────────────────────────
+
+  var reportsPage = 1;
+  var reportsLimit = 25;
+  var reportsHasMore = false;
+
+  function loadReports() {
+    var s = document.getElementById('reportStatus').value;
+    var url = '/reports?limit=' + (reportsLimit + 1) + '&page=' + reportsPage + (s ? '&status=' + encodeURIComponent(s) : '');
+    api(url).then(function (j) {
+      var rows = Array.isArray(j.data) ? j.data : [];
+      reportsHasMore = rows.length > reportsLimit;
+      if (reportsHasMore) rows = rows.slice(0, reportsLimit);
+      document.getElementById('reportsMeta').textContent = rows.length + ' reportes';
+      document.getElementById('reportsPageLabel').textContent = 'Pag. ' + reportsPage;
+      document.getElementById('reportsPrev').disabled = reportsPage <= 1;
+      document.getElementById('reportsNext').disabled = !reportsHasMore;
+      var tb = document.getElementById('reportsTbodyFull');
+      tb.innerHTML = '';
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="6" class="empty-row">Sin reportes</td></tr>';
+        return;
+      }
+      rows.forEach(function (r) {
+        var isHidden = r.target_hidden == 1 || r.target_hidden === true;
+        var canHide = r.target_type === 'offer' || r.target_type === 'request';
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="muted">' + fmtDateShort(r.created_at) + '</td>' +
+          '<td>' + statusPill(r.status) + (isHidden ? ' <span class="pill bad" style="font-size:10px;">oculto</span>' : '') + '</td>' +
+          '<td>' + esc(r.target_type) + ':<code>' + shortId(r.target_id) + '</code></td>' +
+          '<td>' + esc(r.reason || '-') + '</td>' +
+          '<td class="muted">' + esc(r.notes || '-') + '</td>' +
+          '<td><div class="btn-row">' +
+            (canHide ? '<button class="btn sm ' + (isHidden ? '' : 'danger') + '" data-' + (isHidden ? 'unhide-report' : 'hide-report') + '="' + r.id + '">' + (isHidden ? 'Mostrar' : 'Ocultar') + '</button>' : '') +
+            (r.status === 'open' ? '<button class="btn sm primary" data-resolve-report="' + r.id + '">Resolver</button>' : '') +
+          '</div></td>';
+        tb.appendChild(tr);
+      });
+    }).catch(function (e) { toast(e.message || 'Error cargando reportes', false); });
+  }
+
+  document.getElementById('btnReportSearch') && document.getElementById('btnReportSearch').addEventListener('click', function () { reportsPage = 1; loadReports(); });
+  document.getElementById('reportsPrev') && document.getElementById('reportsPrev').addEventListener('click', function () { if (reportsPage > 1) { reportsPage--; loadReports(); } });
+  document.getElementById('reportsNext') && document.getElementById('reportsNext').addEventListener('click', function () { if (reportsHasMore) { reportsPage++; loadReports(); } });
+
+  // ── Events ────────────────────────────────────────────────────────────────
+
+  var eventsPage = 1;
+  var eventsLimit = 30;
+  var eventsHasMore = false;
+
+  function loadEvents() {
+    var t = document.getElementById('eventType').value.trim();
+    var url = '/events?limit=' + (eventsLimit + 1) + '&page=' + eventsPage + (t ? '&type=' + encodeURIComponent(t) : '');
+    api(url).then(function (j) {
+      var rows = Array.isArray(j.data) ? j.data : [];
+      eventsHasMore = rows.length > eventsLimit;
+      if (eventsHasMore) rows = rows.slice(0, eventsLimit);
+      document.getElementById('eventsMeta').textContent = rows.length + ' eventos';
+      document.getElementById('eventsPageLabel').textContent = 'Pag. ' + eventsPage;
+      document.getElementById('eventsPrev').disabled = eventsPage <= 1;
+      document.getElementById('eventsNext').disabled = !eventsHasMore;
+      var tb = document.getElementById('eventsTbodyFull');
+      tb.innerHTML = '';
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="5" class="empty-row">Sin eventos</td></tr>';
+        return;
+      }
+      rows.forEach(function (e) {
+        var meta = '';
+        try { meta = JSON.stringify(e.meta_json || e.meta || {}).slice(0, 100); } catch(ex) { meta = '-'; }
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="muted">' + fmtDateShort(e.created_at) + '</td>' +
+          '<td>' + esc(e.type) + '</td>' +
+          '<td><code>' + shortId(e.actor_user_id) + '</code></td>' +
+          '<td>' + esc(e.target_type || '-') + (e.target_id ? ':<code>' + shortId(e.target_id) + '</code>' : '') + '</td>' +
+          '<td class="muted">' + esc(meta) + '</td>';
+        tb.appendChild(tr);
+      });
+    }).catch(function (e) { toast(e.message || 'Error cargando eventos', false); });
+  }
+
+  document.getElementById('btnEventSearch') && document.getElementById('btnEventSearch').addEventListener('click', function () { eventsPage = 1; loadEvents(); });
+  document.getElementById('eventType') && document.getElementById('eventType').addEventListener('keydown', function (e) { if (e.key === 'Enter') { eventsPage = 1; loadEvents(); } });
+  document.getElementById('eventsPrev') && document.getElementById('eventsPrev').addEventListener('click', function () { if (eventsPage > 1) { eventsPage--; loadEvents(); } });
+  document.getElementById('eventsNext') && document.getElementById('eventsNext').addEventListener('click', function () { if (eventsHasMore) { eventsPage++; loadEvents(); } });
+
+  // ── Audit ─────────────────────────────────────────────────────────────────
+
+  var auditPage = 1;
+  var auditLimit = 25;
+  var auditHasMore = false;
+
+  function loadAudit() {
+    var url = '/audit?limit=' + (auditLimit + 1) + '&page=' + auditPage;
+    api(url).then(function (j) {
+      var rows = Array.isArray(j.data) ? j.data : [];
+      auditHasMore = rows.length > auditLimit;
+      if (auditHasMore) rows = rows.slice(0, auditLimit);
+      document.getElementById('auditPageLabel').textContent = 'Pag. ' + auditPage;
+      document.getElementById('auditPrev').disabled = auditPage <= 1;
+      document.getElementById('auditNext').disabled = !auditHasMore;
+      var tb = document.getElementById('auditTbody');
+      tb.innerHTML = '';
+      if (!rows.length) {
+        tb.innerHTML = '<tr><td colspan="5" class="empty-row">Sin auditoria</td></tr>';
+        return;
+      }
+      rows.forEach(function (a) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td class="muted">' + fmtDateShort(a.created_at) + '</td>' +
+          '<td><code>' + shortId(a.admin_user_id) + '</code></td>' +
+          '<td>' + esc(a.action) + '</td>' +
+          '<td>' + esc(a.entity_type || '-') + (a.entity_id ? ':<code>' + shortId(a.entity_id) + '</code>' : '') + '</td>' +
+          '<td class="muted">' + esc(a.ip || '-') + '</td>';
+        tb.appendChild(tr);
+      });
+    }).catch(function (e) { toast(e.message || 'Error cargando auditoria', false); });
+  }
+
+  document.getElementById('auditPrev') && document.getElementById('auditPrev').addEventListener('click', function () { if (auditPage > 1) { auditPage--; loadAudit(); } });
+  document.getElementById('auditNext') && document.getElementById('auditNext').addEventListener('click', function () { if (auditHasMore) { auditPage++; loadAudit(); } });
+
+  // ── Config ────────────────────────────────────────────────────────────────
+
+  function loadConfig() {
+    api('/config').then(function (j) {
+      var cfg = (j && j.data) || {};
+
+      var fx = cfg.fx_level || 'wow';
+      document.querySelectorAll('button[data-fx]').forEach(function (b) {
+        b.classList.toggle('primary', b.getAttribute('data-fx') === fx);
+      });
+
+      var dur = cfg.hero_banner_duration;
+      var durInput = document.getElementById('heroDurationInput');
+      if (durInput) durInput.value = (dur !== null && dur !== undefined) ? String(dur) : '';
+
+      var maint = cfg.maintenance_mode;
+      var maintToggle = document.getElementById('maintenanceModeToggle');
+      if (maintToggle) maintToggle.checked = maint === true || maint === 'true' || maint == 1;
+
+      var regOpen = cfg.registration_open;
+      var regToggle = document.getElementById('registrationOpenToggle');
+      if (regToggle) regToggle.checked = regOpen !== false && regOpen !== 'false' && regOpen != 0;
+
+      var legal = cfg.legal_mode;
+      var legalToggle = document.getElementById('legalModeToggle');
+      if (legalToggle) legalToggle.checked = legal === true || legal === 'true' || legal == 1;
+    }).catch(function () {});
+  }
+
+  function patchConfig(key, value) {
+    var body = {};
+    body[key] = value;
+    api('/config', { method: 'PATCH', body: JSON.stringify(body) })
+      .then(function () { toast('Config guardada', true); })
+      .catch(function (e) { toast(e.message || 'Error guardando config', false); });
+  }
+
+  document.querySelectorAll('button[data-fx]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('button[data-fx]').forEach(function(x){ x.classList.remove('primary'); });
+      b.classList.add('primary');
+      patchConfig('fx_level', b.getAttribute('data-fx'));
+    });
+  });
+
+  document.getElementById('heroDurationSave') && document.getElementById('heroDurationSave').addEventListener('click', function () {
+    var v = parseInt(document.getElementById('heroDurationInput').value, 10);
+    if (!v || v < 3 || v > 20) { toast('Valor entre 3 y 20 segundos', false); return; }
+    patchConfig('hero_banner_duration', v);
+  });
+
+  document.getElementById('maintenanceModeSave') && document.getElementById('maintenanceModeSave').addEventListener('click', function () {
+    patchConfig('maintenance_mode', document.getElementById('maintenanceModeToggle').checked);
+  });
+  document.getElementById('registrationOpenSave') && document.getElementById('registrationOpenSave').addEventListener('click', function () {
+    patchConfig('registration_open', document.getElementById('registrationOpenToggle').checked);
+  });
+  document.getElementById('legalModeSave') && document.getElementById('legalModeSave').addEventListener('click', function () {
+    patchConfig('legal_mode', document.getElementById('legalModeToggle').checked);
+  });
+
+  // ── Event delegation (tables) ─────────────────────────────────────────────
+
+  document.body.addEventListener('click', function (e) {
+    var t = e.target;
+
+    // User detail
+    var udId = t.getAttribute('data-user-detail') || t.getAttribute('data-modal-ban') && null;
+    if (t.hasAttribute('data-user-detail')) { openUserModal(t.getAttribute('data-user-detail')); return; }
+
+    // Modal actions
+    if (t.hasAttribute('data-modal-ban')) {
+      var uid = t.getAttribute('data-modal-ban');
+      if (!confirm('Banear este usuario?')) return;
+      api('/users/' + encodeURIComponent(uid) + '/ban', { method: 'POST' })
+        .then(function () { toast('Usuario baneado', true); document.getElementById('modalUser').classList.remove('open'); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-unban')) {
+      var uid2 = t.getAttribute('data-modal-unban');
+      api('/users/' + encodeURIComponent(uid2) + '/unban', { method: 'POST' })
+        .then(function () { toast('Usuario desbaneado', true); document.getElementById('modalUser').classList.remove('open'); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-verify')) {
+      var uid3 = t.getAttribute('data-modal-verify');
+      api('/users/' + encodeURIComponent(uid3), { method: 'PATCH', body: JSON.stringify({ is_verified: true }) })
+        .then(function () { toast('Email verificado', true); openUserModal(uid3); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-unverify')) {
+      var uid4 = t.getAttribute('data-modal-unverify');
+      api('/users/' + encodeURIComponent(uid4), { method: 'PATCH', body: JSON.stringify({ is_verified: false }) })
+        .then(function () { toast('Verificacion eliminada', true); openUserModal(uid4); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-reset-points')) {
+      var uid5 = t.getAttribute('data-modal-reset-points');
+      if (!confirm('Resetear puntos de este usuario a 0?')) return;
+      api('/users/' + encodeURIComponent(uid5) + '/reset-points', { method: 'POST' })
+        .then(function () { toast('Puntos reseteados', true); openUserModal(uid5); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-reset-cooldowns')) {
+      var uid6 = t.getAttribute('data-modal-reset-cooldowns');
+      api('/users/' + encodeURIComponent(uid6) + '/reset-cooldowns', { method: 'POST' })
+        .then(function () { toast('Cooldowns reseteados', true); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-gdpr-export')) {
+      var uid7 = t.getAttribute('data-modal-gdpr-export');
+      api('/users/' + encodeURIComponent(uid7) + '/gdpr/export', { method: 'POST' })
+        .then(function (j) {
+          var blob = new Blob([JSON.stringify(j.data, null, 2)], { type: 'application/json' });
+          var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+          a.download = 'gdpr-export-' + uid7.slice(0,8) + '.json'; a.click();
+          toast('Export descargado', true);
+        }).catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-gdpr-delete')) {
+      var uid8 = t.getAttribute('data-modal-gdpr-delete');
+      if (!confirm('ATENCION: Esta accion anonimiza la cuenta permanentemente. Continuar?')) return;
+      if (!confirm('Confirma de nuevo: borrar datos de usuario ' + uid8.slice(0,8) + '?')) return;
+      api('/users/' + encodeURIComponent(uid8) + '/gdpr/delete', { method: 'POST' })
+        .then(function () { toast('Cuenta anonimizada', true); document.getElementById('modalUser').classList.remove('open'); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-set-premium')) {
+      var uid9 = t.getAttribute('data-modal-set-premium');
+      var tier = t.getAttribute('data-tier');
+      api('/users/' + encodeURIComponent(uid9), { method: 'PATCH', body: JSON.stringify({ premium_tier: tier }) })
+        .then(function () { toast('Premium actualizado a ' + tier, true); openUserModal(uid9); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
     }
 
-      function loadContent() {
-        var kind = document.getElementById('contentKind').value || 'requests';
-        var q = document.getElementById('contentQuery').value || '';
-        var base = (kind === 'offers') ? '/offers' : '/requests';
-        var url = base + '?limit=30&page=1' + (q ? '&query=' + encodeURIComponent(q) : '');
-        return api(url).then(function (j) {
-          document.getElementById('contentMeta').textContent = 'Mostrando ' + j.meta.count + ' elementos';
-          var tb = document.getElementById('contentTbody');
-          tb.innerHTML = '';
-          if (!j.data.length) {
-            renderEmptyRow(tb, 7, 'Sin contenido');
-          }
-          j.data.forEach(function (r) {
-            var tr = document.createElement('tr');
-            var id = (r.id || '').slice(0, 8);
-            var title = r.title || '-';
-            var cat = r.category || '-';
-            var status = (r.status || '-') + (r.is_hidden ? ' · oculto' : '');
-            var user = (r.seeker_name || r.provider_name || '-') + ' · ' + (r.seeker_email || r.provider_email || '-');
-            var hidden = r.is_hidden == 1 || r.is_hidden === true;
-            var toggleLabel = hidden ? 'Mostrar' : 'Ocultar';
-            var toggleAttr = hidden ? 'data-content-unhide' : 'data-content-hide';
-            tr.innerHTML =
-              '<td><code>' + id + '</code></td>' +
-              '<td>' + title + '</td>' +
-              '<td>' + cat + '</td>' +
-              '<td>' + status + '</td>' +
-              '<td>' + user + '</td>' +
-              '<td>' + (r.created_at || '-') + '</td>' +
-              '<td style="display:flex;gap:6px;">' +
-                '<button class="btn" data-content-detail="' + r.id + '" data-content-kind="' + kind + '">Detalle</button>' +
-                '<button class="btn" ' + toggleAttr + '="' + r.id + '" data-content-kind="' + kind + '">' + toggleLabel + '</button>' +
-              '</td>';
-            tb.appendChild(tr);
-          });
-        });
-      }
+    // Ban / unban from table
+    if (t.hasAttribute('data-ban')) {
+      var bid = t.getAttribute('data-ban');
+      if (!confirm('Banear este usuario?')) return;
+      api('/users/' + encodeURIComponent(bid) + '/ban', { method: 'POST' })
+        .then(function () { toast('Usuario baneado', true); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-unban')) {
+      var ubid = t.getAttribute('data-unban');
+      api('/users/' + encodeURIComponent(ubid) + '/unban', { method: 'POST' })
+        .then(function () { toast('Usuario desbaneado', true); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
 
-      function loadMatches() {
-        var q = document.getElementById('matchQuery').value || '';
-        var url = '/matches?limit=40&page=1' + (q ? '&query=' + encodeURIComponent(q) : '');
-        return api(url).then(function (j) {
-          document.getElementById('matchesMeta').textContent = 'Mostrando ' + j.meta.count + ' matches';
-          var tb = document.getElementById('matchesTbody');
-          tb.innerHTML = '';
-          if (!j.data.length) {
-            renderEmptyRow(tb, 8, 'Sin matches');
-          }
-          j.data.forEach(function (m) {
-            var tr = document.createElement('tr');
-            var id = (m.id || '').slice(0, 8);
-            var subject = (m.request_title || m.offer_title || '-');
-            tr.innerHTML =
-              '<td><code>' + id + '</code></td>' +
-              '<td>' + (m.status || '-') + '</td>' +
-              '<td>' + (m.compensation_type || '-') + '</td>' +
-              '<td>' + (m.provider_name || '-') + '</td>' +
-              '<td>' + (m.seeker_name || '-') + '</td>' +
-              '<td>' + subject + '</td>' +
-              '<td>' + (m.created_at || '-') + '</td>' +
-              '<td><button class="btn" data-match-detail="' + m.id + '">Detalle</button></td>';
-            tb.appendChild(tr);
-          });
-        });
-      }
+    // Content detail / hide / unhide
+    if (t.hasAttribute('data-content-detail')) {
+      openContentModal(t.getAttribute('data-content-kind') || 'requests', t.getAttribute('data-content-detail'));
+      return;
+    }
+    if (t.hasAttribute('data-content-hide')) {
+      var ctype = t.getAttribute('data-content-type') || 'request';
+      api('/' + ctype + 's/' + encodeURIComponent(t.getAttribute('data-content-hide')) + '/hide', { method: 'POST' })
+        .then(function () { toast('Contenido ocultado', true); loadContent(); document.getElementById('modalContent').classList.remove('open'); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-content-unhide')) {
+      var ctype2 = t.getAttribute('data-content-type') || 'request';
+      api('/' + ctype2 + 's/' + encodeURIComponent(t.getAttribute('data-content-unhide')) + '/unhide', { method: 'POST' })
+        .then(function () { toast('Contenido restaurado', true); loadContent(); document.getElementById('modalContent').classList.remove('open'); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
 
-      function showUserDetail(data) {
-        var card = document.getElementById('userDetailCard');
-        var pre = document.getElementById('userDetailPre');
-        if (!card || !pre) return;
-        pre.textContent = JSON.stringify(data || {}, null, 2);
-        card.style.display = '';
-      }
+    // Match detail
+    if (t.hasAttribute('data-match-detail')) { openMatchModal(t.getAttribute('data-match-detail')); return; }
 
-      function showContentDetail(data) {
-        var card = document.getElementById('contentDetailCard');
-        var pre = document.getElementById('contentDetailPre');
-        if (!card || !pre) return;
-        pre.textContent = JSON.stringify(data || {}, null, 2);
-        card.style.display = '';
-      }
+    // Reports: hide/unhide/resolve
+    if (t.hasAttribute('data-hide-report')) {
+      api('/reports/' + encodeURIComponent(t.getAttribute('data-hide-report')) + '/hide', { method: 'POST' })
+        .then(function () { toast('Contenido ocultado', true); if (currentView === 'reports') loadReports(); else loadOverview(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-unhide-report')) {
+      api('/reports/' + encodeURIComponent(t.getAttribute('data-unhide-report')) + '/unhide', { method: 'POST' })
+        .then(function () { toast('Contenido restaurado', true); if (currentView === 'reports') loadReports(); else loadOverview(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-resolve-report')) {
+      api('/reports/' + encodeURIComponent(t.getAttribute('data-resolve-report')) + '/resolve', { method: 'POST', body: JSON.stringify({}) })
+        .then(function () { toast('Reporte resuelto', true); if (currentView === 'reports') loadReports(); else loadOverview(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+  });
 
-      function showMatchDetail(data) {
-        var card = document.getElementById('matchDetailCard');
-        var pre = document.getElementById('matchDetailPre');
-        if (!card || !pre) return;
-        pre.textContent = JSON.stringify(data || {}, null, 2);
-        card.style.display = '';
-      }
+  // ── Init app ──────────────────────────────────────────────────────────────
 
-      function loadUserDetail(id) {
-        return api('/users/' + encodeURIComponent(id) + '/detail')
-          .then(function (j) {
-            showUserDetail(j.data || {});
-          });
-      }
+  function loadMe() {
+    return api('/auth/me').then(function (j) {
+      var role = j.role || 'admin';
+      var email = (j.user && j.user.email) ? j.user.email : '-';
+      document.getElementById('meEmail').textContent = email;
+      document.getElementById('roleLabel').textContent = role;
+    });
+  }
 
-      function loadContentDetail(kind, id) {
-        var base = kind === 'offers' ? '/offers/' : '/requests/';
-        return api(base + encodeURIComponent(id))
-          .then(function (j) {
-            showContentDetail(j.data || {});
-          });
-      }
+  function loadVersion() {
+    fetch('/api/v1/version', { credentials: 'include' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        var git = j && j.gitSha ? j.gitSha : '-';
+        var env2 = j && j.env ? j.env : '-';
+        document.getElementById('buildStamp').textContent = 'BUILD ' + git + ' · ' + env2;
+      }).catch(function () {});
+  }
 
-      function loadMatchDetail(id) {
-        return api('/matches/' + encodeURIComponent(id))
-          .then(function (j) {
-            showMatchDetail(j.data || {});
-          });
-      }
+  function initApp() {
+    loadMe();
+    loadVersion();
+    showView('overview');
+  }
 
-      function loadAudit() {
-        return api('/audit?limit=25&page=1').then(function (j) {
-          var tb = document.getElementById('auditTbody');
-          tb.innerHTML = '';
-          if (!j.data.length) {
-            renderEmptyRow(tb, 5, 'Sin auditoria');
-          }
-          j.data.forEach(function (a) {
-            var tr = document.createElement('tr');
-            tr.innerHTML =
-              '<td>' + (a.created_at || '-') + '</td>' +
-              '<td><code>' + (a.admin_user_id || '').slice(0, 8) + '</code></td>' +
-              '<td>' + (a.action || '-') + '</td>' +
-              '<td>' + (a.entity_type || '-') + (a.entity_id ? (':' + (a.entity_id + '').slice(0, 8)) : '') + '</td>' +
-              '<td>' + (a.ip || '-') + '</td>';
-            tb.appendChild(tr);
-          });
-        });
-      }
+  // Boot: check session
+  api('/auth/me').then(function () {
+    showLogin(false);
+    initApp();
+  }).catch(function () {
+    showLogin(true);
+  });
 
-      function loadConfig() {
-        return api('/config').then(function (j) {
-          var cfg = (j && j.data) || {};
-          var fx = (cfg.fx_level === 'off' || cfg.fx_level === 'subtle' || cfg.fx_level === 'wow') ? cfg.fx_level : 'wow';
-          document.querySelectorAll('button[data-fx]').forEach(function (b) {
-            var v = b.getAttribute('data-fx');
-            b.classList.toggle('primary', v === fx);
-          });
-
-          var input = document.getElementById('heroDurationInput');
-          if (input) {
-            var v = cfg.hero_banner_duration;
-            input.value = (v === null || v === undefined) ? '' : String(v);
-          }
-
-          var legalToggle = document.getElementById('legalModeToggle');
-          if (legalToggle) {
-            var lv = cfg.legal_mode;
-            legalToggle.checked = (lv === true || lv === 1 || lv === 'true');
-          }
-        });
-      }
-
-      function bind() {
-        if (bind._done) return;
-        bind._done = true;
-        var loginForm = document.getElementById('admin-login-form');
-        if (loginForm) {
-          loginForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            setLoginError('');
-            var email = document.getElementById('admin-email').value || '';
-            var pass = document.getElementById('admin-pass').value || '';
-            if (!email || !pass) { setLoginError('Completa email y contraseña'); return; }
-            fetch('/api/v1/admin/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify({ email: email, password: pass })
-            }).then(function (r) { return r.json().then(function (j) {
-              if (!r.ok) throw new Error((j && j.error) ? j.error : 'Login fallido');
-              setToken('');
-              return ensureLogin();
-            });}).then(function () {
-              if (location.pathname.indexOf('/admin/login') === 0) location.href = '/admin';
-              return Promise.all([loadMe(), loadOverview(), loadConfig()]);
-            }).catch(function (err) {
-              setToken('');
-              setLoginError(err.message || 'Acceso denegado');
-            });
-          });
-        }
-
-        document.querySelectorAll('.nav button').forEach(function (b) {
-          b.addEventListener('click', function () {
-            document.querySelectorAll('.nav button').forEach(function (x) { x.classList.remove('active'); });
-            b.classList.add('active');
-            var v = b.getAttribute('data-view');
-            showView(v);
-            if (v === 'overview') loadOverview();
-            if (v === 'users') loadUsers();
-            if (v === 'content') loadContent();
-            if (v === 'matches') loadMatches();
-            if (v === 'events') loadEvents();
-            if (v === 'reports') loadReports();
-            if (v === 'audit') loadAudit();
-          });
-        });
-
-        document.getElementById('btnUserSearch').addEventListener('click', loadUsers);
-        document.getElementById('btnContentSearch').addEventListener('click', loadContent);
-        document.getElementById('btnMatchSearch').addEventListener('click', loadMatches);
-        document.getElementById('btnEventSearch').addEventListener('click', loadEvents);
-        document.getElementById('btnReportSearch').addEventListener('click', loadReports);
-        document.getElementById('contentKind').addEventListener('change', loadContent);
-        var retry = document.getElementById('apiRetry');
-        if (retry) retry.addEventListener('click', loadOverview);
-
-        document.body.addEventListener('click', function (e) {
-          var t = e.target;
-          if (!t) return;
-          if (t.matches('button[data-resolve-report]')) {
-            var id = t.getAttribute('data-resolve-report');
-            var notes = prompt('Notas (opcional):') || '';
-            api('/reports/' + encodeURIComponent(id) + '/resolve', { method: 'POST', body: JSON.stringify({ notes: notes }) })
-              .then(function () { toast('Report resuelto', true); return Promise.all([loadOverview(), loadReports()]); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          if (t.matches('button[data-hide-report], button[data-unhide-report]')) {
-            var hideId = t.getAttribute('data-hide-report') || t.getAttribute('data-unhide-report');
-            var action = t.hasAttribute('data-hide-report') ? 'hide' : 'unhide';
-            api('/reports/' + encodeURIComponent(hideId) + '/' + action, { method: 'POST', body: JSON.stringify({}) })
-              .then(function () { toast(action === 'hide' ? 'Contenido oculto' : 'Contenido visible', true); return Promise.all([loadOverview(), loadReports()]); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-        });
-        document.getElementById('usersTbody').addEventListener('click', function (e) {
-          var t = e.target;
-          if (!t) return;
-          var id = t.getAttribute('data-id');
-          if (!id) return;
-          // Verify / unverify
-          if (t.matches('button[data-verify]')) {
-            var v = t.getAttribute('data-verify') === '1';
-            var msg = v ? '¿Verificar este usuario?' : '¿Desverificar este usuario?';
-            if (!window.confirm(msg)) return;
-            api('/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ is_verified: v }) })
-              .then(function () { toast('Usuario actualizado', true); return loadUsers(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          // Ban / unban
-          if (t.matches('button[data-ban-action]')) {
-            var action = t.getAttribute('data-ban-action');
-            var confirm_msg = action === 'ban' ? '¿Banear este usuario? No podrá iniciar sesión.' : '¿Desbanear este usuario?';
-            if (!window.confirm(confirm_msg)) return;
-            api('/users/' + encodeURIComponent(id) + '/' + action, { method: 'POST', body: JSON.stringify({}) })
-              .then(function () { toast(action === 'ban' ? 'Usuario baneado' : 'Usuario desbaneado', true); return loadUsers(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          // User detail
-          if (t.matches('button[data-detail]')) {
-            loadUserDetail(id)
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          // Reset cooldowns
-          if (t.matches('button[data-reset-cooldowns]')) {
-            if (!window.confirm('¿Resetear cooldowns de notificaciones para este usuario?')) return;
-            api('/users/' + encodeURIComponent(id) + '/reset-cooldowns', { method: 'POST', body: JSON.stringify({}) })
-              .then(function () { toast('Cooldowns reseteados', true); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          // Reset points
-          if (t.matches('button[data-reset-points]')) {
-            if (!window.confirm('¿Resetear reputacion/puntos de este usuario?')) return;
-            api('/users/' + encodeURIComponent(id) + '/reset-points', { method: 'POST', body: JSON.stringify({}) })
-              .then(function () { toast('Puntos reseteados', true); return loadUsers(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          // GDPR export
-          if (t.matches('button[data-gdpr-export]')) {
-            api('/users/' + encodeURIComponent(id) + '/gdpr/export', { method: 'POST', body: JSON.stringify({}) })
-              .then(function (j) {
-                showUserDetail(j.data || {});
-                toast('Export listo', true);
-              })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          // GDPR delete
-          if (t.matches('button[data-gdpr-delete]')) {
-            var confirmText = window.prompt('Escribe ELIMINAR para confirmar (irreversible):') || '';
-            if (confirmText !== 'ELIMINAR') return;
-            api('/users/' + encodeURIComponent(id) + '/gdpr/delete', { method: 'POST', body: JSON.stringify({}) })
-              .then(function () { toast('Usuario anonimizado', true); return loadUsers(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-        });
-
-        document.getElementById('contentTbody').addEventListener('click', function (e) {
-          var t = e.target;
-          if (!t) return;
-          if (t.matches('button[data-content-detail]')) {
-            var id = t.getAttribute('data-content-detail');
-            var kind = t.getAttribute('data-content-kind') || 'requests';
-            loadContentDetail(kind, id)
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-          if (t.matches('button[data-content-hide], button[data-content-unhide]')) {
-            var cid = t.getAttribute('data-content-hide') || t.getAttribute('data-content-unhide');
-            var ck = t.getAttribute('data-content-kind') || 'requests';
-            var type = (ck === 'offers') ? 'offer' : 'request';
-            var action = t.hasAttribute('data-content-hide') ? 'hide' : 'unhide';
-            var confirmMsg = action === 'hide' ? '¿Ocultar este contenido?' : '¿Mostrar este contenido?';
-            if (!window.confirm(confirmMsg)) return;
-            api('/' + type + '/' + encodeURIComponent(cid) + '/' + action, { method: 'POST', body: JSON.stringify({}) })
-              .then(function () { toast(action === 'hide' ? 'Contenido oculto' : 'Contenido visible', true); return loadContent(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-        });
-
-        document.getElementById('matchesTbody').addEventListener('click', function (e) {
-          var t = e.target;
-          if (!t) return;
-          if (t.matches('button[data-match-detail]')) {
-            var id = t.getAttribute('data-match-detail');
-            loadMatchDetail(id)
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          }
-        });
-
-        document.getElementById('btnLogout').addEventListener('click', function () {
-          api('/auth/logout', { method: 'POST' })
-            .catch(function () { })
-            .finally(function () {
-              setToken('');
-              resetAdminUI();
-              showLogin(true);
-              if (location.pathname.indexOf('/admin/login') !== 0) location.href = '/admin/login';
-            });
-        });
-
-        var closeDetail = document.getElementById('btnUserDetailClose');
-        if (closeDetail) {
-          closeDetail.addEventListener('click', function () {
-            var card = document.getElementById('userDetailCard');
-            if (card) card.style.display = 'none';
-          });
-        }
-
-        var closeContent = document.getElementById('btnContentDetailClose');
-        if (closeContent) {
-          closeContent.addEventListener('click', function () {
-            var card = document.getElementById('contentDetailCard');
-            if (card) card.style.display = 'none';
-          });
-        }
-
-        var closeMatch = document.getElementById('btnMatchDetailClose');
-        if (closeMatch) {
-          closeMatch.addEventListener('click', function () {
-            var card = document.getElementById('matchDetailCard');
-            if (card) card.style.display = 'none';
-          });
-        }
-
-        document.querySelectorAll('button[data-fx]').forEach(function (b) {
-          b.addEventListener('click', function () {
-            var v = b.getAttribute('data-fx');
-            api('/config', { method: 'PATCH', body: JSON.stringify({ fx_level: v }) })
-              .then(function () {
-                toast('Config guardada: fx_level=' + v, true);
-                return loadConfig();
-              })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          });
-        });
-
-        var heroSave = document.getElementById('heroDurationSave');
-        if (heroSave) {
-          heroSave.addEventListener('click', function () {
-            var input = document.getElementById('heroDurationInput');
-            if (!input) return;
-            var raw = String(input.value || '').trim();
-            var payload = { hero_banner_duration: null };
-            if (raw) {
-              var n = Math.max(3, Math.min(20, parseInt(raw, 10)));
-              payload.hero_banner_duration = n;
-            }
-            api('/config', { method: 'PATCH', body: JSON.stringify(payload) })
-              .then(function () { toast('Config guardada: hero_banner_duration', true); return loadConfig(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          });
-        }
-
-        var legalSave = document.getElementById('legalModeSave');
-        if (legalSave) {
-          legalSave.addEventListener('click', function () {
-            var toggle = document.getElementById('legalModeToggle');
-            if (!toggle) return;
-            var enabled = !!toggle.checked;
-            var msg = enabled ? '¿Activar modo legal?' : '¿Desactivar modo legal?';
-            if (!window.confirm(msg)) return;
-            api('/config', { method: 'PATCH', body: JSON.stringify({ legal_mode: enabled }) })
-              .then(function () { toast('Config guardada: legal_mode', true); return loadConfig(); })
-              .catch(function (err) { toast(err.message || 'Error', false); });
-          });
-        }
-      }
-
-      bind();
-      loadVersion();
-      ensureLogin()
-        .then(loadMe)
-        .then(function () {
-          if (location.pathname.indexOf('/admin/login') === 0) location.href = '/admin';
-          return Promise.all([loadOverview(), loadConfig()]);
-        })
-        .catch(function (e) {
-          if (e && e.silent) return;
-          toast(e.message || 'Error', false);
-        });
-    })();
-  </script>
+})();
+</script>
 </body>
-
 </html>
