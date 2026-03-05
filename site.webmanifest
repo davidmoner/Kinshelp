@@ -3,12 +3,12 @@
   "short_name": "KingsHelp",
   "icons": [
     {
-      "src": "favicon-256.png",
+      "src": "favicon-256.png?v=1",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "favicon-512.png",
+      "src": "favicon-512.png?v=1",
       "sizes": "512x512",
       "type": "image/png"
     }
