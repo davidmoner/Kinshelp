@@ -1564,8 +1564,11 @@
           <span class="kh-theme-label">Ranking</span>
         </button>
         <div class="dash-menu">
-          <button class="btn btn-ghost btn-sm" type="button" id="dash-menu-btn" aria-haspopup="menu"
-            aria-expanded="false" data-action="toggleDashMenu" data-args="$event">Cuenta ▾</button>
+          <button class="btn btn-ghost btn-sm btn-account" type="button" id="dash-menu-btn" aria-haspopup="menu"
+            aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
+            <span class="dash-menu-name" id="dash-menu-name">Cuenta</span>
+            <span class="dash-menu-caret" aria-hidden="true">▾</span>
+          </button>
           <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
             <button class="dash-menu-item" type="button" role="menuitem"
               data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>

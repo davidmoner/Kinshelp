@@ -1557,6 +1557,13 @@
         $('user-avatar').textContent = (user.display_name || '?')[0].toUpperCase();
         $('user-tier').style.color = (user.premium_tier && user.premium_tier !== 'free') ? 'var(--gold-light)' : 'var(--kh-brand-500)';
 
+        const dashName = document.getElementById('dash-menu-name');
+        if (dashName) {
+            const rawName = String(user.display_name || '').trim();
+            const shortName = rawName ? rawName.split(/\s+/)[0] : 'Cuenta';
+            dashName.textContent = shortName || 'Cuenta';
+        }
+
         const isVerified = user.is_verified === true || user.is_verified === 1;
         const v = document.getElementById('user-verified');
         if (v) v.classList.toggle('hidden', !isVerified);
@@ -4854,6 +4861,7 @@
         showPage('page-landing');
         stopNotifPolling();
         closeNotifPanel();
+        if ($('dash-menu-name')) $('dash-menu-name').textContent = 'Cuenta';
         if ($('notif-badge')) {
             $('notif-badge').textContent = '0';
             $('notif-badge').classList.add('hidden');

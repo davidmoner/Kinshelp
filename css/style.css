@@ -2422,6 +2422,41 @@ html[data-theme="light"] .site-footer {
   position: relative;
 }
 
+.btn-account {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.btn-account:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.btn-account .dash-menu-caret {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+html[data-theme="light"] .btn-account {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--text);
+}
+
+html[data-theme="light"] .btn-account:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
 .dash-burger {
   display: none;
   width: 38px;
@@ -3201,21 +3236,30 @@ html[data-theme="light"] .rep-act-pts.neg {
 
 #card-feed .explore-radar {
   position: absolute;
-  left: -450px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 18px;
+  right: 18px;
+  left: auto;
+  transform: none;
+  margin: 0;
+  pointer-events: none;
+  opacity: 0.9;
 }
 
 @media (max-width: 980px) {
   #card-feed .explore-radar {
-    left: -410px;
+    top: 16px;
+    right: 16px;
+    width: 72px;
+    height: 72px;
   }
 }
 
 @media (max-width: 720px) {
   #card-feed .explore-radar {
-    position: static;
-    transform: none;
+    top: 12px;
+    right: 12px;
+    width: 60px;
+    height: 60px;
   }
 }
 
