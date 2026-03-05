@@ -11,6 +11,7 @@ function getPool() {
     connectionString: url,
     ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: false },
     max: 5,
+    connectionTimeoutMillis: Number(process.env.PG_CONNECT_TIMEOUT_MS || 5000),
   });
   return pool;
 }

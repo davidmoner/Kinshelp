@@ -139,9 +139,21 @@ app.use((req, res, next) => {
   next();
 });
 
+const DB_HEALTH_TIMEOUT_MS = Number(process.env.DB_HEALTH_TIMEOUT_MS || 3000);
+
+function withTimeout(promise, ms, label) {
+  let timer = null;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label || 'timeout')), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
+}
+
 async function checkDb() {
   if (db.isPg) {
-    await db.one('SELECT 1 AS ok', []);
+    await withTimeout(db.one('SELECT 1 AS ok', []), DB_HEALTH_TIMEOUT_MS, 'db timeout');
     return { ok: true, type: 'postgres' };
   }
   // SQLite
