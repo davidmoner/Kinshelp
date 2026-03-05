@@ -283,6 +283,15 @@ const staticOpts = {
 app.use('/web', express.static(path.join(publicRoot, 'web'), staticOpts));
 app.use('/legal', express.static(path.join(publicRoot, 'legal'), staticOpts));
 app.use('/img', express.static(path.join(publicRoot, 'img'), staticOpts));
+// Admin route: relax CSP to allow inline scripts (admin panel uses a large inline script)
+app.use('/admin', (req, res, next) => {
+  res.setHeader('Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'none';"
+  );
+  next();
+});
+
 app.get('/admin/login', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   return sendStaticFile(res, 'admin/index.html');

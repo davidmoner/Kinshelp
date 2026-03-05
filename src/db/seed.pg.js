@@ -130,6 +130,21 @@ async function seed() {
       await upsertUserByEmail(client, { ...u, passwordHash: hash });
     }
 
+    // Admin user from env vars
+    const adminEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    const adminHash = process.env.ADMIN_PASSWORD_HASH || null;
+    if (adminEmails.length && adminHash) {
+      for (const email of adminEmails) {
+        await client.query(
+          `INSERT INTO users (id, display_name, email, password_hash, points_balance, is_verified, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, 0, true, now(), now())
+           ON CONFLICT (email) DO NOTHING`,
+          [randomUUID(), 'Admin', email, adminHash]
+        );
+      }
+      console.log(`✔  admin user(s) ensured: ${adminEmails.join(', ')}`);
+    }
+
     await client.query('COMMIT');
     console.log('✅  Postgres seed complete. Demo password: password123');
   } catch (e) {

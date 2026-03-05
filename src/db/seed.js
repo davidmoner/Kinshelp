@@ -228,6 +228,30 @@ const insertRequest = db.prepare(`
 requests.forEach(r => insertRequest.run(r));
 console.log(`  ✔  ${requests.length} help requests seeded`);
 
+// ── Admin user ───────────────────────────────────────────────────────────────
+try {
+    const adminEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    const adminHash = process.env.ADMIN_PASSWORD_HASH || null;
+    if (adminEmails.length && adminHash) {
+        const insertAdmin = db.prepare(`
+          INSERT OR IGNORE INTO users
+            (id, display_name, email, password_hash, bio, location_text,
+             points_balance, rating_avg, rating_count, premium_tier,
+             is_verified, created_at, updated_at, profile_photos, boost_48h_tokens)
+          VALUES
+            (?, ?, ?, ?, NULL, NULL, 0, 0.0, 0, 'free', 1, ?, ?, '[]', 0)
+        `);
+        adminEmails.forEach(email => {
+            insertAdmin.run(randomUUID(), 'Admin', email, adminHash, now, now);
+        });
+        console.log(`  ✔  admin user(s) ensured: ${adminEmails.join(', ')}`);
+    } else {
+        console.log('  ⚠  ADMIN_EMAILS or ADMIN_PASSWORD_HASH not set, skipping admin user seed');
+    }
+} catch (e) {
+    console.warn('  ⚠  admin user seed skipped:', e && e.message ? e.message : String(e));
+}
+
 console.log('\n✅  Seed complete.\n');
 console.log('Demo credentials (all password: password123):');
 users.forEach(u => console.log(`  ${u.email}  [${u.premium_tier}]  reputacion: ${u.points_balance} rep`));
