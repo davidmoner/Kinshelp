@@ -172,13 +172,13 @@ html[data-theme="dark"] .kh-ios-sub {
     text-overflow: ellipsis;
     opacity: 1;
     transform: translateY(0);
-    transition: opacity 280ms ease, transform 280ms ease;
+    transition: opacity 320ms ease, transform 320ms ease;
     will-change: opacity, transform;
 }
 
 .hero-sub-cycle .hero-sub-text.is-out {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
 }
 
 @media (prefers-reduced-motion: reduce) {

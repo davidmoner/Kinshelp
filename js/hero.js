@@ -107,7 +107,7 @@
         subtitleSwapTimer = setTimeout(function () {
             subtitleTextEl.textContent = nextText;
             subtitleTextEl.classList.remove('is-out');
-        }, 220);
+        }, 240);
     }
 
     function startSubtitleRotation() {
