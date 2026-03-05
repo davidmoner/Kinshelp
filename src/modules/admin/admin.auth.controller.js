@@ -31,8 +31,14 @@ function resolveRole(email) {
 
 async function findUserByEmail(email) {
   const normalized = String(email || '').trim().toLowerCase();
-  if (db.isPg) return db.one('SELECT id, email, display_name, is_banned FROM users WHERE email = $1', [normalized]);
-  return db.prepare('SELECT id, email, display_name, is_banned FROM users WHERE email = ?').get(normalized);
+  try {
+    if (db.isPg) return db.one('SELECT id, email, display_name, is_banned FROM users WHERE email = $1', [normalized]);
+    return db.prepare('SELECT id, email, display_name, is_banned FROM users WHERE email = ?').get(normalized);
+  } catch (err) {
+    // Backward-compatible: older schemas may not have is_banned.
+    if (db.isPg) return db.one('SELECT id, email, display_name FROM users WHERE email = $1', [normalized]);
+    return db.prepare('SELECT id, email, display_name FROM users WHERE email = ?').get(normalized);
+  }
 }
 
 function safeUser(u) {

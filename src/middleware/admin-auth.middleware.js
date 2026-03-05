@@ -29,8 +29,14 @@ function getTokenFromRequest(req) {
 
 async function getAdminUserById(id) {
   if (!id) return null;
-  if (db.isPg) return db.one('SELECT id, email, display_name, is_banned FROM users WHERE id = $1', [id]);
-  return db.prepare('SELECT id, email, display_name, is_banned FROM users WHERE id = ?').get(id);
+  try {
+    if (db.isPg) return db.one('SELECT id, email, display_name, is_banned FROM users WHERE id = $1', [id]);
+    return db.prepare('SELECT id, email, display_name, is_banned FROM users WHERE id = ?').get(id);
+  } catch (err) {
+    // Backward-compatible: older schemas may not have is_banned.
+    if (db.isPg) return db.one('SELECT id, email, display_name FROM users WHERE id = $1', [id]);
+    return db.prepare('SELECT id, email, display_name FROM users WHERE id = ?').get(id);
+  }
 }
 
 async function verifyAdminRequest(req) {
