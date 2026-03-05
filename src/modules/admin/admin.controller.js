@@ -218,6 +218,66 @@ function listMatches(req, res) {
   res.json({ ok: true, data: rows, meta: { page, limit, count: rows.length } });
 }
 
+function getRequestDetail(req, res) {
+  const id = String(req.params.id);
+  const row = repo.getRequestById(id);
+  if (!row) throw httpError(404, 'Request not found');
+  res.json({ ok: true, data: row });
+}
+
+function getOfferDetail(req, res) {
+  const id = String(req.params.id);
+  const row = repo.getOfferById(id);
+  if (!row) throw httpError(404, 'Offer not found');
+  res.json({ ok: true, data: row });
+}
+
+function getMatchDetail(req, res) {
+  const id = String(req.params.id);
+  const row = repo.getMatchById(id);
+  if (!row) throw httpError(404, 'Match not found');
+  res.json({ ok: true, data: row });
+}
+
+function setContentHidden(req, res, hidden) {
+  const type = String(req.params.type || '').toLowerCase();
+  const id = String(req.params.id);
+  if (!['offer', 'request'].includes(type)) throw httpError(400, 'Unsupported content type');
+
+  const before = type === 'offer' ? repo.getOfferById(id) : repo.getRequestById(id);
+  if (!before) throw httpError(404, 'Content not found');
+
+  Promise.resolve(reportsRepo.setContentHidden({ targetType: type, targetId: id, hidden }))
+    .then(() => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: hidden ? 'content.hide' : 'content.unhide',
+      entityType: type,
+      entityId: id,
+      beforeJson: JSON.stringify({ is_hidden: before.is_hidden }),
+      afterJson: JSON.stringify({ is_hidden: !!hidden }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }))
+    .then(() => Promise.resolve(eventsRepo.logEvent({
+      type: hidden ? 'content.hidden' : 'content.unhidden',
+      actorUserId: req.user.id,
+      targetType: type,
+      targetId: id,
+      meta: { source: 'admin' },
+    })))
+    .then(() => res.json({ ok: true }))
+    .catch(err => res.status(err.status || 500).json({ error: err.message || 'Failed to update content' }));
+}
+
+function hideContent(req, res) {
+  return setContentHidden(req, res, true);
+}
+
+function unhideContent(req, res) {
+  return setContentHidden(req, res, false);
+}
+
 function getUser(req, res) {
   const u = repo.getUserById(req.params.id);
   if (!u) throw httpError(404, 'User not found');
@@ -477,6 +537,9 @@ module.exports = {
   listRequests,
   listOffers,
   listMatches,
+  getRequestDetail,
+  getOfferDetail,
+  getMatchDetail,
   getUser,
   getUserDetail,
   patchUser,
@@ -489,6 +552,8 @@ module.exports = {
   resolveReport,
   hideReportTarget,
   unhideReportTarget,
+  hideContent,
+  unhideContent,
   getConfig,
   patchConfig,
 };
