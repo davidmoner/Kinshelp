@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const { randomUUID } = require('crypto');
 const env = require('./config/env');
 const db = require('./config/db');
+const { verifyAdminRequest } = require('./middleware/admin-auth.middleware');
 
 const { errorHandler, notFound } = require('./middleware/error.middleware');
 
@@ -110,6 +111,7 @@ app.set('trust proxy', 1);
 
 // Rate limit: keep API protected, avoid breaking static assets.
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
+const adminLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false });
 
 // Request ID + lightweight structured logging
 app.use((req, res, next) => {
@@ -205,8 +207,8 @@ api.use('/stats', require('./modules/stats/stats.routes'));
 api.use('/notifications', require('./modules/notifications/notifications.routes'));
 api.use('/reports', require('./modules/reports/reports.routes'));
 
-// Admin (protected by auth + ADMIN_EMAILS)
-api.use('/admin', require('./modules/admin/admin.routes'));
+// Admin (protected by admin auth)
+api.use('/admin', adminLimiter, require('./modules/admin/admin.routes'));
 
 app.use('/api/v1', apiLimiter, api);
 
@@ -220,7 +222,8 @@ function applyStaticHeaders(res, filePath) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   const ext = path.extname(filePath || '').toLowerCase();
   if (ext === '.html' || ext === '.json' || ext === '.webmanifest') {
-    res.setHeader('Cache-Control', CACHE_HTML);
+    const isAdmin = String(filePath || '').includes(`${path.sep}admin${path.sep}`);
+    res.setHeader('Cache-Control', isAdmin ? 'no-store' : CACHE_HTML);
     return;
   }
   res.setHeader('Cache-Control', CACHE_ASSET);
@@ -237,7 +240,19 @@ const staticOpts = {
 app.use('/web', express.static(path.join(publicRoot, 'web'), staticOpts));
 app.use('/legal', express.static(path.join(publicRoot, 'legal'), staticOpts));
 app.use('/img', express.static(path.join(publicRoot, 'img'), staticOpts));
-app.use('/admin', express.static(path.join(publicRoot, 'admin'), staticOpts));
+app.get('/admin/login', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  return sendStaticFile(res, 'admin/index.html');
+});
+
+async function adminGate(req, res, next) {
+  if (req.path === '/login' || req.path === '/login/') return next();
+  const admin = await verifyAdminRequest(req);
+  if (!admin) return res.redirect(302, '/admin/login');
+  return next();
+}
+
+app.use('/admin', adminGate, express.static(path.join(publicRoot, 'admin'), staticOpts));
 app.use('/css', express.static(path.join(publicRoot, 'css'), staticOpts));
 app.use('/js', express.static(path.join(publicRoot, 'js'), staticOpts));
 app.use('/.well-known', express.static(path.join(publicRoot, '.well-known'), staticOpts));

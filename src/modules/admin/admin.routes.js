@@ -1,22 +1,32 @@
 'use strict';
 const express = require('express');
-const { authenticate } = require('../../middleware/auth.middleware');
-const { requireAdmin } = require('../../middleware/admin.middleware');
+const { requireAdminAuth } = require('../../middleware/admin-auth.middleware');
+const rateLimit = require('express-rate-limit');
 const controller = require('./admin.controller');
+const authController = require('./admin.auth.controller');
 
 const r = express.Router();
 
-// All admin routes require auth + admin.
-r.use(authenticate, requireAdmin);
+// Admin auth
+const adminAuthLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
+r.post('/auth/login', adminAuthLimiter, authController.login);
+r.get('/auth/me', requireAdminAuth, authController.me);
+r.post('/auth/logout', requireAdminAuth, authController.logout);
+
+// All admin routes require admin auth.
+r.use(requireAdminAuth);
 
 r.get('/me', controller.me);
 r.get('/stats/overview', controller.overview);
+r.get('/overview', controller.overview);
 
 // Activity
 r.get('/events', controller.listEvents);
+r.get('/activity', controller.listEvents);
 
 // Moderation
 r.get('/reports', controller.listReports);
+r.get('/moderation', controller.listReports);
 r.post('/reports', controller.createReport);
 r.post('/reports/:id/resolve', controller.resolveReport);
 r.post('/reports/:id/hide', controller.hideReportTarget);

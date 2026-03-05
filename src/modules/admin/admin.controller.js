@@ -13,7 +13,7 @@ function safeUser(user) {
 }
 
 function me(req, res) {
-  res.json({ ok: true, admin: true, user: safeUser(req.user) });
+  res.json({ ok: true, admin: true, role: req.admin ? req.admin.role : 'admin', user: safeUser(req.user) });
 }
 
 function overview(req, res) {
