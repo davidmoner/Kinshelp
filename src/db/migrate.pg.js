@@ -25,6 +25,7 @@ async function migrate() {
         premium_tier   text NOT NULL DEFAULT 'free',
         premium_until  timestamptz,
         is_verified    boolean NOT NULL DEFAULT false,
+        is_banned      boolean NOT NULL DEFAULT false,
         created_at     timestamptz NOT NULL DEFAULT now(),
         updated_at     timestamptz NOT NULL DEFAULT now(),
         profile_photos jsonb NOT NULL DEFAULT '[]'::jsonb,
@@ -32,6 +33,8 @@ async function migrate() {
         boost_48h_tokens integer NOT NULL DEFAULT 0
       );
     `);
+
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned boolean NOT NULL DEFAULT false;`);
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS service_offers (

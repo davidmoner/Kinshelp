@@ -303,6 +303,9 @@ if (!hasColumn('matches', 'agreement_at')) {
 if (!hasColumn('users', 'profile_photos')) {
   addColumn('users', "profile_photos TEXT NOT NULL DEFAULT '[]'");
 }
+if (!hasColumn('users', 'is_banned')) {
+  addColumn('users', 'is_banned INTEGER NOT NULL DEFAULT 0');
+}
 
 // AutoMatch settings additions (provider + seeker modes)
 if (!hasColumn('automatch_settings', 'seeker_enabled')) {

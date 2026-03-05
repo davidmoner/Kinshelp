@@ -149,6 +149,22 @@ async function checkDb() {
   return { ok: true, type: 'sqlite' };
 }
 
+async function ensureAdminSchema() {
+  try {
+    if (db.isPg) {
+      await db.exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned boolean NOT NULL DEFAULT false");
+      return;
+    }
+    const cols = db.prepare('PRAGMA table_info(users)').all();
+    const has = cols.some(c => c.name === 'is_banned');
+    if (!has) db.exec('ALTER TABLE users ADD COLUMN is_banned INTEGER NOT NULL DEFAULT 0');
+  } catch (err) {
+    try { console.warn('Admin schema check failed:', err && err.message ? err.message : err); } catch { }
+  }
+}
+
+ensureAdminSchema();
+
 async function healthPayload() {
   let dbStatus = { ok: false, type: db.isPg ? 'postgres' : 'sqlite' };
   try { dbStatus = await checkDb(); } catch (e) { dbStatus = { ok: false, type: db.isPg ? 'postgres' : 'sqlite', error: e && e.message ? e.message : String(e) }; }
