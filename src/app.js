@@ -91,6 +91,7 @@ const cspScriptHashes = [
   "'sha256-SXk7z1QIWnFhmfe1L3zWbBaoIOoy8eRqkbIL09e/eVk='",
   "'sha256-o5jUa2287/3qNrLao2K53IA9k0M3fu/1sqSLdPpmHK4='",
   "'sha256-YQpG8tDKHvf0v0iZSC0Ogp2tLbCPTGBkXaTzbSAmrKs='",
+  "'sha256-f7tu0IcJJJeK2fyZT/xe0AzShPWM12IgLN17x84V9YE='",
 ];
 
 app.use(helmet({
