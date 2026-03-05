@@ -5359,8 +5359,9 @@ html[data-theme="light"] .feed-body-panel {
 
 /* ── Ranking modal controls ───────────────────────────── */
 .modal-ranking-box {
-  max-width: min(1340px, 98vw);
-  padding: 22px 22px 18px;
+  width: min(1200px, 96vw);
+  max-width: 1200px;
+  padding: 24px 24px 20px;
   display: flex;
   flex-direction: column;
   max-height: calc(100svh - 64px);
@@ -5372,17 +5373,33 @@ html[data-theme="light"] .feed-body-panel {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+}
+
+.ranking-head-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ranking-head-meta {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  padding-top: 4px;
+  text-align: right;
+  min-width: 160px;
 }
 
 .ranking-list {
   flex: 1 1 auto;
   overflow: auto;
-  padding: 12px;
+  padding: 16px;
   margin-top: 10px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 .ranking-list--page {
@@ -5411,21 +5428,76 @@ html[data-theme="light"] .feed-body-panel {
     border-radius: 18px;
     max-height: calc(100svh - 28px);
   }
+
+  .ranking-head-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ranking-head-meta {
+    text-align: left;
+    min-width: 0;
+  }
+
+  .rank-controls-row--primary,
+  .rank-controls-row--secondary {
+    align-items: stretch;
+  }
+
+  .rank-search,
+  .rank-chip-group,
+  .rank-select-group,
+  .rank-loc-btn {
+    width: 100%;
+  }
+
+  .rank-loc-btn {
+    margin-left: 0;
+  }
 }
 
 .rank-controls {
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 18px;
-  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 20px;
+  padding: 14px;
 }
 
 .rank-controls-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
-  row-gap: 10px;
+  row-gap: 12px;
+}
+
+.rank-controls-row--primary {
+  justify-content: space-between;
+}
+
+.rank-controls-row--secondary {
+  justify-content: space-between;
+}
+
+.rank-search {
+  flex: 1;
+  min-width: 240px;
+}
+
+.rank-chip-group {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rank-select-group {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rank-loc-btn {
+  margin-left: auto;
 }
 
 .rank-chip {

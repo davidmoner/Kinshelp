@@ -3065,39 +3065,48 @@
     <div class="modal-box modal-ranking-box">
       <button class="modal-close" data-action="closeRankingModal">✕</button>
       <div class="ranking-head">
-        <div class="upgrade-top" style="padding-bottom:0;">
-          <div class="upgrade-k">Ranking vecinal</div>
-          <div class="upgrade-v">Tu barrio en directo</div>
-          <div class="upgrade-sub" id="ranking-me" style="margin-top:10px; display:none;"></div>
+        <div class="ranking-head-top">
+          <div class="upgrade-top" style="padding-bottom:0;">
+            <div class="upgrade-k">Ranking vecinal</div>
+            <div class="upgrade-v">Tu barrio en directo</div>
+          </div>
+          <div class="ranking-head-meta upgrade-sub" id="ranking-me" style="display:none;"></div>
         </div>
 
         <div class="rank-controls" style="margin-top:14px;">
-          <div class="rank-controls-row">
+          <div class="rank-controls-row rank-controls-row--primary">
             <div class="rank-search" role="search" aria-label="Buscar vecino">
               <input class="rank-search-input" id="rank-q-modal" type="search" placeholder="Buscar vecino o zona"
                 autocomplete="off" data-input="setRankingQuery" data-input-args="$value|obj:modal=true" />
             </div>
-            <button class="rank-chip rank-chip--active" type="button" data-scope="global"
-              data-action="setRankingScope" data-args="global|obj:modal=true">Global</button>
-            <button class="rank-chip" type="button" data-scope="near"
-              data-action="setRankingScope" data-args="near|obj:modal=true">Cerca de mi</button>
-            <select class="rank-select" id="rank-radius-modal"
-              data-change="setRankingRadius" data-change-args="$value|obj:modal=true" aria-label="Radio">
-              <option value="1">1 km</option>
-              <option value="3">3 km</option>
-              <option value="5" selected>5 km</option>
-              <option value="10">10 km</option>
-            </select>
-            <button class="btn btn-ghost btn-sm" type="button" data-action="useMyLocation" data-args="obj:modal=true">Ubicacion</button>
-            <select class="rank-select" id="rank-level-modal"
-              data-change="setRankingLevel" data-change-args="$value|obj:modal=true" aria-label="Nivel minimo">
-              <option value="all" selected>Todos</option>
-              <option value="incept">Incept (0+)</option>
-              <option value="bronze">Bronce (100+)</option>
-              <option value="silver">Plata (250+)</option>
-              <option value="gold">Oro (500+)</option>
-              <option value="legend">Leyenda (1000+)</option>
-            </select>
+            <div class="rank-chip-group" role="group" aria-label="Scope ranking">
+              <button class="rank-chip rank-chip--active" type="button" data-scope="global"
+                data-action="setRankingScope" data-args="global|obj:modal=true">Global</button>
+              <button class="rank-chip" type="button" data-scope="near"
+                data-action="setRankingScope" data-args="near|obj:modal=true">Cerca de mi</button>
+            </div>
+          </div>
+          <div class="rank-controls-row rank-controls-row--secondary">
+            <div class="rank-select-group">
+              <select class="rank-select" id="rank-radius-modal"
+                data-change="setRankingRadius" data-change-args="$value|obj:modal=true" aria-label="Radio">
+                <option value="1">1 km</option>
+                <option value="3">3 km</option>
+                <option value="5" selected>5 km</option>
+                <option value="10">10 km</option>
+              </select>
+              <select class="rank-select" id="rank-level-modal"
+                data-change="setRankingLevel" data-change-args="$value|obj:modal=true" aria-label="Nivel minimo">
+                <option value="all" selected>Todos</option>
+                <option value="incept">Incept (0+)</option>
+                <option value="bronze">Bronce (100+)</option>
+                <option value="silver">Plata (250+)</option>
+                <option value="gold">Oro (500+)</option>
+                <option value="legend">Leyenda (1000+)</option>
+              </select>
+            </div>
+            <button class="btn btn-ghost btn-sm rank-loc-btn" type="button" data-action="useMyLocation"
+              data-args="obj:modal=true">Ubicacion</button>
           </div>
         </div>
       </div>
