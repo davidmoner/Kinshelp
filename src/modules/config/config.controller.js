@@ -17,9 +17,13 @@ function normalizeConfig(raw) {
   const durNum = Number(durRaw);
   const heroDuration = Number.isFinite(durNum) && durNum > 0 ? durNum : null;
 
+  const legalRaw = parseValue(cfg.legal_mode);
+  const legalMode = legalRaw === true || legalRaw === 1 || legalRaw === 'true';
+
   return {
     fx_level: fx,
     hero_banner_duration: heroDuration,
+    legal_mode: legalMode,
   };
 }
 

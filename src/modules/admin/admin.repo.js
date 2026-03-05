@@ -7,7 +7,7 @@ function listUsers({ query, limit, offset }) {
   if (db.isPg) {
     if (q) {
       return db.many(
-        `SELECT id, display_name, email, points_balance, premium_tier, is_verified, created_at, updated_at
+        `SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
          FROM users
          WHERE lower(email) LIKE $1 OR lower(display_name) LIKE $1 OR cast(id as text) LIKE $1
          ORDER BY created_at DESC
@@ -16,7 +16,7 @@ function listUsers({ query, limit, offset }) {
       );
     }
     return db.many(
-      `SELECT id, display_name, email, points_balance, premium_tier, is_verified, created_at, updated_at
+      `SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
        FROM users
        ORDER BY created_at DESC
        LIMIT $1 OFFSET $2`,
@@ -26,7 +26,7 @@ function listUsers({ query, limit, offset }) {
 
   if (q) {
     return db.prepare(`
-      SELECT id, display_name, email, points_balance, premium_tier, is_verified, created_at, updated_at
+      SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
       FROM users
       WHERE lower(email) LIKE ? OR lower(display_name) LIKE ? OR id LIKE ?
       ORDER BY created_at DESC
@@ -35,7 +35,7 @@ function listUsers({ query, limit, offset }) {
   }
 
   return db.prepare(`
-    SELECT id, display_name, email, points_balance, premium_tier, is_verified, created_at, updated_at
+    SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
     FROM users
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
@@ -209,6 +209,70 @@ function listMatches({ query, limit, offset }) {
   ).all(limit, offset);
 }
 
+function getRequestById(id) {
+  if (db.isPg) {
+    return db.one(
+      `SELECT r.*, u.display_name AS seeker_name, u.email AS seeker_email
+       FROM help_requests r
+       JOIN users u ON u.id = r.seeker_id
+       WHERE r.id = $1`,
+      [id]
+    );
+  }
+  return db.prepare(
+    `SELECT r.*, u.display_name AS seeker_name, u.email AS seeker_email
+     FROM help_requests r
+     JOIN users u ON u.id = r.seeker_id
+     WHERE r.id = ?`
+  ).get(id);
+}
+
+function getOfferById(id) {
+  if (db.isPg) {
+    return db.one(
+      `SELECT o.*, u.display_name AS provider_name, u.email AS provider_email
+       FROM service_offers o
+       JOIN users u ON u.id = o.provider_id
+       WHERE o.id = $1`,
+      [id]
+    );
+  }
+  return db.prepare(
+    `SELECT o.*, u.display_name AS provider_name, u.email AS provider_email
+     FROM service_offers o
+     JOIN users u ON u.id = o.provider_id
+     WHERE o.id = ?`
+  ).get(id);
+}
+
+function getMatchById(id) {
+  if (db.isPg) {
+    return db.one(
+      `SELECT m.*, p.display_name AS provider_name, p.email AS provider_email,
+              s.display_name AS seeker_name, s.email AS seeker_email,
+              r.title AS request_title, o.title AS offer_title
+       FROM matches m
+       JOIN users p ON p.id = m.provider_id
+       JOIN users s ON s.id = m.seeker_id
+       LEFT JOIN help_requests r ON r.id = m.request_id
+       LEFT JOIN service_offers o ON o.id = m.offer_id
+       WHERE m.id = $1`,
+      [id]
+    );
+  }
+  return db.prepare(
+    `SELECT m.*, p.display_name AS provider_name, p.email AS provider_email,
+            s.display_name AS seeker_name, s.email AS seeker_email,
+            r.title AS request_title, o.title AS offer_title
+     FROM matches m
+     JOIN users p ON p.id = m.provider_id
+     JOIN users s ON s.id = m.seeker_id
+     LEFT JOIN help_requests r ON r.id = m.request_id
+     LEFT JOIN service_offers o ON o.id = m.offer_id
+     WHERE m.id = ?`
+  ).get(id);
+}
+
 function ensureTables() {
   if (db.isPg) return;
   db.exec(`
@@ -311,6 +375,9 @@ module.exports = {
   listRequests,
   listOffers,
   listMatches,
+  getRequestById,
+  getOfferById,
+  getMatchById,
   insertAudit,
   listAudit,
   getConfig,

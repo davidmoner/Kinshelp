@@ -379,10 +379,18 @@
                 <th>Estado</th>
                 <th>Usuario</th>
                 <th>Creado</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="contentTbody"></tbody>
           </table>
+        </div>
+        <div class="card" id="contentDetailCard" style="box-shadow:none; margin-top:12px; display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div style="font-weight:800;">Detalle contenido</div>
+            <button class="btn" id="btnContentDetailClose" type="button">Cerrar</button>
+          </div>
+          <pre id="contentDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
         </div>
       </section>
 
@@ -403,10 +411,18 @@
                 <th>Solicitante</th>
                 <th>Asunto</th>
                 <th>Creado</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="matchesTbody"></tbody>
           </table>
+        </div>
+        <div class="card" id="matchDetailCard" style="box-shadow:none; margin-top:12px; display:none;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+            <div style="font-weight:800;">Detalle match</div>
+            <button class="btn" id="btnMatchDetailClose" type="button">Cerrar</button>
+          </div>
+          <pre id="matchDetailPre" style="white-space:pre-wrap; font-size:12px; margin:10px 0 0;"></pre>
         </div>
       </section>
 
@@ -493,6 +509,17 @@
               <button class="btn" id="heroDurationSave" type="button">Guardar</button>
             </div>
           </div>
+          <div class="card" style="box-shadow:none;">
+            <div style="font-weight:800;">Modo legal</div>
+            <div class="muted" style="margin-top:6px;">Activa avisos legales y refuerzo de cumplimiento.</div>
+            <div style="margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <label class="pill" style="cursor:pointer;">
+                <input id="legalModeToggle" type="checkbox" style="width:auto; margin:0 6px 0 0;" />
+                <span>Legal activo</span>
+              </label>
+              <button class="btn" id="legalModeSave" type="button">Guardar</button>
+            </div>
+          </div>
         </div>
       </section>
     </main>
@@ -509,6 +536,11 @@
         t.textContent = msg;
         t.className = 'toast show ' + (ok ? 'ok' : 'bad');
         setTimeout(function () { t.className = 'toast'; }, 2400);
+      }
+
+      function renderEmptyRow(tb, cols, label) {
+        if (!tb) return;
+        tb.innerHTML = '<tr><td colspan="' + cols + '" class="muted">' + label + '</td></tr>';
       }
 
       var ADMIN_TOKEN_KEY = 'kh_admin_token';
@@ -551,6 +583,20 @@
         if (wrap) wrap.style.display = show ? 'none' : '';
       }
 
+      function resetAdminUI() {
+        var ids = ['eventsTbody', 'reportsTbody', 'usersTbody', 'contentTbody', 'matchesTbody', 'eventsTbodyFull', 'reportsTbodyFull', 'auditTbody'];
+        ids.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.innerHTML = '';
+        });
+        var cards = ['userDetailCard', 'contentDetailCard', 'matchDetailCard'];
+        cards.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        document.getElementById('meEmail').textContent = '-';
+      }
+
       function setLoginError(msg) {
         var el = document.getElementById('admin-login-error');
         if (el) el.textContent = msg || '';
@@ -560,6 +606,7 @@
         var tok = getToken();
         if (!tok) {
           showLogin(true);
+          resetAdminUI();
           return Promise.reject({ silent: true });
         }
         return api('/me').then(function () {
@@ -567,6 +614,7 @@
         }).catch(function (err) {
           setToken('');
           showLogin(true);
+          resetAdminUI();
           throw err;
         });
       }
@@ -601,7 +649,11 @@
 
           var etb = document.getElementById('eventsTbody');
           etb.innerHTML = '';
-          (d.recent_events || []).forEach(function (e) {
+          var evs = d.recent_events || [];
+          if (!evs.length) {
+            renderEmptyRow(etb, 4, 'Sin eventos recientes');
+          }
+          evs.forEach(function (e) {
             var tr = document.createElement('tr');
             tr.innerHTML =
               '<td>' + (e.created_at || '-') + '</td>' +
@@ -613,7 +665,11 @@
 
           var rtb = document.getElementById('reportsTbody');
           rtb.innerHTML = '';
-          (d.open_reports || []).forEach(function (r) {
+          var reps = d.open_reports || [];
+          if (!reps.length) {
+            renderEmptyRow(rtb, 4, 'Sin reportes abiertos');
+          }
+          reps.forEach(function (r) {
             var tr2 = document.createElement('tr');
             var isHidden = r.target_hidden == 1 || r.target_hidden === true;
             var canHide = r.target_type === 'offer' || r.target_type === 'request';
@@ -637,6 +693,9 @@
           document.getElementById('eventsMeta').textContent = 'Mostrando ' + j.meta.count + ' eventos';
           var tb = document.getElementById('eventsTbodyFull');
           tb.innerHTML = '';
+          if (!j.data.length) {
+            renderEmptyRow(tb, 5, 'Sin eventos');
+          }
           j.data.forEach(function (e) {
             var meta = '';
             try { meta = JSON.stringify(e.meta_json || {}).slice(0, 140); } catch (err) { meta = '-'; }
@@ -659,6 +718,9 @@
           document.getElementById('reportsMeta').textContent = 'Mostrando ' + j.meta.count + ' reports';
           var tb = document.getElementById('reportsTbodyFull');
           tb.innerHTML = '';
+          if (!j.data.length) {
+            renderEmptyRow(tb, 6, 'Sin reportes');
+          }
           j.data.forEach(function (r) {
             var tr = document.createElement('tr');
             var isHidden = r.target_hidden == 1 || r.target_hidden === true;
@@ -685,6 +747,9 @@
           document.getElementById('usersMeta').textContent = 'Mostrando ' + j.meta.count + ' usuarios';
           var tb = document.getElementById('usersTbody');
           tb.innerHTML = '';
+          if (!j.data.length) {
+            renderEmptyRow(tb, 8, 'Sin usuarios');
+          }
           j.data.forEach(function (u) {
             var tr = document.createElement('tr');
             var banned = u.is_banned == 1 || u.is_banned === true;
@@ -719,6 +784,9 @@
           document.getElementById('contentMeta').textContent = 'Mostrando ' + j.meta.count + ' elementos';
           var tb = document.getElementById('contentTbody');
           tb.innerHTML = '';
+          if (!j.data.length) {
+            renderEmptyRow(tb, 7, 'Sin contenido');
+          }
           j.data.forEach(function (r) {
             var tr = document.createElement('tr');
             var id = (r.id || '').slice(0, 8);
@@ -726,13 +794,20 @@
             var cat = r.category || '-';
             var status = (r.status || '-') + (r.is_hidden ? ' · oculto' : '');
             var user = (r.seeker_name || r.provider_name || '-') + ' · ' + (r.seeker_email || r.provider_email || '-');
+            var hidden = r.is_hidden == 1 || r.is_hidden === true;
+            var toggleLabel = hidden ? 'Mostrar' : 'Ocultar';
+            var toggleAttr = hidden ? 'data-content-unhide' : 'data-content-hide';
             tr.innerHTML =
               '<td><code>' + id + '</code></td>' +
               '<td>' + title + '</td>' +
               '<td>' + cat + '</td>' +
               '<td>' + status + '</td>' +
               '<td>' + user + '</td>' +
-              '<td>' + (r.created_at || '-') + '</td>';
+              '<td>' + (r.created_at || '-') + '</td>' +
+              '<td style="display:flex;gap:6px;">' +
+                '<button class="btn" data-content-detail="' + r.id + '" data-content-kind="' + kind + '">Detalle</button>' +
+                '<button class="btn" ' + toggleAttr + '="' + r.id + '" data-content-kind="' + kind + '">' + toggleLabel + '</button>' +
+              '</td>';
             tb.appendChild(tr);
           });
         });
@@ -745,6 +820,9 @@
           document.getElementById('matchesMeta').textContent = 'Mostrando ' + j.meta.count + ' matches';
           var tb = document.getElementById('matchesTbody');
           tb.innerHTML = '';
+          if (!j.data.length) {
+            renderEmptyRow(tb, 8, 'Sin matches');
+          }
           j.data.forEach(function (m) {
             var tr = document.createElement('tr');
             var id = (m.id || '').slice(0, 8);
@@ -756,7 +834,8 @@
               '<td>' + (m.provider_name || '-') + '</td>' +
               '<td>' + (m.seeker_name || '-') + '</td>' +
               '<td>' + subject + '</td>' +
-              '<td>' + (m.created_at || '-') + '</td>';
+              '<td>' + (m.created_at || '-') + '</td>' +
+              '<td><button class="btn" data-match-detail="' + m.id + '">Detalle</button></td>';
             tb.appendChild(tr);
           });
         });
@@ -770,6 +849,22 @@
         card.style.display = '';
       }
 
+      function showContentDetail(data) {
+        var card = document.getElementById('contentDetailCard');
+        var pre = document.getElementById('contentDetailPre');
+        if (!card || !pre) return;
+        pre.textContent = JSON.stringify(data || {}, null, 2);
+        card.style.display = '';
+      }
+
+      function showMatchDetail(data) {
+        var card = document.getElementById('matchDetailCard');
+        var pre = document.getElementById('matchDetailPre');
+        if (!card || !pre) return;
+        pre.textContent = JSON.stringify(data || {}, null, 2);
+        card.style.display = '';
+      }
+
       function loadUserDetail(id) {
         return api('/users/' + encodeURIComponent(id) + '/detail')
           .then(function (j) {
@@ -777,10 +872,28 @@
           });
       }
 
+      function loadContentDetail(kind, id) {
+        var base = kind === 'offers' ? '/offers/' : '/requests/';
+        return api(base + encodeURIComponent(id))
+          .then(function (j) {
+            showContentDetail(j.data || {});
+          });
+      }
+
+      function loadMatchDetail(id) {
+        return api('/matches/' + encodeURIComponent(id))
+          .then(function (j) {
+            showMatchDetail(j.data || {});
+          });
+      }
+
       function loadAudit() {
         return api('/audit?limit=25&page=1').then(function (j) {
           var tb = document.getElementById('auditTbody');
           tb.innerHTML = '';
+          if (!j.data.length) {
+            renderEmptyRow(tb, 5, 'Sin auditoria');
+          }
           j.data.forEach(function (a) {
             var tr = document.createElement('tr');
             tr.innerHTML =
@@ -808,10 +921,18 @@
             var v = cfg.hero_banner_duration;
             input.value = (v === null || v === undefined) ? '' : String(v);
           }
+
+          var legalToggle = document.getElementById('legalModeToggle');
+          if (legalToggle) {
+            var lv = cfg.legal_mode;
+            legalToggle.checked = (lv === true || lv === 1 || lv === 'true');
+          }
         });
       }
 
       function bind() {
+        if (bind._done) return;
+        bind._done = true;
         var loginForm = document.getElementById('admin-login-form');
         if (loginForm) {
           loginForm.addEventListener('submit', function (e) {
@@ -886,6 +1007,8 @@
           // Verify / unverify
           if (t.matches('button[data-verify]')) {
             var v = t.getAttribute('data-verify') === '1';
+            var msg = v ? '¿Verificar este usuario?' : '¿Desverificar este usuario?';
+            if (!window.confirm(msg)) return;
             api('/users/' + encodeURIComponent(id), { method: 'PATCH', body: JSON.stringify({ is_verified: v }) })
               .then(function () { toast('Usuario actualizado', true); return loadUsers(); })
               .catch(function (err) { toast(err.message || 'Error', false); });
@@ -913,15 +1036,64 @@
           }
         });
 
+        document.getElementById('contentTbody').addEventListener('click', function (e) {
+          var t = e.target;
+          if (!t) return;
+          if (t.matches('button[data-content-detail]')) {
+            var id = t.getAttribute('data-content-detail');
+            var kind = t.getAttribute('data-content-kind') || 'requests';
+            loadContentDetail(kind, id)
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+          if (t.matches('button[data-content-hide], button[data-content-unhide]')) {
+            var cid = t.getAttribute('data-content-hide') || t.getAttribute('data-content-unhide');
+            var ck = t.getAttribute('data-content-kind') || 'requests';
+            var type = (ck === 'offers') ? 'offer' : 'request';
+            var action = t.hasAttribute('data-content-hide') ? 'hide' : 'unhide';
+            var confirmMsg = action === 'hide' ? '¿Ocultar este contenido?' : '¿Mostrar este contenido?';
+            if (!window.confirm(confirmMsg)) return;
+            api('/' + type + '/' + encodeURIComponent(cid) + '/' + action, { method: 'POST', body: JSON.stringify({}) })
+              .then(function () { toast(action === 'hide' ? 'Contenido oculto' : 'Contenido visible', true); return loadContent(); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+        });
+
+        document.getElementById('matchesTbody').addEventListener('click', function (e) {
+          var t = e.target;
+          if (!t) return;
+          if (t.matches('button[data-match-detail]')) {
+            var id = t.getAttribute('data-match-detail');
+            loadMatchDetail(id)
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          }
+        });
+
         document.getElementById('btnLogout').addEventListener('click', function () {
           setToken('');
-          location.reload();
+          resetAdminUI();
+          showLogin(true);
         });
 
         var closeDetail = document.getElementById('btnUserDetailClose');
         if (closeDetail) {
           closeDetail.addEventListener('click', function () {
             var card = document.getElementById('userDetailCard');
+            if (card) card.style.display = 'none';
+          });
+        }
+
+        var closeContent = document.getElementById('btnContentDetailClose');
+        if (closeContent) {
+          closeContent.addEventListener('click', function () {
+            var card = document.getElementById('contentDetailCard');
+            if (card) card.style.display = 'none';
+          });
+        }
+
+        var closeMatch = document.getElementById('btnMatchDetailClose');
+        if (closeMatch) {
+          closeMatch.addEventListener('click', function () {
+            var card = document.getElementById('matchDetailCard');
             if (card) card.style.display = 'none';
           });
         }
@@ -954,11 +1126,26 @@
               .catch(function (err) { toast(err.message || 'Error', false); });
           });
         }
+
+        var legalSave = document.getElementById('legalModeSave');
+        if (legalSave) {
+          legalSave.addEventListener('click', function () {
+            var toggle = document.getElementById('legalModeToggle');
+            if (!toggle) return;
+            var enabled = !!toggle.checked;
+            var msg = enabled ? '¿Activar modo legal?' : '¿Desactivar modo legal?';
+            if (!window.confirm(msg)) return;
+            api('/config', { method: 'PATCH', body: JSON.stringify({ legal_mode: enabled }) })
+              .then(function () { toast('Config guardada: legal_mode', true); return loadConfig(); })
+              .catch(function (err) { toast(err.message || 'Error', false); });
+          });
+        }
       }
 
+      bind();
       ensureLogin()
         .then(loadMe)
-        .then(function () { bind(); return Promise.all([loadOverview(), loadConfig()]); })
+        .then(function () { return Promise.all([loadOverview(), loadConfig()]); })
         .catch(function (e) {
           if (e && e.silent) return;
           toast(e.message || 'Error', false);

@@ -88,6 +88,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Nav landing + hamburguesa (movil): header limpio y legible; boton con estilo glass; menu con items por estado (guest/auth), cierre por click fuera y ESC.
 - Demo mobiles (Elena/Maria): labels subidos y separados; z-index alto; zoom sincronizado con cada movil; respeta reduced motion.
 - Admin panel: login dedicado con token `kh_admin_token`; validacion real via `ADMIN_EMAILS`; acciones activas (ban, verify, reset cooldowns, reports, config).
+- Admin panel: vistas funcionales con detalles, moderacion de contenido y modo legal configurable.
 - Ranking: popup y pagina completa con layout glass, filtros compactos, lista en tarjeta y meta informativa.
 - Feed: barra de tiempo con rojo solo al final; secciones con gradiente semi-transparente por tema; textos heredan `--text`.
 - Favoritos: toggle estrella (UI) + API backend + sección en Perfil.
