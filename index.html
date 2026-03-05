@@ -138,11 +138,14 @@
           Crear
         </button>
         <div class="nav-menu hidden">
-          <button id="nav-burger" class="btn btn-ghost nav-burger" type="button" aria-label="Abrir menú"
+          <button id="nav-burger" class="btn btn-ghost nav-burger nav-account" type="button" aria-label="Abrir menú"
             aria-expanded="false" data-action="toggleLandingMenu">
-            <span class="nav-burger-ico" aria-hidden="true">☰</span>
-            <span class="nav-burger-label">Cuenta</span>
-            <span class="nav-burger-caret" aria-hidden="true">▾</span>
+            <span class="nav-account-avatar" id="nav-account-avatar" aria-hidden="true">D</span>
+            <span class="nav-account-meta">
+              <span class="nav-account-name" id="nav-account-name">Cuenta</span>
+              <span class="nav-account-tier" id="nav-account-tier">—</span>
+            </span>
+            <span class="nav-account-caret" aria-hidden="true">▾</span>
           </button>
           <div class="dash-menu-pop nav-menu-pop hidden" id="nav-menu-pop" role="menu" aria-label="Menú principal">
             <button class="dash-menu-item guest-only" type="button" role="menuitem" data-action="showEmailAuth"
@@ -150,11 +153,14 @@
             <button class="dash-menu-item guest-only" type="button" role="menuitem" data-action="showEmailAuth"
               data-args="register">Crear cuenta</button>
             <div class="dash-menu-sep guest-only" aria-hidden="true"></div>
-            <button class="dash-menu-item auth-only nav-only-mobile" type="button" role="menuitem"
-              data-action="goDashboardFromLanding" data-args="explorar">Explorar</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
-              data-args="automatch">AutoMatch</button>
+              data-args="explorar">Explorar</button>
+            <button class="dash-menu-item dash-menu-item--gold auth-only" type="button" role="menuitem"
+              data-action="goDashboardFromLanding" data-args="automatch">
+              <span class="menu-gold-icon">⚡</span>AutoMatch Premium
+            </button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
+            <div class="dash-menu-sep auth-only" aria-hidden="true"></div>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="creaciones">Mis creaciones</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
@@ -164,6 +170,8 @@
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="premium">Premium</button>
             <div class="dash-menu-sep auth-only" aria-hidden="true"></div>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goLanding" data-args="$event">Ir a inicio
+              web</button>
             <button class="dash-menu-item auth-only danger" type="button" role="menuitem" data-action="logout">Salir</button>
           </div>
         </div>

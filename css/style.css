@@ -678,6 +678,55 @@ body {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
+.nav-account {
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 14px 30px rgba(5, 10, 22, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.nav-account-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #fff;
+  background: var(--kh-brand-gradient);
+  box-shadow: 0 8px 16px rgba(33, 82, 173, 0.35);
+  flex-shrink: 0;
+}
+
+.nav-account-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
+.nav-account-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.nav-account-tier {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav-account-caret {
+  opacity: 0.7;
+  font-size: 12px;
+}
+
 .nav-burger-ico {
   display: none;
   font-size: 16px;
@@ -696,6 +745,12 @@ body {
 .nav-burger:hover {
   border-color: var(--border-h);
   transform: translateY(-1px);
+}
+
+html[data-theme="light"] .nav-account {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 30px rgba(20, 30, 60, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .nav-menu-pop {
@@ -807,9 +862,15 @@ html[data-theme="light"] .btn-auth {
     display: inline-flex;
   }
 
+  .nav-account-meta,
+  .nav-account-caret,
   .nav-burger-label,
   .nav-burger-caret {
     display: none;
+  }
+
+  .nav-account {
+    padding: 6px;
   }
 }
 

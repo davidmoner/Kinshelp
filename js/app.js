@@ -388,12 +388,25 @@
         syncFloatingCreateVisibility();
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
         if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
+        updateNavAccount(logged ? user : null);
         if (!logged) {
             favoritesLoaded = false;
             favoritesMap = new Map();
             favoritesList = [];
             renderFavorites();
         }
+    }
+
+    function updateNavAccount(user) {
+        const nameEl = document.getElementById('nav-account-name');
+        const tierEl = document.getElementById('nav-account-tier');
+        const avatarEl = document.getElementById('nav-account-avatar');
+        if (!nameEl && !tierEl && !avatarEl) return;
+        const rawName = user && user.display_name ? String(user.display_name).trim() : '';
+        const shortName = rawName ? rawName.split(/\s+/)[0] : 'Cuenta';
+        if (nameEl) nameEl.textContent = shortName || 'Cuenta';
+        if (tierEl) tierEl.textContent = user ? tierLabel(user.premium_tier) : '—';
+        if (avatarEl) avatarEl.textContent = initials(rawName || shortName || '—');
     }
 
     function syncFloatingCreateVisibility() {
@@ -1573,6 +1586,8 @@
             const shortName = rawName ? rawName.split(/\s+/)[0] : 'Cuenta';
             dashName.textContent = shortName || 'Cuenta';
         }
+
+        updateNavAccount(user);
 
         const isVerified = user.is_verified === true || user.is_verified === 1;
         const v = document.getElementById('user-verified');
