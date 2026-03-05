@@ -2248,7 +2248,9 @@ html[data-theme="light"] .btn-account:hover {
 @media (max-width: 820px) {
   /* Mobile header: keep it calm; move account into burger */
   .dash-user .kh-pill { display: none; }
-  .dash-user .dash-menu { display: none; }
+  .dash-user .btn-create { display: none; }
+  .dash-user .dash-menu { display: block; }
+  .dash-menu #dash-menu-btn { display: none; }
   .dash-burger { display: inline-flex; }
 
   /* Turn the account popover into a bottom sheet on mobile */
@@ -2434,6 +2436,14 @@ html[data-theme="light"] .dash-menu-sep {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.dash-user .nav-account .verified-badge {
+  display: none;
+}
+
+.dash-user .notif-bell-wrap {
+  display: none;
 }
 
 .dash-user .user-info {
@@ -6937,6 +6947,9 @@ html[data-theme="light"] .quick-match {
   font-weight: 600;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(217, 164, 65, 0.15), 0 0 16px rgba(217, 164, 65, 0.18);
+  text-shadow: 0 0 10px rgba(217, 164, 65, 0.25);
+  animation: goldPulse 2.8s ease-in-out infinite;
 }
 
 .dash-menu-item--gold::before {
@@ -6964,6 +6977,26 @@ html[data-theme="light"] .quick-match {
 @keyframes shimmer {
   0% { left: -100%; }
   50%, 100% { left: 100%; }
+}
+
+@keyframes goldPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(217, 164, 65, 0.12), 0 0 12px rgba(217, 164, 65, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(217, 164, 65, 0.35), 0 0 22px rgba(217, 164, 65, 0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-menu-item--gold {
+    animation: none;
+  }
+
+  .dash-menu-item--gold::before {
+    animation: none;
+  }
 }
 
 /* ── 5. ANIMACIONES EN PÁGINAS INTERIORES ───────────────────── */

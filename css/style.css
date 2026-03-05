@@ -2550,6 +2550,10 @@ html[data-theme="light"] .btn-account:hover {
     display: none;
   }
 
+  .dash-user .btn-create {
+    display: none;
+  }
+
   .dash-user .dash-menu {
     display: block;
   }
@@ -2654,6 +2658,65 @@ html[data-theme="light"] .dash-menu-pop {
 .dash-menu-item.danger:hover {
   background: rgba(239, 68, 68, 0.10);
   border-color: rgba(239, 68, 68, 0.18);
+}
+
+.dash-menu-item--gold {
+  background: linear-gradient(135deg, rgba(217, 164, 65, 0.15), rgba(217, 164, 65, 0.05));
+  border: 1px solid var(--gold-border);
+  color: var(--gold-light);
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(217, 164, 65, 0.15), 0 0 16px rgba(217, 164, 65, 0.18);
+  text-shadow: 0 0 10px rgba(217, 164, 65, 0.25);
+  animation: goldPulse 2.8s ease-in-out infinite;
+}
+
+.dash-menu-item--gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s infinite;
+}
+
+.dash-menu-item--gold:hover {
+  background: linear-gradient(135deg, rgba(217, 164, 65, 0.25), rgba(217, 164, 65, 0.1));
+  border-color: var(--gold);
+  transform: translateX(4px);
+}
+
+.menu-gold-icon {
+  margin-right: 8px;
+  filter: drop-shadow(0 0 4px var(--gold-glow));
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  50%, 100% { left: 100%; }
+}
+
+@keyframes goldPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(217, 164, 65, 0.12), 0 0 12px rgba(217, 164, 65, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(217, 164, 65, 0.35), 0 0 22px rgba(217, 164, 65, 0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dash-menu-item--gold {
+    animation: none;
+  }
+
+  .dash-menu-item--gold::before {
+    animation: none;
+  }
 }
 
 .dash-menu-sep {
@@ -2768,6 +2831,14 @@ html[data-theme="light"] .dash-menu-sep {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.dash-user .nav-account .verified-badge {
+  display: none;
+}
+
+.dash-user .notif-bell-wrap {
+  display: none;
 }
 
 .user-avatar {

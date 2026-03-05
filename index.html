@@ -124,15 +124,15 @@
       </div>
 
       <div class="nav-actions">
+        <button id="nav-auth-btn" class="btn btn-ghost btn-auth" data-action="openLogin">Regístrate o inicia
+          sesión</button>
         <button id="nav-ranking-btn" class="kh-pill hidden" type="button" data-action="openRanking"
           data-args="$event"
           aria-label="Abrir ranking vecinal">
           <span class="kh-theme-icon" aria-hidden="true">🏆</span>
           <span class="kh-theme-label">Ranking</span>
         </button>
-        <button id="nav-auth-btn" class="btn btn-ghost btn-auth" data-action="openLogin">Regístrate o inicia
-          sesión</button>
-        <button id="nav-panel-btn" class="btn btn-ghost hidden" data-action="goDashboard">Explorar</button>
+        <button id="nav-panel-btn" class="kh-pill hidden" type="button" data-action="goDashboard">Explorar</button>
         <button class="btn btn-primary btn-create" data-action="startFirstMatch">
           <span class="btn-plus" aria-hidden="true">＋</span>
           Crear
@@ -159,20 +159,15 @@
               data-action="goDashboardFromLanding" data-args="automatch">
               <span class="menu-gold-icon">⚡</span>AutoMatch Premium
             </button>
-            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
-            <div class="dash-menu-sep auth-only" aria-hidden="true"></div>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="creaciones">Mis creaciones</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="matches">Mis matches</button>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="perfil">Perfil</button>
-            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
-              data-args="premium">Premium</button>
             <div class="dash-menu-sep auth-only" aria-hidden="true"></div>
-            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goLanding" data-args="$event">Ir a inicio
-              web</button>
-            <button class="dash-menu-item auth-only danger" type="button" role="menuitem" data-action="logout">Salir</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
+            <button class="dash-menu-item auth-only danger" type="button" role="menuitem" data-action="logout">Cerrar sesión</button>
           </div>
         </div>
       </div>
@@ -1532,13 +1527,44 @@
         <span id="kh-theme-slot-dash"></span>
       </div>
       <div class="dash-user">
-        <div class="user-avatar" id="user-avatar">A</div>
-        <div class="user-info">
-          <div class="user-name" id="user-name">—</div>
-          <div class="user-tier" id="user-tier">free</div>
+        <button class="kh-pill" type="button" data-action="openRanking" data-args="$event" aria-label="Abrir ranking vecinal">
+          <span class="kh-theme-icon" aria-hidden="true">🏆</span>
+          <span class="kh-theme-label">Ranking</span>
+        </button>
+        <button class="kh-pill" type="button" data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>
+        <button class="btn btn-primary btn-create" type="button" data-action="goCreateFromFab">
+          <span class="btn-plus" aria-hidden="true">＋</span>
+          Crear
+        </button>
+        <div class="dash-menu">
+          <button class="btn btn-ghost nav-burger nav-account" type="button" id="dash-menu-btn" aria-haspopup="menu"
+            aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
+            <span class="nav-account-avatar" id="user-avatar">A</span>
+            <span class="nav-account-meta">
+              <span class="nav-account-name" id="user-name">—</span>
+              <span class="nav-account-tier" id="user-tier">free</span>
+            </span>
+            <span class="verified-badge hidden" id="user-verified" title="Email verificado"
+              aria-label="Email verificado">✓</span>
+            <span class="nav-account-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
+            <button class="dash-menu-item" type="button" role="menuitem"
+              data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>
+            <button class="dash-menu-item dash-menu-item--gold" type="button" role="menuitem" data-action="goAutoMatchFromMenu">
+              <span class="menu-gold-icon">⚡</span>AutoMatch Premium
+            </button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              data-action="gotoDashFromMenu" data-args="creaciones">Mis creaciones</button>
+            <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
+              data-args="matches">Mis matches</button>
+            <button class="dash-menu-item" type="button" role="menuitem"
+              data-action="gotoDashFromMenu" data-args="perfil">Perfil</button>
+            <div class="dash-menu-sep" aria-hidden="true"></div>
+            <button class="dash-menu-item" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
+            <button class="dash-menu-item danger" type="button" role="menuitem" data-action="logout">Cerrar sesión</button>
+          </div>
         </div>
-        <span class="verified-badge hidden" id="user-verified" title="Email verificado"
-          aria-label="Email verificado">✓</span>
 
         <!-- Campana notificaciones -->
         <div class="notif-bell-wrap" id="notif-bell-wrap">
@@ -1567,38 +1593,6 @@
           aria-haspopup="menu" aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
           ☰
         </button>
-        <button class="kh-pill" type="button" data-action="openRanking" data-args="$event" aria-label="Abrir ranking vecinal">
-          <span class="kh-theme-icon" aria-hidden="true">🏆</span>
-          <span class="kh-theme-label">Ranking</span>
-        </button>
-        <div class="dash-menu">
-          <button class="btn btn-ghost btn-sm btn-account" type="button" id="dash-menu-btn" aria-haspopup="menu"
-            aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
-            <span class="dash-menu-name" id="dash-menu-name">Cuenta</span>
-            <span class="dash-menu-caret" aria-hidden="true">▾</span>
-          </button>
-          <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>
-            <button class="dash-menu-item dash-menu-item--gold" type="button" role="menuitem" data-action="goAutoMatchFromMenu">
-              <span class="menu-gold-icon">⚡</span>AutoMatch Premium
-            </button>
-            <button class="dash-menu-item" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
-            <div class="dash-menu-sep" aria-hidden="true"></div>
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="creaciones">Mis creaciones</button>
-            <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
-              data-args="matches">Mis matches</button>
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="perfil">Perfil</button>
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="premium">Premium</button>
-            <div class="dash-menu-sep" aria-hidden="true"></div>
-            <button class="dash-menu-item" type="button" role="menuitem" data-action="goLanding" data-args="$event">Ir a inicio
-              web</button>
-            <button class="dash-menu-item danger" type="button" role="menuitem" data-action="logout">Salir</button>
-          </div>
-        </div>
       </div>
     </header>
 
@@ -1997,8 +1991,11 @@
                     <div class="rep-bar">
                       <div class="rep-bar-fill" id="profile-hero-premium-fill" style="width:0%"></div>
                     </div>
-                    <div class="rep-progress-foot" id="profile-hero-premium-foot">—</div>
+                  <div class="rep-progress-foot" id="profile-hero-premium-foot">—</div>
+                  <div class="rep-progress-cta">
+                    <button class="rep-link" type="button" data-action="fx.openPremiumModal">Ver beneficios Premium</button>
                   </div>
+                </div>
 
                   <div class="rep-activity">
                     <div class="rep-activity-head">
