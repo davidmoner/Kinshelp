@@ -1617,8 +1617,13 @@
         <!-- AutoMatch (Premium) -->
         <div class="glass-card card-automatch reveal" id="card-automatch" data-view="automatch">
           <div class="card-head">
-            <h3>AutoMatch <span class="badge-pill"
-                style="margin-left:8px; border-color:rgba(201,168,76,.28); color:var(--gold-light);">Premium</span></h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--sweep" aria-hidden="true"><span>⚡</span></div>
+              <div>
+                <h3>AutoMatch <span class="badge-pill"
+                    style="margin-left:8px; border-color:rgba(201,168,76,.28); color:var(--gold-light);">Premium</span></h3>
+              </div>
+            </div>
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="badge-pill success hidden" id="am-status-pill">Activo</span>
               <button class="btn btn-gold btn-sm" type="button" data-action="fx.openPremiumModal" id="btn-am-premium">
@@ -1852,7 +1857,7 @@
         <div class="glass-card card-ranking reveal" id="card-ranking" data-view="ranking">
           <div class="card-head">
             <div class="card-title">
-              <div class="card-ico" aria-hidden="true"><span>🏆</span></div>
+              <div class="card-ico card-ico--orbit" aria-hidden="true"><span>🏆</span></div>
               <div>
                 <h3>Ranking vecinal</h3>
                 <div class="card-sub">Tu barrio en directo con filtros avanzados.</div>
@@ -2018,7 +2023,7 @@
         <div class="glass-card card-profile reveal" id="card-profile" data-view="perfil">
           <div class="card-head">
             <div class="card-title">
-              <div class="card-ico" aria-hidden="true"><span>👤</span></div>
+              <div class="card-ico card-ico--halo" aria-hidden="true"><span>👤</span></div>
               <div>
                 <h3>Mi perfil</h3>
                 <div class="card-sub">Tu carnet vecinal: que te reconozcan por lo que aportas.</div>
@@ -2098,7 +2103,7 @@
         <div class="glass-card card-favorites reveal" id="card-favorites" data-view="perfil">
           <div class="card-head">
             <div class="card-title">
-              <div class="card-ico" aria-hidden="true"><span>★</span></div>
+              <div class="card-ico card-ico--twinkle" aria-hidden="true"><span>★</span></div>
               <div>
                 <h3>Favoritos</h3>
                 <div class="card-sub">Guarda solicitudes y ofertas para volver más tarde.</div>
@@ -2121,7 +2126,7 @@
         <div class="glass-card card-status reveal" data-view="perfil">
           <div class="card-head">
             <div class="card-title">
-              <div class="card-ico" aria-hidden="true"><span>🩺</span></div>
+              <div class="card-ico card-ico--heartbeat" aria-hidden="true"><span>🩺</span></div>
               <div>
                 <h3>Estado API</h3>
                 <div class="card-sub">Conexión con el servidor</div>
@@ -2141,7 +2146,7 @@
         <div class="glass-card card-ledger reveal" data-view="perfil">
           <div class="card-head">
             <div class="card-title">
-              <div class="card-ico" aria-hidden="true"><span>⚡</span></div>
+              <div class="card-ico card-ico--charge" aria-hidden="true"><span>⚡</span></div>
               <div>
                 <h3>Mi reputación</h3>
                 <div class="card-sub">Reputación de barrio: gana confianza ayudando de verdad.</div>
@@ -2167,7 +2172,12 @@
         <!-- Premium progress -->
         <div class="glass-card card-premium-progress reveal" id="card-premium-progress" data-view="premium">
           <div class="card-head">
-            <h3>Premium</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--glow" aria-hidden="true"><span>♛</span></div>
+              <div>
+                <h3>Premium</h3>
+              </div>
+            </div>
             <span class="badge-pill" id="premium-progress-badge">—</span>
           </div>
 
@@ -2195,7 +2205,12 @@
         <!-- Ranking vecinal (para todos) -->
         <div class="glass-card card-leaderboard reveal" id="card-leaderboard" data-view="premium">
           <div class="card-head">
-            <h3>Ranking vecinal</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--orbit" aria-hidden="true"><span>🏆</span></div>
+              <div>
+                <h3>Ranking vecinal</h3>
+              </div>
+            </div>
             <div class="mvp-row" style="gap:8px;">
               <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking" data-args="$event">Abrir</button>
               <button class="btn btn-ghost btn-sm" type="button" id="btn-leaderboard" data-action="loadLeaderboard">
@@ -2214,7 +2229,12 @@
         <!-- Colecciones y perks -->
         <div class="glass-card card-collections reveal" id="card-collections" data-view="premium perfil">
           <div class="card-head">
-            <h3>Colecciones</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--stack" aria-hidden="true"><span>🗂️</span></div>
+              <div>
+                <h3>Colecciones</h3>
+              </div>
+            </div>
             <span class="badge-pill" id="perk-boost">—</span>
           </div>
           <div class="collections-body" id="collections-body">
@@ -2226,7 +2246,12 @@
         <!-- Badges -->
         <div class="glass-card card-badges reveal" id="card-badges" data-view="perfil">
           <div class="card-head">
-            <h3>Insignias</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--spin" aria-hidden="true"><span>🏅</span></div>
+              <div>
+                <h3>Insignias</h3>
+              </div>
+            </div>
             <span class="badge-pill" id="badges-badge">—</span>
           </div>
           <div class="badges-grid" id="badges-grid">
@@ -2237,7 +2262,12 @@
         <!-- Match Timeline -->
         <div class="glass-card card-timeline reveal" data-view="crear">
           <div class="card-head">
-            <h3>Flujo de Match</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--path" aria-hidden="true"><span>🧭</span></div>
+              <div>
+                <h3>Flujo de Match</h3>
+              </div>
+            </div>
             <span class="badge-pill">Guía rápida</span>
           </div>
           <div class="timeline">
@@ -2281,7 +2311,7 @@
         <div class="glass-card card-mvp-request reveal" id="card-mvp-request" data-view="crear">
           <div class="card-head">
             <div class="card-title">
-              <div class="card-ico" aria-hidden="true"><span>🧩</span></div>
+              <div class="card-ico card-ico--shimmer" aria-hidden="true"><span>🧩</span></div>
               <div>
                 <h3>¿Qué quieres crear?</h3>
                 <div class="card-sub">Publica tu necesidad u oferta: claro, cercano y sin drama.</div>
@@ -2620,7 +2650,12 @@
         <!-- Mis creaciones -->
         <div class="glass-card card-mvp-creations reveal" id="card-mvp-creations" data-view="creaciones">
           <div class="card-head">
-            <h3>Mis creaciones</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--grid" aria-hidden="true"><span>🧾</span></div>
+              <div>
+                <h3>Mis creaciones</h3>
+              </div>
+            </div>
             <button class="btn btn-ghost btn-sm" data-action="loadCreations" id="btn-creations-refresh">
               <span class="btn-label">Actualizar</span>
               <span class="spinner hidden"></span>
@@ -2664,7 +2699,12 @@
         <!-- Matches (MVP) -->
         <div class="glass-card card-mvp-matches reveal" id="card-mvp-matches" data-view="matches">
           <div class="card-head">
-            <h3>Mis matches</h3>
+            <div class="card-title">
+              <div class="card-ico card-ico--bubble" aria-hidden="true"><span>🤝</span></div>
+              <div>
+                <h3>Mis matches</h3>
+              </div>
+            </div>
             <button class="btn btn-ghost btn-sm" data-action="loadMatches" id="btn-matches-refresh">
               <span class="btn-label">Actualizar</span>
               <span class="spinner hidden"></span>
