@@ -564,11 +564,16 @@
       function api(path, opts) {
         opts = opts || {};
         opts.headers = Object.assign({ 'Content-Type': 'application/json' }, authHeaders(), (opts.headers || {}));
+        opts.credentials = 'include';
         return fetch('/api/v1/admin' + path, opts).then(function (r) {
           return r.json().then(function (j) {
             if (!r.ok) {
               var e = new Error((j && j.error) ? j.error : 'Request failed');
               e.status = r.status;
+              if (r.status === 401 || r.status === 403) {
+                setToken('');
+                showLogin(true);
+              }
               throw e;
             }
             return j;
@@ -605,11 +610,16 @@
       function ensureLogin() {
         var tok = getToken();
         if (!tok) {
-          showLogin(true);
-          resetAdminUI();
-          return Promise.reject({ silent: true });
+          // Still allow cookie-based admin sessions.
+          return api('/auth/me').then(function () {
+            showLogin(false);
+          }).catch(function () {
+            showLogin(true);
+            resetAdminUI();
+            return Promise.reject({ silent: true });
+          });
         }
-        return api('/me').then(function () {
+        return api('/auth/me').then(function () {
           showLogin(false);
         }).catch(function (err) {
           setToken('');
@@ -634,8 +644,10 @@
       }
 
       function loadMe() {
-        return api('/me').then(function (j) {
-          document.getElementById('meEmail').textContent = (j.user && j.user.email) ? j.user.email : '-';
+        return api('/auth/me').then(function (j) {
+          var role = j.role || (j.user && j.user.role) || 'admin';
+          var email = (j.user && j.user.email) ? j.user.email : '-';
+          document.getElementById('meEmail').textContent = email + ' · ' + role;
         });
       }
 
@@ -941,15 +953,17 @@
             var email = document.getElementById('admin-email').value || '';
             var pass = document.getElementById('admin-pass').value || '';
             if (!email || !pass) { setLoginError('Completa email y contraseña'); return; }
-            fetch('/api/v1/auth/login', {
+            fetch('/api/v1/admin/auth/login', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
               body: JSON.stringify({ email: email, password: pass })
             }).then(function (r) { return r.json().then(function (j) {
               if (!r.ok) throw new Error((j && j.error) ? j.error : 'Login fallido');
-              setToken(j.token);
+              setToken('');
               return ensureLogin();
             });}).then(function () {
+              if (location.pathname.indexOf('/admin/login') === 0) location.href = '/admin';
               return Promise.all([loadMe(), loadOverview(), loadConfig()]);
             }).catch(function (err) {
               setToken('');
@@ -1069,9 +1083,14 @@
         });
 
         document.getElementById('btnLogout').addEventListener('click', function () {
-          setToken('');
-          resetAdminUI();
-          showLogin(true);
+          api('/auth/logout', { method: 'POST' })
+            .catch(function () { })
+            .finally(function () {
+              setToken('');
+              resetAdminUI();
+              showLogin(true);
+              if (location.pathname.indexOf('/admin/login') !== 0) location.href = '/admin/login';
+            });
         });
 
         var closeDetail = document.getElementById('btnUserDetailClose');
@@ -1145,7 +1164,10 @@
       bind();
       ensureLogin()
         .then(loadMe)
-        .then(function () { return Promise.all([loadOverview(), loadConfig()]); })
+        .then(function () {
+          if (location.pathname.indexOf('/admin/login') === 0) location.href = '/admin';
+          return Promise.all([loadOverview(), loadConfig()]);
+        })
         .catch(function (e) {
           if (e && e.silent) return;
           toast(e.message || 'Error', false);
