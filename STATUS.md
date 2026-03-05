@@ -85,6 +85,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Hero: subtitulo rotativo con transicion suave (cada 3s) y mensaje motivador.
 - Dashboard: emblemas animados por seccion + halo en avatar del perfil; radar de Explorar alineado al titulo con margenes.
 - Smoke tests: notificaciones in-app cubiertas (match_message, automatch_invite).
+- Notificaciones: panel web refinado para encajar con el entorno (glass oscuro, cabecera y items).
 - Feed: panel de texto destacado por tema + acciones de favorito/reportar.
 - Feed: botones favorito/reportar con hover/focus y transiciones suaves.
 - Favoritos: API + UI en perfil con cards y toggle estrella.
