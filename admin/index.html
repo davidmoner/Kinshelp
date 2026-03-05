@@ -146,6 +146,19 @@
       padding: 14px;
     }
 
+    .banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      margin-bottom: 14px;
+    }
+    .banner.show { display: flex; }
+
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .kpi { display: flex; flex-direction: column; gap: 6px; }
     .kpi .label { color: var(--muted); font-size: 12px; }
@@ -255,13 +268,21 @@
         <div class="top">
           <div>
             <div class="muted" id="subtitle">Panel administrativo</div>
-            <div class="muted" id="buildStamp">ADMIN BUILD: 2026-03-05 14:56 / 9cd141a</div>
+            <div class="muted" id="buildStamp">ADMIN BUILD: 2026-03-05 15:13 / 7a6ee8c</div>
+            <div class="muted" id="apiVersion">API VERSION: -</div>
             <div style="font-size:26px; font-weight:900; letter-spacing:-0.7px;" id="title">Overview</div>
           </div>
         <div style="min-width: 280px;" id="searchWrap" class="hidden"></div>
       </div>
 
       <section id="view-overview" class="card">
+        <div class="banner" id="apiErrorBanner">
+          <div>
+            <strong>Error de API</strong>
+            <div class="muted" id="apiErrorText">No se pudo cargar el overview.</div>
+          </div>
+          <button class="btn" id="apiRetry" type="button">Reintentar</button>
+        </div>
         <div class="row">
           <div class="card" style="box-shadow:none;">
             <div class="kpi">
@@ -544,6 +565,25 @@
         tb.innerHTML = '<tr><td colspan="' + cols + '" class="muted">' + label + '</td></tr>';
       }
 
+      function setApiVersion(text) {
+        var el = document.getElementById('apiVersion');
+        if (el) el.textContent = text;
+      }
+
+      function loadVersion() {
+        return fetch('/api/v1/version', { credentials: 'include' })
+          .then(function (r) { return r.json(); })
+          .then(function (j) {
+            var git = j && j.gitSha ? j.gitSha : '-';
+            var env = j && j.env ? j.env : '-';
+            var bt = j && j.buildTime ? j.buildTime : '-';
+            setApiVersion('API VERSION: ' + git + ' · ' + env + ' · ' + bt);
+          })
+          .catch(function () {
+            setApiVersion('API VERSION: unavailable');
+          });
+      }
+
       var ADMIN_TOKEN_KEY = 'kh_admin_token';
 
       function getToken() {
@@ -608,6 +648,20 @@
         if (el) el.textContent = msg || '';
       }
 
+      function showApiError(msg) {
+        var el = document.getElementById('apiErrorBanner');
+        if (!el) return;
+        el.classList.add('show');
+        var textEl = document.getElementById('apiErrorText');
+        if (textEl) textEl.textContent = msg || 'No se pudo cargar el overview.';
+      }
+
+      function clearApiError() {
+        var el = document.getElementById('apiErrorBanner');
+        if (!el) return;
+        el.classList.remove('show');
+      }
+
       function ensureLogin() {
         var tok = getToken();
         if (!tok) {
@@ -653,6 +707,7 @@
       }
 
       function loadOverview() {
+        clearApiError();
         return api('/stats/overview').then(function (j) {
           var d = j.data || {};
           document.getElementById('kpiUsersTotal').textContent = (d.users && d.users.total) || 0;
@@ -696,6 +751,9 @@
               '<td style="display:flex; gap:6px;">' + hideBtn + '<button class="btn" data-resolve-report="' + r.id + '">Resolver</button></td>';
             rtb.appendChild(tr2);
           });
+        }).catch(function (err) {
+          if (err && (err.status === 401 || err.status === 403)) return;
+          showApiError('Error de API al cargar el overview.');
         });
       }
 
@@ -998,6 +1056,8 @@
         document.getElementById('btnEventSearch').addEventListener('click', loadEvents);
         document.getElementById('btnReportSearch').addEventListener('click', loadReports);
         document.getElementById('contentKind').addEventListener('change', loadContent);
+        var retry = document.getElementById('apiRetry');
+        if (retry) retry.addEventListener('click', loadOverview);
 
         document.body.addEventListener('click', function (e) {
           var t = e.target;
@@ -1190,6 +1250,7 @@
       }
 
       bind();
+      loadVersion();
       ensureLogin()
         .then(loadMe)
         .then(function () {

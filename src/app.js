@@ -91,7 +91,7 @@ const cspScriptHashes = [
   "'sha256-SXk7z1QIWnFhmfe1L3zWbBaoIOoy8eRqkbIL09e/eVk='",
   "'sha256-o5jUa2287/3qNrLao2K53IA9k0M3fu/1sqSLdPpmHK4='",
   "'sha256-YQpG8tDKHvf0v0iZSC0Ogp2tLbCPTGBkXaTzbSAmrKs='",
-  "'sha256-f7tu0IcJJJeK2fyZT/xe0AzShPWM12IgLN17x84V9YE='",
+  "'sha256-fldGhCf7Gm/xyDpLq4C0Hb5OzAlNTrefRV4KLhgCSOI='",
 ];
 
 app.use(helmet({
@@ -165,6 +165,31 @@ async function healthPayload() {
   };
 }
 
+function resolveGitSha() {
+  let sha = process.env.GIT_SHA || process.env.RENDER_GIT_COMMIT || '';
+  if (!sha) {
+    try {
+      const headPath = path.resolve(__dirname, '..', '.git', 'HEAD');
+      const head = fs.readFileSync(headPath, 'utf8').trim();
+      if (head.startsWith('ref:')) {
+        const ref = head.split(' ')[1].trim();
+        const refPath = path.resolve(__dirname, '..', '.git', ref);
+        sha = fs.readFileSync(refPath, 'utf8').trim();
+      } else {
+        sha = head;
+      }
+    } catch { }
+  }
+  if (!sha) return null;
+  return sha.slice(0, 7);
+}
+
+const buildInfo = {
+  gitSha: resolveGitSha(),
+  env: process.env.NODE_ENV || 'development',
+  buildTime: process.env.BUILD_TIME || process.env.RENDER_BUILD_TIME || new Date().toISOString(),
+};
+
 app.get('/health', (req, res) => {
   healthPayload()
     .then(payload => res.json(payload))
@@ -173,6 +198,7 @@ app.get('/health', (req, res) => {
 
 const api = express.Router();
 api.get('/', (req, res) => res.json({ ok: true, service: 'KingsHelp API', version: 'v1' }));
+api.get('/version', (req, res) => res.json({ ok: true, gitSha: buildInfo.gitSha, env: buildInfo.env, buildTime: buildInfo.buildTime }));
 
 // Raw body route (Stripe webhook)
 api.use('/premium/webhook', express.raw({ type: '*/*', limit: '2mb' }), (req, res, next) => {
