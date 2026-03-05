@@ -12,7 +12,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Repo sincronizado con GitHub: `main` incluye commit `feat: db facade and pg-compatible points`.
 - Tracker de estado agregado: `STATUS.md`.
 - Premium Stripe (checkout + webhook) con persistencia en tabla `payments`.
-- Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` (WIP triggers).
+- Notificaciones in-app: tabla `notifications` + endpoints `/api/v1/notifications` + panel web (campana, badge, marcar leidas, polling, links a matches/automatch).
 - Notificaciones: triggers para mensajes de match y AutoMatch (invitaciones) con cooldown.
 - API publica: `/api/v1/stats` (KPIs reales) y `/api/v1/config` (flags visuales).
 - Postgres hardening: transacciones disponibles via `db.tx()` y points transfer atomico en PG.
@@ -476,7 +476,7 @@ ADMIN_STAFF_EMAILS=staff1@dominio.com,staff2@dominio.com
 - Hay notificaciones push?
 - Como verifico mi email o recupero mi contrasena?
 - Que hago si hay abuso/estafa/contenido peligroso?
-- Notificaciones in-app: agregar triggers restantes (mensajes, invites) y sumar smoke coverage.
+- Notificaciones in-app: sumar smoke coverage (match_message, automatch_invite) y validacion UI basica.
 
 ## Estado (mar 2026)
 

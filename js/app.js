@@ -341,6 +341,13 @@
         relocateThemeToggle(pageId);
         syncFloatingCreateVisibility();
 
+        if (pageId === 'page-dashboard') {
+            startNotifPolling();
+        } else {
+            stopNotifPolling();
+            closeNotifPanel();
+        }
+
         if (pageId === 'page-landing') {
             onLandingShown();
         }
@@ -508,6 +515,160 @@
     let feedDebounce = null;
     let premiumNudgeTimer = null;
     let badgeNudgeTimer = null;
+
+    /* ── Notifications ───────────────────────────────────────────────────────── */
+    let notifPollTimer = null;
+    let notifPanelOpen = false;
+
+    const NOTIF_KIND_ICON = {
+        match_created: '🤝',
+        match_accepted: '✅',
+        match_done: '🏅',
+        match_rejected: '❌',
+        match_message: '💬',
+        automatch_invite: '⚡',
+        automatch_offer_invite: '⚡',
+    };
+    const NOTIF_KIND_LABEL = {
+        match_created: 'Nuevo match',
+        match_accepted: 'Match aceptado',
+        match_done: 'Match completado',
+        match_rejected: 'Match rechazado',
+        match_message: 'Mensaje nuevo',
+        automatch_invite: 'Invitación AutoMatch',
+        automatch_offer_invite: 'Invitación AutoMatch',
+    };
+
+    async function loadNotifications({ silent = false } = {}) {
+        if (!KHApi.getToken()) return;
+        try {
+            const data = await KHApi.getNotifications({ limit: 30, offset: 0 });
+            const items = (data && data.data) || [];
+            renderNotifications(items);
+        } catch (err) {
+            if (!silent) console.warn('[notif] load error', err);
+        }
+    }
+
+    function renderNotifications(items) {
+        const list = document.getElementById('notif-list');
+        const badge = document.getElementById('notif-badge');
+        const markAllBtn = document.getElementById('btn-notif-mark-all');
+        if (!list) return;
+
+        const unread = items.filter(n => !n.read_at).length;
+        if (badge) {
+            badge.textContent = unread > 9 ? '9+' : String(unread);
+            badge.classList.toggle('hidden', unread === 0);
+        }
+        if (markAllBtn) markAllBtn.disabled = unread === 0;
+
+        if (!items.length) {
+            list.innerHTML = '<div class="notif-empty">Sin notificaciones nuevas</div>';
+            return;
+        }
+
+        list.innerHTML = '';
+        items.forEach(n => {
+            const isUnread = !n.read_at;
+            const icon = NOTIF_KIND_ICON[n.kind] || '🔔';
+            const kindLabel = NOTIF_KIND_LABEL[n.kind] || n.kind;
+            const when = fmtShortDate(n.created_at);
+            const el = document.createElement('div');
+            el.className = 'notif-item' + (isUnread ? ' notif-item--unread' : '');
+            el.dataset.notifId = n.id;
+            el.innerHTML = `
+                <span class="notif-item-icon" aria-hidden="true">${icon}</span>
+                <div class="notif-item-body">
+                    <div class="notif-item-title">${escapeHtml(n.title || kindLabel)}</div>
+                    ${n.body ? `<div class="notif-item-body-text">${escapeHtml(String(n.body))}</div>` : ''}
+                    ${when ? `<div class="notif-item-when">${escapeHtml(when)}</div>` : ''}
+                </div>
+                ${isUnread ? `<button class="notif-item-read" type="button" aria-label="Marcar como leída" data-notif-id="${n.id}">✓</button>` : ''}
+            `;
+            el.addEventListener('click', () => handleNotificationClick(n));
+            if (isUnread) {
+                el.querySelector('.notif-item-read') && el.querySelector('.notif-item-read').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    try {
+                        await KHApi.markNotifRead(n.id);
+                        await loadNotifications({ silent: true });
+                    } catch { }
+                });
+            }
+            list.appendChild(el);
+        });
+    }
+
+    async function handleNotificationClick(notif) {
+        if (!notif) return;
+        const payload = (notif && notif.payload) ? notif.payload : {};
+        const matchId = payload.match_id || payload.matchId || null;
+        try {
+            if (!notif.read_at) {
+                await KHApi.markNotifRead(notif.id);
+                await loadNotifications({ silent: true });
+            }
+        } catch { }
+
+        closeNotifPanel();
+
+        if (notif.kind === 'automatch_invite' || notif.kind === 'automatch_offer_invite') {
+            setDashView('automatch');
+            return;
+        }
+
+        if (String(notif.kind || '').startsWith('match')) {
+            setDashView('matches');
+            if (notif.kind === 'match_message' && matchId) {
+                openChat(matchId);
+            }
+        }
+    }
+
+    function toggleNotifPanel(event) {
+        if (event && event.preventDefault) event.preventDefault();
+        if (event && event.stopPropagation) event.stopPropagation();
+        const panel = document.getElementById('notif-panel');
+        const btn = document.getElementById('notif-bell-btn');
+        if (!panel) return;
+        notifPanelOpen = !notifPanelOpen;
+        panel.classList.toggle('hidden', !notifPanelOpen);
+        if (btn) btn.setAttribute('aria-expanded', String(notifPanelOpen));
+        if (notifPanelOpen) loadNotifications();
+    }
+
+    function closeNotifPanel() {
+        const panel = document.getElementById('notif-panel');
+        const btn = document.getElementById('notif-bell-btn');
+        if (panel) panel.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+        notifPanelOpen = false;
+    }
+
+    async function markAllNotifsReadUI() {
+        const btn = document.getElementById('btn-notif-mark-all');
+        if (btn) btn.disabled = true;
+        try {
+            await KHApi.markAllNotifsRead();
+            await loadNotifications({ silent: true });
+        } catch (err) {
+            toast(err.message || 'No se pudo actualizar', 'error');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    function startNotifPolling() {
+        stopNotifPolling();
+        if (!KHApi.getToken()) return;
+        loadNotifications();
+        notifPollTimer = setInterval(() => loadNotifications({ silent: true }), 30000);
+    }
+
+    function stopNotifPolling() {
+        if (notifPollTimer) { clearInterval(notifPollTimer); notifPollTimer = null; }
+    }
 
     function setDashView(view, opts = {}) {
         const v = normalizeDashView(view);
@@ -4691,6 +4852,13 @@
         currentUser = null;
         setLandingSessionUI(null);
         showPage('page-landing');
+        stopNotifPolling();
+        closeNotifPanel();
+        if ($('notif-badge')) {
+            $('notif-badge').textContent = '0';
+            $('notif-badge').classList.add('hidden');
+        }
+        if ($('notif-list')) $('notif-list').innerHTML = '<div class="notif-empty">Sin notificaciones nuevas</div>';
         $('balance-value').textContent = '—';
         $('ledger-list').innerHTML = '<div class="ledger-empty">Pulsa "Cargar" para ver tu historial</div>';
         $('status-dot').className = 'status-dot';
@@ -4848,6 +5016,7 @@
             closeBadgeNudge();
             closeDashMenu();
             closeLandingMenu();
+            closeNotifPanel();
         }
     });
 
@@ -5203,6 +5372,15 @@
             if (pop.contains(e.target) || (btn && btn.contains(e.target))) return;
             closeLandingMenu();
         });
+
+        // Close notifications panel on outside click
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('notif-panel');
+            const btn = document.getElementById('notif-bell-btn');
+            if (!panel || panel.classList.contains('hidden')) return;
+            if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+            closeNotifPanel();
+        });
     });
 
     /* ── Report modal ────────────────────────────────────────────────────────── */
@@ -5349,6 +5527,9 @@
         loadSuggestedProviders,
         loadCreations,
         loadMatches,
+        toggleNotifPanel,
+        closeNotifPanel,
+        markAllNotifsReadUI,
     };
 
     // Back-compat: tolerate console checks like `khapp` / `khapi`.

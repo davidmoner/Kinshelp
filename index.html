@@ -1531,6 +1531,30 @@
         </div>
         <span class="verified-badge hidden" id="user-verified" title="Email verificado"
           aria-label="Email verificado">✓</span>
+
+        <!-- Campana notificaciones -->
+        <div class="notif-bell-wrap" id="notif-bell-wrap">
+          <button class="notif-bell-btn" id="notif-bell-btn" type="button" aria-label="Notificaciones"
+            aria-haspopup="true" aria-expanded="false" data-action="toggleNotifPanel">
+            <svg class="notif-bell-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="notif-badge hidden" id="notif-badge" aria-label="notificaciones sin leer">0</span>
+          </button>
+          <div class="notif-panel hidden" id="notif-panel" role="dialog" aria-label="Notificaciones">
+            <div class="notif-panel-head">
+              <span class="notif-panel-title">Notificaciones</span>
+              <button class="notif-mark-all-btn" id="btn-notif-mark-all" type="button"
+                data-action="markAllNotifsReadUI" aria-label="Marcar todas como leídas">Todo leído</button>
+            </div>
+            <div class="notif-list" id="notif-list">
+              <div class="notif-empty">Sin notificaciones nuevas</div>
+            </div>
+          </div>
+        </div>
+
         <button class="btn btn-ghost btn-sm dash-burger" type="button" id="dash-burger" aria-label="Abrir menú"
           aria-haspopup="menu" aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
           ☰
@@ -1545,7 +1569,9 @@
           <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
             <button class="dash-menu-item" type="button" role="menuitem"
               data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>
-            <button class="dash-menu-item" type="button" role="menuitem" data-action="goAutoMatchFromMenu">AutoMatch</button>
+            <button class="dash-menu-item dash-menu-item--gold" type="button" role="menuitem" data-action="goAutoMatchFromMenu">
+              <span class="menu-gold-icon">⚡</span>AutoMatch Premium
+            </button>
             <button class="dash-menu-item" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
             <div class="dash-menu-sep" aria-hidden="true"></div>
             <button class="dash-menu-item" type="button" role="menuitem"
@@ -2677,16 +2703,11 @@
     </main>
   </div><!-- /page-dashboard -->
 
-  <button id="floating-create" class="floating-create hidden" type="button" data-action="goCreateFromFab"
-    aria-label="Crear solicitud o oferta">
-    <span class="floating-create-plus" aria-hidden="true">＋</span>
-    <span class="floating-create-label">Crear</span>
-  </button>
-
-  <button id="floating-virtud" class="floating-create floating-virtud hidden" type="button" data-action="goCreateFromFab"
-    aria-label="Crear solicitud o oferta">
-    <span class="floating-create-plus" aria-hidden="true">＋</span>
-    <span class="floating-create-label">Virtud</span>
+  <!-- ── BOTÓN FLOTANTE FIJO +CREAR ─────────────────────────────────── -->
+  <button id="fab-create" class="fab-create hidden" type="button" data-action="goCreateFromFab"
+    aria-label="Crear solicitud u oferta">
+    <span class="fab-icon" aria-hidden="true">＋</span>
+    <span class="fab-label">Crear</span>
   </button>
 
   <!-- ── LOGIN MODAL ────────────────────────────────────────────────── -->

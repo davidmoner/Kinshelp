@@ -340,6 +340,20 @@
         return apiFetch('/favorites?' + qs, { method: 'DELETE' });
     }
 
+    /** Notifications */
+    async function getNotifications(params) {
+        const qs = params ? ('?' + new URLSearchParams(params).toString()) : '';
+        return apiFetch('/notifications' + qs);
+    }
+
+    async function markNotifRead(notifId) {
+        return apiFetch('/notifications/' + encodeURIComponent(notifId) + '/read', { method: 'PATCH', body: {} });
+    }
+
+    async function markAllNotifsRead() {
+        return apiFetch('/notifications/read-all', { method: 'PATCH', body: {} });
+    }
+
     /* ── Export ─────────────────────────────────────────────────────────────── */
     window.KHApi = {
         setToken,
@@ -396,6 +410,9 @@
         listFavorites,
         addFavorite,
         removeFavorite,
+        getNotifications,
+        markNotifRead,
+        markAllNotifsRead,
     };
 
     // Back-compat: tolerate console checks like `khapi`.
