@@ -614,6 +614,9 @@
               if (r.status === 401 || r.status === 403) {
                 setToken('');
                 showLogin(true);
+                if (location.pathname.indexOf('/admin/login') !== 0) {
+                  location.href = '/admin/login';
+                }
               }
               throw e;
             }
