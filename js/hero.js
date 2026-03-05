@@ -81,6 +81,57 @@
 
     if (!banners.length) return;
 
+    /* ── Hero subtitle rotation ──────────────────────────── */
+    var subtitleWrap = stage.querySelector('.hero-banner[data-banner="0"] .hero-sub-cycle');
+    var subtitleTextEl = subtitleWrap ? subtitleWrap.querySelector('.hero-sub-text') : null;
+    var subtitlePhrases = [
+        'Pide ayuda u ofrécela. Match local en segundos.',
+        'Activa tu barrio: ayuda cuando puedas, recibe cuando lo necesites.',
+        'Sin comisiones. Vecinos verificados. Rápido y seguro.',
+        'Reputación real por ayudar. Comunidad que funciona.',
+        'Solicita u ofrece con un clic. Match automático.'
+    ];
+    var subtitleIndex = 0;
+    var subtitleInterval = null;
+    var subtitleSwapTimer = null;
+
+    function setSubtitle(nextIndex, immediate) {
+        if (!subtitleTextEl) return;
+        var nextText = subtitlePhrases[nextIndex % subtitlePhrases.length];
+        if (prefersReduced || immediate) {
+            subtitleTextEl.textContent = nextText;
+            return;
+        }
+        subtitleTextEl.classList.add('is-out');
+        if (subtitleSwapTimer) clearTimeout(subtitleSwapTimer);
+        subtitleSwapTimer = setTimeout(function () {
+            subtitleTextEl.textContent = nextText;
+            subtitleTextEl.classList.remove('is-out');
+        }, 220);
+    }
+
+    function startSubtitleRotation() {
+        if (!subtitleTextEl || subtitleInterval || !subtitlePhrases.length) return;
+        subtitleInterval = setInterval(function () {
+            subtitleIndex = (subtitleIndex + 1) % subtitlePhrases.length;
+            setSubtitle(subtitleIndex, false);
+        }, 3000);
+    }
+
+    function stopSubtitleRotation() {
+        if (subtitleInterval) clearInterval(subtitleInterval);
+        subtitleInterval = null;
+        if (subtitleSwapTimer) clearTimeout(subtitleSwapTimer);
+        subtitleSwapTimer = null;
+    }
+
+    if (subtitleTextEl && subtitlePhrases.length) {
+        setSubtitle(0, true);
+        startSubtitleRotation();
+        window.addEventListener('pagehide', stopSubtitleRotation);
+        window.addEventListener('beforeunload', stopSubtitleRotation);
+    }
+
     fetchPublicConfig();
 
     /* ── State ───────────────────────────────────────────── */
@@ -197,8 +248,10 @@
         isHidden = document.hidden;
         if (isHidden) {
             pause();
+            stopSubtitleRotation();
         } else {
             resumeIfShould();
+            startSubtitleRotation();
         }
     });
 
