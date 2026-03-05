@@ -23,4 +23,8 @@ module.exports = {
 
   // Admin access (comma-separated emails)
   ADMIN_EMAILS: process.env.ADMIN_EMAILS || null,
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL || null,
+  ADMIN_STAFF_EMAILS: process.env.ADMIN_STAFF_EMAILS || null,
+  ADMIN_PASSWORD_HASH: process.env.ADMIN_PASSWORD_HASH || null,
+  ADMIN_JWT_EXPIRES_IN: process.env.ADMIN_JWT_EXPIRES_IN || null,
 };
