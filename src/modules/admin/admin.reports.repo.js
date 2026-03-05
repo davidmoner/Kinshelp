@@ -3,7 +3,23 @@ const { randomUUID } = require('crypto');
 const db = require('../../config/db');
 
 function ensureTables() {
-  if (db.isPg) return;
+  if (db.isPg) {
+    return db.exec(`
+      CREATE TABLE IF NOT EXISTS reports (
+        id          uuid PRIMARY KEY,
+        reporter_id uuid,
+        target_type text NOT NULL,
+        target_id   text NOT NULL,
+        reason      text NOT NULL,
+        status      text NOT NULL DEFAULT 'open',
+        notes       text,
+        resolved_at timestamptz,
+        resolved_by uuid,
+        created_at  timestamptz NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_reports_status_created ON reports(status, created_at);
+    `);
+  }
   try {
     db.exec(`
       CREATE TABLE IF NOT EXISTS reports (
@@ -24,14 +40,16 @@ function ensureTables() {
 }
 
 function createReport({ reporterId, targetType, targetId, reason }) {
-  ensureTables();
+  const ensure = ensureTables();
   const id = randomUUID();
   if (db.isPg) {
-    return db.exec(
-      `INSERT INTO reports (id, reporter_id, target_type, target_id, reason, status, created_at)
-       VALUES ($1,$2,$3,$4,$5,'open',now())`,
-      [id, reporterId || null, targetType, targetId, reason]
-    ).then(() => ({ id }));
+    return Promise.resolve(ensure)
+      .then(() => db.exec(
+        `INSERT INTO reports (id, reporter_id, target_type, target_id, reason, status, created_at)
+         VALUES ($1,$2,$3,$4,$5,'open',now())`,
+        [id, reporterId || null, targetType, targetId, reason]
+      ))
+      .then(() => ({ id }));
   }
   db.prepare(`
     INSERT INTO reports (id, reporter_id, target_type, target_id, reason, status, created_at)
@@ -41,11 +59,10 @@ function createReport({ reporterId, targetType, targetId, reason }) {
 }
 
 function listReports({ status, limit, offset }) {
-  ensureTables();
+  const ensure = ensureTables();
   if (db.isPg) {
-    if (status) {
-      return db.many(
-        `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+    const baseQuery = status
+      ? `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
             CASE
               WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
               WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
@@ -54,22 +71,38 @@ function listReports({ status, limit, offset }) {
          FROM reports
          WHERE status = $1
          ORDER BY created_at DESC
-         LIMIT $2 OFFSET $3`,
-        [status, limit, offset]
-      );
+         LIMIT $2 OFFSET $3`
+      : `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+            CASE
+              WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
+              WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
+              ELSE NULL
+            END AS target_hidden
+         FROM reports
+         ORDER BY created_at DESC
+         LIMIT $1 OFFSET $2`;
+
+    const fallbackQuery = status
+      ? `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+            NULL AS target_hidden
+         FROM reports
+         WHERE status = $1
+         ORDER BY created_at DESC
+         LIMIT $2 OFFSET $3`
+      : `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
+            NULL AS target_hidden
+         FROM reports
+         ORDER BY created_at DESC
+         LIMIT $1 OFFSET $2`;
+
+    if (status) {
+      return Promise.resolve(ensure)
+        .then(() => db.many(baseQuery, [status, limit, offset]))
+        .catch(() => Promise.resolve(ensure).then(() => db.many(fallbackQuery, [status, limit, offset])).catch(() => []));
     }
-    return db.many(
-      `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at,
-          CASE
-            WHEN target_type = 'offer' THEN (SELECT is_hidden FROM service_offers o WHERE o.id = reports.target_id)
-            WHEN target_type = 'request' THEN (SELECT is_hidden FROM help_requests h WHERE h.id = reports.target_id)
-            ELSE NULL
-          END AS target_hidden
-       FROM reports
-       ORDER BY created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
+    return Promise.resolve(ensure)
+      .then(() => db.many(baseQuery, [limit, offset]))
+      .catch(() => Promise.resolve(ensure).then(() => db.many(fallbackQuery, [limit, offset])).catch(() => []));
   }
 
   if (status) {
@@ -100,13 +133,13 @@ function listReports({ status, limit, offset }) {
 }
 
 function getReportById(id) {
-  ensureTables();
+  const ensure = ensureTables();
   if (db.isPg) {
-    return db.one(
+    return Promise.resolve(ensure).then(() => db.one(
       `SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
        FROM reports WHERE id = $1`,
       [id]
-    );
+    ));
   }
   return db.prepare(`
     SELECT id, reporter_id, target_type, target_id, reason, status, notes, resolved_at, resolved_by, created_at
@@ -133,12 +166,12 @@ function setContentHidden({ targetType, targetId, hidden }) {
 }
 
 function resolveReport({ id, adminUserId, notes }) {
-  ensureTables();
+  const ensure = ensureTables();
   if (db.isPg) {
-    return db.exec(
+    return Promise.resolve(ensure).then(() => db.exec(
       `UPDATE reports SET status = 'resolved', notes = $1, resolved_at = now(), resolved_by = $2 WHERE id = $3`,
       [notes || null, adminUserId, id]
-    );
+    ));
   }
   db.prepare(`
     UPDATE reports
