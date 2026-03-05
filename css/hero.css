@@ -160,6 +160,7 @@ html[data-theme="dark"] .kh-ios-sub {
     position: absolute;
     left: 0;
     right: 0;
+    top: 0;
     opacity: 0;
     transform: translateY(6px);
     animation: heroSubSwap 6s ease-in-out infinite;
@@ -542,8 +543,9 @@ html[data-theme="dark"] .kh-ios-sub {
     color: var(--text-soft);
     font-size: 15.5px;
     line-height: 1.6;
-    max-width: 420px;
-    margin: 6px 0 4px;
+    max-width: 520px;
+    margin: 6px auto 4px;
+    text-align: center;
     text-wrap: balance;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -563,6 +565,7 @@ html[data-theme="dark"] .kh-ios-sub {
     position: absolute;
     left: 0;
     right: 0;
+    top: 0;
     opacity: 0;
     max-height: calc(1.6em * 2);
     overflow: hidden;

@@ -70,8 +70,11 @@
   <!-- ── INTRO OVERLAY — PNG assets, sessionStorage guard ─────────────── -->
   <div id="kh-intro-overlay" aria-hidden="true" role="presentation">
     <div class="kh-intro-inner" id="kh-intro-inner">
-      <img class="kh-intro-crown-img" id="kh-intro-crown" src="img/LOGO_2.png" alt="KingsHelp"
-        draggable="false" />
+      <picture>
+        <source srcset="img/LOGO_2.webp" type="image/webp" />
+        <img class="kh-intro-crown-img" id="kh-intro-crown" src="img/LOGO_2.png" alt="KingsHelp"
+          draggable="false" decoding="async" />
+      </picture>
     </div>
   </div>
 
@@ -90,8 +93,14 @@
         <div class="nav-brand">
           <!-- PNG Brand Lockup: crown + wordmark horizontal -->
           <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
-            <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
-            <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
+            <picture>
+              <source srcset="img/CORONAKH.webp" type="image/webp" />
+              <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" decoding="async" />
+            </picture>
+            <picture>
+              <source srcset="img/KINGSHELP.webp" type="image/webp" />
+              <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" decoding="async" />
+            </picture>
           </a>
           <span class="brand-badge">Incept</span>
         </div>
@@ -128,7 +137,7 @@
           <span class="btn-plus" aria-hidden="true">＋</span>
           Crear
         </button>
-        <div class="nav-menu">
+        <div class="nav-menu hidden">
           <button id="nav-burger" class="btn btn-ghost nav-burger" type="button" aria-label="Abrir menú"
             aria-expanded="false" data-action="toggleLandingMenu">
             <span class="nav-burger-ico" aria-hidden="true">☰</span>
@@ -336,7 +345,10 @@
                           <!-- Escena A (Solicito) -->
                           <div class="hb2p-scene hb2p-scene--a">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
+                              <picture>
+                                <source srcset="img/CORONAKH.webp" type="image/webp" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                              </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag" aria-hidden="true">María</span>
                             </div>
@@ -384,7 +396,10 @@
                           <!-- Escena C (Completado) -->
                           <div class="hb2p-scene hb2p-scene--c">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
+                              <picture>
+                                <source srcset="img/CORONAKH.webp" type="image/webp" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                              </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag" aria-hidden="true">María</span>
                             </div>
@@ -419,14 +434,20 @@
                           <!-- Escena B (Ofrezco) -->
                           <div class="hb2p-scene hb2p-scene--b">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
+                              <picture>
+                                <source srcset="img/CORONAKH.webp" type="image/webp" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                              </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
                             </div>
                             <div class="ds-scene-body">
                               <div class="hb2p-sys-notif">
                                 <div class="hb2p-sys-top">
-                                  <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
+                                  <picture>
+                                    <source srcset="img/CORONAKH.webp" type="image/webp" />
+                                    <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                                  </picture>
                                   <span class="hb2p-sys-app">KingsHelp</span>
                                   <span class="hb2p-sys-chip">Mudanza</span>
                                   <span class="hb2p-sys-now">ahora</span>
@@ -459,7 +480,10 @@
                           <!-- Escena C (Completado + reputación) -->
                           <div class="hb2p-scene hb2p-scene--c">
                             <div class="ds-topbar">
-                              <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" />
+                              <picture>
+                                <source srcset="img/CORONAKH.webp" type="image/webp" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                              </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
                             </div>
@@ -1450,8 +1474,14 @@
       <div class="container footer-inner">
         <div class="footer-brand">
           <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
-            <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
-            <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
+            <picture>
+              <source srcset="img/CORONAKH.webp" type="image/webp" />
+              <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" decoding="async" />
+            </picture>
+            <picture>
+              <source srcset="img/KINGSHELP.webp" type="image/webp" />
+              <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" decoding="async" />
+            </picture>
           </a>
           <p class="footer-note">KingsHelp conecta vecinos. No procesamos dinero: cualquier pago en EUR se acuerda en el
             chat y se realiza fuera de la plataforma.</p>
@@ -1482,8 +1512,14 @@
       <div class="dash-left">
         <div class="nav-brand">
           <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio" data-action="goLanding" data-args="$event">
-            <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" />
-            <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" />
+            <picture>
+              <source srcset="img/CORONAKH.webp" type="image/webp" />
+              <img class="nav-brand-crown" src="img/CORONAKH.png" alt="" aria-hidden="true" draggable="false" decoding="async" />
+            </picture>
+            <picture>
+              <source srcset="img/KINGSHELP.webp" type="image/webp" />
+              <img class="nav-brand-word" src="img/KINGSHELP.png" alt="KingsHelp" draggable="false" decoding="async" />
+            </picture>
           </a>
         </div>
         <span id="kh-theme-slot-dash"></span>
@@ -3113,10 +3149,10 @@
     </div>
   </div>
 
-  <script src="js/base-url.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/theme.js"></script>
+  <script src="js/base-url.js" defer></script>
+  <script src="js/api.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/theme.js" defer></script>
   <script src="js/fx.js" defer></script>
   <script src="js/particles.js" defer></script>
   <script src="js/demo.js" defer></script>

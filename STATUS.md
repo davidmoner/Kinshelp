@@ -101,6 +101,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Hero: subtitulos visibles con animacion estable y selector activo en gradiente.
 - CTA flotantes: segundo botón “Virtud” verde con trayectoria opuesta y sin solaparse.
 - Hero: subtitulo de banner 1 en 2 lineas con swap cada 4s y header mas diferenciado.
+- Hero: subtitulo banner 1 centrado y estable con swap limpio.
 - Email verificacion: HTML con logo/CTA, texto plano para deliverability, preview en `web/preview/verify-email.html`.
 
 ### AutoMatch Premium — Plan Maestro (seguridad, eficiencia, diseño KingsHelp)
