@@ -89,6 +89,7 @@ Mantenerlo actualizado cuando se agregan endpoints, migraciones o cambios de arq
 - Ranking: modal mas ancho y controles reestructurados (busqueda + filtros en filas).
 - Busquedas: todas las barras devuelven respuesta (feed con mensajes por filtro, ranking con vacio contextual, nav search envia a explorar tras login).
 - AutoMatch: UI premium refinada (hero, toggles, categorias, tablero e invitaciones con estados visibles).
+- AutoMatch: ajustes responsive (padding, tarjetas y acciones en movil).
 - Feed: panel de texto destacado por tema + acciones de favorito/reportar.
 - Feed: botones favorito/reportar con hover/focus y transiciones suaves.
 - Favoritos: API + UI en perfil con cards y toggle estrella.

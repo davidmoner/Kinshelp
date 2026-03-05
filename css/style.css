@@ -4679,6 +4679,27 @@ html[data-theme="light"] .rep-act-pts.neg {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .automatch-hero {
+    padding: 14px 16px;
+  }
+
+  .automatch-board,
+  .automatch-invites {
+    padding: 12px;
+  }
+
+  .am-mode {
+    padding: 12px;
+  }
+
+  .am-board {
+    padding: 10px;
+  }
+
+  .am-invite {
+    grid-template-columns: 1fr;
+  }
+
   .card-profile .profile-layout {
     grid-template-columns: 1fr;
   }
@@ -4695,6 +4716,14 @@ html[data-theme="light"] .rep-act-pts.neg {
 
   .am-invite-img {
     aspect-ratio: 16 / 9;
+  }
+
+  .am-invite-title {
+    font-size: 14px;
+  }
+
+  .am-invite-actions {
+    flex-wrap: wrap;
   }
 }
 

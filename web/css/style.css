@@ -3861,6 +3861,27 @@ html[data-theme="light"] .glass-card {
   .automatch-cats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .automatch-hero {
+    padding: 14px 16px;
+  }
+
+  .automatch-board,
+  .automatch-invites {
+    padding: 12px;
+  }
+
+  .am-mode {
+    padding: 12px;
+  }
+
+  .am-board {
+    padding: 10px;
+  }
+
+  .am-invite {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 520px) {
@@ -3869,6 +3890,14 @@ html[data-theme="light"] .glass-card {
   }
   .am-invite-img {
     aspect-ratio: 16 / 9;
+  }
+
+  .am-invite-title {
+    font-size: 14px;
+  }
+
+  .am-invite-actions {
+    flex-wrap: wrap;
   }
 }
 
