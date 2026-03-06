@@ -380,7 +380,13 @@ app.get('/robots.txt', (req, res) => sendStaticFile(res, 'robots.txt'));
 app.get('/sitemap.xml', (req, res) => sendStaticFile(res, 'sitemap.xml'));
 app.get('/site.webmanifest', (req, res) => sendStaticFile(res, 'site.webmanifest'));
 app.get('/favicon.svg', (req, res) => sendStaticFile(res, 'favicon.svg'));
-app.get('/favicon.ico', (req, res) => res.redirect(302, '/favicon.svg'));
+app.get('/favicon.ico', (req, res) => sendStaticFile(res, 'favicon.ico'));
+app.get('/favicon-16.png', (req, res) => sendStaticFile(res, 'favicon-16.png'));
+app.get('/favicon-32.png', (req, res) => sendStaticFile(res, 'favicon-32.png'));
+app.get('/favicon-256.png', (req, res) => sendStaticFile(res, 'favicon-256.png'));
+app.get('/favicon-512.png', (req, res) => sendStaticFile(res, 'favicon-512.png'));
+app.get('/apple-touch-icon.png', (req, res) => sendStaticFile(res, 'apple-touch-icon.png'));
+app.get('/apple-touch-icon-180x180.png', (req, res) => sendStaticFile(res, 'apple-touch-icon-180x180.png'));
 app.get('/index.html', (req, res) => sendStaticFile(res, 'index.html'));
 
 // Best-effort SPA entrypoint: only serve index.html if it exists.
