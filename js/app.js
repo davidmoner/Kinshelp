@@ -1298,6 +1298,9 @@
         if (switchRegister) switchRegister.classList.toggle('hidden', true);
         if (switchReset) switchReset.classList.toggle('hidden', false);
 
+        const loginEmail = $('login-email');
+        const resetEmail = $('reset-email');
+        if (loginEmail && resetEmail && !resetEmail.value) resetEmail.value = loginEmail.value || '';
         setTimeout(() => $('reset-email') && $('reset-email').focus(), 80);
     }
 
@@ -1486,6 +1489,11 @@
         const email = $('login-email').value.trim();
         const pass = $('login-pass').value;
 
+        if (!email || !pass) {
+            toast('Escribe tu email y contraseña', 'error');
+            return;
+        }
+
         setLoading(btn, true);
         try {
             const { user, token } = await KHApi.login(email, pass);
@@ -1495,7 +1503,7 @@
 
             // If the backend tracks email verification, prompt users early.
             if (user && (user.is_verified === false || user.is_verified === 0)) {
-                toast('Te falta verificar el email. Revisa tu correo o reenvia la verificacion.', 'warn');
+                toast('Aún falta verificar tu email. Revisa tu correo o vuelve a enviarlo desde tu perfil.', 'warn');
             }
 
             if (postLoginAction === 'quick_match' && quickDraft) {
@@ -1540,8 +1548,11 @@
             // Show more context for common failures (CORS/network vs 4xx)
             const status = err && err.status;
             const apiErr = err && err.data && (err.data.error || err.data.message);
-            const msg = apiErr || err.message || 'Error al iniciar sesión';
-            toast(status ? `${msg} (HTTP ${status})` : msg, 'error');
+            let msg = apiErr || err.message || 'No se pudo iniciar sesión';
+            if (status === 401) msg = 'Email o contraseña incorrectos.';
+            if (status === 403) msg = 'Tu cuenta no tiene acceso o está suspendida.';
+            if (status === 429) msg = 'Demasiados intentos. Espera unos minutos y prueba de nuevo.';
+            toast(msg, 'error');
             try { console.error('Login error', err); } catch { }
         } finally {
             setLoading(btn, false);
@@ -1582,10 +1593,10 @@
             // After signup, send verify email automatically (best effort).
             try {
                 const out = await KHApi.requestVerifyEmail();
-                if (out && out.email_sent) toast('Email de verificacion enviado. Revisa tu correo.', 'success');
-                else toast('No se pudo enviar el email de verificacion (config pendiente).', 'warn');
+                if (out && out.email_sent) toast('Te enviamos el email de verificación. Revisa tu bandeja.', 'success');
+                else toast('No pudimos enviar el email de verificación. Puedes solicitarlo desde tu perfil.', 'warn');
             } catch {
-                toast('No se pudo enviar el email de verificacion (config pendiente).', 'warn');
+                toast('No pudimos enviar el email de verificación. Puedes solicitarlo desde tu perfil.', 'warn');
             }
 
             if (postLoginAction === 'quick_match' && quickDraft) {
@@ -2856,13 +2867,19 @@
             toast('Escribe tu correo electrónico', 'error');
             return;
         }
+        if (!email.includes('@')) {
+            toast('Revisa tu correo electrónico', 'error');
+            return;
+        }
         try {
             if (btn) setLoading(btn, true);
             await KHApi.forgotPassword(email);
-            toast('Te enviamos un enlace para restablecer la contraseña', 'success');
+            toast('Listo. Revisa tu correo y sigue el enlace para cambiar la contraseña.', 'success');
+            const loginEmail = $('login-email');
+            if (loginEmail) loginEmail.value = email;
             showEmailAuth('login');
         } catch (err) {
-            toast((err && err.message) || 'No se pudo enviar el email', 'error');
+            toast((err && err.message) || 'No se pudo enviar el email. Inténtalo de nuevo.', 'error');
         } finally {
             if (btn) setLoading(btn, false);
         }
@@ -3348,12 +3365,14 @@
             const leftMs = exp - Date.now();
             if (leftMs <= 0) {
                 el.textContent = 'Caducada';
+                el.classList.remove('am-chip--urgent');
                 return;
             }
             const s = Math.ceil(leftMs / 1000);
             const mm = String(Math.floor(s / 60)).padStart(2, '0');
             const ss = String(s % 60).padStart(2, '0');
             el.textContent = `${mm}:${ss}`;
+            el.classList.toggle('am-chip--urgent', leftMs <= 2 * 60 * 1000);
         });
     }
 

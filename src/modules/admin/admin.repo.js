@@ -6,7 +6,7 @@ function listUsers({ query, status, verified, premium, limit, offset }) {
 
   const hasStatus = status === 'active' || status === 'banned';
   const hasVerified = verified === 'yes' || verified === 'no';
-  const hasPremium = premium === 'free' || premium === 'paid' || premium === 'basic' || premium === 'pro';
+  const hasPremium = ['free', 'paid', 'premium', 'gold', 'silver'].includes(premium);
 
   if (db.isPg) {
     const clauses = [];
@@ -37,7 +37,7 @@ function listUsers({ query, status, verified, premium, limit, offset }) {
        ORDER BY created_at DESC
        LIMIT $${i} OFFSET $${i + 1}`;
     vals.push(limit, offset);
-    return db.many(sql, vals);
+    return db.many(sql, vals).catch(() => listUsersFallback({ query, limit, offset, pg: true }));
   }
 
   const clauses = [];
@@ -63,7 +63,71 @@ function listUsers({ query, status, verified, premium, limit, offset }) {
     LIMIT ? OFFSET ?
   `;
   vals.push(limit, offset);
-  return db.prepare(sql).all(...vals);
+  try {
+    return db.prepare(sql).all(...vals);
+  } catch {
+    return listUsersFallback({ query, limit, offset, pg: false });
+  }
+}
+
+function listUsersFallback({ query, limit, offset, pg }) {
+  const q = query ? `%${String(query).toLowerCase()}%` : null;
+  if (pg) {
+    if (q) {
+      return db.many(
+        `SELECT id, display_name, email,
+                0 AS points_balance,
+                'free' AS premium_tier,
+                false AS is_verified,
+                false AS is_banned,
+                created_at, updated_at
+         FROM users
+         WHERE lower(email) LIKE $1 OR lower(display_name) LIKE $1 OR cast(id as text) LIKE $1
+         ORDER BY created_at DESC
+         LIMIT $2 OFFSET $3`,
+        [q, limit, offset]
+      );
+    }
+    return db.many(
+      `SELECT id, display_name, email,
+              0 AS points_balance,
+              'free' AS premium_tier,
+              false AS is_verified,
+              false AS is_banned,
+              created_at, updated_at
+       FROM users
+       ORDER BY created_at DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+  }
+
+  if (q) {
+    return db.prepare(
+      `SELECT id, display_name, email,
+              0 AS points_balance,
+              'free' AS premium_tier,
+              0 AS is_verified,
+              0 AS is_banned,
+              created_at, updated_at
+       FROM users
+       WHERE lower(email) LIKE ? OR lower(display_name) LIKE ? OR id LIKE ?
+       ORDER BY created_at DESC
+       LIMIT ? OFFSET ?`
+    ).all(q, q, q, limit, offset);
+  }
+
+  return db.prepare(
+    `SELECT id, display_name, email,
+            0 AS points_balance,
+            'free' AS premium_tier,
+            0 AS is_verified,
+            0 AS is_banned,
+            created_at, updated_at
+     FROM users
+     ORDER BY created_at DESC
+     LIMIT ? OFFSET ?`
+  ).all(limit, offset);
 }
 
 function getUserById(id) {

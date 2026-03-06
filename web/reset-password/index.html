@@ -5,32 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>KingsHelp - Restablecer contrasena</title>
     <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
       :root {
-        --bg1: #f8f9ff;
-        --bg2: #eef3ff;
+        --bg1: #f5f7fb;
+        --bg2: #edf1f8;
         --card: #ffffff;
         --text: #1f2937;
         --muted: rgba(31, 41, 55, 0.6);
         --line: rgba(15, 23, 42, 0.12);
-        --shadow: 0 28px 70px rgba(15, 23, 42, 0.14);
+        --shadow: 0 28px 70px rgba(15, 23, 42, 0.16);
         --brand: #1b4490;
-        --brand-2: #1f4e9e;
-        --brand-glow: rgba(31, 78, 158, 0.18);
-        --link: #1b8a76;
+        --brand-2: #2a5bce;
+        --brand-glow: rgba(31, 78, 158, 0.2);
+        --gold: #c9a84c;
+        --link: #1f8f7a;
         --radius: 22px;
       }
       * { box-sizing: border-box; }
       html, body { height: 100%; }
       body {
         margin: 0;
-        font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+        font-family: 'Manrope', system-ui, -apple-system, Segoe UI, sans-serif;
         color: var(--text);
         background: radial-gradient(900px 520px at 15% 10%, rgba(189, 203, 255, 0.45), transparent 60%),
                     radial-gradient(900px 520px at 85% 15%, rgba(213, 232, 255, 0.55), transparent 60%),
                     linear-gradient(180deg, var(--bg1), var(--bg2));
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        position: relative;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        inset: -20%;
+        background:
+          radial-gradient(620px 320px at 18% 12%, rgba(201, 168, 76, 0.16), transparent 60%),
+          radial-gradient(700px 360px at 85% 0%, rgba(31, 78, 158, 0.18), transparent 65%);
+        opacity: 0.7;
+        pointer-events: none;
+        z-index: 0;
       }
       .wrap { min-height: 100%; display: grid; place-items: center; padding: 24px; }
       .card {
@@ -41,6 +57,16 @@
         box-shadow: var(--shadow);
         padding: 26px 24px;
         text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      .card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        pointer-events: none;
       }
       .logo {
         width: 120px;
@@ -61,6 +87,7 @@
         outline: none;
         font-size: 14px;
         color: var(--text);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
       input:focus {
         border-color: rgba(31, 78, 158, 0.4);
@@ -78,6 +105,7 @@
         cursor: pointer;
         box-shadow: 0 10px 24px var(--brand-glow);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        letter-spacing: 0.2px;
       }
       button:hover { transform: translateY(-1px); box-shadow: 0 16px 30px var(--brand-glow); }
       button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }

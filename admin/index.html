@@ -7,11 +7,14 @@
   <link rel="icon" href="/favicon.ico?v=1" type="image/x-icon" />
   <link rel="icon" href="/favicon-32.png?v=1" sizes="32x32" type="image/png" />
   <link rel="icon" href="/favicon-16.png?v=1" sizes="16x16" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #070A10;
       --panel: rgba(16, 22, 34, 0.88);
-      --panel2: rgba(255, 255, 255, 0.05);
+      --panel2: rgba(255, 255, 255, 0.06);
       --text: #EDF0F8;
       --muted: rgba(237, 240, 248, 0.55);
       --border: rgba(255, 255, 255, 0.10);
@@ -22,7 +25,8 @@
       --bad: #EF4444;
       --shadow: 0 18px 60px rgba(0,0,0,0.55);
       --radius: 14px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      --font: "Space Grotesk", "Segoe UI", system-ui, -apple-system, Roboto, Arial;
+      --font-display: "Fraunces", "Space Grotesk", "Times New Roman", serif;
     }
     html, body { height: 100%; margin: 0; }
     body {
@@ -32,6 +36,7 @@
       color: var(--text);
       font-family: var(--font);
       font-size: 14px;
+      letter-spacing: 0.1px;
     }
     *, *::before, *::after { box-sizing: border-box; }
 
@@ -46,7 +51,7 @@
       display: flex; flex-direction: column; gap: 4px;
     }
     .brand { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; padding: 0 4px; }
-    .brand b { font-size: 15px; letter-spacing: -0.3px; }
+    .brand b { font-size: 15px; letter-spacing: -0.3px; font-family: var(--font-display); }
     .badge-role {
       font-size: 10px; padding: 3px 7px; border-radius: 999px;
       color: rgba(222,173,90,0.95); border: 1px solid rgba(222,173,90,0.3);
@@ -103,7 +108,7 @@
     /* Main */
     .main { padding: 20px 24px; min-width: 0; }
     .page-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
-    .page-title { font-size: 24px; font-weight: 900; letter-spacing: -0.6px; margin: 0; }
+    .page-title { font-size: 24px; font-weight: 800; letter-spacing: -0.6px; margin: 0; font-family: var(--font-display); }
     .page-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
     /* Cards */
@@ -112,6 +117,7 @@
       background: var(--panel2);
       border-radius: var(--radius);
       padding: 16px;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.35);
     }
     .card + .card, .mt { margin-top: 14px; }
 
@@ -119,12 +125,13 @@
     .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
     .kpi-card {
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.04);
       border-radius: var(--radius);
       padding: 14px 16px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
     .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
-    .kpi-val { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1; }
+    .kpi-val { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; font-family: var(--font-display); }
     .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
     /* Two-col */
@@ -149,8 +156,12 @@
       white-space: nowrap; transition: background 0.14s;
     }
     .btn:hover { background: rgba(255,255,255,0.09); }
-    .btn.primary { background: rgba(41,90,173,0.22); border-color: rgba(41,90,173,0.35); }
-    .btn.primary:hover { background: rgba(41,90,173,0.32); }
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(41,90,173,0.8), rgba(32,74,150,0.85));
+      border-color: rgba(41,90,173,0.45);
+      box-shadow: 0 10px 20px rgba(12,20,36,0.35);
+    }
+    .btn.primary:hover { background: linear-gradient(135deg, rgba(41,90,173,0.95), rgba(32,74,150,0.95)); }
     .btn.danger { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.28); color: #fca5a5; }
     .btn.danger:hover { background: rgba(239,68,68,0.20); }
     .btn.gold { background: rgba(222,173,90,0.14); border-color: rgba(222,173,90,0.3); color: var(--gold); }
@@ -159,12 +170,13 @@
     .btn-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
 
     /* Tables */
-    .table-wrap { overflow-x: auto; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
     table { width: 100%; border-collapse: collapse; }
     th, td { padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); font-size: 12px; vertical-align: middle; }
     th { text-align: left; color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
     td code { color: rgba(222,173,90,0.9); font-size: 11px; }
     tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: rgba(255,255,255,0.03); }
 
     /* Status pills */
     .pill {
@@ -223,7 +235,7 @@
       padding: 20px 22px;
     }
     .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .modal-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+    .modal-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; font-family: var(--font-display); }
 
     /* Detail sections in modal */
     .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
@@ -244,6 +256,19 @@
     .gap-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .section-view { display: none; }
     .section-view.active { display: block; }
+
+    @keyframes viewIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .section-view.active { animation: viewIn 0.28s ease both; }
+    .modal-overlay.open .modal-box { animation: modalIn 0.18s ease both; }
     .empty-row { text-align: center; padding: 24px 0 !important; color: var(--muted); font-size: 12px; }
 
     @media (max-width: 960px) {
@@ -409,10 +434,11 @@
         </select>
         <select id="userFilterPremium" aria-label="Plan premium">
           <option value="">Plan: todos</option>
+          <option value="paid">Premium (cualquiera)</option>
+          <option value="premium">Premium</option>
+          <option value="gold">Gold</option>
+          <option value="silver">Silver</option>
           <option value="free">Free</option>
-          <option value="paid">Premium</option>
-          <option value="basic">Basic</option>
-          <option value="pro">Pro</option>
         </select>
         <button class="btn primary" id="btnUserSearch">Buscar</button>
         <button class="btn" id="btnUserRefresh">Actualizar</button>
@@ -954,7 +980,7 @@
       html += '<div class="cfg-card" style="margin-bottom:14px;">';
       html += '<div class="cfg-title" style="font-size:13px; margin-bottom:6px;">Cambiar plan premium</div>';
       html += '<div class="btn-row">';
-      ['free','basic','pro'].forEach(function(t) {
+      ['free','premium','gold','silver'].forEach(function(t) {
         var active = u.premium_tier === t;
         html += '<button class="btn sm ' + (active ? 'gold' : '') + '" data-modal-set-premium="' + esc(u.id) + '" data-tier="' + t + '">' + t + (active ? ' (actual)' : '') + '</button>';
       });
