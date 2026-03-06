@@ -2762,16 +2762,16 @@
 
   <!-- ── LOGIN MODAL ────────────────────────────────────────────────── -->
   <div id="modal-login" class="modal-overlay hidden" data-action="closeLogin" data-args="$event">
-    <div class="modal-box">
+    <div class="modal-box modal-auth">
       <button class="modal-close" data-action="closeLogin">✕</button>
 
       <!-- Provider chooser (Wallapop-like) -->
       <div id="auth-chooser">
-        <div class="modal-brand">
-          <span class="brand-icon">♛</span>
-          <span class="modal-title">Regístrate o inicia sesión.</span>
+        <div class="auth-hero">
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <div class="auth-title">Regístrate o inicia sesión.</div>
+          <div class="auth-subtitle">¡Te estamos esperando!</div>
         </div>
-        <p class="modal-sub">Te estamos esperando. Entra en KingsHelp y crea tu primer match.</p>
 
         <div class="auth-provider-list">
           <button class="auth-provider" type="button" data-action="authProvider" data-args="google"
@@ -2791,7 +2791,14 @@
           </button>
         </div>
 
-        <div class="demo-hint">Acceso con email disponible tras registro.</div>
+        <div class="auth-switch">
+          <span>¿Ya tienes una cuenta?</span>
+          <button class="auth-link" type="button" data-action="showEmailAuth" data-args="login">Iniciar sesión</button>
+        </div>
+        <div class="auth-legal">
+          Sitio protegido por reCAPTCHA, la <a href="legal/privacidad.html">Política de Privacidad</a> y los
+          <a href="legal/terminos.html">Términos del Servicio</a> de Google aplican.
+        </div>
       </div>
 
       <!-- Email auth -->
