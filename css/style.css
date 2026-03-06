@@ -626,6 +626,14 @@ body {
   opacity: 0.92;
 }
 
+.nav-brand-logo {
+  height: 30px;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px var(--gold-glow));
+}
+
 .nav-brand-fallback {
   font-size: 17px;
   font-weight: 700;
@@ -637,6 +645,9 @@ body {
 @media (max-width: 380px) {
   .nav-brand-word {
     display: none;
+  }
+  .nav-brand-logo {
+    height: 24px;
   }
 }
 
@@ -7336,6 +7347,11 @@ html[data-theme="light"] .rank-chip {
 .dash-header .nav-brand-word {
   height: 16px;
   opacity: 0.92;
+}
+
+.dash-header .nav-brand-logo {
+  height: 24px;
+  filter: drop-shadow(0 0 6px var(--gold-glow));
 }
 
 .premium-modal-badge {
