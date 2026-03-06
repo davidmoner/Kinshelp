@@ -22,6 +22,7 @@
     const autoChatOpened = new Set();
 
     let premiumInterval = 'year';
+    const AUTOMATCH_ALLOWLIST = new Set(['davidmoner90@gmail.com']);
 
     // Ranking (public modal)
     let rankingScope = 'global'; // global | near
@@ -3447,6 +3448,18 @@
             openLogin();
             return;
         }
+
+        let user = currentUser;
+        if (!user) {
+            try { user = await ensureCurrentUser(); } catch { }
+        }
+
+        const email = user && user.email ? String(user.email).trim().toLowerCase() : '';
+        if (email && AUTOMATCH_ALLOWLIST.has(email)) {
+            setDashView('automatch');
+            return;
+        }
+
         try {
             const e = await KHApi.premiumEligibility();
             if (e && e.premium_active) {

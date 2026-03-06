@@ -13,17 +13,21 @@ const {
   CATEGORIES,
 } = require('../../config/constants');
 
+const AUTOMATCH_ALLOWLIST = new Set(['davidmoner90@gmail.com']);
+
 function isPremiumActive(userId) {
   if (db.isPg) {
-    return db.one('SELECT premium_tier, premium_until FROM users WHERE id = $1', [userId]).then(u => {
+    return db.one('SELECT premium_tier, premium_until, email FROM users WHERE id = $1', [userId]).then(u => {
       if (!u) return false;
+      if (u.email && AUTOMATCH_ALLOWLIST.has(String(u.email).trim().toLowerCase())) return true;
       if (!u.premium_tier || u.premium_tier === 'free') return false;
       if (!u.premium_until) return true;
       return new Date(u.premium_until).getTime() > Date.now();
     });
   }
-  const u = db.prepare('SELECT premium_tier, premium_until FROM users WHERE id = ?').get(userId);
+  const u = db.prepare('SELECT premium_tier, premium_until, email FROM users WHERE id = ?').get(userId);
   if (!u) return false;
+  if (u.email && AUTOMATCH_ALLOWLIST.has(String(u.email).trim().toLowerCase())) return true;
   if (!u.premium_tier || u.premium_tier === 'free') return false;
   if (!u.premium_until) return true;
   return new Date(u.premium_until).getTime() > Date.now();
