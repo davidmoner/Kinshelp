@@ -968,18 +968,42 @@
       html += '<button class="btn sm primary" data-modal-set-points="' + esc(u.id) + '">Guardar puntos</button>';
       html += '</div></div>';
 
+      html += '<div class="btn-row" style="margin:-6px 0 12px;">';
+      html += '<button class="btn sm" data-modal-points-delta="50">+50</button>';
+      html += '<button class="btn sm" data-modal-points-delta="100">+100</button>';
+      html += '<button class="btn sm" data-modal-points-delta="250">+250</button>';
+      html += '</div>';
+
       // Badges
       html += '<div class="detail-section">';
       html += '<div class="detail-section-title">Insignias (' + badges.length + ')</div>';
       if (badges.length) {
-        html += '<div class="btn-row">';
+        html += '<div class="btn-row" style="flex-wrap:wrap;">';
         badges.forEach(function (b) {
-          html += '<span class="pill muted">' + esc(b.slug || b.name) + '</span>';
+          var label = esc(b.name || b.slug);
+          html += '<button class="btn sm" data-modal-remove-badge="' + esc(b.slug) + '" data-user-id="' + esc(u.id) + '">' + label + ' ✕</button>';
         });
         html += '</div>';
       } else {
         html += '<div class="muted text-sm">Sin insignias</div>';
       }
+
+      var allBadges = Array.isArray(d.allBadges) ? d.allBadges : [];
+      var owned = new Set(badges.map(function (b) { return b.slug; }));
+      var available = allBadges.filter(function (b) { return b && b.slug && !owned.has(b.slug); });
+      html += '<div class="gap-row" style="margin-top:10px;">';
+      html += '<select id="modalBadgeSelect" style="min-width:220px;">';
+      if (!available.length) {
+        html += '<option value="">Todas asignadas</option>';
+      } else {
+        available.forEach(function (b) {
+          var label = esc(b.name || b.slug) + (b.points_bonus ? ' · +' + b.points_bonus + ' rep' : '');
+          html += '<option value="' + esc(b.slug) + '">' + label + '</option>';
+        });
+      }
+      html += '</select>';
+      html += '<button class="btn sm primary" data-modal-add-badge="' + esc(u.id) + '"' + (available.length ? '' : ' disabled') + '>Añadir insignia</button>';
+      html += '</div>';
       html += '</div>';
 
       // Recent matches
@@ -1448,6 +1472,34 @@
       if (!Number.isFinite(val) || val < 0) { toast('Valor de puntos invalido', false); return; }
       api('/users/' + encodeURIComponent(uid10) + '/points', { method: 'POST', body: JSON.stringify({ points_balance: val }) })
         .then(function () { toast('Reputacion actualizada', true); openUserModal(uid10); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-points-delta')) {
+      var input2 = document.getElementById('modalPointsInput');
+      var delta = parseInt(t.getAttribute('data-modal-points-delta'), 10);
+      if (!input2 || !Number.isFinite(delta)) return;
+      var current = parseInt(input2.value || '0', 10);
+      if (!Number.isFinite(current)) current = 0;
+      input2.value = String(Math.max(0, current + delta));
+      return;
+    }
+    if (t.hasAttribute('data-modal-add-badge')) {
+      var uid11 = t.getAttribute('data-modal-add-badge');
+      var sel = document.getElementById('modalBadgeSelect');
+      var slug = sel ? String(sel.value || '').trim() : '';
+      if (!slug) { toast('Selecciona una insignia', false); return; }
+      api('/users/' + encodeURIComponent(uid11) + '/badges', { method: 'POST', body: JSON.stringify({ slug: slug }) })
+        .then(function () { toast('Insignia asignada', true); openUserModal(uid11); loadUsers(); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-remove-badge')) {
+      var uid12 = t.getAttribute('data-user-id');
+      var slug2 = t.getAttribute('data-modal-remove-badge');
+      if (!uid12 || !slug2) return;
+      api('/users/' + encodeURIComponent(uid12) + '/badges/' + encodeURIComponent(slug2), { method: 'DELETE' })
+        .then(function () { toast('Insignia retirada', true); openUserModal(uid12); loadUsers(); })
         .catch(function (e) { toast(e.message || 'Error', false); });
       return;
     }

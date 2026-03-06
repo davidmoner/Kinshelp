@@ -3,6 +3,8 @@ const { randomUUID } = require('crypto');
 const repo = require('./admin.repo');
 const eventsRepo = require('./admin.events.repo');
 const reportsRepo = require('./admin.reports.repo');
+const badgesRepo = require('../badges/badges.repo');
+const badgesService = require('../badges/badges.service');
 const db = require('../../config/db');
 const pointsRepo = require('../points/points.repo');
 const { OFFER_STATUS, REQUEST_STATUS, PREMIUM_TIER } = require('../../config/constants');
@@ -296,6 +298,8 @@ function getUserDetail(req, res) {
     const user = await Promise.resolve(repo.getUserById(id));
     if (!user) throw httpError(404, 'User not found');
 
+    const allBadges = await Promise.resolve(badgesRepo.findAll());
+
     if (db.isPg) {
       const [badges, matches, reports] = await Promise.all([
         db.many(`
@@ -323,7 +327,7 @@ function getUserDetail(req, res) {
           LIMIT 50
         `, [id]),
       ]);
-      return { user: safeUser(user), badges, matches, reports };
+      return { user: safeUser(user), badges, matches, reports, allBadges };
     }
 
     const badges = db.prepare(`
@@ -351,7 +355,7 @@ function getUserDetail(req, res) {
       LIMIT 50
     `).all(id, id);
 
-    return { user: safeUser(user), badges, matches, reports };
+    return { user: safeUser(user), badges, matches, reports, allBadges };
   };
 
   Promise.resolve(fetch())
@@ -472,6 +476,63 @@ function resetPoints(req, res) {
     }))
     .then(() => res.json({ ok: true }))
     .catch(() => res.status(500).json({ error: 'Failed to reset points' }));
+}
+
+function addUserBadge(req, res) {
+  const id = String(req.params.id);
+  const slug = (req.body && req.body.slug) ? String(req.body.slug).trim() : '';
+  if (!slug) throw httpError(400, 'Badge slug required');
+
+  const before = repo.getUserById(id);
+  if (!before) throw httpError(404, 'User not found');
+
+  Promise.resolve(badgesService.awardBadge(id, slug, null))
+    .then((badge) => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'user.badge_add',
+      entityType: 'user',
+      entityId: id,
+      beforeJson: JSON.stringify({ slug }),
+      afterJson: JSON.stringify({ awarded: !!badge }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }).then(() => res.json({ ok: true, data: badge || null })))
+    .catch((err) => res.status(err.status || 500).json({ error: err.message || 'Failed to add badge' }));
+}
+
+function removeUserBadge(req, res) {
+  const id = String(req.params.id);
+  const slug = String(req.params.slug || '').trim();
+  if (!slug) throw httpError(400, 'Badge slug required');
+
+  const before = repo.getUserById(id);
+  if (!before) throw httpError(404, 'User not found');
+
+  const run = async () => {
+    const badge = await Promise.resolve(badgesRepo.getBySlug(slug));
+    if (!badge) throw httpError(404, 'Badge not found');
+    if (db.isPg) {
+      await db.exec('DELETE FROM user_badges WHERE user_id = $1 AND badge_id = $2', [id, badge.id]);
+      return badge;
+    }
+    db.prepare('DELETE FROM user_badges WHERE user_id = ? AND badge_id = ?').run(id, badge.id);
+    return badge;
+  };
+
+  Promise.resolve(run())
+    .then((badge) => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'user.badge_remove',
+      entityType: 'user',
+      entityId: id,
+      beforeJson: JSON.stringify({ slug: badge.slug }),
+      afterJson: JSON.stringify({ removed: true }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }).then(() => res.json({ ok: true })))
+    .catch((err) => res.status(err.status || 500).json({ error: err.message || 'Failed to remove badge' }));
 }
 
 function setPoints(req, res) {
@@ -792,6 +853,8 @@ module.exports = {
   getUserDetail,
   resetPoints,
   setPoints,
+  addUserBadge,
+  removeUserBadge,
   gdprExport,
   gdprDelete,
   patchUser,

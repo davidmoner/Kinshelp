@@ -45,6 +45,8 @@ r.get('/offers/:id', controller.getOfferDetail);
 r.get('/matches/:id', controller.getMatchDetail);
 r.post('/users/:id/reset-points', controller.resetPoints);
 r.post('/users/:id/points', controller.setPoints);
+r.post('/users/:id/badges', controller.addUserBadge);
+r.delete('/users/:id/badges/:slug', controller.removeUserBadge);
 r.post('/users/:id/gdpr/export', controller.gdprExport);
 r.post('/users/:id/gdpr/delete', controller.gdprDelete);
 r.post('/:type/:id/hide', controller.hideContent);
