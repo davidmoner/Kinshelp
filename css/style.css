@@ -1117,6 +1117,10 @@ html[data-theme="light"] .btn-auth {
   box-shadow: 0 28px 70px rgba(17, 24, 39, 0.18);
   color: #1f2937;
   text-align: center;
+  width: min(420px, 94vw);
+  max-height: calc(100vh - 36px);
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-auth .modal-close {
@@ -1332,6 +1336,79 @@ html[data-theme="light"] .auth-provider[disabled] {
 .auth-legal a {
   color: #1f8f7a;
   text-decoration: underline;
+}
+
+.modal-auth #auth-email {
+  text-align: left;
+}
+
+.modal-auth .auth-tabs {
+  justify-content: center;
+}
+
+@media (max-width: 560px) {
+  .modal-auth {
+    padding: 28px 22px;
+    border-radius: 20px;
+  }
+
+  .modal-auth .modal-close {
+    top: 12px;
+    right: 12px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .auth-logo {
+    width: 96px;
+  }
+
+  .auth-title {
+    font-size: 18px;
+  }
+
+  .auth-subtitle {
+    font-size: 14px;
+  }
+
+  .modal-auth .auth-provider-list {
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .modal-auth .auth-provider {
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+
+  .modal-auth .auth-ico {
+    width: 26px;
+    height: 26px;
+    border-radius: 9px;
+  }
+
+  .auth-switch {
+    flex-wrap: wrap;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 380px) {
+  .modal-auth {
+    padding: 24px 18px;
+  }
+
+  .auth-logo {
+    width: 88px;
+  }
+
+  .auth-title {
+    font-size: 17px;
+  }
+
+  .auth-subtitle {
+    font-size: 13px;
+  }
 }
 
 .auth-tabs {
