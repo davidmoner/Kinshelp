@@ -2803,28 +2803,31 @@
 
       <!-- Email auth -->
       <div id="auth-email" class="hidden">
-        <div class="auth-email-top">
-          <button class="btn btn-ghost btn-sm" type="button" data-action="showAuthChooser">Volver</button>
+        <div class="auth-hero auth-hero--email" id="auth-hero-login">
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <div class="auth-title">Accede con tu email</div>
+          <div class="auth-subtitle auth-subtitle--muted">Introduce tu correo electrónico para acceder.</div>
         </div>
-
-        <div class="auth-tabs" role="tablist" aria-label="Tipo de acceso">
-          <button class="auth-tab auth-tab--active" type="button" data-tab="login" role="tab" aria-selected="true"
-            data-action="showEmailAuth" data-args="login">Iniciar sesión</button>
-          <button class="auth-tab" type="button" data-tab="register" role="tab" aria-selected="false"
-            data-action="showEmailAuth" data-args="register">Regístrate</button>
+        <div class="auth-hero auth-hero--email hidden" id="auth-hero-register">
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <div class="auth-title">Crea tu cuenta</div>
+          <div class="auth-subtitle auth-subtitle--muted">Completa tus datos para empezar.</div>
         </div>
 
         <form id="login-form" data-submit="submitLogin">
           <div class="field">
-            <label for="login-email">Email</label>
-            <input id="login-email" type="email" placeholder="tu@email.com" required autocomplete="email" />
+            <label for="login-email">Correo electrónico</label>
+            <input id="login-email" type="email" placeholder="Correo electrónico" required autocomplete="email" />
           </div>
           <div class="field">
-            <label for="login-pass">Contraseña</label>
-            <input id="login-pass" type="password" placeholder="Tu contraseña" required autocomplete="current-password" />
+            <div class="auth-field-row">
+              <label for="login-pass">Contraseña</label>
+              <span class="auth-help">¿Olvidaste tu contraseña?</span>
+            </div>
+            <input id="login-pass" type="password" placeholder="Contraseña" required autocomplete="current-password" />
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="btn-login">
-            <span class="btn-label">Entrar</span>
+            <span class="btn-label">Continuar</span>
             <span class="spinner hidden"></span>
           </button>
         </form>
@@ -2835,8 +2838,8 @@
             <input id="reg-name" type="text" placeholder="Tu nombre" required autocomplete="name" />
           </div>
           <div class="field">
-            <label for="reg-email">Email</label>
-            <input id="reg-email" type="email" placeholder="tu@email.com" required autocomplete="email" />
+            <label for="reg-email">Correo electrónico</label>
+            <input id="reg-email" type="email" placeholder="Correo electrónico" required autocomplete="email" />
           </div>
           <div class="field">
             <label for="reg-pass">Contraseña</label>
@@ -2852,6 +2855,19 @@
             <span class="spinner hidden"></span>
           </button>
         </form>
+
+        <div class="auth-switch" id="auth-switch-login">
+          <span>¿No tienes una cuenta?</span>
+          <button class="auth-link" type="button" data-action="showEmailAuth" data-args="register">Regístrate</button>
+        </div>
+        <div class="auth-switch hidden" id="auth-switch-register">
+          <span>¿Ya tienes una cuenta?</span>
+          <button class="auth-link" type="button" data-action="showEmailAuth" data-args="login">Iniciar sesión</button>
+        </div>
+        <div class="auth-legal">
+          Sitio protegido por reCAPTCHA, la <a href="legal/privacidad.html">Política de Privacidad</a> y los
+          <a href="legal/terminos.html">Términos del Servicio</a> de Google aplican.
+        </div>
       </div>
     </div>
   </div>

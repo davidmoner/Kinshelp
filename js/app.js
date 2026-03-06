@@ -1247,6 +1247,16 @@
             regTab.setAttribute('aria-selected', String(t === 'register'));
         }
 
+        const heroLogin = $('auth-hero-login');
+        const heroRegister = $('auth-hero-register');
+        if (heroLogin) heroLogin.classList.toggle('hidden', t !== 'login');
+        if (heroRegister) heroRegister.classList.toggle('hidden', t !== 'register');
+
+        const switchLogin = $('auth-switch-login');
+        const switchRegister = $('auth-switch-register');
+        if (switchLogin) switchLogin.classList.toggle('hidden', t !== 'login');
+        if (switchRegister) switchRegister.classList.toggle('hidden', t !== 'register');
+
         if (t === 'login') {
             show($('login-form'));
             hide($('register-form'));

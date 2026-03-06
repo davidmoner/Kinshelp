@@ -1143,6 +1143,10 @@ html[data-theme="light"] .btn-auth {
   margin-bottom: 16px;
 }
 
+.auth-hero--email {
+  margin-bottom: 18px;
+}
+
 .auth-logo {
   width: 120px;
   max-width: 70%;
@@ -1161,6 +1165,12 @@ html[data-theme="light"] .btn-auth {
   font-size: 15px;
   font-weight: 700;
   color: #1b8a76;
+}
+
+.auth-subtitle--muted {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(31, 41, 55, 0.55);
 }
 
 .auth-provider-list {
@@ -1251,6 +1261,24 @@ html[data-theme="light"] .auth-provider[disabled] {
 .modal-auth .auth-ico {
   background: #f5f7fb;
   border-color: rgba(15, 23, 42, 0.1);
+}
+
+.auth-field-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.auth-help {
+  font-size: 12px;
+  color: rgba(31, 41, 55, 0.55);
+  white-space: nowrap;
+}
+
+.modal-auth #login-form .btn-block,
+.modal-auth #register-form .btn-block {
+  border-radius: 999px;
 }
 
 .auth-ico--g {
@@ -1374,6 +1402,10 @@ html[data-theme="light"] .auth-provider[disabled] {
 
   .auth-subtitle {
     font-size: 14px;
+  }
+
+  .auth-subtitle--muted {
+    font-size: 13px;
   }
 
   .modal-auth .auth-provider-list {
