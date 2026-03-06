@@ -1112,15 +1112,16 @@ html[data-theme="light"] .btn-auth {
 
 /* ── Auth modal (Wallapop-like) ───────────────────────── */
 .modal-auth {
-  background: #fdfdff;
-  border: 1px solid rgba(18, 24, 38, 0.10);
-  box-shadow: 0 28px 70px rgba(17, 24, 39, 0.18);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f7fb 100%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 28px 70px rgba(17, 24, 39, 0.16);
   color: #1f2937;
   text-align: center;
   width: min(420px, 94vw);
   max-height: calc(100vh - 36px);
   overflow: auto;
   overscroll-behavior: contain;
+  border-radius: 24px;
 }
 
 .modal-auth .modal-close {
@@ -1139,7 +1140,7 @@ html[data-theme="light"] .btn-auth {
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .auth-logo {
@@ -1152,14 +1153,14 @@ html[data-theme="light"] .btn-auth {
 .auth-title {
   font-size: 20px;
   font-weight: 700;
-  letter-spacing: -0.3px;
-  color: #1f2937;
+  letter-spacing: -0.4px;
+  color: #202633;
 }
 
 .auth-subtitle {
   font-size: 15px;
   font-weight: 700;
-  color: #1f8f7a;
+  color: #1b8a76;
 }
 
 .auth-provider-list {
@@ -1192,14 +1193,18 @@ html[data-theme="light"] .btn-auth {
 .modal-auth .auth-provider {
   background: #ffffff;
   border-color: rgba(15, 23, 42, 0.12);
-  color: #2b3448;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+  color: #2a3244;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
 .modal-auth .auth-provider:hover {
-  border-color: rgba(31, 143, 122, 0.35);
+  border-color: rgba(31, 143, 122, 0.4);
   background: #fbfffe;
   transform: translateY(-1px);
+}
+
+.modal-auth .auth-provider span {
+  letter-spacing: -0.1px;
 }
 
 html[data-theme="light"] .auth-provider {
@@ -1278,7 +1283,7 @@ html[data-theme="light"] .auth-provider[disabled] {
 }
 
 .modal-auth .field label {
-  color: rgba(31, 41, 55, 0.65);
+  color: rgba(31, 41, 55, 0.6);
 }
 
 .modal-auth .field input,
@@ -1348,7 +1353,7 @@ html[data-theme="light"] .auth-provider[disabled] {
 
 @media (max-width: 560px) {
   .modal-auth {
-    padding: 28px 22px;
+    padding: 26px 20px;
     border-radius: 20px;
   }
 
@@ -1395,7 +1400,7 @@ html[data-theme="light"] .auth-provider[disabled] {
 
 @media (max-width: 380px) {
   .modal-auth {
-    padding: 24px 18px;
+    padding: 24px 16px;
   }
 
   .auth-logo {
