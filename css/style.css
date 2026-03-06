@@ -4483,12 +4483,13 @@ html[data-theme="light"] .rep-act-pts.neg {
 .card-automatch {
   position: relative;
   overflow: hidden;
-  border-color: rgba(201, 168, 76, 0.20);
+  border-color: rgba(201, 168, 76, 0.36);
+  color: rgba(237, 240, 248, 0.95);
   background:
-    radial-gradient(120% 140% at 14% 0%, rgba(82, 49, 148, 0.18) 0%, transparent 60%),
-    radial-gradient(120% 140% at 90% 10%, rgba(33, 82, 173, 0.14) 0%, transparent 56%),
-    radial-gradient(120% 140% at 55% 120%, rgba(201, 168, 76, 0.10) 0%, transparent 62%),
-    rgba(255, 255, 255, 0.03);
+    radial-gradient(120% 160% at 12% -10%, rgba(201, 168, 76, 0.22) 0%, transparent 55%),
+    radial-gradient(130% 150% at 90% 0%, rgba(59, 130, 246, 0.20) 0%, transparent 60%),
+    radial-gradient(120% 140% at 45% 120%, rgba(124, 58, 237, 0.12) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(18, 24, 40, 0.78), rgba(10, 14, 28, 0.72));
 }
 
 .card-automatch::after {
@@ -4497,7 +4498,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   inset: 0;
   background-image: radial-gradient(rgba(237, 240, 248, 0.06) 1px, transparent 1px);
   background-size: 22px 22px;
-  opacity: 0.18;
+  opacity: 0.12;
   pointer-events: none;
   mix-blend-mode: overlay;
 }
@@ -4506,9 +4507,9 @@ html[data-theme="light"] .rep-act-pts.neg {
   content: '';
   position: absolute;
   inset: -40px;
-  background: radial-gradient(circle at 30% 30%, rgba(33, 82, 173, 0.14), transparent 55%);
-  filter: blur(18px);
-  opacity: 0.8;
+  background: radial-gradient(circle at 28% 30%, rgba(124, 58, 237, 0.18), transparent 55%);
+  filter: blur(22px);
+  opacity: 0.65;
   pointer-events: none;
   transform: translate3d(0, 0, 0);
 }
@@ -4554,11 +4555,11 @@ html[data-theme="light"] .rep-act-pts.neg {
 
 .automatch-hero {
   grid-column: 1 / -1;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
   padding: 16px 18px;
-  background: linear-gradient(135deg, rgba(18, 24, 42, 0.88), rgba(8, 12, 24, 0.78));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  background: linear-gradient(135deg, rgba(28, 36, 62, 0.9), rgba(16, 22, 40, 0.85));
+  box-shadow: 0 16px 36px rgba(5, 10, 20, 0.35);
   position: relative;
   overflow: hidden;
 }
@@ -4576,21 +4577,21 @@ html[data-theme="light"] .rep-act-pts.neg {
 }
 
 .automatch-board {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .am-mode {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
   padding: 14px;
-  background: rgba(7, 10, 20, 0.35);
+  background: rgba(255, 255, 255, 0.06);
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .am-mode::before {
@@ -4621,7 +4622,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   font-weight: 900;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: rgba(237, 240, 248, 0.62);
+  color: rgba(237, 240, 248, 0.78);
 }
 
 .am-mode-v {
@@ -4634,12 +4635,12 @@ html[data-theme="light"] .rep-act-pts.neg {
 .am-mode-sub {
   margin-top: 8px;
   font-size: 12.5px;
-  color: var(--text-soft);
+  color: rgba(237, 240, 248, 0.86);
   line-height: 1.5;
 }
 
 .am-mode[data-kind="provider"] {
-  background: radial-gradient(circle at 25% 0%, rgba(82, 49, 148, 0.2), transparent 55%), rgba(7, 10, 20, 0.35);
+  background: radial-gradient(circle at 25% 0%, rgba(82, 49, 148, 0.24), transparent 55%), rgba(255, 255, 255, 0.06);
 }
 
 .am-mode[data-kind="provider"]::before {
@@ -4647,7 +4648,7 @@ html[data-theme="light"] .rep-act-pts.neg {
 }
 
 .am-mode[data-kind="seeker"] {
-  background: radial-gradient(circle at 25% 0%, rgba(33, 82, 173, 0.22), transparent 55%), rgba(7, 10, 20, 0.35);
+  background: radial-gradient(circle at 25% 0%, rgba(33, 82, 173, 0.24), transparent 55%), rgba(255, 255, 255, 0.06);
 }
 
 .am-mode[data-kind="seeker"]::before {
@@ -4659,10 +4660,10 @@ html[data-theme="light"] .rep-act-pts.neg {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  border: 1px dashed rgba(201, 168, 76, 0.22);
+  border: 1px dashed rgba(201, 168, 76, 0.35);
   border-radius: 20px;
   padding: 12px 14px;
-  background: rgba(201, 168, 76, 0.08);
+  background: rgba(201, 168, 76, 0.14);
 }
 
 .am-rule-ico {
@@ -4683,7 +4684,7 @@ html[data-theme="light"] .rep-act-pts.neg {
 .am-rule-sub {
   margin-top: 3px;
   font-size: 12px;
-  color: var(--text-soft);
+  color: rgba(237, 240, 248, 0.85);
   line-height: 1.5;
 }
 
@@ -4692,7 +4693,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   font-weight: 900;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: rgba(237, 240, 248, 0.62);
+  color: rgba(237, 240, 248, 0.78);
 }
 
 .automatch-hero-v {
@@ -4705,17 +4706,17 @@ html[data-theme="light"] .rep-act-pts.neg {
 .automatch-hero-sub {
   margin-top: 6px;
   font-size: 13px;
-  color: var(--text-soft);
+  color: rgba(237, 240, 248, 0.88);
   line-height: 1.55;
 }
 
 .automatch-settings,
 .automatch-invites {
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 20px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .automatch-settings-head {
@@ -4730,7 +4731,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   font-weight: 900;
   letter-spacing: 0.7px;
   text-transform: uppercase;
-  color: rgba(237, 240, 248, 0.7);
+  color: rgba(237, 240, 248, 0.82);
 }
 
 .am-toggle {
@@ -4738,10 +4739,10 @@ html[data-theme="light"] .rep-act-pts.neg {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: rgba(237, 240, 248, 0.78);
+  color: rgba(237, 240, 248, 0.9);
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 4px 10px;
   border-radius: 999px;
 }
@@ -4764,15 +4765,15 @@ html[data-theme="light"] .rep-act-pts.neg {
 }
 
 .am-cat {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 10px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: rgba(237, 240, 248, 0.8);
+  color: rgba(237, 240, 248, 0.92);
   cursor: pointer;
   user-select: none;
   transition: transform var(--transition), background var(--transition), border-color var(--transition), box-shadow var(--transition);
@@ -4829,9 +4830,9 @@ html[data-theme="light"] .rep-act-pts.neg {
 
 .am-filter-chip {
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(237, 240, 248, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(237, 240, 248, 0.9);
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 12px;
@@ -4880,13 +4881,13 @@ html[data-theme="light"] .rep-act-pts.neg {
   margin-top: 12px;
   padding: 12px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(6, 10, 20, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .am-col {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(10, 14, 26, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 20px;
   overflow: hidden;
 }
@@ -4897,8 +4898,8 @@ html[data-theme="light"] .rep-act-pts.neg {
   justify-content: space-between;
   gap: 10px;
   padding: 11px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(180deg, rgba(18, 24, 44, 0.92), rgba(9, 12, 24, 0.7));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(24, 32, 52, 0.95), rgba(16, 22, 38, 0.85));
 }
 
 .am-col-title {
@@ -4906,7 +4907,7 @@ html[data-theme="light"] .rep-act-pts.neg {
   font-weight: 950;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: rgba(237, 240, 248, 0.72);
+  color: rgba(237, 240, 248, 0.82);
 }
 
 .am-col-count {
@@ -4914,9 +4915,9 @@ html[data-theme="light"] .rep-act-pts.neg {
   font-weight: 950;
   padding: 2px 8px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(237, 240, 248, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(237, 240, 248, 0.95);
 }
 
 .am-cards {
@@ -4946,9 +4947,9 @@ html[data-theme="light"] .rep-act-pts.neg {
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(237, 240, 248, 0.78);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(237, 240, 248, 0.9);
   font-size: 14px;
 }
 
@@ -4982,9 +4983,9 @@ html[data-theme="light"] .rep-act-pts.neg {
   gap: 12px;
   padding: 12px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: linear-gradient(135deg, rgba(16, 22, 38, 0.95), rgba(8, 12, 24, 0.8));
-  box-shadow: 0 16px 30px rgba(4, 8, 18, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(135deg, rgba(20, 28, 46, 0.95), rgba(12, 18, 34, 0.85));
+  box-shadow: 0 18px 34px rgba(4, 8, 18, 0.35);
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
@@ -5030,7 +5031,7 @@ html[data-theme="light"] .rep-act-pts.neg {
 .am-invite-meta {
   margin-top: 4px;
   font-size: 12px;
-  color: var(--text-soft);
+  color: rgba(237, 240, 248, 0.82);
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -5042,10 +5043,10 @@ html[data-theme="light"] .rep-act-pts.neg {
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
   font-size: 11px;
-  color: rgba(237, 240, 248, 0.70);
+  color: rgba(237, 240, 248, 0.86);
 }
 
 .am-chip-user {
