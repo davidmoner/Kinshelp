@@ -397,6 +397,23 @@
     <div class="section-view" id="view-users">
       <div class="toolbar">
         <input id="userQuery" placeholder="Buscar por email, nombre o id" />
+        <select id="userFilterStatus" aria-label="Estado de cuenta">
+          <option value="">Estado: todos</option>
+          <option value="active">Activos</option>
+          <option value="banned">Baneados</option>
+        </select>
+        <select id="userFilterVerified" aria-label="Verificacion">
+          <option value="">Verificacion: todas</option>
+          <option value="yes">Verificados</option>
+          <option value="no">No verificados</option>
+        </select>
+        <select id="userFilterPremium" aria-label="Plan premium">
+          <option value="">Plan: todos</option>
+          <option value="free">Free</option>
+          <option value="paid">Premium</option>
+          <option value="basic">Basic</option>
+          <option value="pro">Pro</option>
+        </select>
         <button class="btn primary" id="btnUserSearch">Buscar</button>
         <button class="btn" id="btnUserRefresh">Actualizar</button>
       </div>
@@ -833,7 +850,14 @@
 
   function loadUsers() {
     var q = document.getElementById('userQuery').value.trim();
-    var url = '/users?limit=' + (usersLimit + 1) + '&page=' + usersPage + (q ? '&query=' + encodeURIComponent(q) : '');
+    var status = document.getElementById('userFilterStatus').value || '';
+    var verified = document.getElementById('userFilterVerified').value || '';
+    var premium = document.getElementById('userFilterPremium').value || '';
+    var url = '/users?limit=' + (usersLimit + 1) + '&page=' + usersPage
+      + (q ? '&query=' + encodeURIComponent(q) : '')
+      + (status ? '&status=' + encodeURIComponent(status) : '')
+      + (verified ? '&verified=' + encodeURIComponent(verified) : '')
+      + (premium ? '&premium=' + encodeURIComponent(premium) : '');
     api(url).then(function (j) {
       var rows = Array.isArray(j.data) ? j.data : [];
       usersHasMore = rows.length > usersLimit;
@@ -875,6 +899,9 @@
   document.getElementById('btnUserSearch') && document.getElementById('btnUserSearch').addEventListener('click', function () { usersPage = 1; loadUsers(); });
   document.getElementById('btnUserRefresh') && document.getElementById('btnUserRefresh').addEventListener('click', function () { usersPage = 1; loadUsers(); });
   document.getElementById('userQuery') && document.getElementById('userQuery').addEventListener('keydown', function (e) { if (e.key === 'Enter') { usersPage = 1; loadUsers(); } });
+  document.getElementById('userFilterStatus') && document.getElementById('userFilterStatus').addEventListener('change', function () { usersPage = 1; loadUsers(); });
+  document.getElementById('userFilterVerified') && document.getElementById('userFilterVerified').addEventListener('change', function () { usersPage = 1; loadUsers(); });
+  document.getElementById('userFilterPremium') && document.getElementById('userFilterPremium').addEventListener('change', function () { usersPage = 1; loadUsers(); });
   document.getElementById('usersPrev') && document.getElementById('usersPrev').addEventListener('click', function () { if (usersPage > 1) { usersPage--; loadUsers(); } });
   document.getElementById('usersNext') && document.getElementById('usersNext').addEventListener('click', function () { if (usersHasMore) { usersPage++; loadUsers(); } });
 
@@ -931,6 +958,14 @@
         var active = u.premium_tier === t;
         html += '<button class="btn sm ' + (active ? 'gold' : '') + '" data-modal-set-premium="' + esc(u.id) + '" data-tier="' + t + '">' + t + (active ? ' (actual)' : '') + '</button>';
       });
+      html += '</div></div>';
+
+      html += '<div class="cfg-card" style="margin-bottom:14px;">';
+      html += '<div class="cfg-title" style="font-size:13px; margin-bottom:6px;">Reputacion</div>';
+      html += '<div class="cfg-sub">Establece manualmente la reputacion del usuario.</div>';
+      html += '<div class="gap-row">';
+      html += '<input id="modalPointsInput" type="number" min="0" step="1" value="' + (u.points_balance || 0) + '" style="max-width:140px;" />';
+      html += '<button class="btn sm primary" data-modal-set-points="' + esc(u.id) + '">Guardar puntos</button>';
       html += '</div></div>';
 
       // Badges
@@ -1403,6 +1438,16 @@
       var tier = t.getAttribute('data-tier');
       api('/users/' + encodeURIComponent(uid9), { method: 'PATCH', body: JSON.stringify({ premium_tier: tier }) })
         .then(function () { toast('Premium actualizado a ' + tier, true); openUserModal(uid9); })
+        .catch(function (e) { toast(e.message || 'Error', false); });
+      return;
+    }
+    if (t.hasAttribute('data-modal-set-points')) {
+      var uid10 = t.getAttribute('data-modal-set-points');
+      var input = document.getElementById('modalPointsInput');
+      var val = input ? parseInt(input.value, 10) : NaN;
+      if (!Number.isFinite(val) || val < 0) { toast('Valor de puntos invalido', false); return; }
+      api('/users/' + encodeURIComponent(uid10) + '/points', { method: 'POST', body: JSON.stringify({ points_balance: val }) })
+        .then(function () { toast('Reputacion actualizada', true); openUserModal(uid10); loadUsers(); })
         .catch(function (e) { toast(e.message || 'Error', false); });
       return;
     }

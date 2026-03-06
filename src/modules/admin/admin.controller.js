@@ -190,7 +190,10 @@ function listUsers(req, res) {
   const page = Math.max(1, parseInt(req.query.page || '1', 10));
   const offset = (page - 1) * limit;
   const query = req.query.query ? String(req.query.query) : '';
-  const rows = repo.listUsers({ query, limit, offset });
+  const status = req.query.status ? String(req.query.status) : '';
+  const verified = req.query.verified ? String(req.query.verified) : '';
+  const premium = req.query.premium ? String(req.query.premium) : '';
+  const rows = repo.listUsers({ query, status, verified, premium, limit, offset });
   res.json({ ok: true, data: rows, meta: { page, limit, count: rows.length } });
 }
 
@@ -471,6 +474,53 @@ function resetPoints(req, res) {
     .catch(() => res.status(500).json({ error: 'Failed to reset points' }));
 }
 
+function setPoints(req, res) {
+  const id = String(req.params.id);
+  const raw = req.body && req.body.points_balance;
+  const next = Number(raw);
+  if (!Number.isFinite(next) || next < 0) throw httpError(400, 'Invalid points value');
+
+  const before = repo.getUserById(id);
+  if (!before) throw httpError(404, 'User not found');
+
+  const now = new Date().toISOString();
+  Promise.resolve(pointsRepo.getBalance(id))
+    .then((bal) => {
+      const current = Number(bal || 0);
+      const delta = Math.round(next - current);
+      if (db.isPg) {
+        return db.exec('UPDATE users SET points_balance = $1, updated_at = $2 WHERE id = $3', [next, now, id])
+          .then(() => {
+            if (delta === 0) return null;
+            return db.exec(
+              'INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES ($1,$2,$3,$4,$5,$6,$7)',
+              [randomUUID(), id, null, delta, 'admin_set', next, now]
+            );
+          })
+          .then(() => ({ current, delta }));
+      }
+      db.prepare('UPDATE users SET points_balance = ?, updated_at = ? WHERE id = ?').run(next, now, id);
+      if (delta !== 0) {
+        db.prepare('INSERT INTO points_ledger (id, user_id, match_id, delta, reason, balance_after, created_at) VALUES (?,?,?,?,?,?,?)')
+          .run(randomUUID(), id, null, delta, 'admin_set', next, now);
+      }
+      return { current, delta };
+    })
+    .then((out) => repo.insertAudit({
+      id: randomUUID(),
+      adminUserId: req.user.id,
+      action: 'user.set_points',
+      entityType: 'user',
+      entityId: id,
+      beforeJson: JSON.stringify({ points_balance: before.points_balance }),
+      afterJson: JSON.stringify({ points_balance: next, delta: out && out.delta }),
+      ip: req.ip,
+      userAgent: req.headers['user-agent'] || null,
+    }))
+    .then(() => res.json({ ok: true, data: { points_balance: next } }))
+    .catch((err) => res.status(err.status || 500).json({ error: err.message || 'Failed to set points' }));
+}
+
 function gdprExport(req, res) {
   const id = String(req.params.id);
   const run = async () => {
@@ -741,6 +791,7 @@ module.exports = {
   getUser,
   getUserDetail,
   resetPoints,
+  setPoints,
   gdprExport,
   gdprDelete,
   patchUser,

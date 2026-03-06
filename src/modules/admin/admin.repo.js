@@ -1,45 +1,69 @@
 'use strict';
 const db = require('../../config/db');
 
-function listUsers({ query, limit, offset }) {
+function listUsers({ query, status, verified, premium, limit, offset }) {
   const q = query ? `%${String(query).toLowerCase()}%` : null;
 
+  const hasStatus = status === 'active' || status === 'banned';
+  const hasVerified = verified === 'yes' || verified === 'no';
+  const hasPremium = premium === 'free' || premium === 'paid' || premium === 'basic' || premium === 'pro';
+
   if (db.isPg) {
+    const clauses = [];
+    const vals = [];
+    let i = 1;
+
     if (q) {
-      return db.many(
-        `SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
-         FROM users
-         WHERE lower(email) LIKE $1 OR lower(display_name) LIKE $1 OR cast(id as text) LIKE $1
-         ORDER BY created_at DESC
-         LIMIT $2 OFFSET $3`,
-        [q, limit, offset]
-      );
+      clauses.push(`(lower(email) LIKE $${i} OR lower(display_name) LIKE $${i} OR cast(id as text) LIKE $${i})`);
+      vals.push(q);
+      i++;
     }
-    return db.many(
-      `SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
+    if (hasStatus) clauses.push(`is_banned = ${status === 'banned' ? 'true' : 'false'}`);
+    if (hasVerified) clauses.push(`is_verified = ${verified === 'yes' ? 'true' : 'false'}`);
+    if (hasPremium) {
+      if (premium === 'paid') clauses.push(`(premium_tier IS NOT NULL AND premium_tier != 'free')`);
+      else if (premium === 'free') clauses.push(`(premium_tier IS NULL OR premium_tier = 'free')`);
+      else {
+        clauses.push(`premium_tier = $${i}`);
+        vals.push(premium);
+        i++;
+      }
+    }
+
+    const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+    const sql = `SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
        FROM users
+       ${where}
        ORDER BY created_at DESC
-       LIMIT $1 OFFSET $2`,
-      [limit, offset]
-    );
+       LIMIT $${i} OFFSET $${i + 1}`;
+    vals.push(limit, offset);
+    return db.many(sql, vals);
   }
 
+  const clauses = [];
+  const vals = [];
   if (q) {
-    return db.prepare(`
-      SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
-      FROM users
-      WHERE lower(email) LIKE ? OR lower(display_name) LIKE ? OR id LIKE ?
-      ORDER BY created_at DESC
-      LIMIT ? OFFSET ?
-    `).all(q, q, q, limit, offset);
+    clauses.push('(lower(email) LIKE ? OR lower(display_name) LIKE ? OR id LIKE ?)');
+    vals.push(q, q, q);
+  }
+  if (hasStatus) clauses.push(`is_banned = ${status === 'banned' ? '1' : '0'}`);
+  if (hasVerified) clauses.push(`is_verified = ${verified === 'yes' ? '1' : '0'}`);
+  if (hasPremium) {
+    if (premium === 'paid') clauses.push(`(premium_tier IS NOT NULL AND premium_tier != 'free')`);
+    else if (premium === 'free') clauses.push(`(premium_tier IS NULL OR premium_tier = 'free')`);
+    else { clauses.push('premium_tier = ?'); vals.push(premium); }
   }
 
-  return db.prepare(`
+  const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+  const sql = `
     SELECT id, display_name, email, points_balance, premium_tier, is_verified, is_banned, created_at, updated_at
     FROM users
+    ${where}
     ORDER BY created_at DESC
     LIMIT ? OFFSET ?
-  `).all(limit, offset);
+  `;
+  vals.push(limit, offset);
+  return db.prepare(sql).all(...vals);
 }
 
 function getUserById(id) {
