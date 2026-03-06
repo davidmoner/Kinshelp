@@ -776,8 +776,8 @@ html[data-theme="light"] .nav-account {
 }
 
 .nav-search:focus-within {
-  border-color: rgba(42, 91, 206, 0.55);
-  box-shadow: 0 0 0 1px rgba(42, 91, 206, 0.35), 0 8px 20px rgba(8, 12, 22, 0.35);
+  border-color: var(--border);
+  box-shadow: none;
 }
 
 html[data-theme="light"] .nav-search {
@@ -786,8 +786,8 @@ html[data-theme="light"] .nav-search {
 }
 
 html[data-theme="light"] .nav-search:focus-within {
-  border-color: rgba(31, 78, 158, 0.45);
-  box-shadow: 0 0 0 1px rgba(31, 78, 158, 0.18), 0 10px 18px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: none;
 }
 
 .nav-search-ico {
