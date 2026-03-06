@@ -1249,13 +1249,19 @@
 
         const heroLogin = $('auth-hero-login');
         const heroRegister = $('auth-hero-register');
+        const heroReset = $('auth-hero-reset');
         if (heroLogin) heroLogin.classList.toggle('hidden', t !== 'login');
         if (heroRegister) heroRegister.classList.toggle('hidden', t !== 'register');
+        if (heroReset) heroReset.classList.toggle('hidden', true);
 
         const switchLogin = $('auth-switch-login');
         const switchRegister = $('auth-switch-register');
+        const switchReset = $('auth-switch-reset');
         if (switchLogin) switchLogin.classList.toggle('hidden', t !== 'login');
         if (switchRegister) switchRegister.classList.toggle('hidden', t !== 'register');
+        if (switchReset) switchReset.classList.toggle('hidden', true);
+
+        hide($('reset-form'));
 
         if (t === 'login') {
             show($('login-form'));
@@ -1266,6 +1272,33 @@
             show($('register-form'));
             setTimeout(() => $('reg-name') && $('reg-name').focus(), 80);
         }
+    }
+
+    function showPasswordReset() {
+        closeLandingMenu();
+        show($('modal-login'));
+        hide($('auth-chooser'));
+        show($('auth-email'));
+
+        hide($('login-form'));
+        hide($('register-form'));
+        show($('reset-form'));
+
+        const heroLogin = $('auth-hero-login');
+        const heroRegister = $('auth-hero-register');
+        const heroReset = $('auth-hero-reset');
+        if (heroLogin) heroLogin.classList.toggle('hidden', true);
+        if (heroRegister) heroRegister.classList.toggle('hidden', true);
+        if (heroReset) heroReset.classList.toggle('hidden', false);
+
+        const switchLogin = $('auth-switch-login');
+        const switchRegister = $('auth-switch-register');
+        const switchReset = $('auth-switch-reset');
+        if (switchLogin) switchLogin.classList.toggle('hidden', true);
+        if (switchRegister) switchRegister.classList.toggle('hidden', true);
+        if (switchReset) switchReset.classList.toggle('hidden', false);
+
+        setTimeout(() => $('reset-email') && $('reset-email').focus(), 80);
     }
 
     function authProvider(provider) {
@@ -2813,6 +2846,26 @@
             if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         loadFeed();
+    }
+
+    async function submitForgotPassword(event) {
+        event.preventDefault();
+        const btn = $('btn-reset');
+        const email = ($('reset-email') && $('reset-email').value || '').trim();
+        if (!email) {
+            toast('Escribe tu correo electrónico', 'error');
+            return;
+        }
+        try {
+            if (btn) setLoading(btn, true);
+            await KHApi.forgotPassword(email);
+            toast('Te enviamos un enlace para restablecer la contraseña', 'success');
+            showEmailAuth('login');
+        } catch (err) {
+            toast((err && err.message) || 'No se pudo enviar el email', 'error');
+        } finally {
+            if (btn) setLoading(btn, false);
+        }
     }
 
     async function loadFeed() {
@@ -5529,6 +5582,7 @@
         openLogin,
         showAuthChooser,
         showEmailAuth,
+        showPasswordReset,
         authProvider,
         startFirstMatch,
         startQuickMatch,
@@ -5551,6 +5605,7 @@
         closeLoginDirect,
         submitLogin,
         submitRegister,
+        submitForgotPassword,
         loadProfile,
         loadFavoritesSection,
         goCreateFromFab,

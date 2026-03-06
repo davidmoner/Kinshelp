@@ -2813,6 +2813,11 @@
           <div class="auth-title">Crea tu cuenta</div>
           <div class="auth-subtitle auth-subtitle--muted">Completa tus datos para empezar.</div>
         </div>
+        <div class="auth-hero auth-hero--email hidden" id="auth-hero-reset">
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <div class="auth-title">Recupera tu contraseña</div>
+          <div class="auth-subtitle auth-subtitle--muted">Te enviaremos un enlace para cambiarla.</div>
+        </div>
 
         <form id="login-form" data-submit="submitLogin">
           <div class="field">
@@ -2822,7 +2827,7 @@
           <div class="field">
             <div class="auth-field-row">
               <label for="login-pass">Contraseña</label>
-              <span class="auth-help">¿Olvidaste tu contraseña?</span>
+              <button class="auth-help-link" type="button" data-action="showPasswordReset">¿Olvidaste tu contraseña?</button>
             </div>
             <input id="login-pass" type="password" placeholder="Contraseña" required autocomplete="current-password" />
           </div>
@@ -2856,12 +2861,28 @@
           </button>
         </form>
 
+        <form id="reset-form" class="hidden" data-submit="submitForgotPassword">
+          <div class="field">
+            <label for="reset-email">Correo electrónico</label>
+            <input id="reset-email" type="email" placeholder="Correo electrónico" required autocomplete="email" />
+          </div>
+          <div class="auth-reset-note">Te enviaremos un enlace para restablecer tu contraseña.</div>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-reset">
+            <span class="btn-label">Enviar enlace</span>
+            <span class="spinner hidden"></span>
+          </button>
+        </form>
+
         <div class="auth-switch" id="auth-switch-login">
           <span>¿No tienes una cuenta?</span>
           <button class="auth-link" type="button" data-action="showEmailAuth" data-args="register">Regístrate</button>
         </div>
         <div class="auth-switch hidden" id="auth-switch-register">
           <span>¿Ya tienes una cuenta?</span>
+          <button class="auth-link" type="button" data-action="showEmailAuth" data-args="login">Iniciar sesión</button>
+        </div>
+        <div class="auth-switch hidden" id="auth-switch-reset">
+          <span>¿Ya la recuerdas?</span>
           <button class="auth-link" type="button" data-action="showEmailAuth" data-args="login">Iniciar sesión</button>
         </div>
         <div class="auth-legal">

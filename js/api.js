@@ -114,6 +114,11 @@
         return data;
     }
 
+    /** POST /auth/forgot-password — request reset link */
+    async function forgotPassword(email) {
+        return apiFetch('/auth/forgot-password', { method: 'POST', body: { email } });
+    }
+
     /** POST /auth/request-verify-email — requires token */
     async function requestVerifyEmail() {
         return apiFetch('/auth/request-verify-email', { method: 'POST', body: {} });
@@ -363,6 +368,7 @@
         healthCheck,
         register,
         login,
+        forgotPassword,
         requestVerifyEmail,
         getMyPoints,
         getMe,

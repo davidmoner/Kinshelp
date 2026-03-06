@@ -1276,8 +1276,31 @@ html[data-theme="light"] .auth-provider[disabled] {
   white-space: nowrap;
 }
 
+.auth-help-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 12px;
+  color: rgba(31, 41, 55, 0.6);
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.auth-help-link:hover {
+  color: #1b8a76;
+}
+
+.auth-reset-note {
+  margin: -4px 0 14px;
+  font-size: 12.5px;
+  color: rgba(31, 41, 55, 0.6);
+}
+
 .modal-auth #login-form .btn-block,
-.modal-auth #register-form .btn-block {
+.modal-auth #register-form .btn-block,
+.modal-auth #reset-form .btn-block {
   border-radius: 999px;
 }
 
