@@ -4201,12 +4201,6 @@
             photosEl.innerHTML = arr.map(p => `<img src="${p.dataUrl}" class="preview-photo-thumb" alt="foto previa">`).join('');
         }
 
-        // Wire up confirm button
-        const confirmBtn = $(`btn-${prefix}-confirm`);
-        if (confirmBtn) {
-            confirmBtn.onclick = () => confirmCreate(kind);
-        }
-
         hide($(isReq ? 'req-form-wrap' : 'off-form-wrap'));
         show($(`${prefix}-preview`));
         const pv = $(`${prefix}-preview`);

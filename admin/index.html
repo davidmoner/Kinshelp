@@ -1431,14 +1431,14 @@
     }
     if (t.hasAttribute('data-content-hide')) {
       var ctype = t.getAttribute('data-content-type') || 'request';
-      api('/' + ctype + 's/' + encodeURIComponent(t.getAttribute('data-content-hide')) + '/hide', { method: 'POST' })
+      api('/' + ctype + '/' + encodeURIComponent(t.getAttribute('data-content-hide')) + '/hide', { method: 'POST' })
         .then(function () { toast('Contenido ocultado', true); loadContent(); document.getElementById('modalContent').classList.remove('open'); })
         .catch(function (e) { toast(e.message || 'Error', false); });
       return;
     }
     if (t.hasAttribute('data-content-unhide')) {
       var ctype2 = t.getAttribute('data-content-type') || 'request';
-      api('/' + ctype2 + 's/' + encodeURIComponent(t.getAttribute('data-content-unhide')) + '/unhide', { method: 'POST' })
+      api('/' + ctype2 + '/' + encodeURIComponent(t.getAttribute('data-content-unhide')) + '/unhide', { method: 'POST' })
         .then(function () { toast('Contenido restaurado', true); loadContent(); document.getElementById('modalContent').classList.remove('open'); })
         .catch(function (e) { toast(e.message || 'Error', false); });
       return;
