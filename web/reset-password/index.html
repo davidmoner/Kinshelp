@@ -87,6 +87,24 @@
       .small { margin-top: 12px; font-size: 12px; color: rgba(31, 41, 55, 0.55); text-align: center; }
       a { color: var(--link); text-decoration: underline; }
       .legal { margin-top: 12px; font-size: 11px; color: rgba(31, 41, 55, 0.5); text-align: center; line-height: 1.6; }
+
+      @media (max-width: 560px) {
+        .wrap { padding: 20px; }
+        .card { padding: 22px 18px; border-radius: 18px; }
+        .logo { width: 96px; }
+        h1 { font-size: 18px; }
+        p { font-size: 13px; }
+        input { padding: 11px 12px; }
+        button { padding: 11px 12px; }
+      }
+
+      @media (max-width: 380px) {
+        .wrap { padding: 16px; }
+        .card { padding: 20px 14px; }
+        .logo { width: 88px; }
+        h1 { font-size: 17px; }
+        p { font-size: 12.5px; }
+      }
     </style>
   </head>
   <body>
