@@ -3436,6 +3436,8 @@ html[data-theme="light"] .glass-card {
   font-size: 16px;
   font-weight: 950;
   letter-spacing: -0.3px;
+  color: rgba(245, 248, 255, 0.98);
+  text-shadow: 0 10px 26px rgba(8, 12, 24, 0.35);
 }
 
 .am-mode-sub {
@@ -3453,12 +3455,22 @@ html[data-theme="light"] .glass-card {
   background: linear-gradient(180deg, rgba(124, 58, 237, 0.8), rgba(82, 49, 148, 0.25));
 }
 
+.am-mode[data-kind="provider"] .am-mode-v {
+  color: #f3e9ff;
+  text-shadow: 0 10px 26px rgba(124, 58, 237, 0.35);
+}
+
 .am-mode[data-kind="seeker"] {
   background: radial-gradient(circle at 25% 0%, rgba(33, 82, 173, 0.24), transparent 55%), rgba(255, 255, 255, 0.06);
 }
 
 .am-mode[data-kind="seeker"]::before {
   background: linear-gradient(180deg, rgba(59, 130, 246, 0.8), rgba(33, 82, 173, 0.25));
+}
+
+.am-mode[data-kind="seeker"] .am-mode-v {
+  color: #e6f1ff;
+  text-shadow: 0 10px 26px rgba(59, 130, 246, 0.35);
 }
 
 .am-rule {
@@ -3507,6 +3519,8 @@ html[data-theme="light"] .glass-card {
   font-size: 18px;
   font-weight: 900;
   letter-spacing: -0.4px;
+  color: #f7e8bb;
+  text-shadow: 0 12px 30px rgba(201, 168, 76, 0.25);
 }
 
 .automatch-hero-sub {
