@@ -139,6 +139,16 @@ app.use(helmet({
       'script-src-attr': ["'none'"],
       'img-src': ["'self'", 'data:', 'https:'],
       'connect-src': ["'self'", 'https:'],
+      'frame-ancestors': ["'none'"],
+    },
+  },
+  permissionsPolicy: {
+    features: {
+      camera: [],
+      microphone: [],
+      geolocation: [],
+      payment: [],
+      usb: [],
     },
   },
   hsts: process.env.NODE_ENV === 'production' ? { maxAge: 15552000, includeSubDomains: true, preload: true } : false,
@@ -326,7 +336,7 @@ app.get('/health', requireHealthAccess, (req, res) => {
 
 const api = express.Router();
 api.get('/', (req, res) => res.json({ ok: true, service: 'KingsHelp API', version: 'v1' }));
-api.get('/version', (req, res) => res.json({ ok: true, gitSha: buildInfo.gitSha, env: buildInfo.env, buildTime: buildInfo.buildTime }));
+api.get('/version', requireHealthAccess, (req, res) => res.json({ ok: true, gitSha: buildInfo.gitSha, env: buildInfo.env, buildTime: buildInfo.buildTime }));
 
 // Raw body route (Stripe webhook)
 api.use('/premium/webhook', express.raw({ type: '*/*', limit: '2mb' }), (req, res, next) => {
@@ -346,6 +356,7 @@ api.get('/health', requireHealthAccess, (req, res) => {
 });
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true, legacyHeaders: false });
+const reportsLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 40, standardHeaders: true, legacyHeaders: false });
 api.use('/auth', authLimiter, require('./modules/auth/auth.routes'));
 api.use('/users', require('./modules/users/users.routes'));
 api.use('/offers', require('./modules/offers/offers.routes'));
@@ -360,7 +371,7 @@ api.use('/feed', require('./modules/feed/feed.routes'));
 api.use('/config', require('./modules/config/config.routes'));
 api.use('/stats', require('./modules/stats/stats.routes'));
 api.use('/notifications', require('./modules/notifications/notifications.routes'));
-api.use('/reports', require('./modules/reports/reports.routes'));
+api.use('/reports', reportsLimiter, require('./modules/reports/reports.routes'));
 
 // Admin API (protected by admin auth)
 api.use('/admin', adminLimiter, require('./modules/admin/admin.routes'));
