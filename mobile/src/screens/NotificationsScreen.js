@@ -19,7 +19,7 @@ function Row({ item, onRead }) {
   );
 }
 
-export default function NotificationsScreen() {
+export default function NotificationsScreen({ navigation }) {
   const { token } = useAuth();
   const [items, setItems] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -51,6 +51,11 @@ export default function NotificationsScreen() {
         // ignore
       }
     }
+    const payload = item.payload || {};
+    if (payload.match_id) navigation.navigate('Match', { matchId: payload.match_id, title: item.title || 'Match' });
+    if (payload.request_id) navigation.navigate('FeedDetail', { kind: 'request', id: payload.request_id });
+    if (payload.offer_id) navigation.navigate('FeedDetail', { kind: 'offer', id: payload.offer_id });
+    if (item.kind === 'automatch_invite' || item.kind === 'automatch_offer_invite') navigation.navigate('AutoMatch');
     await load(true);
   }
 

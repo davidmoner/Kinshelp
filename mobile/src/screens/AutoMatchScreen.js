@@ -36,7 +36,7 @@ function pickClosestPreset(val) {
   ), SIMPLE_RADIUS[0]);
 }
 
-export default function AutoMatchScreen() {
+export default function AutoMatchScreen({ navigation }) {
   const { token } = useAuth();
   const [booted, setBooted] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -171,8 +171,10 @@ export default function AutoMatchScreen() {
   const onAccept = async (inviteId) => {
     if (!token) return;
     try {
-      await automatchAccept(token, inviteId);
+      const out = await automatchAccept(token, inviteId);
       await load();
+      const matchId = out && out.match && out.match.id;
+      if (matchId) navigation.navigate('Chat', { matchId, title: 'Chat' });
     } catch (e) {
       setError(e);
     }

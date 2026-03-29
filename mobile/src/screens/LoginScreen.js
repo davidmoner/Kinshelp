@@ -8,8 +8,8 @@ import { signInWithGoogle, signInWithFacebook } from '../auth/oauth';
 
 export default function LoginScreen({ navigation }) {
   const { signIn } = useAuth();
-  const [email, setEmail] = React.useState('demo.alice@kingshelp.local');
-  const [password, setPassword] = React.useState('password123');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [loading, setLoading] = React.useState(false);
 
   async function onSubmit() {
@@ -106,6 +106,10 @@ export default function LoginScreen({ navigation }) {
 
         <TouchableOpacity style={styles.linkBtn} onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.linkText}>Olvidaste tu password?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.linkBtn} onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.linkText}>Crear cuenta</Text>
         </TouchableOpacity>
       </View>
 
