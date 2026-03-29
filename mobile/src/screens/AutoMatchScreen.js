@@ -55,6 +55,8 @@ export default function AutoMatchScreen() {
   const [categories, setCategories] = React.useState([]);
   const [seekerCategories, setSeekerCategories] = React.useState([]);
   const [invites, setInvites] = React.useState([]);
+  const [statusFilter, setStatusFilter] = React.useState('pending');
+  const [kindFilter, setKindFilter] = React.useState('all');
 
   const load = React.useCallback(async () => {
     if (!token) return;
@@ -190,10 +192,11 @@ export default function AutoMatchScreen() {
     const title = row.title || row.category || 'Invitacion';
     const kindLabel = row.kind === 'offer' ? 'Oferta' : 'Solicitud';
     const status = row.status || 'pending';
+    const group = status === 'accepted' ? 'Aceptada' : (status === 'pending' ? 'Pendiente' : 'Archivada');
     return (
       <View key={row.id} style={styles.inviteCard}>
         <Text style={styles.inviteTitle}>{title}</Text>
-        <Text style={styles.inviteMeta}>{kindLabel} · {status}</Text>
+        <Text style={styles.inviteMeta}>{kindLabel} · {group}</Text>
         {status === 'pending' ? (
           <View style={styles.inviteActions}>
             <Pressable style={[styles.btn, styles.btnPrimary]} onPress={() => onAccept(row.id)}>
@@ -207,6 +210,44 @@ export default function AutoMatchScreen() {
       </View>
     );
   };
+
+  const summaryActive = enabled || seekerEnabled;
+  const summaryRadius = mode === 'simple' ? simpleRadius : radiusKm;
+  const summaryCats = mode === 'simple'
+    ? (summaryActive ? AM_CATS.length : 0)
+    : (categories.length + seekerCategories.length);
+  const summaryInvites = mode === 'simple' ? 20 : maxInvites;
+
+  const stats = React.useMemo(() => {
+    const out = {
+      pending: 0,
+      accepted: 0,
+      archived: 0,
+      all: invites.length,
+      request: 0,
+      offer: 0,
+    };
+    invites.forEach((row) => {
+      const status = row && row.status;
+      const kind = row && row.kind === 'offer' ? 'offer' : 'request';
+      const bucket = status === 'pending' ? 'pending' : (status === 'accepted' ? 'accepted' : 'archived');
+      out[bucket] += 1;
+      out[kind] += 1;
+    });
+    return out;
+  }, [invites]);
+
+  const filteredInvites = React.useMemo(() => {
+    return invites.filter((row) => {
+      if (!row) return false;
+      const status = row.status || 'pending';
+      const bucket = status === 'pending' ? 'pending' : (status === 'accepted' ? 'accepted' : 'archived');
+      const kind = row.kind === 'offer' ? 'offer' : 'request';
+      if (statusFilter !== 'all' && bucket !== statusFilter) return false;
+      if (kindFilter !== 'all' && kind !== kindFilter) return false;
+      return true;
+    });
+  }, [invites, statusFilter, kindFilter]);
 
   return (
     <Screen>
@@ -224,6 +265,12 @@ export default function AutoMatchScreen() {
                 <Pressable onPress={load} style={styles.retry}><Text style={styles.retryText}>Reintentar</Text></Pressable>
               </View>
             ) : null}
+
+            <View style={styles.statusCard}>
+              <Text style={styles.statusTitle}>{summaryActive ? 'AutoMatch activo' : 'AutoMatch inactivo'}</Text>
+              <Text style={styles.statusSub}>Radio {summaryRadius} km · Categorias {summaryCats} · Invitaciones/dia {summaryInvites}</Text>
+            </View>
+
             <View style={styles.modeWrap}>
               <Pressable style={[styles.modeBtn, mode === 'simple' && styles.modeBtnActive]} onPress={() => setMode('simple')}>
                 <Text style={[styles.modeText, mode === 'simple' && styles.modeTextActive]}>Modo simple</Text>
@@ -336,10 +383,40 @@ export default function AutoMatchScreen() {
 
             <View style={styles.card}>
               <Text style={styles.sectionTitle}>Invitaciones</Text>
-              {!invites.length ? (
+              <View style={styles.filterRow}>
+                <Pressable style={[styles.filterChip, statusFilter === 'pending' && styles.filterChipActive]} onPress={() => setStatusFilter('pending')}>
+                  <Text style={[styles.filterText, statusFilter === 'pending' && styles.filterTextActive]}>Pendientes {stats.pending}</Text>
+                </Pressable>
+                <Pressable style={[styles.filterChip, statusFilter === 'accepted' && styles.filterChipActive]} onPress={() => setStatusFilter('accepted')}>
+                  <Text style={[styles.filterText, statusFilter === 'accepted' && styles.filterTextActive]}>Aceptadas {stats.accepted}</Text>
+                </Pressable>
+                <Pressable style={[styles.filterChip, statusFilter === 'archived' && styles.filterChipActive]} onPress={() => setStatusFilter('archived')}>
+                  <Text style={[styles.filterText, statusFilter === 'archived' && styles.filterTextActive]}>Archivadas {stats.archived}</Text>
+                </Pressable>
+                <Pressable style={[styles.filterChip, statusFilter === 'all' && styles.filterChipActive]} onPress={() => setStatusFilter('all')}>
+                  <Text style={[styles.filterText, statusFilter === 'all' && styles.filterTextActive]}>Todas {stats.all}</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.filterRow}>
+                <Pressable style={[styles.filterChip, kindFilter === 'all' && styles.filterChipActive]} onPress={() => setKindFilter('all')}>
+                  <Text style={[styles.filterText, kindFilter === 'all' && styles.filterTextActive]}>Todas</Text>
+                </Pressable>
+                <Pressable style={[styles.filterChip, kindFilter === 'request' && styles.filterChipActive]} onPress={() => setKindFilter('request')}>
+                  <Text style={[styles.filterText, kindFilter === 'request' && styles.filterTextActive]}>Solicitudes {stats.request}</Text>
+                </Pressable>
+                <Pressable style={[styles.filterChip, kindFilter === 'offer' && styles.filterChipActive]} onPress={() => setKindFilter('offer')}>
+                  <Text style={[styles.filterText, kindFilter === 'offer' && styles.filterTextActive]}>Ofertas {stats.offer}</Text>
+                </Pressable>
+                <Pressable style={styles.refreshBtn} onPress={load}>
+                  <Text style={styles.refreshText}>Actualizar</Text>
+                </Pressable>
+              </View>
+
+              {!filteredInvites.length ? (
                 <Text style={styles.muted}>No hay invitaciones por ahora.</Text>
               ) : (
-                invites.map(renderInvite)
+                filteredInvites.map(renderInvite)
               )}
             </View>
           </View>
@@ -356,6 +433,9 @@ const styles = StyleSheet.create({
   retry: { borderWidth: 1, borderColor: theme.colors.border, paddingVertical: 10, paddingHorizontal: 14, borderRadius: theme.radius.md },
   retryText: { color: theme.colors.text },
   errorBanner: { gap: 8 },
+  statusCard: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, borderWidth: 1, borderColor: theme.colors.border, padding: 14 },
+  statusTitle: { color: theme.colors.text, fontSize: 16, fontWeight: '800' },
+  statusSub: { color: theme.colors.muted, marginTop: 6 },
   card: { backgroundColor: theme.colors.card, borderRadius: theme.radius.lg, borderWidth: 1, borderColor: theme.colors.border, padding: 14 },
   modeWrap: { flexDirection: 'row', gap: 8 },
   modeBtn: { flex: 1, borderWidth: 1, borderColor: theme.colors.border, paddingVertical: 10, borderRadius: theme.radius.md },
@@ -393,4 +473,11 @@ const styles = StyleSheet.create({
   inviteMeta: { color: theme.colors.muted, marginTop: 4 },
   inviteActions: { flexDirection: 'row', gap: 10, marginTop: 10 },
   muted: { color: theme.colors.muted },
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+  filterChip: { borderWidth: 1, borderColor: theme.colors.border, borderRadius: 999, paddingVertical: 6, paddingHorizontal: 10 },
+  filterChipActive: { borderColor: theme.colors.brand, backgroundColor: 'rgba(42, 212, 165, 0.15)' },
+  filterText: { color: theme.colors.muted, fontSize: 12, fontWeight: '700' },
+  filterTextActive: { color: theme.colors.text },
+  refreshBtn: { borderWidth: 1, borderColor: theme.colors.border, borderRadius: 999, paddingVertical: 6, paddingHorizontal: 10 },
+  refreshText: { color: theme.colors.text, fontWeight: '700', fontSize: 12 },
 });
