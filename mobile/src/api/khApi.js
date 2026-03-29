@@ -96,3 +96,27 @@ export async function listNotifications(token, { limit = 40, offset = 0, unread 
 export async function markNotificationRead(token, id) {
   return apiFetch(`/notifications/${encodeURIComponent(id)}/read`, { method: 'PATCH', token });
 }
+
+export async function automatchGetSettings(token) {
+  return apiFetch('/automatch/settings', { token });
+}
+
+export async function automatchUpdateSettings(token, body) {
+  return apiFetch('/automatch/settings', { method: 'PUT', token, body });
+}
+
+export async function automatchListInvites(token, { limit = 20, offset = 0, status } = {}) {
+  const qs = new URLSearchParams();
+  qs.set('limit', String(limit));
+  qs.set('offset', String(offset));
+  if (status) qs.set('status', String(status));
+  return apiFetch(`/automatch/invites?${qs.toString()}`, { token });
+}
+
+export async function automatchAccept(token, inviteId) {
+  return apiFetch(`/automatch/invites/${encodeURIComponent(inviteId)}/accept`, { method: 'POST', token, body: {} });
+}
+
+export async function automatchDecline(token, inviteId) {
+  return apiFetch(`/automatch/invites/${encodeURIComponent(inviteId)}/decline`, { method: 'POST', token, body: {} });
+}

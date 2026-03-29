@@ -61,6 +61,9 @@ export default function MatchesScreen({ navigation }) {
         <Pressable style={styles.tab} onPress={() => navigation.navigate('Notifications')}>
           <Text style={styles.tabText}>Notificaciones</Text>
         </Pressable>
+        <Pressable style={styles.tab} onPress={() => navigation.navigate('AutoMatch')}>
+          <Text style={styles.tabText}>AutoMatch</Text>
+        </Pressable>
       </View>
 
       {loading ? (

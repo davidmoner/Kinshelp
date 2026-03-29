@@ -10,6 +10,7 @@ const { randomUUID } = require('crypto');
 const env = require('./config/env');
 const db = require('./config/db');
 const { verifyAdminRequest } = require('./middleware/admin-auth.middleware');
+const editorStore = require('./modules/editor/editor.store');
 
 const { errorHandler, notFound } = require('./middleware/error.middleware');
 
@@ -71,6 +72,40 @@ function isLocalhostOrigin(origin) {
   }
 }
 
+function isAllowedOrigin(origin) {
+  return Boolean(origin && allowedOrigins.includes(origin));
+}
+
+function getOriginFromReferer(referer) {
+  try {
+    const u = new URL(referer);
+    return u.origin;
+  } catch {
+    return '';
+  }
+}
+
+function allowApiWithoutOrigin(req) {
+  const path = String(req.path || req.url || '');
+  if (path.startsWith('/auth')) return true;
+  if (path.startsWith('/health')) return true;
+  if (path.startsWith('/config')) return true;
+  if (path.startsWith('/stats')) return true;
+  return false;
+}
+
+function requireApiAccess(req, res, next) {
+  if (process.env.NODE_ENV !== 'production') return next();
+  const origin = String(req.headers.origin || '').trim();
+  const referer = String(req.headers.referer || '').trim();
+  if (isAllowedOrigin(origin)) return next();
+  const refOrigin = getOriginFromReferer(referer);
+  if (isAllowedOrigin(refOrigin)) return next();
+  if (req.headers.authorization) return next();
+  if (allowApiWithoutOrigin(req)) return next();
+  return res.status(403).json({ error: 'API access blocked.' });
+}
+
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true);
@@ -109,6 +144,23 @@ app.use(helmet({
   hsts: process.env.NODE_ENV === 'production' ? { maxAge: 15552000, includeSubDomains: true, preload: true } : false,
 }));
 app.set('trust proxy', 1);
+
+function isLocalRequest(req) {
+  const ip = String(req.ip || '');
+  return ip === '127.0.0.1' || ip === '::1' || ip.startsWith('::ffff:127.0.0.1');
+}
+
+function allowHealth(req) {
+  if (process.env.NODE_ENV !== 'production') return true;
+  if (isLocalRequest(req)) return true;
+  const token = String(req.headers['x-health-token'] || '').trim();
+  return Boolean(token && env.HEALTH_TOKEN && token === env.HEALTH_TOKEN);
+}
+
+function requireHealthAccess(req, res, next) {
+  if (allowHealth(req)) return next();
+  return res.status(404).end();
+}
 
 // Rate limit: keep API protected, avoid breaking static assets.
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false });
@@ -266,7 +318,7 @@ const buildInfo = {
   buildTime: process.env.BUILD_TIME || process.env.RENDER_BUILD_TIME || new Date().toISOString(),
 };
 
-app.get('/health', (req, res) => {
+app.get('/health', requireHealthAccess, (req, res) => {
   healthPayload()
     .then(payload => res.json(payload))
     .catch(() => res.status(500).json({ status: 'error', service: 'KingsHelp API' }));
@@ -287,7 +339,7 @@ api.use('/premium/webhook', express.raw({ type: '*/*', limit: '2mb' }), (req, re
 api.use(express.json({ limit: '64kb' }));
 
 // Convenience: allow API health checks via /api/v1/health
-api.get('/health', (req, res) => {
+api.get('/health', requireHealthAccess, (req, res) => {
   healthPayload()
     .then(payload => res.json({ ...payload, version: 'v1' }))
     .catch(() => res.status(500).json({ status: 'error', service: 'KingsHelp API', version: 'v1' }));
@@ -310,10 +362,10 @@ api.use('/stats', require('./modules/stats/stats.routes'));
 api.use('/notifications', require('./modules/notifications/notifications.routes'));
 api.use('/reports', require('./modules/reports/reports.routes'));
 
-// Admin (protected by admin auth)
+// Admin API (protected by admin auth)
 api.use('/admin', adminLimiter, require('./modules/admin/admin.routes'));
 
-app.use('/api/v1', apiLimiter, api);
+app.use('/api/v1', apiLimiter, requireApiAccess, api);
 
 // Serve only public static assets (avoid exposing repo root).
 // Keep the set tight: landing, web SPA pages, legal, admin, and assets.
@@ -343,8 +395,8 @@ const staticOpts = {
 app.use('/web', express.static(path.join(publicRoot, 'web'), staticOpts));
 app.use('/legal', express.static(path.join(publicRoot, 'legal'), staticOpts));
 app.use('/img', express.static(path.join(publicRoot, 'img'), staticOpts));
-// Admin route: relax CSP to allow inline scripts (admin panel uses a large inline script)
-app.use('/admin', (req, res, next) => {
+// Admin panel route: relax CSP to allow inline scripts (admin panel uses a large inline script)
+app.use('/somango', (req, res, next) => {
   res.setHeader('Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https:; connect-src 'self' https:; frame-ancestors 'none';"
@@ -352,7 +404,7 @@ app.use('/admin', (req, res, next) => {
   next();
 });
 
-app.get('/admin/login', (req, res) => {
+app.get('/somango/login', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   return sendStaticFile(res, 'admin/index.html');
 });
@@ -360,14 +412,28 @@ app.get('/admin/login', (req, res) => {
 async function adminGate(req, res, next) {
   if (req.path === '/login' || req.path === '/login/') return next();
   const admin = await verifyAdminRequest(req);
-  if (!admin) return res.redirect(302, '/admin/login');
+  if (!admin) return res.redirect(302, '/somango/login');
   return next();
 }
 
-app.use('/admin', adminGate, express.static(path.join(publicRoot, 'admin'), staticOpts));
+app.use('/somango', adminGate, express.static(path.join(publicRoot, 'admin'), staticOpts));
+// Redirect legacy admin path to current admin login
+app.use('/admin', (req, res) => res.redirect(302, '/somango/login'));
 app.use('/css', express.static(path.join(publicRoot, 'css'), staticOpts));
 app.use('/js', express.static(path.join(publicRoot, 'js'), staticOpts));
 app.use('/.well-known', express.static(path.join(publicRoot, '.well-known'), staticOpts));
+
+// Public editor overrides (read-only)
+app.get('/editor/overrides.json', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  try {
+    const out = await editorStore.readOverrides();
+    return res.json(out);
+  } catch {
+    return res.json({ version: 1, updated_at: null, items: [] });
+  }
+});
 
 function sendStaticFile(res, relPath) {
   const p = path.join(publicRoot, relPath);
@@ -388,6 +454,13 @@ app.get('/favicon-512.png', (req, res) => sendStaticFile(res, 'favicon-512.png')
 app.get('/apple-touch-icon.png', (req, res) => sendStaticFile(res, 'apple-touch-icon.png'));
 app.get('/apple-touch-icon-180x180.png', (req, res) => sendStaticFile(res, 'apple-touch-icon-180x180.png'));
 app.get('/index.html', (req, res) => sendStaticFile(res, 'index.html'));
+
+// Shareable AutoMatch invite links
+app.get('/invite/:id', (req, res) => {
+  const id = String(req.params.id || '').trim();
+  if (!id) return res.redirect(302, '/');
+  return res.redirect(302, '/?invite=' + encodeURIComponent(id));
+});
 
 // Best-effort SPA entrypoint: only serve index.html if it exists.
 // In some deployments the frontend may not be bundled; avoid ENOENT.

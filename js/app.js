@@ -10,7 +10,6 @@
     let lastCreatedRequest = null;
     let lastCreatedOffer = null;
     let ratingMatchId = null;
-    let quickDraft = null;
     let pendingDraft = null;
     let createKind = 'request';
     const creationsFilter = { kind: 'all', status: 'active', q: '' };
@@ -22,7 +21,7 @@
     const autoChatOpened = new Set();
 
     let premiumInterval = 'year';
-    const AUTOMATCH_ALLOWLIST = new Set(['davidmoner90@gmail.com']);
+    const AUTOMATCH_ALLOWLIST = new Set(['contact@kingshelp.es']);
 
     // Ranking (public modal)
     let rankingScope = 'global'; // global | near
@@ -119,8 +118,11 @@
     function setLoading(btn, state) {
         const label = btn.querySelector('.btn-label');
         const spinner = btn.querySelector('.spinner');
+        const refreshIcon = btn.querySelector('.btn-refresh-ico');
         btn.disabled = state;
+        btn.classList.toggle('is-loading', state);
         if (label) label.style.opacity = state ? 0 : 1;
+        if (refreshIcon) refreshIcon.style.opacity = state ? 0 : 1;
         if (spinner) state ? show(spinner) : hide(spinner);
     }
 
@@ -278,7 +280,7 @@
 
     /* ── KPI counters on scroll ───────────────────────────────────────────────── */
     function initKpiCounters() {
-        const items = Array.from(document.querySelectorAll('.kpi-value[data-target]'));
+        const items = Array.from(document.querySelectorAll('.kpi-value[data-kpi]'));
         if (!items.length) return;
 
         loadKpiStats().finally(() => {
@@ -293,6 +295,22 @@
             }, { threshold: 0.5 });
             items.forEach(el => kpiObs.observe(el));
         });
+    }
+
+    function formatResponseTime(minutes) {
+        const mins = Number(minutes || 0);
+        if (!Number.isFinite(mins) || mins <= 0) return '—';
+        if (mins < 60) return `${Math.round(mins)} min`;
+        const hours = mins / 60;
+        if (hours < 24) return `${hours.toFixed(1).replace('.', ',')} h`;
+        const days = hours / 24;
+        return `${days.toFixed(1).replace('.', ',')} d`;
+    }
+
+    function formatRating(avg) {
+        const val = Number(avg || 0);
+        if (!Number.isFinite(val) || val <= 0) return '—';
+        return `${val.toFixed(1).replace('.', ',')} / 5`;
     }
 
     async function loadKpiStats() {
@@ -312,7 +330,40 @@
                 const val = Number(data[key] || 0);
                 if (!Number.isFinite(val)) return;
                 el.dataset.target = String(val);
+                el.textContent = val.toLocaleString('es-ES');
             });
+
+            const demoServices = $('demo-metric-services');
+            const demoRating = $('demo-metric-rating');
+            const demoResponse = $('demo-metric-response');
+            if (demoServices) demoServices.textContent = Number(data.matches_done || 0).toLocaleString('es-ES');
+            if (demoRating) demoRating.textContent = formatRating(data.rating_avg);
+            if (demoResponse) demoResponse.textContent = formatResponseTime(data.avg_response_minutes);
+
+            const repScore = $('rep-score-val');
+            const repMini = $('rep-progress-mini');
+            const repFill = $('rep-bar-fill');
+            const repActMatches = $('rep-act-matches');
+            const repActBadges = $('rep-act-badges');
+            const repSummaryUsers = $('rep-summary-users');
+            const repSummaryRep = $('rep-summary-rep');
+            const usersTotal = Number(data.users_total || 0);
+            const repTotal = Number(data.reputation_gained || 0);
+            const avgRep = usersTotal > 0 ? Math.round(repTotal / usersTotal) : 0;
+            const threshold = Number(data.premium_lite_threshold || 0);
+            if (repScore) repScore.textContent = avgRep ? avgRep.toLocaleString('es-ES') : '0';
+            if (repMini && threshold > 0) {
+                repMini.textContent = `${avgRep.toLocaleString('es-ES')} / ${threshold.toLocaleString('es-ES')} rep`;
+            }
+            if (repFill && threshold > 0) {
+                const pct = Math.max(0, Math.min(100, (avgRep / threshold) * 100));
+                repFill.style.width = `${pct.toFixed(1)}%`;
+            }
+            if (repActMatches) repActMatches.textContent = Number(data.matches_done || 0).toLocaleString('es-ES');
+            if (repActBadges) repActBadges.textContent = Number(data.badges_awarded || 0).toLocaleString('es-ES');
+            if (repSummaryUsers) repSummaryUsers.textContent = usersTotal.toLocaleString('es-ES');
+            if (repSummaryRep) repSummaryRep.textContent = repTotal.toLocaleString('es-ES');
+
             if (note) {
                 const when = out && out.ts ? new Date(out.ts) : new Date();
                 note.textContent = `Métricas en vivo · actualizado ${when.toLocaleDateString('es-ES')}`;
@@ -323,6 +374,23 @@
     }
 
     /* ── Page Navigation ──────────────────────────────────────────────────────── */
+    const PAGE_STORAGE_KEY = 'kh_last_page';
+
+    function normalizePageKey(pageId) {
+        const v = String(pageId || '').toLowerCase();
+        if (v === 'page-dashboard' || v === 'dashboard') return 'dashboard';
+        if (v === 'page-landing' || v === 'landing') return 'landing';
+        return 'landing';
+    }
+
+    function saveLastPage(pageId) {
+        try { localStorage.setItem(PAGE_STORAGE_KEY, normalizePageKey(pageId)); } catch { }
+    }
+
+    function getSavedPage() {
+        try { return normalizePageKey(localStorage.getItem(PAGE_STORAGE_KEY)); } catch { return 'landing'; }
+    }
+
     function relocateThemeToggle(pageId) {
         const btn = document.getElementById('kh-theme-toggle');
         if (!btn) return;
@@ -339,6 +407,8 @@
         show($(pageId));
         window.scrollTo(0, 0);
 
+        saveLastPage(pageId);
+
         relocateThemeToggle(pageId);
         syncFloatingCreateVisibility();
 
@@ -352,6 +422,127 @@
         if (pageId === 'page-landing') {
             onLandingShown();
         }
+    }
+
+    /* ── Cookie consent ──────────────────────────────────────────────────────── */
+    const COOKIE_CONSENT_KEY = 'kh_cookie_consent';
+    const COOKIE_CONSENT_VERSION = 1;
+
+    function defaultCookieConsent() {
+        return {
+            v: COOKIE_CONSENT_VERSION,
+            necessary: true,
+            preferences: false,
+            analytics: false,
+            marketing: false,
+            ts: new Date().toISOString(),
+        };
+    }
+
+    function normalizeCookieConsent(consent) {
+        const base = defaultCookieConsent();
+        const out = { ...base, ...(consent || {}) };
+        out.v = COOKIE_CONSENT_VERSION;
+        out.necessary = true;
+        return out;
+    }
+
+    function readCookieConsent() {
+        try {
+            const raw = localStorage.getItem(COOKIE_CONSENT_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || parsed.v !== COOKIE_CONSENT_VERSION) return null;
+            return normalizeCookieConsent(parsed);
+        } catch {
+            return null;
+        }
+    }
+
+    function writeCookieConsent(consent) {
+        const out = normalizeCookieConsent(consent);
+        try { localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(out)); } catch { }
+        applyCookieConsent(out);
+        syncCookieToggles(out);
+    }
+
+    function applyCookieConsent(consent) {
+        const root = document.documentElement;
+        if (!root || !consent) return;
+        root.setAttribute('data-cookie-preferences', consent.preferences ? '1' : '0');
+        root.setAttribute('data-cookie-analytics', consent.analytics ? '1' : '0');
+        root.setAttribute('data-cookie-marketing', consent.marketing ? '1' : '0');
+    }
+
+    function syncCookieToggles(consent) {
+        const c = consent || defaultCookieConsent();
+        const pref = document.getElementById('cookie-pref-preferences');
+        const analytics = document.getElementById('cookie-pref-analytics');
+        const marketing = document.getElementById('cookie-pref-marketing');
+        if (pref) pref.checked = !!c.preferences;
+        if (analytics) analytics.checked = !!c.analytics;
+        if (marketing) marketing.checked = !!c.marketing;
+    }
+
+    function showCookieBanner() {
+        const banner = document.getElementById('cookie-banner');
+        if (banner) banner.classList.remove('hidden');
+    }
+
+    function hideCookieBanner() {
+        const banner = document.getElementById('cookie-banner');
+        if (banner) banner.classList.add('hidden');
+    }
+
+    function openCookieSettings() {
+        const panel = document.getElementById('cookie-settings');
+        if (!panel) return;
+        const consent = readCookieConsent() || defaultCookieConsent();
+        syncCookieToggles(consent);
+        panel.classList.remove('hidden');
+        hideCookieBanner();
+    }
+
+    function closeCookieSettings() {
+        const panel = document.getElementById('cookie-settings');
+        if (panel) panel.classList.add('hidden');
+        if (!readCookieConsent()) showCookieBanner();
+    }
+
+    function acceptCookiesAll() {
+        writeCookieConsent({ preferences: true, analytics: true, marketing: true });
+        hideCookieBanner();
+        closeCookieSettings();
+    }
+
+    function rejectCookiesAll() {
+        writeCookieConsent({ preferences: false, analytics: false, marketing: false });
+        hideCookieBanner();
+        closeCookieSettings();
+    }
+
+    function saveCookiePreferences() {
+        const pref = document.getElementById('cookie-pref-preferences');
+        const analytics = document.getElementById('cookie-pref-analytics');
+        const marketing = document.getElementById('cookie-pref-marketing');
+        writeCookieConsent({
+            preferences: !!(pref && pref.checked),
+            analytics: !!(analytics && analytics.checked),
+            marketing: !!(marketing && marketing.checked),
+        });
+        hideCookieBanner();
+        closeCookieSettings();
+    }
+
+    function initCookieConsent() {
+        const consent = readCookieConsent();
+        if (!consent) {
+            syncCookieToggles(defaultCookieConsent());
+            showCookieBanner();
+            return;
+        }
+        applyCookieConsent(consent);
+        syncCookieToggles(consent);
     }
 
     async function onLandingShown() {
@@ -379,18 +570,22 @@
         const rank = document.getElementById('nav-ranking-btn');
         const navMenu = document.querySelector('.nav-menu');
         const navSearch = document.querySelector('.nav-search');
+        const navLinks = document.getElementById('nav-links');
         const menu = document.getElementById('nav-menu-pop');
         const authOnly = menu ? menu.querySelectorAll('.auth-only') : [];
         const guestOnly = menu ? menu.querySelectorAll('.guest-only') : [];
         const logged = !!(user && user.id);
+        const landing = document.getElementById('page-landing');
+        const onLanding = !!(landing && !landing.classList.contains('hidden'));
         if (auth) auth.classList.toggle('hidden', logged);
         if (panel) panel.classList.toggle('hidden', !logged);
         if (rank) rank.classList.toggle('hidden', !logged);
         if (navMenu) navMenu.classList.toggle('hidden', !logged);
-        if (navSearch) navSearch.classList.toggle('hidden', !logged);
         syncFloatingCreateVisibility();
         if (authOnly && authOnly.length) authOnly.forEach(el => el.classList.toggle('hidden', !logged));
         if (guestOnly && guestOnly.length) guestOnly.forEach(el => el.classList.toggle('hidden', logged));
+        if (navSearch) navSearch.classList.toggle('hidden', onLanding || !logged);
+        if (navLinks) navLinks.classList.toggle('hidden', !onLanding);
         updateNavAccount(logged ? user : null);
         if (!logged) {
             favoritesLoaded = false;
@@ -406,10 +601,19 @@
         const avatarEl = document.getElementById('nav-account-avatar');
         if (!nameEl && !tierEl && !avatarEl) return;
         const rawName = user && user.display_name ? String(user.display_name).trim() : '';
-        const shortName = rawName ? rawName.split(/\s+/)[0] : 'Cuenta';
-        if (nameEl) nameEl.textContent = shortName || 'Cuenta';
-        if (tierEl) tierEl.textContent = user ? tierLabel(user.premium_tier) : '—';
-        if (avatarEl) avatarEl.textContent = initials(rawName || shortName || '—');
+        const parts = rawName ? rawName.split(/\s+/).filter(Boolean) : [];
+        const displayName = parts.length >= 2 ? `${parts[0]} ${parts[1]}` : (rawName || 'Cuenta');
+        if (nameEl) nameEl.textContent = displayName || 'Cuenta';
+        if (tierEl) {
+            const tierText = user ? navTierLabel(user.premium_tier) : '—';
+            tierEl.textContent = tierText;
+            tierEl.classList.remove('nav-account-tier--silver');
+            if (user && user.premium_tier && user.premium_tier !== 'free') {
+                tierEl.classList.add('nav-account-tier--silver');
+            }
+        }
+        normalizeNavTriggerLabel();
+        if (avatarEl) avatarEl.textContent = initials(rawName || displayName || '—');
     }
 
     function syncFloatingCreateVisibility() {
@@ -420,6 +624,308 @@
         const logged = !!(currentUser && currentUser.id);
         if (floating) floating.classList.toggle('hidden', !logged || onLanding);
         if (floatingVirtue) floatingVirtue.classList.toggle('hidden', !logged || onLanding);
+    }
+
+    /* ── Guided tutorial (web) ───────────────────────────────────────────────── */
+    const TUTORIAL_COMPLETED_KEY = 'kh_web_tutorial_completed_v1';
+    const TUTORIAL_OPTOUT_KEY = 'kh_web_tutorial_optout_v1';
+    const tutorialState = { active: false, step: 0, dismissed: false };
+    let tutorialRaf = null;
+    let tutorialListenersBound = false;
+
+    function getTutorialEls() {
+        return {
+            overlay: $('kh-tutorial'),
+            card: $('kh-tutorial-card'),
+            highlight: $('kh-tutorial-highlight'),
+            step: $('kh-tutorial-step'),
+            title: $('kh-tutorial-title'),
+            text: $('kh-tutorial-text'),
+            next: $('kh-tutorial-next'),
+            optoutWrap: $('kh-tutorial-optout'),
+            optoutCheck: $('kh-tutorial-optout-check'),
+        };
+    }
+
+    function isTutorialSuppressed() {
+        try {
+            return localStorage.getItem(TUTORIAL_COMPLETED_KEY) === '1'
+                && localStorage.getItem(TUTORIAL_OPTOUT_KEY) === '1';
+        } catch {
+            return false;
+        }
+    }
+
+    function shouldStartTutorial() {
+        if (tutorialState.active || tutorialState.dismissed) return false;
+        if (isTutorialSuppressed()) return false;
+        if (!KHApi.getToken()) return false;
+        const dash = document.getElementById('page-dashboard');
+        if (!dash || dash.classList.contains('hidden')) return false;
+        return true;
+    }
+
+    function getCreateTutorialTarget() {
+        const fab = document.getElementById('fab-create');
+        if (fab && !fab.classList.contains('hidden')) return fab;
+        const btn = document.querySelector('#page-dashboard .dash-header .btn-create');
+        if (btn && !btn.classList.contains('hidden')) return btn;
+        return null;
+    }
+
+    function getPublishTutorialTarget() {
+        const offWrap = document.getElementById('off-form-wrap');
+        const useOffer = createKind === 'offer' && offWrap && !offWrap.classList.contains('hidden');
+        const btn = useOffer ? document.getElementById('btn-off-create') : document.getElementById('btn-req-create');
+        return btn || null;
+    }
+
+    const tutorialSteps = [
+        {
+            id: 'create',
+            title: 'Crea tu primer match',
+            text: 'Pulsa Crear para publicar una solicitud o una oferta.',
+            ensure: () => {
+                const dash = document.getElementById('page-dashboard');
+                if (dash && dash.classList.contains('hidden')) showPage('page-dashboard');
+            },
+            target: getCreateTutorialTarget,
+        },
+        {
+            id: 'type',
+            title: 'Elige el tipo',
+            text: 'Selecciona si necesitas ayuda o si ofreces ayuda.',
+            ensure: () => setDashView('crear', { noScroll: true }),
+            target: () => document.querySelector('.create-switch'),
+        },
+        {
+            id: 'publish',
+            title: 'Publica tu match',
+            text: 'Completa los detalles y publica para empezar a recibir respuestas.',
+            ensure: () => setDashView('crear', { noScroll: true }),
+            target: getPublishTutorialTarget,
+        },
+    ];
+
+    function maybeStartTutorialAfterLogin() {
+        if (!shouldStartTutorial()) return;
+        startTutorial();
+    }
+
+    function startTutorial() {
+        const { overlay, card } = getTutorialEls();
+        if (!overlay || !card) return;
+        tutorialState.active = true;
+        tutorialState.step = 1;
+        overlay.classList.remove('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
+        card.classList.remove('hidden');
+        bindTutorialListeners();
+        updateTutorialStep();
+    }
+
+    function hideTutorial() {
+        const { overlay, card } = getTutorialEls();
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.setAttribute('aria-hidden', 'true');
+        }
+        if (card) card.classList.add('hidden');
+    }
+
+    function updateTutorialStep() {
+        const stepIdx = tutorialState.step - 1;
+        const step = tutorialSteps[stepIdx];
+        const { step: stepEl, title, text, next, optoutWrap, optoutCheck } = getTutorialEls();
+        if (!step) return;
+        if (stepEl) stepEl.textContent = `Paso ${tutorialState.step} de ${tutorialSteps.length}`;
+        if (title) title.textContent = step.title;
+        if (text) text.textContent = step.text;
+
+        const isLast = tutorialState.step === tutorialSteps.length;
+        if (next) next.textContent = isLast ? 'Listo' : 'Siguiente';
+        if (optoutWrap) optoutWrap.classList.toggle('hidden', !isLast);
+        if (!isLast && optoutCheck) optoutCheck.checked = false;
+
+        if (step.ensure) step.ensure();
+        requestTutorialPosition();
+    }
+
+    function requestTutorialPosition() {
+        if (tutorialRaf) return;
+        tutorialRaf = requestAnimationFrame(() => {
+            tutorialRaf = null;
+            positionTutorial();
+        });
+    }
+
+    function positionTutorial() {
+        if (!tutorialState.active) return;
+        const { card, highlight } = getTutorialEls();
+        const stepIdx = tutorialState.step - 1;
+        const step = tutorialSteps[stepIdx];
+        if (!card || !highlight || !step) return;
+
+        const target = step.target ? step.target() : null;
+        if (!target) {
+            highlight.style.opacity = '0';
+            card.style.top = '20px';
+            card.style.left = '50%';
+            card.style.transform = 'translateX(-50%)';
+            return;
+        }
+
+        const rect = target.getBoundingClientRect();
+        const pad = 6;
+        highlight.style.opacity = '1';
+        highlight.style.top = `${Math.max(0, rect.top - pad)}px`;
+        highlight.style.left = `${Math.max(0, rect.left - pad)}px`;
+        highlight.style.width = `${Math.max(0, rect.width + pad * 2)}px`;
+        highlight.style.height = `${Math.max(0, rect.height + pad * 2)}px`;
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const cardWidth = card.offsetWidth;
+        const cardHeight = card.offsetHeight;
+        let top = rect.bottom + 12;
+        if (top + cardHeight > vh - 12) top = rect.top - cardHeight - 12;
+        if (top < 12) top = 12;
+        let left = rect.left + rect.width / 2 - cardWidth / 2;
+        left = Math.max(12, Math.min(vw - cardWidth - 12, left));
+        card.style.top = `${top}px`;
+        card.style.left = `${left}px`;
+        card.style.transform = 'translateX(0)';
+    }
+
+    function advanceTutorialStep(nextStep) {
+        const step = Math.max(1, Math.min(tutorialSteps.length, nextStep));
+        tutorialState.step = step;
+        updateTutorialStep();
+    }
+
+    function tutorialNext() {
+        if (!tutorialState.active) return;
+        if (tutorialState.step >= tutorialSteps.length) {
+            completeTutorial();
+            return;
+        }
+        advanceTutorialStep(tutorialState.step + 1);
+    }
+
+    function tutorialSkip() {
+        if (!tutorialState.active) return;
+        tutorialState.active = false;
+        tutorialState.dismissed = true;
+        hideTutorial();
+    }
+
+    function completeTutorial() {
+        const { optoutCheck } = getTutorialEls();
+        try {
+            localStorage.setItem(TUTORIAL_COMPLETED_KEY, '1');
+            if (optoutCheck && optoutCheck.checked) {
+                localStorage.setItem(TUTORIAL_OPTOUT_KEY, '1');
+            }
+        } catch { }
+        tutorialState.active = false;
+        tutorialState.dismissed = true;
+        hideTutorial();
+    }
+
+    function bindTutorialListeners() {
+        if (tutorialListenersBound) return;
+        tutorialListenersBound = true;
+        window.addEventListener('resize', requestTutorialPosition);
+        window.addEventListener('scroll', requestTutorialPosition, { passive: true });
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function initScrollTopButton() {
+        const btn = $('scroll-top');
+        if (!btn) return;
+        let threshold = 320;
+        let raf = null;
+
+        const computeThreshold = () => {
+            const anchor = document.getElementById('demo-section') || document.querySelector('#page-landing section');
+            if (anchor) threshold = Math.max(120, anchor.offsetTop - 80);
+        };
+
+        const update = () => {
+            const landing = document.getElementById('page-landing');
+            const onLanding = !!(landing && !landing.classList.contains('hidden'));
+            if (!onLanding) {
+                btn.classList.remove('is-visible');
+                return;
+            }
+            const show = window.scrollY >= threshold;
+            btn.classList.toggle('is-visible', show);
+        };
+
+        const onScroll = () => {
+            if (raf) return;
+            raf = requestAnimationFrame(() => {
+                raf = null;
+                update();
+            });
+        };
+
+        computeThreshold();
+        update();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', () => {
+            computeThreshold();
+            update();
+        });
+    }
+
+    function initNavAutoHide() {
+        const nav = document.querySelector('.nav');
+        if (!nav) return;
+        let lastY = window.scrollY || 0;
+        let ticking = false;
+        const threshold = 10;
+
+        const onScroll = () => {
+            const currentY = window.scrollY || 0;
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                const diff = currentY - lastY;
+                if (Math.abs(diff) > threshold) {
+                    if (diff > 0 && currentY > 72) {
+                        nav.classList.add('nav--hidden');
+                    } else {
+                        nav.classList.remove('nav--hidden');
+                    }
+                    lastY = currentY;
+                }
+                if (currentY <= 20) nav.classList.remove('nav--hidden');
+                ticking = false;
+            });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
+    function initAutoMatchStatusStrip() {
+        const radiusInput = $('am-radius');
+        const invitesInput = $('am-max-invites');
+        const providerToggle = $('am-provider-enabled');
+        const seekerToggle = $('am-seeker-enabled');
+
+        if (radiusInput) radiusInput.addEventListener('input', updateAutoMatchStatusStrip);
+        if (invitesInput) invitesInput.addEventListener('input', updateAutoMatchStatusStrip);
+        if (providerToggle) providerToggle.addEventListener('change', updateAutoMatchStatusStrip);
+        if (seekerToggle) seekerToggle.addEventListener('change', updateAutoMatchStatusStrip);
+
+        setAutoMatchMode(autoMatchMode, { silent: true });
+
+        updateAutoMatchStatusStrip();
+        updateAutoMatchLocalActivity();
     }
 
     async function goCreateFromFab() {
@@ -437,6 +943,11 @@
             showPage('page-dashboard');
         }
         setDashView('crear');
+        if (tutorialState.active && tutorialState.step === 1) {
+            setTimeout(() => advanceTutorialStep(2), 60);
+        } else if (tutorialState.active) {
+            requestTutorialPosition();
+        }
     }
 
     /* ── Dashboard account menu ───────────────────────────────────────────── */
@@ -528,6 +1039,7 @@
 
     let automatchPollTimer = null;
     let automatchCountdownTimer = null;
+    let automatchLiveFeedTimer = null;
     let feedDebounce = null;
     let premiumNudgeTimer = null;
     let badgeNudgeTimer = null;
@@ -701,6 +1213,10 @@
 
         if (!opts.noScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
 
+        if (tutorialState.active) {
+            setTimeout(requestTutorialPosition, 80);
+        }
+
         if (badgeNudgeTimer) { clearTimeout(badgeNudgeTimer); badgeNudgeTimer = null; }
         if (v === 'premium' || v === 'automatch') scheduleBadgeNudge(v);
 
@@ -709,6 +1225,7 @@
         // Start/stop view-specific polling
         if (automatchPollTimer) { clearInterval(automatchPollTimer); automatchPollTimer = null; }
         if (automatchCountdownTimer) { clearInterval(automatchCountdownTimer); automatchCountdownTimer = null; }
+        if (automatchLiveFeedTimer) { clearInterval(automatchLiveFeedTimer); automatchLiveFeedTimer = null; }
 
         // Lazy refresh on section entry (avoid spamming requests)
         const now = Date.now();
@@ -729,6 +1246,9 @@
                 if (!root || root.dataset.view !== 'automatch') return;
                 tickInviteCountdowns();
             }, 2000);
+            automatchLiveFeedTimer = setInterval(() => {
+                updateAutoMatchLiveFeed();
+            }, 30000);
         }
         if (v === 'creaciones') loadCreations();
         if (v === 'matches') loadMatches();
@@ -881,9 +1401,9 @@
         const leftPartners = Math.max(0, partnersReq - partners);
         const foot = $('upgrade-foot');
         if (foot) {
-            foot.textContent = leftPartners > 0
-                ? `Te faltan ${leftRep} rep y ${leftPartners} vecinos distintos para desbloquear Premium.`
-                : (leftRep === 0 ? 'Listo para desbloquear Premium.' : `Te faltan ${leftRep} rep para desbloquear Premium.`);
+            foot.textContent = leftRep === 0
+                ? 'Listo para desbloquear AutoMatch Premium.'
+                : `Te faltan ${leftRep} rep para desbloquear AutoMatch Premium.`;
         }
 
         m.classList.remove('hidden');
@@ -946,6 +1466,12 @@
             } else {
                 show($('off-form-wrap'));
             }
+        }
+
+        if (tutorialState.active && tutorialState.step === 2) {
+            setTimeout(() => advanceTutorialStep(3), 60);
+        } else if (tutorialState.active) {
+            requestTutorialPosition();
         }
     }
 
@@ -1445,6 +1971,47 @@
 
     let postLoginAction = null; // e.g. 'first_match'
     let pendingSearchQuery = null;
+    const INVITE_SESSION_KEY = 'kh_invite_id';
+
+    function rememberInviteId(inviteId) {
+        if (!inviteId) return;
+        try { sessionStorage.setItem(INVITE_SESSION_KEY, String(inviteId)); } catch { }
+    }
+
+    function consumeInviteId() {
+        try {
+            const id = sessionStorage.getItem(INVITE_SESSION_KEY);
+            sessionStorage.removeItem(INVITE_SESSION_KEY);
+            return id;
+        } catch {
+            return null;
+        }
+    }
+
+    function handleInviteRedirect() {
+        const params = new URLSearchParams(window.location.search);
+        const inviteId = params.get('invite');
+        if (!inviteId) return false;
+        rememberInviteId(inviteId);
+        postLoginAction = 'automatch_invite';
+        const clean = window.location.pathname + (window.location.hash || '');
+        try { window.history.replaceState({}, document.title, clean); } catch { }
+        if (!KHApi.getToken()) openLogin();
+        return true;
+    }
+
+    async function openAutomatchFromInvite() {
+        if (!KHApi.getToken()) {
+            postLoginAction = 'automatch_invite';
+            openLogin();
+            return;
+        }
+        consumeInviteId();
+        try { await ensureCurrentUser(); } catch { }
+        showPage('page-dashboard');
+        setDashView('automatch', { noScroll: true });
+        loadAutoMatch({ silent: true });
+    }
 
     function openFirstMatchFlow() {
         showPage('page-dashboard');
@@ -1483,6 +2050,37 @@
         showAuthChooser();
     }
 
+    /* ── App download modal ─────────────────────────────────────────────────── */
+    const APP_DOWNLOAD_PROMPT_KEY = 'kh_app_download_prompt_v1';
+
+    function openAppDownloadModal() {
+        show($('modal-app-download'));
+        setTimeout(() => {
+            const btn = document.querySelector('#modal-app-download .btn');
+            if (btn) btn.focus();
+        }, 80);
+    }
+
+    function closeAppDownloadModal(event) {
+        if (event && event.target !== $('modal-app-download')) return;
+        hide($('modal-app-download'));
+    }
+
+    function shouldPromptAppDownload() {
+        try {
+            if (localStorage.getItem(APP_DOWNLOAD_PROMPT_KEY) === '1') return false;
+        } catch { }
+        const landing = document.getElementById('page-landing');
+        if (!landing || landing.classList.contains('hidden')) return false;
+        return true;
+    }
+
+    function maybePromptAppDownload() {
+        if (!shouldPromptAppDownload()) return;
+        try { localStorage.setItem(APP_DOWNLOAD_PROMPT_KEY, '1'); } catch { }
+        openAppDownloadModal();
+    }
+
     async function submitLogin(event) {
         event.preventDefault();
         const btn = $('btn-login');
@@ -1506,15 +2104,6 @@
                 toast('Aún falta verificar tu email. Revisa tu correo o vuelve a enviarlo desde tu perfil.', 'warn');
             }
 
-            if (postLoginAction === 'quick_match' && quickDraft) {
-                const draft = quickDraft;
-                quickDraft = null;
-                postLoginAction = null;
-                showPage('page-landing');
-                await runQuickMatch(draft);
-                return;
-            }
-
             showPage('page-dashboard');
             enterDashboardDefault(user);
             loadMatches();
@@ -1530,6 +2119,13 @@
                 postLoginAction = null;
                 setDashView('explorar');
                 applyFeedSearch(q, { scroll: true });
+                maybeStartTutorialAfterLogin();
+                return;
+            }
+
+            if (postLoginAction === 'automatch_invite') {
+                postLoginAction = null;
+                openAutomatchFromInvite();
                 return;
             }
 
@@ -1542,8 +2138,11 @@
             if (postLoginAction === 'go_dashboard_create') {
                 postLoginAction = null;
                 setDashView('crear');
+                maybeStartTutorialAfterLogin();
                 return;
             }
+
+            maybeStartTutorialAfterLogin();
         } catch (err) {
             // Show more context for common failures (CORS/network vs 4xx)
             const status = err && err.status;
@@ -1599,15 +2198,6 @@
                 toast('No pudimos enviar el email de verificación. Puedes solicitarlo desde tu perfil.', 'warn');
             }
 
-            if (postLoginAction === 'quick_match' && quickDraft) {
-                const draft = quickDraft;
-                quickDraft = null;
-                postLoginAction = null;
-                showPage('page-landing');
-                await runQuickMatch(draft);
-                return;
-            }
-
             showPage('page-dashboard');
             enterDashboardDefault(user);
             loadMatches();
@@ -1617,9 +2207,17 @@
             loadBadgesMine();
             loadLeaderboard();
 
+            if (postLoginAction === 'automatch_invite') {
+                postLoginAction = null;
+                openAutomatchFromInvite();
+                return;
+            }
+
             if (postLoginAction === 'first_match') {
                 postLoginAction = null;
                 openFirstMatchFlow();
+            } else {
+                maybeStartTutorialAfterLogin();
             }
         } catch (err) {
             toast(err.message || 'No se pudo crear la cuenta', 'error');
@@ -1632,15 +2230,23 @@
         if (!user) return;
         currentUser = user;
         setLandingSessionUI(user);
-        $('user-name').textContent = user.display_name || '—';
-        $('user-tier').textContent = tierLabel(user.premium_tier);
-        $('user-avatar').textContent = (user.display_name || '?')[0].toUpperCase();
-        $('user-tier').style.color = (user.premium_tier && user.premium_tier !== 'free') ? 'var(--gold-light)' : 'var(--kh-brand-500)';
+        const rawName = String(user.display_name || '').trim();
+        const parts = rawName ? rawName.split(/\s+/).filter(Boolean) : [];
+        const displayName = parts.length >= 2 ? `${parts[0]} ${parts[1]}` : (rawName || '—');
+        $('user-name').textContent = displayName;
+        const userTier = $('user-tier');
+        if (userTier) {
+            userTier.textContent = navTierLabel(user.premium_tier);
+            userTier.classList.remove('nav-account-tier--silver');
+            if (user.premium_tier && user.premium_tier !== 'free') {
+                userTier.classList.add('nav-account-tier--silver');
+            }
+        }
+        $('user-avatar').textContent = initials(rawName || displayName || '?');
 
         const dashName = document.getElementById('dash-menu-name');
         if (dashName) {
-            const rawName = String(user.display_name || '').trim();
-            const shortName = rawName ? rawName.split(/\s+/)[0] : 'Cuenta';
+            const shortName = parts.length >= 2 ? `${parts[0]} ${parts[1]}` : (rawName || 'Cuenta');
             dashName.textContent = shortName || 'Cuenta';
         }
 
@@ -1680,6 +2286,10 @@
         if ($('profile-name')) $('profile-name').value = user.display_name || '';
         if ($('profile-bio')) $('profile-bio').value = user.bio || '';
         if ($('profile-location')) $('profile-location').value = user.location_text || '';
+        const bioPreview = $('profile-bio-preview');
+        if (bioPreview) {
+            bioPreview.textContent = user.bio ? String(user.bio) : 'Aún no has añadido una bio.';
+        }
         if ($('profile-points')) $('profile-points').textContent = (user.points_balance != null) ? String(user.points_balance) : '—';
         if ($('profile-rating')) {
             const r = user.rating_avg;
@@ -1720,7 +2330,7 @@
             if (url) {
                 avatarEl.innerHTML = `<img src="${escapeHtml(url)}" alt="" loading="lazy" />`;
             } else {
-                avatarEl.textContent = initialsForName(name);
+                avatarEl.innerHTML = '<img src="img/corona2.png" alt="" aria-hidden="true" />';
             }
         }
 
@@ -1934,6 +2544,13 @@
         try {
             const user = await KHApi.getMe();
             loadUserInfo(user);
+            const bio = ($('profile-bio-preview') && $('profile-bio-preview').textContent || '').trim();
+            if (!bio || bio === '—') {
+                const fallback = 'Vecino activo en la comunidad. Me gusta resolver problemas prácticos y acompañar a la gente en el día a día, desde reparaciones rápidas hasta orientación básica. Prefiero acuerdos claros, respuestas rápidas y ayudar con lo que sé.';
+                const el = $('profile-bio-preview');
+                if (el) el.textContent = fallback;
+            }
+            loadProfileAvailability();
             await loadFavoritesSection({ silent: true });
             loadBadgesMine();
             loadPremiumProgress();
@@ -1947,18 +2564,38 @@
         }
     }
 
+    async function loadProfileAvailability() {
+        const wd = $('profile-availability-weekday');
+        const we = $('profile-availability-weekend');
+        const note = $('profile-availability-note');
+        if (!wd || !we) return;
+        try {
+            const settings = await KHApi.automatchGetSettings();
+            const fmt = (start, end, allDayLabel) => {
+                if (!start || !end) return '—';
+                if (start === '00:00' && end === '23:59') return allDayLabel;
+                return `${start} - ${end}`;
+            };
+            wd.textContent = fmt(settings.weekday_start, settings.weekday_end, 'Todo el día');
+            we.textContent = fmt(settings.weekend_start, settings.weekend_end, 'Todo el día');
+            if (note) note.textContent = 'Horarios sincronizados con AutoMatch.';
+        } catch {
+            if (note) note.textContent = 'Gestiona horarios y alertas desde AutoMatch.';
+        }
+    }
+
     async function loadProfileHeroRank() {
         const el = $('profile-hero-rank');
         if (!el || !KHApi.getToken()) return;
         try {
             const me = await KHApi.leaderboardMe({});
             if (me && me.rank && me.total) {
-                el.textContent = `Ranking vecinal: #${me.rank} de ${me.total}`;
+                el.textContent = `Ranking comunitario: #${me.rank} de ${me.total}`;
             } else {
-                el.textContent = 'Ranking vecinal: —';
+                el.textContent = 'Ranking comunitario: —';
             }
         } catch {
-            el.textContent = 'Ranking vecinal: —';
+            el.textContent = 'Ranking comunitario: —';
         }
     }
 
@@ -2065,7 +2702,7 @@
         }
         try {
             const out = await KHApi.premiumUnlock();
-            toast('Premium desbloqueado ✓', 'success');
+            toast('AutoMatch Premium desbloqueado ✓', 'success');
             // Refresh user info
             const user = await KHApi.getMe();
             loadUserInfo(user);
@@ -2091,15 +2728,15 @@
         if (!e) return;
         const rep = Number(e.reputation || 0);
         const th = Number(e.threshold || 1000);
-        const partners = Number(e.partners_done_distinct || 0);
-        const partnersReq = Number(e.partners_required || 0);
+        const liteDays = Number(e.premium_lite_days || 7);
+        const liteListingDays = Number(e.premium_lite_listing_days || 7);
         const pct = Math.max(0, Math.min(100, Math.round((rep / Math.max(1, th)) * 100)));
 
         if ($('premium-rep')) $('premium-rep').textContent = String(rep);
         if ($('premium-th')) $('premium-th').textContent = String(th);
         if ($('premium-progress-fill')) $('premium-progress-fill').style.width = pct + '%';
         if ($('premium-progress-badge')) {
-            $('premium-progress-badge').textContent = e.premium_active ? 'Premium activo' : (pct + '%');
+            $('premium-progress-badge').textContent = e.premium_active ? 'AutoMatch Premium activo' : (pct + '%');
         }
 
         if ($('profile-hero-premium-mini')) $('profile-hero-premium-mini').textContent = `${rep}/${th}`;
@@ -2108,38 +2745,28 @@
         const btn = $('btn-premium-unlock');
         if (btn) {
             btn.disabled = !e.eligible || e.premium_active;
-            btn.textContent = e.premium_active ? 'Activado' : 'Desbloquear';
+            btn.textContent = e.premium_active ? 'Activado' : 'Desbloquear AutoMatch Premium';
         }
 
         if ($('premium-progress-foot')) {
             if (e.premium_active) {
-                $('premium-progress-foot').textContent = 'Ya tienes Premium. Tus publicaciones se renuevan solas.';
+                $('premium-progress-foot').textContent = `AutoMatch Premium activo: AutoMatch ${liteDays} dias · publicaciones ${liteListingDays} dias.`;
             } else {
                 const left = Math.max(0, th - rep);
-                const partsLeft = Math.max(0, partnersReq - partners);
-                if (partsLeft > 0) {
-                    $('premium-progress-foot').textContent = `Te faltan ${left} de reputación y ${partsLeft} vecinos distintos para desbloquear Premium.`;
-                } else {
-                    $('premium-progress-foot').textContent = left === 0
-                        ? 'Listo para desbloquear Premium.'
-                        : `Te faltan ${left} de reputación para desbloquear Premium.`;
-                }
+                $('premium-progress-foot').textContent = left === 0
+                    ? 'Listo para desbloquear AutoMatch Premium.'
+                    : `Te faltan ${left} de reputacion para desbloquear AutoMatch Premium.`;
             }
         }
 
         if ($('profile-hero-premium-foot')) {
             if (e.premium_active) {
-                $('profile-hero-premium-foot').textContent = 'Premium activo. Tus publicaciones se renuevan solas.';
+                $('profile-hero-premium-foot').textContent = `AutoMatch Premium activo: AutoMatch ${liteDays} dias · publicaciones ${liteListingDays} dias.`;
             } else {
                 const left = Math.max(0, th - rep);
-                const partsLeft = Math.max(0, partnersReq - partners);
-                if (partsLeft > 0) {
-                    $('profile-hero-premium-foot').textContent = `Faltan ${left} de reputación y ${partsLeft} vecinos distintos.`;
-                } else {
-                    $('profile-hero-premium-foot').textContent = left === 0
-                        ? 'Listo para desbloquear Premium.'
-                        : `Faltan ${left} de reputación para desbloquear Premium.`;
-                }
+                $('profile-hero-premium-foot').textContent = left === 0
+                    ? 'Listo para desbloquear AutoMatch Premium.'
+                    : `Faltan ${left} de reputacion para desbloquear AutoMatch Premium.`;
             }
         }
     }
@@ -2162,7 +2789,9 @@
                 const el = document.createElement('div');
                 const isMe = currentUser && u.id === currentUser.id;
                 el.className = 'leaderboard-item' + (isMe ? ' me' : '');
-                const tier = (u.premium_tier && u.premium_tier !== 'free') ? 'premium' : '';
+                const tier = (u.premium_tier && u.premium_tier !== 'free')
+                    ? (u.premium_tier === 'premium_lite' ? 'premium_lite' : 'premium')
+                    : '';
                 const badgeCount = Number(u.badge_count || 0);
                 const rep = Number(u.points_balance || 0);
                 const rating = (u.rating_avg || 0).toFixed(1);
@@ -2176,7 +2805,7 @@
                     </div>
                   </div>
                   <div class="leaderboard-right">
-                    ${tier ? '<span class="lb-chip premium">Premium</span>' : ''}
+                    ${tier ? '<span class="lb-chip premium">' + (tier === 'premium_lite' ? 'AutoMatch Premium' : 'Premium') + '</span>' : ''}
                   </div>
                 `;
                 wrap.appendChild(el);
@@ -2193,10 +2822,10 @@
     function repLevelLabel(rep) {
         const r = Number(rep || 0);
         if (r >= 1000) return 'Leyenda';
-        if (r >= 500) return 'Oro';
-        if (r >= 250) return 'Plata';
-        if (r >= 100) return 'Bronce';
-        return 'Incept';
+        if (r >= 500) return 'Experto';
+        if (r >= 250) return 'Veterano';
+        if (r >= 100) return 'Vecino Top';
+        return 'Vecino';
     }
 
     function initialsForName(name) {
@@ -2208,43 +2837,61 @@
         return (a + b).toUpperCase();
     }
 
+    // Paleta de colores para avatares por posición
+    const AVATAR_COLORS = [
+        { bg: 'linear-gradient(135deg, #D4A942 0%, #C08A1E 100%)', color: '#fff' }, // #1 dorado
+        { bg: 'linear-gradient(135deg, #8B98A8 0%, #6B7684 100%)', color: '#fff' }, // #2 plata
+        { bg: 'linear-gradient(135deg, #A0785A 0%, #7D5A3C 100%)', color: '#fff' }, // #3 bronce
+        { bg: 'linear-gradient(135deg, #7B5CF5 0%, #5E3FD0 100%)', color: '#fff' }, // #4 púrpura
+        { bg: 'linear-gradient(135deg, #3B82C4 0%, #2563A0 100%)', color: '#fff' }, // #5 azul
+        { bg: 'linear-gradient(135deg, #10927A 0%, #0B715F 100%)', color: '#fff' }, // #6 verde
+        { bg: 'linear-gradient(135deg, #D06B3A 0%, #A8511F 100%)', color: '#fff' }, // naranja
+        { bg: 'linear-gradient(135deg, #C2487A 0%, #9E2F5C 100%)', color: '#fff' }, // rosa
+    ];
+
     function renderLeaderboardRows(wrap, rows, { highlightUserId, offsetBase = 0 } = {}) {
         if (!wrap) return;
         rows.forEach((u, idx) => {
             const el = document.createElement('div');
             const isMe = highlightUserId && u.id === highlightUserId;
-            el.className = 'leaderboard-item' + (isMe ? ' me' : '');
+            const absPos = offsetBase + idx + 1;
+            const isTop = absPos === 1;
+            el.className = 'leaderboard-item' + (isMe ? ' me' : '') + (isTop ? ' is-top' : '');
             el.tabIndex = 0;
             el.setAttribute('role', 'button');
             el.setAttribute('aria-label', `Ver perfil de ${String(u.display_name || 'vecino')}`);
-            const tier = (u.premium_tier && u.premium_tier !== 'free') ? 'premium' : '';
+            const tier = (u.premium_tier && u.premium_tier !== 'free')
+                ? (u.premium_tier === 'premium_lite' ? 'premium_lite' : 'premium')
+                : '';
             const badgeCount = Number(u.badge_count || 0);
             const rep = Number(u.points_balance || 0);
             const rating = (u.rating_avg || 0).toFixed(1);
             const lvl = repLevelLabel(rep);
-            const distVal = (u.distance_km != null) ? Number(u.distance_km).toFixed(1) : null;
-            const loc = String(u.location_text || '').trim();
+            const showLevel = lvl !== 'Vecino'; // Vecino es el nivel base, no lo mostramos
+            const levelBadge = showLevel ? `<span class="ranking-level-badge">${escapeHtml(lvl)}</span>` : `<span class="ranking-level-badge ranking-level-badge--base">${escapeHtml(lvl)}</span>`;
 
+            // Avatar coloreado por posición o imagen real
+            const colorIdx = Math.min(absPos - 1, AVATAR_COLORS.length - 1);
+            const avColor = AVATAR_COLORS[colorIdx] || AVATAR_COLORS[AVATAR_COLORS.length - 1];
+            const initials = escapeHtml(initialsForName(u.display_name));
             const avatarHtml = u.avatar_url
                 ? `<img src="${escapeHtml(String(u.avatar_url))}" alt="" loading="lazy" />`
-                : escapeHtml(initialsForName(u.display_name));
+                : `<span class="ranking-avatar-initials">${initials}</span>`;
+            const avatarStyle = u.avatar_url ? '' : `style="background:${avColor.bg};color:${avColor.color};"`;
 
+            const premiumHtml = tier ? '<span class="ranking-chip--premium">Premium</span>' : '';
             el.innerHTML = `
-              <div class="leaderboard-left">
-                <span class="leaderboard-rank">${offsetBase + idx + 1}</span>
-                <span class="lb-avatar" aria-hidden="true">${avatarHtml}</span>
-                <div style="min-width:0;">
-                  <div class="leaderboard-name">${escapeHtml(u.display_name || '—')}</div>
-                  <div class="lb-mini">${escapeHtml(loc || '—')}</div>
+              <div class="ranking-row">
+                <div class="ranking-rank">${absPos}</div>
+                <div class="ranking-avatar${isTop ? ' is-top' : ''}" aria-hidden="true" ${avatarStyle}>${avatarHtml}</div>
+                <div class="ranking-content">
+                  <div class="ranking-meta-row">
+                    ${levelBadge}
+                    <span class="ranking-stat-inline">${rep.toLocaleString('es-ES')} rep&nbsp;·&nbsp;${badgeCount}&nbsp;🏅&nbsp;${rating}&nbsp;★</span>
+                    ${premiumHtml}
+                  </div>
+                  <div class="ranking-user">${escapeHtml(u.display_name || '—')}</div>
                 </div>
-              </div>
-              <div class="leaderboard-right">
-                <span class="lb-stat" title="Nivel"><strong>${escapeHtml(lvl)}</strong></span>
-                <span class="lb-stat" title="Reputacion"><strong>${rep}</strong> rep</span>
-                <span class="lb-stat" title="Insignias"><strong>${badgeCount}</strong> 🏅</span>
-                <span class="lb-stat" title="Valoracion"><strong>${rating}</strong> ★</span>
-                ${distVal ? `<span class="lb-stat" title="Distancia"><strong>${escapeHtml(distVal)}</strong> km</span>` : ''}
-                ${tier ? '<span class="lb-chip premium">Premium</span>' : ''}
               </div>
             `;
 
@@ -2360,6 +3007,11 @@
             b.classList.toggle('rank-chip--active', active);
             b.setAttribute('aria-pressed', String(active));
         });
+        document.querySelectorAll('.rank-chip[data-level]').forEach(b => {
+            const active = String(b.getAttribute('data-level') || 'all') === String(rankingMinLevel || 'all');
+            b.classList.toggle('rank-chip--active', active);
+            b.setAttribute('aria-pressed', String(active));
+        });
         const selModal = $('rank-radius-modal');
         if (selModal) selModal.value = String(rankingRadiusKm);
         const selPage = $('rank-radius-page');
@@ -2467,7 +3119,7 @@
             err => {
                 rankingOrigin = null;
                 const msg = (err && err.code === 1)
-                    ? 'Permiso denegado. Activa la ubicación para ver “cerca de mí”.'
+                    ? 'Permiso denegado. Activa la ubicación para ver “cerca de mi”.'
                     : 'No se pudo obtener tu ubicación.';
                 if (wrap) wrap.innerHTML = `<div class="ledger-empty" style="color:var(--danger)">${escapeHtml(msg)}</div>`;
             },
@@ -2498,7 +3150,7 @@
             if (String(rankingQuery || '').trim()) params.q = String(rankingQuery || '').trim();
             if (rankingScope === 'near') {
                 if (!rankingOrigin) {
-                    wrap.innerHTML = '<div class="ledger-empty">Pulsa “Ubicación” para ver el ranking cerca de ti</div>';
+                    wrap.innerHTML = '<div class="ledger-empty">Pulsa “Cerca de mi” para ver el ranking cerca de ti</div>';
                     if (moreWrap) moreWrap.style.display = 'none';
                     return;
                 }
@@ -2528,7 +3180,7 @@
                         const me = await KHApi.leaderboardMe(qs);
                         if (me && me.rank && me.total) {
                             meBox.style.display = '';
-                            meBox.textContent = `Tu puesto: #${me.rank} de ${me.total}`;
+                            meBox.textContent = `Tu posición: #${me.rank} de ${me.total}`;
                         } else {
                             meBox.style.display = 'none';
                         }
@@ -2859,6 +3511,45 @@
         loadFeed();
     }
 
+    function getFeedFilters() {
+        const cat = ($('feed-filter-category') && $('feed-filter-category').value) || 'all';
+        const distRaw = ($('feed-filter-distance') && $('feed-filter-distance').value) || 'all';
+        const order = ($('feed-filter-order') && $('feed-filter-order').value) || 'recent';
+        const dist = distRaw === 'all' ? null : Number(distRaw);
+        return { cat, dist, order };
+    }
+
+    function applyFeedFilters(rows) {
+        const out = Array.isArray(rows) ? rows.slice() : [];
+        const { cat, dist, order } = getFeedFilters();
+
+        let filtered = out;
+        if (cat && cat !== 'all') {
+            filtered = filtered.filter(r => String(r.category || 'other') === cat);
+        }
+        if (Number.isFinite(dist)) {
+            filtered = filtered.filter(r => Number.isFinite(+r.distance_km) && +r.distance_km <= dist);
+        }
+
+        if (order === 'distance') {
+            filtered.sort((a, b) => {
+                const da = Number.isFinite(+a.distance_km) ? +a.distance_km : Number.POSITIVE_INFINITY;
+                const db = Number.isFinite(+b.distance_km) ? +b.distance_km : Number.POSITIVE_INFINITY;
+                return da - db;
+            });
+        } else if (order === 'rating') {
+            filtered.sort((a, b) => Number(b.user_rating || 0) - Number(a.user_rating || 0));
+        } else {
+            filtered.sort((a, b) => {
+                const ta = parseTime(a.created_at) || 0;
+                const tb = parseTime(b.created_at) || 0;
+                return tb - ta;
+            });
+        }
+
+        return filtered;
+    }
+
     async function submitForgotPassword(event) {
         event.preventDefault();
         const btn = $('btn-reset');
@@ -2873,8 +3564,12 @@
         }
         try {
             if (btn) setLoading(btn, true);
-            await KHApi.forgotPassword(email);
-            toast('Listo. Revisa tu correo y sigue el enlace para cambiar la contraseña.', 'success');
+            const out = await KHApi.forgotPassword(email);
+            if (out && out.implemented === false) {
+                toast(out.message || 'El envio de emails no esta configurado todavia.', 'error');
+                return;
+            }
+            toast((out && out.message) || 'Si el correo existe, recibiras un enlace para restablecer la contrasena.', 'success');
             const loginEmail = $('login-email');
             if (loginEmail) loginEmail.value = email;
             showEmailAuth('login');
@@ -2904,6 +3599,7 @@
                         || String(r.user_name || '').toLowerCase().includes(q)
                     );
                 }
+                rows = applyFeedFilters(rows);
                 renderFeed(rows, q);
                 setFeedTab(activeFeedTab);
             } catch (err) {
@@ -3030,7 +3726,7 @@
                   </div>
                   <div class="feed-sub" style="margin-top:8px; opacity:.9;">
                     <button class="feed-pill feed-user" type="button" data-user="1">${escapeHtml(r.user_name || '—')}${r.user_verified ? ' ✓' : ''} · ★ ${(Number(r.user_rating || 0)).toFixed(1)}</button>
-                    ${r.premium_user ? '<span class="feed-pill" style="border-color:rgba(201,168,76,.25); color:var(--gold-light)">Premium</span>' : ''}
+                    ${r.premium_user ? '<span class="feed-pill feed-pill--silver">AutoMatch Premium</span>' : ''}
                   </div>
                   ${expiryHtml}
                 </div>
@@ -3222,7 +3918,7 @@
                 ${dist ? `<span class="feed-pill">📏 ${escapeHtml(dist)}</span>` : ''}
               </div>
               <div class="feed-details-meta">
-                ${row && row.premium_user ? '<div class="feed-details-meta-item">✨ Publicación Premium</div>' : ''}
+                ${row && row.premium_user ? '<div class="feed-details-meta-item">✨ Publicación AutoMatch Premium</div>' : ''}
                 ${row && row.expires_at ? '<div class="feed-details-meta-item">⏱ Caducidad activa</div>' : ''}
               </div>
               <div class="feed-details-user">
@@ -3305,9 +4001,490 @@
         { id: 'other', label: 'Otros', icon: '✨' },
     ];
 
+    const SIMPLE_RADIUS_PRESETS = [2, 5, 10];
+    const SIMPLE_DEFAULT_INVITES = 20;
+    let autoMatchMode = 'simple';
+
     let lastInviteIds = new Set();
     let lastAutoMatchRows = [];
     let autoMatchFilterCat = 'all';
+    let smartMatchIndex = 0;
+    let smartMatchCache = [];
+    let smartMatchDismissed = new Set();
+
+    function normalizeAutoMatchMode(mode) {
+        const v = String(mode || '').trim().toLowerCase();
+        return v === 'advanced' ? 'advanced' : 'simple';
+    }
+
+    function setAutoMatchMode(mode, opts = {}) {
+        const next = normalizeAutoMatchMode(mode);
+        autoMatchMode = next;
+        const card = document.getElementById('card-automatch');
+        if (card) card.setAttribute('data-am-mode', next);
+        const desc = $('am-mode-desc');
+        if (desc) {
+            desc.textContent = next === 'simple'
+                ? 'Configuracion rapida, ideal para empezar.'
+                : 'Ajustes detallados de categorias, horarios y limites.';
+        }
+        document.querySelectorAll('.am-mode-btn').forEach(btn => {
+            const btnMode = btn.getAttribute('data-am-mode');
+            const active = btnMode === next;
+            btn.classList.toggle('am-mode-btn--active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        if (!opts.silent) updateAutoMatchStatusStrip();
+    }
+
+    function isSimpleRoleActive(kind) {
+        const btn = document.querySelector(`.am-choice[data-am-role="${kind}"]`);
+        return !!(btn && btn.classList.contains('is-active'));
+    }
+
+    function setSimpleRole(kind, active) {
+        const btn = document.querySelector(`.am-choice[data-am-role="${kind}"]`);
+        if (btn) {
+            btn.classList.toggle('is-active', !!active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+        if (kind === 'provider') {
+            const input = $('am-provider-enabled');
+            if (input) input.checked = !!active;
+        }
+        if (kind === 'seeker') {
+            const input = $('am-seeker-enabled');
+            if (input) input.checked = !!active;
+        }
+    }
+
+    function toggleSimpleRole(kind) {
+        const active = !isSimpleRoleActive(kind);
+        setSimpleRole(kind, active);
+        updateAutoMatchStatusStrip();
+        updateAutoMatchLocalActivity();
+    }
+
+    function setSimpleRadius(value, opts = {}) {
+        const v = Number(value);
+        if (!Number.isFinite(v)) return;
+        const syncAdvanced = opts.syncAdvanced !== false;
+        document.querySelectorAll('.am-pill[data-am-radius]').forEach(btn => {
+            const btnVal = Number(btn.getAttribute('data-am-radius'));
+            const active = btnVal === v;
+            btn.classList.toggle('is-active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        if (syncAdvanced) {
+            const radiusInput = $('am-radius');
+            if (radiusInput) radiusInput.value = String(v);
+            const radiusLabel = $('am-radius-value');
+            if (radiusLabel) radiusLabel.textContent = `${v} km`;
+        }
+        updateAutoMatchStatusStrip();
+    }
+
+    function getSimpleRadius() {
+        const btn = document.querySelector('.am-pill.is-active[data-am-radius]');
+        const v = btn ? Number(btn.getAttribute('data-am-radius')) : NaN;
+        return Number.isFinite(v) ? v : 5;
+    }
+
+    function closestSimpleRadius(value) {
+        const v = Number(value);
+        if (!Number.isFinite(v)) return 5;
+        return SIMPLE_RADIUS_PRESETS.reduce((best, cur) => {
+            return Math.abs(cur - v) < Math.abs(best - v) ? cur : best;
+        }, SIMPLE_RADIUS_PRESETS[0]);
+    }
+
+    function isAutoMatchProviderEnabled() {
+        if (autoMatchMode === 'simple') return isSimpleRoleActive('provider');
+        return !!($('am-provider-enabled') && $('am-provider-enabled').checked);
+    }
+
+    function isAutoMatchSeekerEnabled() {
+        if (autoMatchMode === 'simple') return isSimpleRoleActive('seeker');
+        return !!($('am-seeker-enabled') && $('am-seeker-enabled').checked);
+    }
+
+    function updateAutoMatchStatusStrip() {
+        const strip = $('am-status-strip');
+        if (!strip) return;
+        const text = $('am-status-text');
+        const items = $('am-status-items');
+        const radiusEl = $('am-status-radius');
+        const catsEl = $('am-status-cats');
+        const invitesEl = $('am-status-invites');
+
+        const provEnabled = isAutoMatchProviderEnabled();
+        const seekEnabled = isAutoMatchSeekerEnabled();
+        const isActive = provEnabled || seekEnabled;
+
+        const radiusInput = $('am-radius');
+        const maxInvitesInput = $('am-max-invites');
+        const radiusVal = autoMatchMode === 'simple'
+            ? getSimpleRadius()
+            : (radiusInput ? Number(radiusInput.value) : NaN);
+        const invitesVal = autoMatchMode === 'simple'
+            ? SIMPLE_DEFAULT_INVITES
+            : (maxInvitesInput ? Number(maxInvitesInput.value) : NaN);
+
+        let catCount = 0;
+        if (autoMatchMode === 'simple') {
+            catCount = isActive ? AM_CATS.length : 0;
+        } else {
+            const provWrap = $('am-provider-cats');
+            const seekWrap = $('am-seeker-cats');
+            catCount = (provWrap ? provWrap.querySelectorAll('input[type="checkbox"]:checked').length : 0)
+                + (seekWrap ? seekWrap.querySelectorAll('input[type="checkbox"]:checked').length : 0);
+        }
+
+        if (text) text.textContent = isActive ? 'AutoMatch activo' : 'AutoMatch inactivo';
+        if (items) items.classList.toggle('hidden', !isActive);
+        strip.classList.toggle('is-inactive', !isActive);
+
+        if (radiusEl) radiusEl.textContent = Number.isFinite(radiusVal) ? `${radiusVal} km` : '— km';
+        if (catsEl) catsEl.textContent = String(catCount || 0);
+        if (invitesEl) invitesEl.textContent = Number.isFinite(invitesVal) ? String(invitesVal) : '0';
+    }
+
+    function updateAutoMatchLocalActivity() {
+        const block = document.querySelector('.automatch-local-activity');
+        if (!block) return;
+        const linesWrap = block.querySelector('.automatch-local-lines');
+        if (!linesWrap) return;
+        const lines = linesWrap.querySelectorAll('span:not(.am-local-helper)');
+        if (!lines || lines.length === 0) return;
+
+        const readCount = (id) => {
+            const el = $(id);
+            const raw = el ? String(el.textContent || '').trim() : '';
+            const n = parseInt(raw, 10);
+            return Number.isFinite(n) ? n : 0;
+        };
+
+        const reqPending = readCount('am-req-count-pending');
+        const offPending = readCount('am-off-count-pending');
+        const accepted = readCount('am-req-count-accepted') + readCount('am-off-count-accepted');
+
+        const texts = [
+            `• ${reqPending} solicitudes activas`,
+            `• ${offPending} ofertas de ayuda`,
+            `• ${accepted} ayudas completadas`,
+        ];
+
+        lines.forEach((line, idx) => {
+            if (texts[idx]) line.textContent = texts[idx];
+        });
+
+        const isEmpty = reqPending === 0 && offPending === 0 && accepted === 0;
+        let helper = linesWrap.querySelector('.am-local-helper');
+        if (isEmpty) {
+            if (!helper) {
+                helper = document.createElement('span');
+                helper.className = 'am-local-helper';
+                linesWrap.appendChild(helper);
+            }
+            helper.textContent = 'Cuando empiece la actividad, aquí verás un resumen rápido de tu zona.';
+        } else if (helper) {
+            helper.remove();
+        }
+    }
+
+    function updateAutoMatchLiveFeed(rows = []) {
+        const feed = document.querySelector('.automatch-live-feed');
+        if (!feed) return;
+        const linesWrap = feed.querySelector('.automatch-live-lines');
+        if (!linesWrap) return;
+
+        const source = Array.isArray(rows) && rows.length
+            ? rows
+            : (Array.isArray(lastAutoMatchRows) ? lastAutoMatchRows : []);
+
+        const pending = source.filter(r => r && r.status === 'pending');
+        if (!pending.length) {
+            linesWrap.innerHTML = `
+                <span class="am-empty-line">Todavía no hay actividad reciente en tu zona.</span>
+                <span class="am-empty-hint">Cuando aparezcan nuevas solicitudes u ofertas, las verás aquí.</span>
+            `;
+            return;
+        }
+
+        const pickNumber = (...vals) => {
+            for (const v of vals) {
+                if (v == null) continue;
+                const n = Number(v);
+                if (Number.isFinite(n) && n >= 0) return n;
+            }
+            return null;
+        };
+
+        const items = pending.slice().sort((a, b) => {
+            const ta = parseTime(a && a.created_at) || 0;
+            const tb = parseTime(b && b.created_at) || 0;
+            return tb - ta;
+        }).slice(0, 4);
+
+        const lines = items.map(r => {
+            const kind = (r && r.kind === 'offer') ? 'offer' : 'request';
+            const base = kind === 'offer' ? 'Vecino ofrece ayuda' : 'Nueva solicitud';
+            const detail = String(r.title || r.category || '').trim();
+            const distVal = pickNumber(r.distance_km, r.distance, r.dist_km, r.km);
+            const distText = (distVal != null) ? ` (${distVal.toFixed(1)} km)` : '';
+            const label = detail ? `${base} de ${detail}` : base;
+            return `• ${label}${distText}`;
+        });
+
+        linesWrap.innerHTML = lines.map(line => `<span>${escapeHtml(line)}</span>`).join('');
+    }
+
+    function updateAutoMatchSmartMatch(reqRows = [], offRows = []) {
+        const block = document.querySelector('.automatch-smart-match');
+        if (!block) return;
+
+        const renderSmartMatchEmpty = () => {
+            block.innerHTML = `
+              <div class="automatch-smart-title">No hay coincidencias todavía</div>
+              <div class="am-smart-empty">Activa tus categorías y espera a que aparezcan solicitudes u ofertas compatibles cerca de ti.</div>
+              <div class="am-smart-empty-hint">AutoMatch te avisará cuando encuentre una coincidencia.</div>
+            `;
+            show(block);
+        };
+
+        const providerEnabled = isAutoMatchProviderEnabled();
+        const seekerEnabled = isAutoMatchSeekerEnabled();
+
+        if (!providerEnabled && !seekerEnabled) {
+            smartMatchCache = [];
+            smartMatchIndex = 0;
+            renderSmartMatchEmpty();
+            return;
+        }
+
+        const readSelectedCats = (id) => {
+            const wrap = $(id);
+            if (!wrap) return new Set();
+            const items = wrap.querySelectorAll('input[type="checkbox"]:checked');
+            return new Set(Array.from(items).map(i => String(i.value || '').trim()).filter(Boolean));
+        };
+
+        const providerCats = readSelectedCats('am-provider-cats');
+        const seekerCats = readSelectedCats('am-seeker-cats');
+
+        const source = [];
+        if (Array.isArray(reqRows) && reqRows.length) source.push(...reqRows);
+        if (Array.isArray(offRows) && offRows.length) source.push(...offRows);
+        if (!source.length && Array.isArray(lastAutoMatchRows)) {
+            source.push(...lastAutoMatchRows.filter(r => r && r.status === 'pending'));
+        }
+
+        if (!source.length) {
+            smartMatchCache = [];
+            smartMatchIndex = 0;
+            renderSmartMatchEmpty();
+            return;
+        }
+
+        const pickNumber = (...vals) => {
+            for (const v of vals) {
+                if (v == null) continue;
+                const n = Number(v);
+                if (Number.isFinite(n) && n >= 0) return n;
+            }
+            return null;
+        };
+
+        const matchCategory = (row, catSet) => {
+            if (!catSet || !catSet.size) return { matched: false, label: '' };
+            const cat = String(row.category || '').trim();
+            if (cat && catSet.has(cat)) return { matched: true, label: catLabel(cat) };
+            const title = String(row.title || '').trim().toLowerCase();
+            if (title) {
+                for (const id of catSet) {
+                    const label = String(catLabel(id) || id).toLowerCase();
+                    if (label && title.includes(label)) return { matched: true, label: catLabel(id) };
+                }
+            }
+            return { matched: false, label: '' };
+        };
+
+        const candidates = source
+            .filter(r => r && r.status === 'pending')
+            .map(r => {
+                const kind = (r.kind === 'offer') ? 'offer' : 'request';
+                if (kind === 'request' && !providerEnabled) return null;
+                if (kind === 'offer' && !seekerEnabled) return null;
+                const catSet = kind === 'offer' ? seekerCats : providerCats;
+                const match = matchCategory(r, catSet);
+                const dist = pickNumber(r.distance_km, r.distance, r.dist_km, r.km);
+                const ts = parseTime(r.created_at) || 0;
+                return { r, kind, match, dist, ts };
+            })
+            .filter(Boolean)
+            .filter(c => c.r && c.r.id && !smartMatchDismissed.has(c.r.id));
+
+        if (!candidates.length) {
+            smartMatchCache = [];
+            smartMatchIndex = 0;
+            renderSmartMatchEmpty();
+            return;
+        }
+
+        candidates.sort((a, b) => {
+            if (a.match.matched !== b.match.matched) return a.match.matched ? -1 : 1;
+            const ad = (a.dist == null) ? Number.POSITIVE_INFINITY : a.dist;
+            const bd = (b.dist == null) ? Number.POSITIVE_INFINITY : b.dist;
+            if (ad !== bd) return ad - bd;
+            if (a.ts !== b.ts) return b.ts - a.ts;
+            return 0;
+        });
+
+        smartMatchCache = candidates;
+        if (smartMatchIndex >= smartMatchCache.length) smartMatchIndex = 0;
+
+        const chosen = smartMatchCache[smartMatchIndex];
+        if (!chosen || !chosen.r) {
+            renderSmartMatchEmpty();
+            return;
+        }
+
+        const row = chosen.r;
+        const nameRaw = String(row.other_name || '').trim();
+        const name = nameRaw || '';
+        const detail = String(row.title || '').trim() || String(catLabel(row.category) || row.category || '').trim();
+
+        let headline = '';
+        if (chosen.kind === 'request') {
+            if (name && detail) headline = `${name} necesita ayuda con ${detail}`;
+            else headline = 'Alguien necesita ayuda';
+        } else {
+            if (name && detail) headline = `${name} ofrece ayuda con ${detail}`;
+            else headline = 'Alguien ofrece ayuda';
+        }
+
+        let reasonText = '';
+        if (chosen.match.matched) reasonText = 'Coincide con tus categorías';
+        else if (chosen.dist != null) reasonText = 'Cerca de ti';
+        else reasonText = 'Coincide con tu modo activo';
+
+        let trustText = '';
+        if (row.other_verified) {
+            trustText = '✔ Vecino verificado por la comunidad';
+        } else {
+            const rating = Number(row.other_rating || row.rating || row.rating_avg || row.score || 0);
+            if (Number.isFinite(rating) && rating > 0) {
+                trustText = `⭐ Valoración de vecinos: ${rating.toFixed(1).replace('.', ',')}`;
+            }
+        }
+
+        const metaParts = [];
+        if (chosen.dist != null) metaParts.push(`📍 ${chosen.dist.toFixed(1)} km`);
+        if (chosen.match.matched && chosen.match.label) metaParts.push(`Coincide con: ${chosen.match.label}`);
+        const metaText = metaParts.join(' • ');
+
+        const remainingMatches = Math.max(0, smartMatchCache.length - 1);
+        const moreText = remainingMatches === 1
+            ? 'Hay 1 coincidencia más cerca de ti'
+            : `Hay ${remainingMatches} coincidencias más cerca de ti`;
+
+        const canRotate = smartMatchCache.length > 1;
+        block.innerHTML = `
+          <div class="automatch-smart-title">Posible coincidencia para ti</div>
+          <div class="automatch-smart-body">
+            <div class="automatch-smart-main">
+              <div class="automatch-smart-text">${escapeHtml(headline)}</div>
+              <div class="am-smart-reason">${escapeHtml(reasonText)}</div>
+              ${trustText ? `<div class="am-smart-trust">${escapeHtml(trustText)}</div>` : ''}
+              ${metaText ? `<div class="automatch-smart-meta">${escapeHtml(metaText)}</div>` : ''}
+            </div>
+            ${remainingMatches > 0 ? `<div class="am-smart-more">${escapeHtml(moreText)}</div>` : ''}
+            <div class="automatch-smart-actions">
+              <button class="btn btn-primary btn-sm am-smart-help-now" type="button" data-smart-help="1">Ayudar ahora</button>
+              <button class="btn btn-ghost btn-xs automatch-smart-action" type="button" data-smart-detail="1">Ver detalle</button>
+              ${canRotate ? '<button class="btn btn-ghost btn-sm am-smart-next" type="button" data-smart-next="1">Ver otra coincidencia</button>' : ''}
+              <button class="btn btn-ghost btn-sm am-smart-dismiss" type="button" data-smart-dismiss="1">No me interesa</button>
+            </div>
+          </div>
+        `;
+
+        const btn = block.querySelector('[data-smart-detail]');
+        if (btn) {
+            btn.addEventListener('click', async () => {
+                try {
+                    const otherId = (row.kind === 'offer') ? row.provider_id : row.seeker_id;
+                    if (!otherId) throw new Error('missing user id');
+                    const u = await KHApi.getUser(otherId);
+                    openUserCard(u);
+                } catch {
+                    toast('No se pudo cargar el perfil', 'error');
+                }
+            });
+        }
+
+        const btnHelp = block.querySelector('[data-smart-help]');
+        if (btnHelp) {
+            btnHelp.addEventListener('click', async () => {
+                if (row.kind === 'request') {
+                    if (!row.id) {
+                        toast('No se pudo iniciar la ayuda', 'error');
+                        return;
+                    }
+                    acceptAutoMatch(row.id);
+                    return;
+                }
+
+                try {
+                    const otherId = (row.kind === 'offer') ? row.provider_id : row.seeker_id;
+                    if (!otherId) throw new Error('missing user id');
+                    const u = await KHApi.getUser(otherId);
+                    openUserCard(u);
+                } catch {
+                    toast('No se pudo cargar el perfil', 'error');
+                }
+            });
+        }
+
+        const btnNext = block.querySelector('[data-smart-next]');
+        if (btnNext) {
+            btnNext.addEventListener('click', () => {
+                if (smartMatchCache.length <= 1) return;
+                smartMatchIndex = (smartMatchIndex + 1) % smartMatchCache.length;
+                updateAutoMatchSmartMatch();
+            });
+        }
+
+        const btnDismiss = block.querySelector('[data-smart-dismiss]');
+        if (btnDismiss) {
+            btnDismiss.addEventListener('click', () => {
+                if (row && row.id) smartMatchDismissed.add(row.id);
+                updateAutoMatchSmartMatch();
+            });
+        }
+
+        show(block);
+    }
+
+    function updateAutoMatchInvitesEmptyState(isEmpty) {
+        const wrap = document.querySelector('.automatch-invites');
+        if (!wrap) return;
+        let empty = wrap.querySelector('.am-invites-empty');
+        if (isEmpty) {
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'am-invites-empty';
+                empty.innerHTML = `
+                    <div class="am-invites-empty-title">No hay invitaciones activas por ahora.</div>
+                    <div class="am-invites-empty-sub">En cuanto AutoMatch detecte solicitudes u ofertas compatibles, aparecerán aquí.</div>
+                `;
+                const head = wrap.querySelector('.automatch-settings-head');
+                if (head) head.insertAdjacentElement('afterend', empty);
+                else wrap.prepend(empty);
+            }
+        } else if (empty) {
+            empty.remove();
+        }
+    }
 
     function renderAutoMatchCats(wrapId, selected, disabled) {
         const wrap = $(wrapId);
@@ -3332,9 +4509,14 @@
                     const row = i.closest('.am-cat');
                     if (row) row.classList.toggle('am-cat--active', i.checked);
                     saveAutoMatchSettings();
+                    updateAutoMatchStatusStrip();
+                    updateAutoMatchLocalActivity();
                 });
             });
         }
+
+        updateAutoMatchStatusStrip();
+        updateAutoMatchLocalActivity();
     }
 
     function renderAutoMatchFilterChips() {
@@ -3433,6 +4615,17 @@
         renderInvites('am-off-pending', offPending, { empty: 'Sin pendientes' });
         renderInvites('am-off-accepted', offAccepted, { empty: 'Aún no aceptaste' });
         renderInvites('am-off-archived', offArchived, { empty: 'Nada archivado' });
+
+        updateAutoMatchLiveFeed([...reqPending, ...offPending]);
+        updateAutoMatchSmartMatch(reqPending, offPending);
+        updateAutoMatchInvitesEmptyState(
+            reqPending.length === 0
+            && reqAccepted.length === 0
+            && reqArchived.length === 0
+            && offPending.length === 0
+            && offAccepted.length === 0
+            && offArchived.length === 0
+        );
     }
 
     async function loadAutoMatch(opts = {}) {
@@ -3441,21 +4634,47 @@
         if (btn && !opts.silent) setLoading(btn, true);
         try {
             const settings = await KHApi.automatchGetSettings();
+            const mode = normalizeAutoMatchMode(settings && settings.automatch_mode);
+            setAutoMatchMode(mode, { silent: true });
             // Premium user: hide upsell button
             const upsell = $('btn-am-premium');
             if (upsell) upsell.classList.add('hidden');
+            const saveBtn = $('btn-am-save');
+            if (saveBtn) saveBtn.classList.remove('hidden');
 
             const provEnabled = !!settings.enabled;
             const seekEnabled = !!settings.seeker_enabled;
-            const provBox = $('am-provider-enabled');
-            const seekBox = $('am-seeker-enabled');
-            if (provBox) provBox.checked = provEnabled;
-            if (seekBox) seekBox.checked = seekEnabled;
+            setSimpleRole('provider', provEnabled);
+            setSimpleRole('seeker', seekEnabled);
 
             renderAutoMatchCats('am-provider-cats', settings.categories, false);
             renderAutoMatchCats('am-seeker-cats', settings.seeker_categories, false);
 
+            const radiusInput = $('am-radius');
+            const radiusLabel = $('am-radius-value');
+            const radiusVal = Number(settings.radius_km || 5);
+            if (radiusInput) radiusInput.value = String(radiusVal);
+            if (radiusLabel) radiusLabel.textContent = `${radiusVal} km`;
+            setSimpleRadius(closestSimpleRadius(radiusVal), { syncAdvanced: false });
+
+            const maxInvitesInput = $('am-max-invites');
+            const maxInvitesLabel = $('am-max-invites-value');
+            const maxInvitesVal = Number(settings.max_invites_per_day || 20);
+            if (maxInvitesInput) maxInvitesInput.value = String(maxInvitesVal);
+            if (maxInvitesLabel) maxInvitesLabel.textContent = String(maxInvitesVal);
+
+            const weekdayStart = $('am-weekday-start');
+            const weekdayEnd = $('am-weekday-end');
+            const weekendStart = $('am-weekend-start');
+            const weekendEnd = $('am-weekend-end');
+            if (weekdayStart) weekdayStart.value = settings.weekday_start || '17:00';
+            if (weekdayEnd) weekdayEnd.value = settings.weekday_end || '21:00';
+            if (weekendStart) weekendStart.value = settings.weekend_start || '00:00';
+            if (weekendEnd) weekendEnd.value = settings.weekend_end || '23:59';
+
             renderAutoMatchFilterChips();
+
+            updateAutoMatchStatusStrip();
 
             const out = await KHApi.automatchListInvites({ limit: 80, offset: 0 });
             const rows = (out && out.data) || [];
@@ -3474,6 +4693,8 @@
                 tabBadge.classList.toggle('hidden', total === 0);
             }
 
+            updateAutoMatchLocalActivity();
+
             const statusPill = $('am-status-pill');
             if (statusPill) statusPill.classList.remove('hidden');
 
@@ -3483,20 +4704,22 @@
             if (hasNew && opts.silent) toast('Nueva invitación de AutoMatch', 'info');
             tickInviteCountdowns();
         } catch (err) {
+            setAutoMatchMode('simple', { silent: true });
             const upsell = $('btn-am-premium');
             if (upsell) upsell.classList.remove('hidden');
+            const saveBtn = $('btn-am-save');
+            if (saveBtn) saveBtn.classList.add('hidden');
 
-            const provBox = $('am-provider-enabled');
-            const seekBox = $('am-seeker-enabled');
-            if (provBox) provBox.checked = false;
-            if (seekBox) seekBox.checked = false;
+            setSimpleRole('provider', false);
+            setSimpleRole('seeker', false);
+            setSimpleRadius(5);
             renderAutoMatchCats('am-provider-cats', [], true);
             renderAutoMatchCats('am-seeker-cats', [], true);
             const msg = (err && err.message) ? err.message : 'AutoMatch no disponible';
             const ids = ['am-req-pending', 'am-req-accepted', 'am-req-archived', 'am-off-pending', 'am-off-accepted', 'am-off-archived'];
             ids.forEach(id => {
                 const el = $(id);
-                if (el) el.innerHTML = `<div class="ledger-empty" style="color:var(--text-soft)">🔒 ${escapeHtml(msg)}<br/>Activa Premium para recibir invitaciones automáticas.</div>`;
+                if (el) el.innerHTML = `<div class="ledger-empty" style="color:var(--text-soft)">🔒 ${escapeHtml(msg)}<br/>Desbloquea AutoMatch Premium para recibir invitaciones automáticas.</div>`;
             });
             const cr = $('am-count-requests');
             const co = $('am-count-offers');
@@ -3511,6 +4734,8 @@
 
             const statusPill = $('am-status-pill');
             if (statusPill) statusPill.classList.add('hidden');
+
+            updateAutoMatchLocalActivity();
         } finally {
             if (btn && !opts.silent) setLoading(btn, false);
         }
@@ -3566,8 +4791,63 @@
 
     async function saveAutoMatchSettings() {
         if (!KHApi.getToken()) return;
+        const timeVal = (id, fallback) => {
+            const el = $(id);
+            const v = el && String(el.value || '').trim();
+            return v ? v : fallback;
+        };
+        const tz_offset_min = new Date().getTimezoneOffset();
+
+        if (autoMatchMode === 'simple') {
+            const enabled = isSimpleRoleActive('provider');
+            const seeker_enabled = isSimpleRoleActive('seeker');
+            if (!enabled && !seeker_enabled) {
+                toast('Elige recibir u ofrecer ayuda', 'error');
+                return;
+            }
+            const radius_km = Math.max(1, Math.min(30, Number(getSimpleRadius()) || 5));
+            const allCats = AM_CATS.map(c => c.id);
+            try {
+                await KHApi.automatchUpdateSettings({
+                    automatch_mode: 'simple',
+                    enabled,
+                    categories: enabled ? allCats : [],
+                    seeker_enabled,
+                    seeker_categories: seeker_enabled ? allCats : [],
+                    radius_km,
+                    max_invites_per_day: SIMPLE_DEFAULT_INVITES,
+                    weekday_start: '17:00',
+                    weekday_end: '21:00',
+                    weekend_start: '00:00',
+                    weekend_end: '23:59',
+                    tz_offset_min,
+                });
+                toast('AutoMatch actualizado ✓', 'success');
+                loadAutoMatch({ silent: true });
+            } catch (err) {
+                toast(err.message || 'No se pudo guardar AutoMatch', 'error');
+                loadAutoMatch({ silent: true });
+            }
+            return;
+        }
+
         const enabled = !!($('am-provider-enabled') && $('am-provider-enabled').checked);
         const seeker_enabled = !!($('am-seeker-enabled') && $('am-seeker-enabled').checked);
+        const radiusInput = $('am-radius');
+        const maxInvitesInput = $('am-max-invites');
+        const radius_km = radiusInput ? Math.max(1, Math.min(30, Number(radiusInput.value) || 5)) : undefined;
+        const max_invites_per_day = maxInvitesInput
+            ? Math.max(5, Math.min(20, Number(maxInvitesInput.value) || 20))
+            : undefined;
+        const weekday_start = timeVal('am-weekday-start', '17:00');
+        const weekday_end = timeVal('am-weekday-end', '21:00');
+        const weekend_start = timeVal('am-weekend-start', '00:00');
+        const weekend_end = timeVal('am-weekend-end', '23:59');
+        const radiusLabel = $('am-radius-value');
+        if (radiusLabel && radius_km != null) radiusLabel.textContent = `${radius_km} km`;
+        const maxInvitesLabel = $('am-max-invites-value');
+        if (maxInvitesLabel && max_invites_per_day != null) maxInvitesLabel.textContent = String(max_invites_per_day);
+        updateAutoMatchStatusStrip();
         const provWrap = $('am-provider-cats');
         const seekWrap = $('am-seeker-cats');
         const cats = provWrap
@@ -3577,7 +4857,20 @@
             ? Array.from(seekWrap.querySelectorAll('input[type="checkbox"]')).filter(i => i.checked).map(i => i.value)
             : [];
         try {
-            await KHApi.automatchUpdateSettings({ enabled, categories: cats, seeker_enabled, seeker_categories });
+            await KHApi.automatchUpdateSettings({
+                automatch_mode: 'advanced',
+                enabled,
+                categories: cats,
+                seeker_enabled,
+                seeker_categories,
+                radius_km,
+                max_invites_per_day,
+                weekday_start,
+                weekday_end,
+                weekend_start,
+                weekend_end,
+                tz_offset_min,
+            });
             toast('AutoMatch actualizado ✓', 'success');
             loadAutoMatch({ silent: true });
         } catch (err) {
@@ -3777,9 +5070,99 @@
             const loc = r.location_text || '';
             const comp = compLabel(r.compensation_type);
             const kind = r.kind === 'offer' ? 'offer' : 'request';
-            const who = r.other_name ? `${r.other_name}${r.other_verified ? ' ✓' : ''} · ★ ${(Number(r.other_rating || 0)).toFixed(1)}` : '';
+            const who = r.other_name ? `${r.other_name}${r.other_verified ? ' ✓' : ''}` : '';
+            const pickNumber = (...vals) => {
+                for (const v of vals) {
+                    if (v == null) continue;
+                    const n = Number(v);
+                    if (Number.isFinite(n) && n > 0) return n;
+                }
+                return null;
+            };
+            const pickText = (...vals) => {
+                for (const v of vals) {
+                    if (v == null) continue;
+                    const t = String(v || '').trim();
+                    if (t) return t;
+                }
+                return '';
+            };
+            const ratingVal = pickNumber(r.other_rating, r.rating, r.rating_avg, r.score);
+            const completedVal = pickNumber(r.completed_count, r.helps_completed, r.matches_completed);
+            const badgeText = pickText(r.badge, r.rank_label, r.tier_label);
+            const trustParts = [];
+            if (ratingVal != null) trustParts.push(`⭐ ${ratingVal.toFixed(1)}`);
+            if (completedVal != null) trustParts.push(`${completedVal} ayudas completadas`);
+            if (badgeText) trustParts.push(badgeText);
+            const trustLine = trustParts.join(' • ');
+            const distVal = pickNumber(r.distance_km, r.distance, r.dist_km, r.km);
+            const distLine = (distVal != null && distVal >= 0) ? `📍 ${distVal.toFixed(1)} km` : '';
+            let timeEstimate = '';
+            if (distVal != null && distVal >= 0) {
+                if (distVal <= 1) timeEstimate = '⏱ 5–10 min';
+                else if (distVal <= 3) timeEstimate = '⏱ 10–15 min';
+                else if (distVal <= 5) timeEstimate = '⏱ 15–20 min';
+                else timeEstimate = '⏱ 20+ min';
+            }
             const st = String(r.status || 'pending');
             const stClass = ['pending', 'accepted', 'declined', 'expired'].includes(st) ? st : 'pending';
+            let urgencyLabel = '';
+            let urgencyAge = '';
+            if (kind === 'request' && st === 'pending') {
+                const rawPriority = String(r.priority || r.urgency || r.level || '').toLowerCase().trim();
+                if (rawPriority) {
+                    if (['high', 'urgent', 'alta', 'urgente'].includes(rawPriority)) urgencyLabel = '🔴 Urgente';
+                    else if (['medium', 'normal', 'media'].includes(rawPriority)) urgencyLabel = '🟠 Prioridad media';
+                    else if (['low', 'baja', 'flexible'].includes(rawPriority)) urgencyLabel = '🟢 Flexible';
+                }
+                if (!urgencyLabel) {
+                    const createdAt = Date.parse(r.created_at || '') || 0;
+                    if (createdAt) {
+                        const hours = (Date.now() - createdAt) / 36e5;
+                        if (hours <= 2) urgencyLabel = '🔴 Urgente';
+                        else if (hours <= 12) urgencyLabel = '🟠 Prioridad media';
+                        else urgencyLabel = '🟢 Flexible';
+                    }
+                }
+                const createdAt = Date.parse(r.created_at || '') || 0;
+                if (createdAt) {
+                    const diffMs = Date.now() - createdAt;
+                    const minutes = Math.max(0, Math.floor(diffMs / 60000));
+                    if (minutes < 60) urgencyAge = `hace ${minutes} min`;
+                    else {
+                        const hours = Math.floor(minutes / 60);
+                        if (hours < 24) urgencyAge = `hace ${hours} h`;
+                        else {
+                            const days = Math.floor(hours / 24);
+                            urgencyAge = `hace ${days} días`;
+                        }
+                    }
+                }
+            }
+            const canShare = !!navigator.share;
+            const pickCoord = (...vals) => {
+                for (const v of vals) {
+                    if (v == null) continue;
+                    const n = Number(v);
+                    if (Number.isFinite(n)) return n;
+                }
+                return null;
+            };
+            const lat = pickCoord(r.lat, r.latitude);
+            const lng = pickCoord(r.lng, r.longitude);
+            const mapUrl = (lat != null && lng != null)
+                ? `https://www.google.com/maps?q=${lat},${lng}`
+                : '';
+            const distText = (distVal != null && distVal >= 0) ? `📍 ${distVal.toFixed(1)} km` : '';
+            const metaItems = [];
+            if (urgencyLabel) {
+                const urgencyText = `${urgencyLabel}${urgencyAge ? ` • ${urgencyAge}` : ''}`;
+                metaItems.push(`<div class="am-card-meta-item am-card-urgency">${escapeHtml(urgencyText)}</div>`);
+            }
+            if (distText) metaItems.push(`<div class="am-card-meta-item am-card-distance">${escapeHtml(distText)}</div>`);
+            if (timeEstimate) metaItems.push(`<div class="am-card-meta-item am-card-time-estimate">${escapeHtml(timeEstimate)}</div>`);
+            if (mapUrl) metaItems.push(`<a class="am-card-meta-item am-card-map-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener">Ver en mapa</a>`);
+            const metaHtml = metaItems.length ? `<div class="am-card-meta">${metaItems.join('')}</div>` : '';
             el.className = `am-invite am-invite--${stClass}`;
             const stLabel = st === 'accepted' ? 'Aceptada' : (st === 'expired' ? 'Caducada' : (st === 'declined' ? 'Rechazada' : null));
             const showActions = st === 'pending';
@@ -3789,17 +5172,26 @@
                 ${img ? `<img src="${escapeHtml(String(img))}" alt="" loading="lazy" />` : `<span aria-hidden="true">${inviteIcon(cat)}</span>`}
               </div>
               <div>
-                <div class="am-invite-title">${escapeHtml(title)}</div>
-                <div class="am-invite-meta">
-                  <span class="am-chip ${kind === 'offer' ? 'offer' : 'req'}">${kind === 'offer' ? 'OFERTA' : 'SOLICITUD'}</span>
-                  <span class="am-chip">${escapeHtml(catLabel(cat))}</span>
-                  <span class="am-chip">${escapeHtml(comp)}</span>
-                  ${loc ? `<span class="am-chip">📍 ${escapeHtml(loc)}</span>` : ''}
-                  ${st === 'pending' ? `<span class="am-chip ttl" data-am-expires="${exp}">—</span>` : (stLabel ? `<span class="am-chip am-status-chip ${st === 'accepted' ? 'ok' : 'bad'}">${stLabel}</span>` : '')}
+                <div class="am-card-body">
+                  <div class="am-card-main">
+                    ${who ? `<div class="am-card-user-row"><button class="am-chip am-chip-user am-card-user-link" type="button" data-user="1">${escapeHtml(who)}</button>${r.other_verified ? '<span class="am-card-verified">✔ Vecino verificado</span>' : ''}</div>` : ''}
+                    <div class="am-invite-title">${escapeHtml(title)}</div>
+                    <div class="am-invite-meta">
+                      <span class="am-chip ${kind === 'offer' ? 'offer' : 'req'}">${kind === 'offer' ? 'OFERTA' : 'SOLICITUD'}</span>
+                      <span class="am-chip">${escapeHtml(catLabel(cat))}</span>
+                      <span class="am-chip">${escapeHtml(comp)}</span>
+                      ${loc ? `<span class="am-chip">📍 ${escapeHtml(loc)}</span>` : ''}
+                      ${st === 'pending' ? `<span class="am-chip ttl" data-am-expires="${exp}">—</span>` : (stLabel ? `<span class="am-chip am-status-chip ${st === 'accepted' ? 'ok' : 'bad'}">${stLabel}</span>` : '')}
+                    </div>
+                    ${trustLine ? `<div class="am-card-trust">${escapeHtml(trustLine)}</div>` : ''}
+                  </div>
+                  ${metaHtml}
                 </div>
-                ${who ? `<div class="am-invite-meta" style="margin-top:8px;"><button class="am-chip am-chip-user" type="button" data-user="1">${escapeHtml(who)}</button></div>` : ''}
                 ${showActions ? `
                   <div class="am-invite-actions">
+                    <button class="btn btn-ghost btn-sm am-card-contact" type="button" data-contact="1">Contactar</button>
+                    <button class="btn btn-ghost btn-sm am-card-share" type="button" data-share="1">Compartir</button>
+                    ${!canShare ? '<button class="btn btn-ghost btn-xs am-card-copy-link" type="button" data-copy="1">Copiar enlace</button>' : ''}
                     <button class="btn btn-primary btn-sm" type="button" onclick="KHApp.acceptAutoMatch('${escapeHtml(r.id)}')">Aceptar</button>
                     <button class="btn btn-ghost btn-sm" type="button" onclick="KHApp.declineAutoMatch('${escapeHtml(r.id)}')">Rechazar</button>
                   </div>
@@ -3822,6 +5214,96 @@
                         openUserCard(u);
                     } catch {
                         toast('No se pudo cargar el perfil', 'error');
+                    }
+                });
+            }
+
+            const btnContact = el.querySelector('button[data-contact]');
+            if (btnContact) {
+                btnContact.addEventListener('click', async () => {
+                    try {
+                        const otherId = (r.kind === 'offer') ? r.provider_id : r.seeker_id;
+                        if (!otherId) throw new Error('missing user id');
+                        const u = await KHApi.getUser(otherId);
+                        openUserCard(u);
+                    } catch {
+                        toast('No se pudo abrir el contacto', 'error');
+                    }
+                });
+            }
+
+            const btnShare = el.querySelector('button[data-share]');
+            if (btnShare) {
+                btnShare.addEventListener('click', async () => {
+                    try {
+                        const inviteId = r.id || r.invite_id;
+                        if (!inviteId) throw new Error('missing invite id');
+                        const url = `${window.location.origin}/invite/${encodeURIComponent(inviteId)}`;
+                        const isOffer = r.kind === 'offer';
+                        let subject = String(
+                            r.title || r.category_label || r.category || (isOffer ? 'oferta de ayuda' : 'solicitud')
+                        );
+                        subject = subject.replace(/\s+/g, ' ').trim();
+                        if (subject.length > 80) {
+                            subject = subject.slice(0, 77) + '…';
+                        }
+                        const title = isOffer ? 'Oferta de ayuda en KingsHelp' : 'Solicitud en KingsHelp';
+                        const text = isOffer
+                            ? `He encontrado esta oferta de ayuda en KingsHelp: ${subject}`
+                            : `He encontrado esta solicitud en KingsHelp: ${subject}`;
+
+                        if (navigator.share) {
+                            await navigator.share({ title, text, url });
+                            return;
+                        }
+
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(url);
+                            toast('Enlace copiado', 'success');
+                            return;
+                        }
+
+                        const temp = document.createElement('textarea');
+                        temp.value = url;
+                        temp.setAttribute('readonly', '');
+                        temp.style.position = 'absolute';
+                        temp.style.left = '-9999px';
+                        document.body.appendChild(temp);
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                        toast('Enlace copiado', 'success');
+                    } catch {
+                        toast('No se pudo compartir', 'error');
+                    }
+                });
+            }
+
+            const btnCopy = el.querySelector('button[data-copy]');
+            if (btnCopy) {
+                btnCopy.addEventListener('click', async () => {
+                    try {
+                        const inviteId = r.id || r.invite_id;
+                        if (!inviteId) throw new Error('missing invite id');
+                        const url = `${window.location.origin}/invite/${encodeURIComponent(inviteId)}`;
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(url);
+                            toast('Enlace copiado', 'success');
+                            return;
+                        }
+
+                        const temp = document.createElement('textarea');
+                        temp.value = url;
+                        temp.setAttribute('readonly', '');
+                        temp.style.position = 'absolute';
+                        temp.style.left = '-9999px';
+                        document.body.appendChild(temp);
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                        toast('Enlace copiado', 'success');
+                    } catch {
+                        toast('No se pudo copiar el enlace', 'error');
                     }
                 });
             }
@@ -3904,7 +5386,7 @@
         },
         {
             slug: 'col_barrio_solidario',
-            name: 'Barrio Solidario',
+            name: 'Comunidad Solidaria',
             desc: 'Acompanamiento, recados y clases.',
             reward: 90,
             type: 'all',
@@ -4084,7 +5566,7 @@
             title.textContent = 'Crea tu primera publicación';
             desc.textContent = 'Elige si necesitas ayuda o si ofreces ayuda. En 1 minuto puedes tener un match.';
             cta.textContent = 'Crear';
-            sec.textContent = 'Ver demo';
+            sec.textContent = 'Ver guía';
             sec.classList.remove('hidden');
             return;
         }
@@ -4140,14 +5622,10 @@
         const price = $('premium-modal-main-price');
         const note = $('premium-modal-main-note');
         if (price) {
-            price.innerHTML = premiumInterval === 'month'
-                ? '0,99&nbsp;€<span>/mes</span>'
-                : '7,99&nbsp;€<span>/año</span>';
+            price.innerHTML = 'Gratis<span>AutoMatch Premium</span>';
         }
         if (note) {
-            note.textContent = premiumInterval === 'month'
-                ? 'sin permanencia'
-                : '≈ 0,67 €/mes · mejor precio';
+            note.textContent = 'Se activa al alcanzar la reputación necesaria';
         }
     }
 
@@ -4179,8 +5657,27 @@
     }
 
     function tierLabel(tier) {
+        if (tier === 'premium_lite') return '⚡ AutoMatch Premium';
         return (tier && tier !== 'free') ? 'Premium' : 'Gratis';
     }
+
+    function navTierLabel(tier) {
+        if (!tier || tier === 'free') return 'Gratis';
+        return '⚡ AutoMatch';
+    }
+
+    function normalizeNavTriggerLabel() {
+        const ids = ['nav-account-tier', 'user-tier'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const text = el.textContent || '';
+            if (text.toLowerCase().includes('premium')) {
+                el.textContent = '⚡ AutoMatch';
+            }
+        });
+    }
+
 
     function escapeHtml(str) {
         return String(str || '').replace(/[&<>"']/g, s => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s]));
@@ -4206,7 +5703,7 @@
             hasError = true;
         }
         if (!location_text) {
-            showFieldError('req-location', 'req-location-err', 'Indica tu zona (ej. barrio o ciudad).');
+            showFieldError('req-location', 'req-location-err', 'Indica tu zona (ej. comunidad o ciudad).');
             hasError = true;
         }
         if (hasError) return;
@@ -4511,136 +6008,6 @@
         });
     }
 
-    /* ── Landing MVP: Quick match flow ───────────────────────────────────────── */
-    function collectQuickDraft() {
-        return {
-            title: ($('quick-title') && $('quick-title').value || '').trim(),
-            category: $('quick-category') ? $('quick-category').value : 'tech',
-            compensation_type: (document.getElementById('quick-comp') && document.getElementById('quick-comp').value) || 'cash',
-            description: ($('quick-desc') && $('quick-desc').value || '').trim() || undefined,
-        };
-    }
-
-    async function startQuickMatch(event) {
-        event.preventDefault();
-        const draft = collectQuickDraft();
-        if (!draft.title) {
-            toast('Escribe un título', 'error');
-            return;
-        }
-        // No numeric amount in the quick demo — compensation type only
-
-        if (!KHApi.getToken()) {
-            quickDraft = draft;
-            postLoginAction = 'quick_match';
-            openLogin();
-            return;
-        }
-
-        await runQuickMatch(draft);
-    }
-
-    async function runQuickMatch(draft) {
-        const btn = $('btn-quick');
-        const out = $('quick-out');
-        const status = $('quick-status');
-        const list = $('quick-suggestions-list');
-
-        if (!btn || !out || !status || !list) {
-            toast('Demo no disponible en este layout', 'error');
-            return;
-        }
-
-        setLoading(btn, true);
-        show(out);
-        status.textContent = 'Creando solicitud...';
-        list.innerHTML = '';
-
-        try {
-            await ensureCurrentUser();
-            if (!currentUser) throw new Error('No se pudo cargar tu usuario');
-
-            const loc = String((currentUser && currentUser.location_text) || '').trim();
-            if (!loc) {
-                status.textContent = 'Falta tu zona';
-                list.innerHTML = '<div class="ledger-empty">Para probar la demo, primero completa tu <b>Zona</b> en Perfil.</div>';
-                toast('Completa tu zona en Perfil para usar la demo', 'error');
-                // Send them to Profile in-dashboard (fast fix).
-                try { setDashView('perfil'); } catch { }
-                return;
-            }
-
-            const body = {
-                title: draft.title,
-                category: draft.category,
-                points_offered: 0,
-                description: draft.description,
-                compensation_type: draft.compensation_type || 'cash',
-                location_text: loc,
-                when: 'asap',
-            };
-
-            const req = await KHApi.createRequest(body);
-            lastCreatedRequest = req;
-            status.textContent = 'Buscando KingsHelp cerca...';
-
-            const data = await KHApi.getSuggestedProviders(req.id);
-            const providers = data.suggested_providers || [];
-
-            if (!providers.length) {
-                status.textContent = 'Sin sugerencias por ahora';
-                list.innerHTML = '<div class="ledger-empty">Vuelve a intentar en un momento</div>';
-                return;
-            }
-
-            status.textContent = 'Sugerencias listas';
-            providers.slice(0, 6).forEach(p => {
-                const el = document.createElement('div');
-                el.className = 'mvp-item';
-                const rating = (p.rating_avg || 0).toFixed(1);
-                const tier = tierLabel(p.premium_tier);
-                el.innerHTML = `
-                  <div class="mvp-item-left">
-                    <button class="mvp-av mvp-av-btn" type="button" data-user="1" aria-label="Ver perfil de ${escapeHtml(p.display_name)}">${initials(p.display_name)}</button>
-                    <div class="mvp-txt">
-                      <div class="mvp-title"><button class="mvp-title-btn" type="button" data-user="1">${escapeHtml(p.display_name)}</button> <span style="opacity:.6">·</span> ★ ${rating}</div>
-                      <div class="mvp-meta">${escapeHtml(tier)} · ${p.active_offer_count || 0} ofertas activas</div>
-                    </div>
-                  </div>
-                  <div class="mvp-actions">
-                    <button class="btn btn-primary btn-sm" type="button">Crear match</button>
-                  </div>
-                `;
-
-                const btnMatch = el.querySelector('button');
-                btnMatch.addEventListener('click', async () => {
-                    const prev = btnMatch.textContent;
-                    btnMatch.disabled = true;
-                    btnMatch.textContent = 'Creando...';
-                    try {
-                        await createMatchForRequest(req, p);
-                        btnMatch.textContent = 'Creado ✓';
-                        status.textContent = 'Match creado ✓';
-                    } catch {
-                        btnMatch.disabled = false;
-                        btnMatch.textContent = prev;
-                    }
-                });
-                list.appendChild(el);
-
-                el.querySelectorAll('button[data-user]').forEach(btnUser => {
-                    btnUser.addEventListener('click', () => openUserCard(p));
-                });
-            });
-        } catch (err) {
-            status.textContent = 'Error';
-            list.innerHTML = '<div class="ledger-empty" style="color:var(--danger)">No se pudo completar</div>';
-            toast(err.message || 'Error en la demo', 'error');
-        } finally {
-            setLoading(btn, false);
-        }
-    }
-
     async function loadSuggestedProviders() {
         if (!KHApi.getToken()) {
             toast('Inicia sesión primero', 'error');
@@ -4711,17 +6078,15 @@
         await ensureCurrentUser();
         if (!currentUser) throw new Error('No se pudo cargar tu usuario');
 
-        const body = {
-            request_id: req.id,
-            provider_id: provider.id,
-            seeker_id: currentUser.id,
-            points_agreed: 0,
-            initiated_by: 'seeker',
-            compensation_type: req.compensation_type || 'cash',
-        };
+        const offerId = provider && provider.offer_id;
+        if (!offerId) {
+            toast('Proveedor sin oferta activa', 'error');
+            return null;
+        }
+        const body = { offer_id: offerId };
 
         try {
-            const match = await KHApi.createMatch(body);
+            const match = await KHApi.createMatchForRequest(req.id, body);
             toast(`Match creado con ${provider.display_name} ✓`, 'success');
             await loadMatches();
             if (match && match.id) openChat(match.id);
@@ -4747,23 +6112,9 @@
         }
 
         const kind = row.kind === 'offer' ? 'offer' : 'request';
-        const body = {
-            initiated_by: kind === 'offer' ? 'seeker' : 'provider',
-            compensation_type: row.compensation_type || 'cash',
-            points_agreed: 0,
-        };
-
-        if (kind === 'offer') {
-            body.offer_id = row.id;
-            body.provider_id = row.user_id;
-            body.seeker_id = currentUser.id;
-        } else {
-            body.request_id = row.id;
-            body.provider_id = currentUser.id;
-            body.seeker_id = row.user_id;
-        }
-
-        const match = await KHApi.createMatch(body);
+        const match = kind === 'offer'
+            ? await KHApi.createMatchForOffer(row.id)
+            : await KHApi.createMatchForRequest(row.id);
         toast('Match creado ✓', 'success');
         await loadMatches();
         if (match && match.id) openChat(match.id);
@@ -5303,6 +6654,1063 @@
         });
     }
 
+    function initCustomSelects() {
+        const selects = Array.from(document.querySelectorAll('select'));
+        if (!selects.length) return;
+
+        if (!window.__khSelectDocInit) {
+            document.addEventListener('click', (e) => {
+                const wrap = e.target.closest('.kh-select');
+                document.querySelectorAll('.kh-select.open').forEach(el => {
+                    if (wrap && el === wrap) return;
+                    el.classList.remove('open');
+                    const btn = el.querySelector('.kh-select-btn');
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                });
+            });
+            window.__khSelectDocInit = true;
+        }
+
+        const getVariant = (sel) => {
+            if (sel.classList.contains('feed-filter-select')) return 'pill';
+            if (sel.classList.contains('rank-select') || sel.classList.contains('rank-select--chip')) return 'chip';
+            return 'field';
+        };
+
+        selects.forEach(select => {
+            if (select.dataset.khSelectInit === '1') return;
+            if (select.closest('.kh-select')) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `kh-select kh-select--${getVariant(select)}`;
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'kh-select-btn';
+            button.setAttribute('aria-haspopup', 'listbox');
+            button.setAttribute('aria-expanded', 'false');
+
+            const list = document.createElement('div');
+            list.className = 'kh-select-list';
+            list.setAttribute('role', 'listbox');
+
+            const updateFromSelect = () => {
+                const opt = select.options[select.selectedIndex];
+                button.textContent = opt ? opt.textContent : '—';
+                list.querySelectorAll('.kh-select-option').forEach(o => {
+                    o.classList.toggle('is-selected', o.dataset.value === select.value);
+                });
+            };
+
+            Array.from(select.options).forEach(opt => {
+                const optBtn = document.createElement('button');
+                optBtn.type = 'button';
+                optBtn.className = 'kh-select-option';
+                optBtn.textContent = opt.textContent;
+                optBtn.dataset.value = opt.value;
+                if (opt.disabled) optBtn.disabled = true;
+                optBtn.addEventListener('click', () => {
+                    if (opt.disabled) return;
+                    select.value = opt.value;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    updateFromSelect();
+                    wrapper.classList.remove('open');
+                    button.setAttribute('aria-expanded', 'false');
+                });
+                optBtn.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        wrapper.classList.remove('open');
+                        button.setAttribute('aria-expanded', 'false');
+                        button.focus();
+                    }
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const opts = Array.from(list.querySelectorAll('.kh-select-option'));
+                        const idx = opts.indexOf(document.activeElement);
+                        const next = e.key === 'ArrowDown' ? opts[idx + 1] : opts[idx - 1];
+                        if (next) next.focus();
+                    }
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        optBtn.click();
+                    }
+                });
+                list.appendChild(optBtn);
+            });
+
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isOpen = wrapper.classList.toggle('open');
+                button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                if (isOpen) {
+                    const selected = list.querySelector('.kh-select-option.is-selected') || list.querySelector('.kh-select-option');
+                    if (selected) selected.focus();
+                }
+            });
+
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    wrapper.classList.add('open');
+                    button.setAttribute('aria-expanded', 'true');
+                    const selected = list.querySelector('.kh-select-option.is-selected') || list.querySelector('.kh-select-option');
+                    if (selected) selected.focus();
+                }
+                if (e.key === 'Escape') {
+                    wrapper.classList.remove('open');
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            select.addEventListener('change', updateFromSelect);
+            select.tabIndex = -1;
+            select.setAttribute('aria-hidden', 'true');
+            select.dataset.khSelectInit = '1';
+
+            select.parentElement.insertBefore(wrapper, select);
+            wrapper.appendChild(select);
+            wrapper.appendChild(button);
+            wrapper.appendChild(list);
+
+            if (select.disabled) wrapper.classList.add('is-disabled');
+            updateFromSelect();
+        });
+    }
+
+    /* ── Editor mode (admin only) ─────────────────────────────────────────── */
+    const EDITOR_OVERRIDES_URL = '/editor/overrides.json';
+    const EDITOR_SAVE_URL = '/api/v1/admin/editor/overrides';
+
+    let editorEnabled = false;
+    let editorSelected = null;
+    let editorDragging = false;
+    let editorResizing = false;
+    let editorStart = null;
+    let editorOverrides = null;
+    let editorClipboardHtml = null;
+    const editorHistory = [];
+    const editorHistoryLimit = 60;
+    let editorSnapEnabled = true;
+    const editorDeleted = new Map();
+    let editorObserver = null;
+    let editorReapplyTimer = null;
+
+    function applyEditorOverrides(payload) {
+        if (!payload || !Array.isArray(payload.items)) return;
+        editorOverrides = payload;
+        const deletions = payload.items.filter(i => i && i.deleted);
+        if (deletions.length) console.log('[editor] applying deletions:', deletions.map(i => i.id || i.selector));
+        const inserts = payload.items.filter(i => i && i.insert);
+        inserts.forEach(item => {
+            if (item.deleted) return;
+            let el = null;
+            if (item.id) el = document.querySelector(`[data-editor-id="${item.id}"]`);
+            if (!el && item.selector) el = document.querySelector(item.selector);
+            if (!el && item && item.deleted && item.fingerprint) {
+                el = findByFingerprint(item.fingerprint);
+                if (el && item.id) el.setAttribute('data-editor-id', item.id);
+                if (el && item.selector) el.dataset.editorSelector = item.selector;
+            }
+            if (el) return;
+            if (!item.insertHtml || !item.parentSelector) return;
+            const parent = document.querySelector(item.parentSelector);
+            if (!parent) return;
+            const temp = document.createElement('div');
+            temp.innerHTML = item.insertHtml;
+            const node = temp.firstElementChild;
+            if (!node) return;
+            const before = item.beforeSelector ? document.querySelector(item.beforeSelector) : null;
+            parent.insertBefore(node, before || null);
+            ensureEditorIdentity(node);
+            if (item.id) node.setAttribute('data-editor-id', item.id);
+            if (item.selector) node.dataset.editorSelector = item.selector;
+        });
+
+        payload.items.forEach(item => {
+            let el = null;
+            if (item && item.id) {
+                el = document.querySelector(`[data-editor-id="${item.id}"]`);
+            }
+            if (!el && item && item.selector) {
+                el = document.querySelector(item.selector);
+                if (el && item.id) el.setAttribute('data-editor-id', item.id);
+            }
+            if (!el && item && item.deleted && item.fingerprint) {
+                el = findByFingerprint(item.fingerprint);
+                if (el && item.id) el.setAttribute('data-editor-id', item.id);
+                if (el && item.selector) el.dataset.editorSelector = item.selector;
+            }
+            if (!el) {
+                if (item && item.deleted) {
+                    const entry = { id: item.id || null, selector: item.selector || null, fingerprint: item.fingerprint || null, deleted: true };
+                    const key = deletionKey(entry);
+                    if (key) editorDeleted.set(key, entry);
+                }
+                return;
+            }
+            if (item && item.selector) el.dataset.editorSelector = item.selector;
+            if (item && item.fingerprint && !el.dataset.editorFingerprint) {
+                try { el.dataset.editorFingerprint = JSON.stringify(item.fingerprint); } catch { }
+            }
+            if (!item.insert) {
+                if (item && typeof item.html === 'string') {
+                    el.innerHTML = item.html;
+                    el.dataset.editorTextMode = 'html';
+                } else if (item && typeof item.text === 'string') {
+                    el.textContent = item.text;
+                    el.dataset.editorTextMode = 'text';
+                } else if (item && typeof item.value === 'string') {
+                    el.value = item.value;
+                    el.setAttribute('value', item.value);
+                    el.dataset.editorTextMode = 'value';
+                }
+            }
+            if (item && item.locked) {
+                el.dataset.editorLocked = '1';
+                el.classList.add('editor-locked');
+            }
+            if (item && item.deleted) {
+                el.dataset.editorDeleted = '1';
+                el.style.display = 'none';
+                const entry = { id: item.id || null, selector: item.selector || null, fingerprint: item.fingerprint || null, deleted: true };
+                const key = deletionKey(entry);
+                if (key) editorDeleted.set(key, entry);
+            }
+            if (item && item.style) {
+                Object.entries(item.style).forEach(([k, v]) => {
+                    try { el.style[k] = v; } catch { }
+                });
+            }
+            if (Array.isArray(item.classes)) {
+                item.classes.forEach(c => {
+                    if (!c) return;
+                    try { el.classList.add(String(c)); } catch { }
+                });
+            }
+        });
+
+        if (editorDeleted.size) {
+            editorDeleted.forEach((entry) => {
+                if (!entry || !entry.deleted) return;
+                let el = null;
+                if (entry.id) el = document.querySelector(`[data-editor-id="${entry.id}"]`);
+                if (!el && entry.selector) el = document.querySelector(entry.selector);
+                if (!el && entry.fingerprint) el = findByFingerprint(entry.fingerprint);
+                if (!el) return;
+                el.dataset.editorDeleted = '1';
+                el.style.display = 'none';
+            });
+        }
+
+        applyDeletedCss();
+    }
+
+    function reapplyEditorOverrides() {
+        if (!editorOverrides || !Array.isArray(editorOverrides.items)) return;
+        applyEditorOverrides(editorOverrides);
+    }
+
+    async function loadEditorOverrides() {
+        let payload = null;
+        let localPayload = null;
+        try {
+            const raw = localStorage.getItem('kh_editor_overrides_backup');
+            if (raw) localPayload = JSON.parse(raw);
+        } catch { }
+        try {
+            const res = await fetch(`${EDITOR_OVERRIDES_URL}?t=${Date.now()}`, { cache: 'no-store' });
+            if (res.ok) payload = await res.json();
+        } catch { }
+        console.log('[editor] load — server items:', payload && payload.items && payload.items.length, '| local items:', localPayload && localPayload.items && localPayload.items.length);
+        const chosen = chooseEditorPayload(payload, localPayload);
+        if (!chosen) { ensureEditorObserver(); return; }
+        try { localStorage.setItem('kh_editor_overrides_backup', JSON.stringify(chosen)); } catch { }
+        console.log('[editor] applying', chosen.items && chosen.items.length, 'items');
+        applyEditorOverrides(chosen);
+        ensureEditorObserver();
+    }
+
+    function collectEditorOverrides() {
+        const items = [];
+        document.querySelectorAll('[data-editor-id]').forEach(el => {
+            const id = el.getAttribute('data-editor-id') || null;
+            const selector = el.dataset.editorSelector || null;
+            if (!id && !selector) return;
+            const style = {};
+            const keys = ['left', 'top', 'width', 'height', 'margin', 'padding', 'fontSize', 'fontWeight', 'opacity', 'zIndex', 'color', 'background', 'backgroundColor', 'borderRadius', 'transform'];
+            keys.forEach(k => {
+                const v = el.style[k];
+                if (v) style[k] = v;
+            });
+            if (el.style.backgroundImage) style.backgroundImage = el.style.backgroundImage;
+            if (el.style.backgroundSize) style.backgroundSize = el.style.backgroundSize;
+            if (el.style.backgroundPosition) style.backgroundPosition = el.style.backgroundPosition;
+            if (el.style.backgroundRepeat) style.backgroundRepeat = el.style.backgroundRepeat;
+            const textMode = el.dataset.editorTextMode || '';
+            const payload = { id, selector, style, classes: [] };
+            if (el.dataset.editorInserted === '1') {
+                const parent = el.parentElement;
+                const next = el.nextElementSibling;
+                payload.insert = true;
+                payload.insertHtml = el.outerHTML;
+                payload.parentSelector = parent ? buildEditorSelector(parent) : null;
+                payload.beforeSelector = next ? (next.dataset.editorSelector || buildEditorSelector(next)) : null;
+            }
+            const fpRaw = el.dataset.editorFingerprint;
+            if (fpRaw) {
+                try { payload.fingerprint = JSON.parse(fpRaw); } catch { }
+            } else {
+                const fp = buildFingerprint(el);
+                if (fp) payload.fingerprint = fp;
+            }
+            if (textMode === 'html') payload.html = el.innerHTML;
+            if (textMode === 'text') payload.text = el.innerText || '';
+            if (textMode === 'value') payload.value = el.value || '';
+            if (el.dataset.editorLocked === '1') payload.locked = true;
+            if (el.dataset.editorDeleted === '1') payload.deleted = true;
+            if (Object.keys(style).length || payload.html || payload.text || payload.value || payload.deleted || payload.insert) items.push(payload);
+        });
+        if (editorDeleted.size) {
+            editorDeleted.forEach((entry) => {
+                if (!entry || !entry.deleted) return;
+                const exists = items.some(i => (entry.id && i.id === entry.id) || (entry.selector && i.selector === entry.selector));
+                if (exists) return;
+                items.push({
+                    id: entry.id || null,
+                    selector: entry.selector || null,
+                    fingerprint: entry.fingerprint || null,
+                    deleted: true,
+                    style: {},
+                    classes: [],
+                });
+            });
+        }
+        return { version: 1, items };
+    }
+
+    function downloadOverrides(payload) {
+        try {
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'editor-overrides.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch { }
+    }
+
+                el = findByFingerprint(item.fingerprint);
+                if (el && item.id) el.setAttribute('data-editor-id', item.id);
+                if (el && item.selector) el.dataset.editorSelector = item.selector;
+            }
+            if (el) return;
+            if (!item.insertHtml || !item.parentSelector) return;
+            const parent = document.querySelector(item.parentSelector);
+            if (!parent) return;
+            const temp = document.createElement('div');
+            temp.innerHTML = item.insertHtml;
+            const node = temp.firstElementChild;
+            if (!node) return;
+            const before = item.beforeSelector ? document.querySelector(item.beforeSelector) : null;
+            parent.insertBefore(node, before || null);
+            ensureEditorIdentity(node);
+            if (item.id) node.setAttribute('data-editor-id', item.id);
+            if (item.selector) node.dataset.editorSelector = item.selector;
+        });
+
+        payload.items.forEach(item => {
+            let el = null;
+            if (item && item.id) {
+                el = document.querySelector(`[data-editor-id="${item.id}"]`);
+            }
+            if (!el && item && item.selector) {
+                el = document.querySelector(item.selector);
+                if (el && item.id) el.setAttribute('data-editor-id', item.id);
+            }
+            if (!el && item && item.deleted && item.fingerprint) {
+                el = findByFingerprint(item.fingerprint);
+                if (el && item.id) el.setAttribute('data-editor-id', item.id);
+                if (el && item.selector) el.dataset.editorSelector = item.selector;
+            }
+            if (!el) {
+                if (item && item.deleted) {
+                    const entry = { id: item.id || null, selector: item.selector || null, fingerprint: item.fingerprint || null, deleted: true };
+                    const key = deletionKey(entry);
+                    if (key) editorDeleted.set(key, entry);
+                }
+                return;
+            }
+            if (item && item.selector) el.dataset.editorSelector = item.selector;
+            if (item && item.fingerprint && !el.dataset.editorFingerprint) {
+                try { el.dataset.editorFingerprint = JSON.stringify(item.fingerprint); } catch { }
+            }
+            if (!item.insert) {
+                if (item && typeof item.html === 'string') {
+                    el.innerHTML = item.html;
+                    el.dataset.editorTextMode = 'html';
+                } else if (item && typeof item.text === 'string') {
+                    el.textContent = item.text;
+                    el.dataset.editorTextMode = 'text';
+                } else if (item && typeof item.value === 'string') {
+                    el.value = item.value;
+                    el.setAttribute('value', item.value);
+                    el.dataset.editorTextMode = 'value';
+                }
+            }
+            if (item && item.locked) {
+                el.dataset.editorLocked = '1';
+                el.classList.add('editor-locked');
+            }
+            if (item && item.deleted) {
+                el.dataset.editorDeleted = "1";
+                el.style.setProperty("display", "none", "important");
+                const entry = { id: item.id || null, selector: item.selector || null, fingerprint: item.fingerprint || null, deleted: true };
+                const key = deletionKey(entry);
+                if (key) editorDeleted.set(key, entry);
+            }
+            if (item && item.style) {
+                Object.entries(item.style).forEach(([k, v]) => {
+                    try { el.style[k] = v; } catch { }
+                });
+            }
+            if (Array.isArray(item.classes)) {
+                item.classes.forEach(c => {
+                    if (!c) return;
+                    try { el.classList.add(String(c)); } catch { }
+                });
+            }
+        });
+
+        if (editorDeleted.size) {
+            editorDeleted.forEach((entry) => {
+                if (!entry || !entry.deleted) return;
+                let el = null;
+                if (entry.id) el = document.querySelector(`[data-editor-id="${entry.id}"]`);
+                if (!el && entry.selector) el = document.querySelector(entry.selector);
+                if (!el && entry.fingerprint) el = findByFingerprint(entry.fingerprint);
+                if (!el) return;
+                el.dataset.editorDeleted = "1";
+                el.style.setProperty("display", "none", "important");
+            });
+        }
+    }
+
+    function reapplyEditorOverrides() {
+        if (!editorOverrides || !Array.isArray(editorOverrides.items)) return;
+        applyEditorOverrides(editorOverrides);
+    }
+
+    async function loadEditorOverrides() {
+        let payload = null;
+        let localPayload = null;
+        try {
+            const raw = localStorage.getItem('kh_editor_overrides_backup');
+            if (raw) localPayload = JSON.parse(raw);
+        } catch { }
+        try {
+            const res = await fetch(`${EDITOR_OVERRIDES_URL}?t=${Date.now()}`, { cache: 'no-store' });
+            if (res.ok) payload = await res.json();
+        } catch { }
+        console.log('[editor] load — server items:', payload && payload.items && payload.items.length, '| local items:', localPayload && localPayload.items && localPayload.items.length);
+        const chosen = chooseEditorPayload(payload, localPayload);
+        if (!chosen) { ensureEditorObserver(); return; }
+        try { localStorage.setItem('kh_editor_overrides_backup', JSON.stringify(chosen)); } catch { }
+        console.log('[editor] applying', chosen.items && chosen.items.length, 'items');
+        applyEditorOverrides(chosen);
+        ensureEditorObserver();
+    }
+
+    function collectEditorOverrides() {
+        const items = [];
+        document.querySelectorAll('[data-editor-id]').forEach(el => {
+            const id = el.getAttribute('data-editor-id') || null;
+            const selector = el.dataset.editorSelector || null;
+            if (!id && !selector) return;
+            const style = {};
+            const keys = ['left', 'top', 'width', 'height', 'margin', 'padding', 'fontSize', 'fontWeight', 'opacity', 'zIndex', 'color', 'background', 'backgroundColor', 'borderRadius', 'transform'];
+            keys.forEach(k => {
+                const v = el.style[k];
+                if (v) style[k] = v;
+            });
+            if (el.style.backgroundImage) style.backgroundImage = el.style.backgroundImage;
+            if (el.style.backgroundSize) style.backgroundSize = el.style.backgroundSize;
+            if (el.style.backgroundPosition) style.backgroundPosition = el.style.backgroundPosition;
+            if (el.style.backgroundRepeat) style.backgroundRepeat = el.style.backgroundRepeat;
+            const textMode = el.dataset.editorTextMode || '';
+            const payload = { id, selector, style, classes: [] };
+            if (el.dataset.editorInserted === '1') {
+                const parent = el.parentElement;
+                const next = el.nextElementSibling;
+                payload.insert = true;
+                payload.insertHtml = el.outerHTML;
+                payload.parentSelector = parent ? buildEditorSelector(parent) : null;
+                payload.beforeSelector = next ? (next.dataset.editorSelector || buildEditorSelector(next)) : null;
+            }
+            const fpRaw = el.dataset.editorFingerprint;
+            if (fpRaw) {
+                try { payload.fingerprint = JSON.parse(fpRaw); } catch { }
+            } else {
+                const fp = buildFingerprint(el);
+                if (fp) payload.fingerprint = fp;
+            }
+            if (textMode === 'html') payload.html = el.innerHTML;
+            if (textMode === 'text') payload.text = el.innerText || '';
+            if (textMode === 'value') payload.value = el.value || '';
+            if (el.dataset.editorLocked === '1') payload.locked = true;
+            if (el.dataset.editorDeleted === '1') payload.deleted = true;
+            if (Object.keys(style).length || payload.html || payload.text || payload.value || payload.deleted || payload.insert) items.push(payload);
+        });
+        if (editorDeleted.size) {
+            editorDeleted.forEach((entry) => {
+                if (!entry || !entry.deleted) return;
+                const exists = items.some(i => (entry.id && i.id === entry.id) || (entry.selector && i.selector === entry.selector));
+                if (exists) return;
+                items.push({
+                    id: entry.id || null,
+                    selector: entry.selector || null,
+                    fingerprint: entry.fingerprint || null,
+                    deleted: true,
+                    style: {},
+                    classes: [],
+                });
+            });
+        }
+        return { version: 1, items };
+    }
+
+    function downloadOverrides(payload) {
+        try {
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'editor-overrides.json';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch { }
+    }
+
+    async function saveEditorOverrides() {
+        const payload = collectEditorOverrides();
+        if (payload) payload.updated_at = new Date().toISOString();
+        // Always persist locally first — before any network call
+        try { localStorage.setItem('kh_editor_overrides_backup', JSON.stringify(payload)); } catch { }
+        console.log('[editor] saving', payload.items && payload.items.length, 'items:', JSON.stringify(payload.items));
+        try {
+            const res = await fetch(EDITOR_SAVE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) {
+                const errText = await res.text().catch(() => '');
+                console.warn('[editor] server save failed', res.status, errText);
+                throw new Error('save failed');
+            }
+            const out = await res.json();
+            const serverData = out.data || out;
+            console.log('[editor] server returned', serverData.items && serverData.items.length, 'items');
+            // Only update local cache with server data if server returned non-empty items,
+            // or if we sent empty items intentionally (cleared overrides).
+            const sentItems = payload.items && payload.items.length;
+            const gotItems = serverData.items && serverData.items.length;
+            const sentCount = Number(sentItems || 0);
+            const gotCount = Number(gotItems || 0);
+            if (!sentCount || gotCount >= sentCount) {
+                editorOverrides = serverData;
+                try { localStorage.setItem('kh_editor_overrides_backup', JSON.stringify(editorOverrides)); } catch { }
+            } else {
+    function ensureEditorObserver() {
+        if (editorObserver) return;
+        editorObserver = new MutationObserver(() => {
+            if (editorReapplyTimer) clearTimeout(editorReapplyTimer);
+            editorReapplyTimer = setTimeout(reapplyEditorOverrides, 120);
+        });
+        try {
+            editorObserver.observe(document.body, { subtree: true, childList: true });
+        } catch { }
+    }
+
+    async function clearEditorOverrides() {
+        try {
+            const res = await fetch(EDITOR_SAVE_URL, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+            if (!res.ok) throw new Error('clear failed');
+            try { localStorage.removeItem('kh_editor_overrides_backup'); } catch { }
+            toast('Cambios revertidos', 'info');
+            location.reload();
+        } catch {
+            toast('No se pudo revertir', 'error');
+        }
+    }
+
+    function ensureEditorToolbar() {
+        if (document.getElementById('editor-toolbar')) return;
+        const bar = document.createElement('div');
+        bar.className = 'editor-toolbar';
+        bar.id = 'editor-toolbar';
+        bar.classList.add('hidden');
+        bar.innerHTML = `
+          <button type="button" id="editor-toggle">Editar</button>
+                // Server returned fewer items than we sent — keep our local version
+                console.warn('[editor] server returned fewer items than sent, keeping local');
+                editorOverrides = payload;
+            }
+            toast('Cambios guardados', 'success');
+            downloadOverrides(editorOverrides);
+        } catch {
+            editorOverrides = payload;
+            toast('Guardado local (sin red)', 'info');
+            downloadOverrides(payload);
+        }
+        reapplyEditorOverrides();
+    }
+
+    function parseEditorTimestamp(payload) {
+        if (!payload || !payload.updated_at) return 0;
+        const ts = Date.parse(payload.updated_at);
+        return Number.isFinite(ts) ? ts : 0;
+    }
+
+    function hasEditorItems(payload) {
+        return !!(payload && Array.isArray(payload.items) && payload.items.length);
+    }
+
+    function chooseEditorPayload(remote, local) {
+        if (!remote && !local) return null;
+        if (remote && !local) return remote;
+        if (!remote && local) return local;
+        const remoteHas = hasEditorItems(remote);
+        const localHas = hasEditorItems(local);
+        if (localHas && !remoteHas) return local;
+        if (remoteHas && !localHas) return remote;
+        const rts = parseEditorTimestamp(remote);
+        const lts = parseEditorTimestamp(local);
+        if (rts && lts) return rts >= lts ? remote : local;
+        if (lts && !rts) return local;
+        return remote || local;
+    }
+
+    function ensureEditorObserver() {
+        if (editorObserver) return;
+        editorObserver = new MutationObserver(() => {
+            if (editorReapplyTimer) clearTimeout(editorReapplyTimer);
+            editorReapplyTimer = setTimeout(reapplyEditorOverrides, 120);
+        });
+        try {
+            editorObserver.observe(document.body, { subtree: true, childList: true });
+        } catch { }
+    }
+
+    async function clearEditorOverrides() {
+        try {
+            const res = await fetch(EDITOR_SAVE_URL, {
+                method: 'DELETE',
+                credentials: 'include',
+            });
+            if (!res.ok) throw new Error('clear failed');
+            try { localStorage.removeItem('kh_editor_overrides_backup'); } catch { }
+            toast('Cambios revertidos', 'info');
+            location.reload();
+        } catch {
+            toast('No se pudo revertir', 'error');
+        }
+    }
+
+    function ensureEditorToolbar() {
+        if (document.getElementById('editor-toolbar')) return;
+        const bar = document.createElement('div');
+        bar.className = 'editor-toolbar';
+        bar.id = 'editor-toolbar';
+        bar.classList.add('hidden');
+        bar.innerHTML = `
+          <button type="button" id="editor-toggle">Editar</button>
+          <button type="button" class="is-primary" id="editor-apply">Aplicar y colgar</button>
+          <button type="button" id="editor-copy">Copiar bloque</button>
+          <button type="button" id="editor-paste">Pegar bloque</button>
+          <button type="button" id="editor-dup">Duplicar</button>
+          <button type="button" id="editor-del">Eliminar</button>
+          <button type="button" id="editor-undo" title="Deshacer">⟲</button>
+          <button type="button" id="editor-snap">Imán</button>
+          <button type="button" id="editor-reset">Revertir todo</button>
+          <button type="button" id="editor-reset-item">Reset elemento</button>
+          <button type="button" id="editor-admin-logout">Cerrar Sesion Admin</button>
+        `;
+          <div class="editor-field"><span>Z</span><input id="editor-zi" type="number" placeholder="1" /></div>
+          <div class="editor-field editor-field--wide"><span>Margin</span><input id="editor-mg" type="text" placeholder="0" /></div>
+          <div class="editor-field editor-field--wide"><span>Padding</span><input id="editor-pd" type="text" placeholder="0" /></div>
+          <div class="editor-field editor-field--wide"><span>Texto</span><textarea id="editor-text" rows="3" placeholder="Editar texto"></textarea></div>
+          <button type="button" class="editor-text-toggle" id="editor-text-toggle">Editar texto inline</button>
+          <button type="button" class="editor-text-toggle" id="editor-lock">Bloquear</button>
+        `;
+        document.body.appendChild(panel);
+
+        const toggle = bar.querySelector('#editor-toggle');
+        const apply = bar.querySelector('#editor-apply');
+        const copyBtn = bar.querySelector('#editor-copy');
+        const pasteBtn = bar.querySelector('#editor-paste');
+        const dupBtn = bar.querySelector('#editor-dup');
+        const reset = bar.querySelector('#editor-reset');
+        const resetItem = bar.querySelector('#editor-reset-item');
+        const undoBtn = bar.querySelector('#editor-undo');
+        const delBtn = bar.querySelector('#editor-del');
+        const snapBtn = bar.querySelector('#editor-snap');
+        const adminLogout = bar.querySelector('#editor-admin-logout');
+
+        toggle.addEventListener('click', () => setEditorMode(!editorEnabled));
+        apply.addEventListener('click', async () => {
+
+        toggle.addEventListener('click', () => setEditorMode(!editorEnabled));
+        apply.addEventListener('click', async () => {
+            await saveEditorOverrides();
+            setEditorMode(false);
+        });
+        if (copyBtn) copyBtn.addEventListener('click', copyEditorBlock);
+        if (pasteBtn) pasteBtn.addEventListener('click', pasteEditorBlock);
+        if (dupBtn) dupBtn.addEventListener('click', duplicateEditorBlock);
+        reset.addEventListener('click', clearEditorOverrides);
+        if (resetItem) resetItem.addEventListener('click', resetEditorSelection);
+        if (undoBtn) undoBtn.addEventListener('click', undoEditorStep);
+        if (delBtn) delBtn.addEventListener('click', deleteEditorSelection);
+        if (snapBtn) {
+            snapBtn.addEventListener('click', () => {
+                editorSnapEnabled = !editorSnapEnabled;
+                snapBtn.classList.toggle('is-active', editorSnapEnabled);
+            });
+        }
+        if (adminLogout) {
+            adminLogout.addEventListener('click', async () => {
+                setEditorMode(false);
+                document.body.classList.remove('editor-admin');
+                try {
+                    await fetch('/api/v1/admin/auth/logout', { method: 'POST', credentials: 'include' });
+                } catch { }
+                try {
+                    const barEl = document.getElementById('editor-toolbar');
+                    if (barEl) barEl.classList.add('hidden');
+                } catch { }
+            });
+        }
+
+    function pushUpdateSnapshot(el) {
+        if (!el) return;
+            if (!parent) break;
+            const siblings = Array.from(parent.children).filter(n => n.tagName === node.tagName);
+            const idx = siblings.indexOf(node) + 1;
+            parts.unshift(`${tag}:nth-of-type(${idx})`);
+            node = parent;
+        }
+        return `body > ${parts.join(' > ')}`;
+    }
+
+    function buildFingerprint(el) {
+        if (!el || !el.tagName) return null;
+        const tag = el.tagName.toLowerCase();
+        const src = el.getAttribute && el.getAttribute('src') ? el.getAttribute('src') : '';
+        const text = (el.innerText || '').trim().slice(0, 60);
+        const parentSelector = el.parentElement ? buildEditorSelector(el.parentElement) : '';
+        const index = el.parentElement ? Array.from(el.parentElement.children).indexOf(el) : 0;
+        return { tag, src, text, parentSelector, index };
+    }
+
+    function findByFingerprint(fp) {
+        if (!fp || !fp.tag) return null;
+        let scope = document;
+        if (fp.parentSelector) {
+            const parent = document.querySelector(fp.parentSelector);
+            if (parent) scope = parent;
+        }
+        let candidates = Array.from(scope.querySelectorAll(fp.tag));
+        if (fp.src) candidates = candidates.filter(el => (el.getAttribute('src') || '') === fp.src);
+        if (fp.text) candidates = candidates.filter(el => (el.innerText || '').trim().includes(fp.text));
+        if (fp.index != null && candidates[fp.index]) return candidates[fp.index];
+        return candidates[0] || null;
+    }
+
+    function ensureEditorIdentity(el) {
+        if (!el || !el.setAttribute) return;
+        if (!el.getAttribute('data-editor-id')) {
+            const id = `auto-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            el.setAttribute('data-editor-id', id);
+        }
+        if (!el.dataset.editorSelector) {
+            const selector = buildEditorSelector(el);
+            if (selector) el.dataset.editorSelector = selector;
+        }
+        if (!el.dataset.editorFingerprint) {
+            const fp = buildFingerprint(el);
+            if (fp) {
+                try { el.dataset.editorFingerprint = JSON.stringify(fp); } catch { }
+            }
+        }
+        storeEditorOriginal(el);
+    }
+
+    function deletionKey(entry) {
+        if (!entry) return '';
+        if (entry.id) return `id:${entry.id}`;
+        if (entry.selector) return `sel:${entry.selector}`;
+        if (entry.fingerprint) return `fp:${JSON.stringify(entry.fingerprint)}`;
+        return '';
+    }
+
+    function escapeAttr(value) {
+        return String(value || '').replace(/"/g, '\\"');
+    }
+
+    function applyDeletedCss() {
+        const entries = Array.from(editorDeleted.values());
+        const selectors = [];
+        entries.forEach((entry) => {
+            if (!entry || !entry.deleted) return;
+            if (entry.id) selectors.push(`[data-editor-id="${escapeAttr(entry.id)}"]`);
+            if (entry.selector) selectors.push(entry.selector);
+            if (entry.fingerprint && entry.fingerprint.tag === 'img' && entry.fingerprint.src) {
+                selectors.push(`img[src=\"${escapeAttr(entry.fingerprint.src)}\"]`);
+            }
+        });
+        const css = selectors.length ? `${selectors.join(',')} { display: none !important; }` : '';
+        let styleEl = document.getElementById('editor-deleted-style');
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = 'editor-deleted-style';
+            document.head.appendChild(styleEl);
+        }
+        styleEl.textContent = css;
+    }
+
+    function applyEditorPosition(el, x, y) {
+        if (!el) return;
+        if (el.dataset.editorLocked === '1') return;
+        const pos = getComputedStyle(el).position;
+        if (pos === 'static') el.style.position = 'relative';
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        updateEditorPanel(el);
+    }
+
+    function updateEditorPanel(el) {
+        if (!el) return;
+        const panel = document.getElementById('editor-panel');
+        if (!panel) return;
+        const x = parseFloat(el.style.left || 0) || 0;
+        const y = parseFloat(el.style.top || 0) || 0;
+        const rect = el.getBoundingClientRect();
+        const w = Math.round(rect.width);
+        const h = Math.round(rect.height);
+        const color = el.style.color || '';
+        const bg = el.style.background || el.style.backgroundColor || '';
+        const fs = parseFloat(el.style.fontSize || 0) || '';
+        const fw = el.style.fontWeight || '';
+        const op = el.style.opacity || '';
+        const zi = el.style.zIndex || '';
+        const mg = el.style.margin || '';
+        const pd = el.style.padding || '';
+        const bgImg = (el.style.backgroundImage || '').replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+        const bgPos = el.style.backgroundPosition || '';
+        const bgSize = el.style.backgroundSize || '';
+        const tag = el.tagName || '';
+        const textVal = (tag === 'INPUT' || tag === 'TEXTAREA') ? (el.value || '') : (el.innerText || '');
+        panel.querySelector('#editor-x').value = x;
+        panel.querySelector('#editor-y').value = y;
+        panel.querySelector('#editor-w').value = w;
+        panel.querySelector('#editor-h').value = h;
+        panel.querySelector('#editor-color').value = color;
+        panel.querySelector('#editor-bg').value = bg;
+        panel.querySelector('#editor-fs').value = fs;
+        panel.querySelector('#editor-fw').value = fw;
+        panel.querySelector('#editor-op').value = op;
+        panel.querySelector('#editor-zi').value = zi;
+        panel.querySelector('#editor-mg').value = mg;
+        panel.querySelector('#editor-pd').value = pd;
+        const bgImgInput = panel.querySelector('#editor-bg-img');
+        const bgPosInput = panel.querySelector('#editor-bg-pos');
+        const bgSizeInput = panel.querySelector('#editor-bg-size');
+        if (bgImgInput) bgImgInput.value = bgImg && bgImg !== 'none' ? bgImg : '';
+        if (bgPosInput) bgPosInput.value = bgPos;
+        if (bgSizeInput) bgSizeInput.value = bgSize;
+        const txtInput = panel.querySelector('#editor-text');
+        if (txtInput) txtInput.value = textVal;
+        const lockBtn = panel.querySelector('#editor-lock');
+        if (lockBtn) lockBtn.textContent = (el.dataset.editorLocked === '1') ? 'Desbloquear' : 'Bloquear';
+    }
+
+    function initEditorPalettes() {
+        const colorPalette = document.getElementById('editor-color-palette');
+        const bgPalette = document.getElementById('editor-bg-palette');
+        if (!colorPalette || !bgPalette) return;
+        if (colorPalette.dataset.ready === '1') return;
+
+        const textColors = ['#111827', '#1F2937', '#6B7280', '#B07A1B', '#2563EB', '#7C3AED', '#DC2626', '#0F766E'];
+        const bgColors = ['#FFFFFF', '#F3F4F6', '#E5E7EB', '#FFF4DB', '#EFF6FF', '#F5F3FF', '#FEE2E2', '#ECFEFF'];
+
+        const renderSwatches = (wrap, colors, isLight) => {
+            wrap.innerHTML = '';
+            colors.forEach(c => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = `editor-swatch${isLight ? ' is-light' : ''}`;
+                b.style.background = c;
+                b.dataset.color = c;
+                b.addEventListener('click', () => {
+                    if (!editorSelected) return;
+                    if (wrap.id === 'editor-color-palette') {
+                        const input = document.getElementById('editor-color');
+                        if (input) input.value = c;
+                        editorSelected.style.color = c;
+                    } else {
+                        const input = document.getElementById('editor-bg');
+                        if (input) input.value = c;
+                        editorSelected.style.background = c;
+                    }
+                });
+                wrap.appendChild(b);
+            });
+        };
+
+        renderSwatches(colorPalette, textColors, true);
+        renderSwatches(bgPalette, bgColors, true);
+        colorPalette.dataset.ready = '1';
+    }
+
+    function initEditorInteractions() {
+        if (window.__khEditorInit) return;
+        window.__khEditorInit = true;
+        const guideX = document.createElement('div');
+        guideX.className = 'editor-guide editor-guide--x';
+        const guideY = document.createElement('div');
+        guideY.className = 'editor-guide editor-guide--y';
+        document.body.appendChild(guideX);
+        document.body.appendChild(guideY);
+        document.addEventListener('click', (e) => {
+            if (!editorEnabled) return;
+            const isToolbar = e.target.closest('.editor-toolbar') || e.target.closest('.editor-panel');
+            if (isToolbar) return;
+            const target = e.target.closest('body *:not(script):not(style)');
+            if (!target) return;
+            const rects = target.getClientRects();
+            if (!rects || !rects.length) return;
+            e.preventDefault();
+            ensureEditorIdentity(target);
+            clearEditorSelection();
+            editorSelected = target;
+            target.classList.add('editor-selected');
+            const handle = document.createElement('div');
+            handle.className = 'editor-handle';
+            target.appendChild(handle);
+            updateEditorPanel(target);
+        });
+
+        document.addEventListener('pointerdown', (e) => {
+            if (!editorEnabled) return;
+            const handle = e.target.closest('.editor-handle');
+            if (handle && editorSelected) {
+                editorResizing = true;
+                pushUpdateSnapshot(editorSelected);
+                const rect = editorSelected.getBoundingClientRect();
+                editorStart = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height };
+                e.preventDefault();
+                return;
+            }
+            const target = e.target.closest('[data-editor-id]');
+            if (!target || !editorSelected || target !== editorSelected) return;
+            editorDragging = true;
+            pushUpdateSnapshot(editorSelected);
+            editorStart = {
+                x: e.clientX,
+                y: e.clientY,
+                left: parseFloat(editorSelected.style.left || 0) || 0,
+                top: parseFloat(editorSelected.style.top || 0) || 0,
+            };
+            e.preventDefault();
+        });
+
+        document.addEventListener('pointermove', (e) => {
+            if (!editorEnabled || !editorSelected || !editorStart) return;
+            if (editorDragging) {
+                const dx = e.clientX - editorStart.x;
+                const dy = e.clientY - editorStart.y;
+                let nextLeft = editorStart.left + dx;
+                let nextTop = editorStart.top + dy;
+                if (editorSnapEnabled) {
+                    const parent = editorSelected.offsetParent || document.body;
+                    const parentRect = parent.getBoundingClientRect();
+                    const rect = editorSelected.getBoundingClientRect();
+                    const centerX = nextLeft + rect.width / 2;
+                    const centerY = nextTop + rect.height / 2;
+                    const targetCenterX = parentRect.width / 2;
+                    const targetCenterY = parentRect.height / 2;
+                    const snapPx = 8;
+                    if (Math.abs(centerX - targetCenterX) <= snapPx) {
+                        nextLeft = targetCenterX - rect.width / 2;
+                        guideX.style.left = `${parentRect.left + targetCenterX}px`;
+                        guideX.style.display = 'block';
+                    } else {
+                        guideX.style.display = 'none';
+                    }
+                    if (Math.abs(centerY - targetCenterY) <= snapPx) {
+                        nextTop = targetCenterY - rect.height / 2;
+                        guideY.style.top = `${parentRect.top + targetCenterY}px`;
+                        guideY.style.display = 'block';
+                    } else {
+                        guideY.style.display = 'none';
+                    }
+                }
+                applyEditorPosition(editorSelected, nextLeft, nextTop);
+            }
+            if (editorResizing) {
+                const dx = e.clientX - editorStart.x;
+                const dy = e.clientY - editorStart.y;
+                const w = Math.max(40, editorStart.w + dx);
+                const h = Math.max(24, editorStart.h + dy);
+                editorSelected.style.width = `${Math.round(w)}px`;
+                editorSelected.style.height = `${Math.round(h)}px`;
+                updateEditorPanel(editorSelected);
+            }
+        });
+
+        document.addEventListener('pointerup', () => {
+            editorDragging = false;
+            editorResizing = false;
+            editorStart = null;
+            guideX.style.display = 'none';
+            guideY.style.display = 'none';
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!editorEnabled) return;
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                undoEditorStep();
+            }
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+                e.preventDefault();
+                deleteEditorSelection();
+            }
+        });
+    }
+
+    async function initEditorMode() {
+        try {
+            const res = await fetch('/api/v1/admin/auth/me', { credentials: 'include', cache: 'no-store' });
+            if (!res.ok) return;
+            ensureEditorToolbar();
+            document.body.classList.add('editor-admin');
+            const bar = document.getElementById('editor-toolbar');
+            if (bar) bar.classList.remove('hidden');
+            initEditorInteractions();
+        } catch { }
+    }
+
     function initFloatingCreate() {
         const btnA = document.getElementById('floating-create');
         const btnB = document.getElementById('floating-virtud');
@@ -5448,16 +7856,69 @@
         });
     }
 
+    function initUsecasesTicker() {
+        const ticker = document.querySelector('.usecases-ticker');
+        const inner = ticker ? ticker.querySelector('.usecases-ticker-inner') : null;
+        const track = ticker ? ticker.querySelector('.usecases-track') : null;
+        if (!ticker || !inner || !track) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        let baseSpeed = 95; // px/s
+        let speed = baseSpeed;
+        let target = baseSpeed;
+        let offset = 0;
+        let trackWidth = 0;
+        let last = performance.now();
+
+        const updateWidth = () => {
+            trackWidth = track.scrollWidth || 0;
+            if (!trackWidth) return;
+            offset = offset % trackWidth;
+        };
+
+        const frame = (now) => {
+            const dt = Math.min(0.05, (now - last) / 1000);
+            last = now;
+            if (trackWidth) {
+                speed += (target - speed) * 0.05;
+                offset = (offset + speed * dt) % trackWidth;
+                inner.style.transform = `translateX(${-offset}px)`;
+            }
+            requestAnimationFrame(frame);
+        };
+
+        const onHover = (state) => {
+            target = state ? baseSpeed * 0.5 : baseSpeed;
+        };
+
+        ticker.addEventListener('mouseenter', () => onHover(true));
+        ticker.addEventListener('mouseleave', () => onHover(false));
+        window.addEventListener('resize', updateWidth);
+        updateWidth();
+        requestAnimationFrame(frame);
+    }
+
     /* ── Auto-restore session ─────────────────────────────────────────────────── */
     async function tryRestoreSession() {
         if (!KHApi.getToken()) return;
         try {
             const user = await KHApi.getMe();
             loadUserInfo(user);
-            // Mantener la landing como default incluso logueado.
-            showPage('page-landing');
+            const savedPage = getSavedPage();
+            if (savedPage === 'dashboard') {
+                showPage('page-dashboard');
+                setDashView(getSavedDashView(), { noScroll: true });
+                setTimeout(maybeStartTutorialAfterLogin, 120);
+            } else {
+                showPage('page-landing');
+            }
             // Precarga ligera: eligibility para nudges/labels; evita cargar todo el dashboard.
             loadPremiumProgress();
+            if (postLoginAction === 'automatch_invite') {
+                postLoginAction = null;
+                openAutomatchFromInvite();
+                return;
+            }
             setTimeout(renderNext, 60);
         } catch {
             KHApi.clearToken(); // Token expired / invalid
@@ -5473,10 +7934,23 @@
         bindFeedTabs();
         initOAuthButtons();
         initFloatingCreate();
+        initScrollTopButton();
+        initNavAutoHide();
+        initAutoMatchStatusStrip();
         const oauthHandled = handleOAuthRedirect();
+        handleInviteRedirect();
         initReveal();
         initKpiCounters();
-        relocateThemeToggle('page-landing');
+        initUsecasesTicker();
+        const initialPage = (KHApi.getToken() && getSavedPage() === 'dashboard') ? 'page-dashboard' : 'page-landing';
+        showPage(initialPage);
+        setTimeout(maybePromptAppDownload, 2400);
+        initCookieConsent();
+        initCustomSelects();
+        loadEditorOverrides();
+        initEditorMode();
+        setTimeout(initEditorMode, 1200);
+        setTimeout(reapplyEditorOverrides, 1800);
         if (!oauthHandled) tryRestoreSession();
         else setTimeout(tryRestoreSession, 80);
         // Sync tabs with persisted view (or default)
@@ -5487,12 +7961,10 @@
         // Default compensation selectors
         selectComp('req', 'cash');
         selectComp('off', 'cash');
-        selectComp('quick', 'cash');
-
         // Default premium selection (annual)
         setPremiumInterval('year');
 
-        // Header search: jump to quick demo (landing)
+        // Header search: jump to explore
         const navQ = document.getElementById('nav-search');
         if (navQ) {
             navQ.addEventListener('keydown', async e => {
@@ -5500,12 +7972,8 @@
                 e.preventDefault();
                 const q = String(navQ.value || '').trim();
                 if (!q) {
-                    const target = $('quick-title') || document.getElementById('how');
+                    const target = document.getElementById('how');
                     if (target && target.scrollIntoView) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    if ($('quick-title')) {
-                        $('quick-title').value = navQ.value;
-                        setTimeout(() => $('quick-title').focus(), 60);
-                    }
                     return;
                 }
 
@@ -5598,14 +8066,21 @@
         goDashboard,
         toggleDashMenu,
         gotoDashFromMenu,
+        openCookieSettings,
+        closeCookieSettings,
+        acceptCookiesAll,
+        rejectCookiesAll,
+        saveCookiePreferences,
         openLogin,
+        openAppDownloadModal,
         showAuthChooser,
         showEmailAuth,
         showPasswordReset,
         authProvider,
         startFirstMatch,
-        startQuickMatch,
         setDashView,
+        tutorialNext,
+        tutorialSkip,
         closeUpgradeModal,
         openPremiumFromNudge,
         goPremiumTab,
@@ -5622,6 +8097,7 @@
         scrollToCreations,
         closeLogin,
         closeLoginDirect,
+        closeAppDownloadModal,
         submitLogin,
         submitRegister,
         submitForgotPassword,
@@ -5646,6 +8122,9 @@
         loadFeed,
         loadAutoMatch,
         saveAutoMatchSettings,
+        setAutoMatchMode,
+        toggleSimpleRole,
+        setSimpleRadius,
         acceptAutoMatch,
         declineAutoMatch,
         setAutoMatchFilter,
@@ -5661,6 +8140,7 @@
         closeRankingModal,
         toggleLandingMenu,
         closeLandingMenu,
+        scrollToTop,
         goDashboardFromLanding,
         goAutoMatchFromMenu,
         rankingLoadMore,
@@ -5709,3 +8189,4 @@
     // These were used informally during debugging.
     try { window.khapp = window.KHApp; } catch { }
 })();
+

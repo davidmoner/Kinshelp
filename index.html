@@ -3,10 +3,10 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KingsHelp — Match automático entre vecinos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>KingsHelp - AutoMatch Comunitario</title>
   <meta name="description"
-    content="KingsHelp hace match automático entre vecinos. Pide ayuda u ofrécela y conecta con personas cerca de ti en minutos." />
+    content="KingsHelp es la plataforma donde solicitas u ofreces servicios a vecinos de tu zona. AutoMatch automático, reputación comunitaria real y acuerdos seguros. ¡Empieza gratis!" />
   <link rel="canonical" href="https://kingshelp.es/" />
   <meta name="robots" content="index,follow,max-image-preview:large" />
   <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
@@ -14,13 +14,13 @@
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="KingsHelp" />
-  <meta property="og:title" content="KingsHelp — Match automático entre vecinos" />
+  <meta property="og:title" content="KingsHelp - AutoMatch Comunitario" />
   <meta property="og:description"
     content="Pide ayuda u ofrécela. KingsHelp conecta vecinos en minutos con match automático." />
   <meta property="og:url" content="https://kingshelp.es/" />
   <meta property="og:image" content="https://kingshelp.es/img/retocar.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="KingsHelp — Match automático entre vecinos" />
+  <meta name="twitter:title" content="KingsHelp - AutoMatch Comunitario" />
   <meta name="twitter:description"
     content="Pide ayuda u ofrécela. KingsHelp conecta vecinos en minutos con match automático." />
   <meta name="twitter:image" content="https://kingshelp.es/img/retocar.png" />
@@ -45,13 +45,11 @@
       "@type": "Organization",
       "name": "KingsHelp",
       "url": "https://kingshelp.es/",
-      "logo": "https://kingshelp.es/img/LOGO_2.png",
+      "logo": "https://kingshelp.es/img/LOGO_222.png?v=2",
       "sameAs": []
     }
   </script>
-  <link rel="icon" href="favicon.ico?v=1" type="image/x-icon" />
-  <link rel="icon" href="favicon-32.png?v=1" sizes="32x32" type="image/png" />
-  <link rel="icon" href="favicon-16.png?v=1" sizes="16x16" type="image/png" />
+  <link rel="icon" href="img/favicon.ico?v=6" type="image/x-icon" />
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-180x180.png?v=1" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=1" />
   <link rel="manifest" href="site.webmanifest" />
@@ -59,12 +57,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/demo.css" />
-  <link rel="stylesheet" href="css/hero.css" />
+  <link rel="stylesheet" href="css/style.css?v=207" />
+  <link rel="stylesheet" href="css/hero.css?v=203" />
+  <link rel="stylesheet" href="web/css/demo.css?v=203" />
+  <link rel="stylesheet" href="css/mobile-fixes.css?v=1" />
+  <style>
+    .app-download-link img { height: 22px !important; width: auto !important; vertical-align: middle !important; }
+  </style>
   <!-- sidepanels.css removed -->
   <!-- Anti-flash: aplica tema antes de que el navegador pinte -->
-  <script src="js/theme-init.js"></script>
+  <script>'use strict';(function(){var t;try{t=localStorage.getItem('kh_theme');}catch(e){}if(!t)t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;})();</script>
 </head>
 
 <body>
@@ -72,16 +74,18 @@
   <!-- ── INTRO OVERLAY — PNG assets, sessionStorage guard ─────────────── -->
   <div id="kh-intro-overlay" aria-hidden="true" role="presentation">
     <div class="kh-intro-inner" id="kh-intro-inner">
-      <picture>
-        <source srcset="img/LOGO_2.webp" type="image/webp" />
-        <img class="kh-intro-crown-img" id="kh-intro-crown" src="img/LOGO_2.png" alt="KingsHelp"
-          draggable="false" decoding="async" />
-      </picture>
+      <div class="kh-intro-logo-wrap" id="kh-intro-logo">
+        <span class="kh-intro-glow" aria-hidden="true"></span>
+        <picture>
+          <source srcset="img/LOGO_222.png?v=2" type="image/webp" />
+          <img class="kh-intro-crown-img" id="kh-intro-crown" src="img/LOGO_222.png?v=2" alt="KingsHelp Intro Logo" draggable="false"
+            decoding="async" />
+        </picture>
+      </div>
     </div>
   </div>
 
   <!-- ── OVERLAY DECORATIVOS (pointer-events:none) ─────────────────────── -->
-  <div class="fx-photo" aria-hidden="true"></div>
   <div class="fx-aurora" aria-hidden="true"></div>
   <div class="fx-grain" aria-hidden="true"></div>
 
@@ -94,11 +98,32 @@
       <div class="nav-left">
         <div class="nav-brand">
           <!-- PNG Brand Lockup: crown + wordmark horizontal -->
-          <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
-            <img class="nav-brand-logo" src="img/LOGO_22.png" alt="KingsHelp" draggable="false" decoding="async" />
+          <a href="/" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
+            <img class="nav-brand-logo" src="img/LOGO_222.png?v=2" alt="KingsHelp Logo" draggable="false" decoding="async" 
+                 onerror="this.src='img/KINGSHELP-LOGO.png'; this.onerror=null;" />
           </a>
-          <span class="brand-badge">Incept</span>
         </div>
+      </div>
+
+        <div class="nav-center">
+          <div class="nav-links guest-only" id="nav-links" role="navigation" aria-label="Secciones principales">
+            <a class="nav-link" href="#premium"><span class="nav-link-ico" aria-hidden="true">⚡</span>AutoMatch</a>
+            <a class="nav-link" href="#trust">Seguridad</a>
+            <a class="nav-link" href="#usecases">Categorías</a>
+            <a class="nav-link nav-link--howto" href="#como-empezar">Cómo funciona</a>
+          </div>
+          <div class="nav-search hidden" role="search" aria-label="Buscar">
+            <svg class="nav-search-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M21 21l-4.3-4.3"></path>
+          </svg>
+          <input id="nav-search" class="nav-search-input" type="search" placeholder="Busca ayuda, ofertas o vecinos"
+            autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="nav-actions">
         <span id="kh-theme-slot-landing">
           <button id="kh-theme-toggle" class="kh-theme-toggle" aria-label="Cambiar a tema claro" aria-pressed="true"
             type="button">
@@ -106,28 +131,8 @@
             <span id="kh-theme-label" class="kh-theme-label">Oscuro</span>
           </button>
         </span>
-      </div>
-
-      <div class="nav-search hidden" role="search" aria-label="Buscar">
-        <svg class="nav-search-ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="11" cy="11" r="7"></circle>
-          <path d="M21 21l-4.3-4.3"></path>
-        </svg>
-        <input id="nav-search" class="nav-search-input" type="search" placeholder="Busca ayuda, ofertas o vecinos"
-          autocomplete="off" />
-      </div>
-
-      <div class="nav-actions">
         <button id="nav-auth-btn" class="btn btn-ghost btn-auth" data-action="openLogin">Regístrate o inicia
           sesión</button>
-        <button id="nav-ranking-btn" class="kh-pill hidden" type="button" data-action="openRanking"
-          data-args="$event"
-          aria-label="Abrir ranking vecinal">
-          <span class="kh-theme-icon" aria-hidden="true">🏆</span>
-          <span class="kh-theme-label">Ranking</span>
-        </button>
-        <button id="nav-panel-btn" class="kh-pill hidden" type="button" data-action="goDashboard">Explorar</button>
         <button class="btn btn-primary btn-create" data-action="startFirstMatch">
           <span class="btn-plus" aria-hidden="true">＋</span>
           Crear
@@ -135,7 +140,9 @@
         <div class="nav-menu hidden">
           <button id="nav-burger" class="btn btn-ghost nav-burger nav-account" type="button" aria-label="Abrir menú"
             aria-expanded="false" data-action="toggleLandingMenu">
-            <span class="nav-account-avatar" id="nav-account-avatar" aria-hidden="true">D</span>
+            <span class="nav-burger-ico" aria-hidden="true">&#9776;</span>
+            <span class="nav-account-avatar" id="nav-account-avatar" aria-hidden="true"
+              title="Nivel (próximamente)">D</span>
             <span class="nav-account-meta">
               <span class="nav-account-name" id="nav-account-name">Cuenta</span>
               <span class="nav-account-tier" id="nav-account-tier">—</span>
@@ -150,7 +157,7 @@
             <div class="dash-menu-sep guest-only" aria-hidden="true"></div>
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="explorar">Explorar</button>
-            <button class="dash-menu-item dash-menu-item--gold auth-only" type="button" role="menuitem"
+            <button class="dash-menu-item dash-menu-item--gold dash-menu-item--cta auth-only" type="button" role="menuitem"
               data-action="goDashboardFromLanding" data-args="automatch">
               <span class="menu-gold-icon">⚡</span>AutoMatch Premium
             </button>
@@ -161,22 +168,24 @@
             <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="goDashboardFromLanding"
               data-args="perfil">Perfil</button>
             <div class="dash-menu-sep auth-only" aria-hidden="true"></div>
-            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
-            <button class="dash-menu-item auth-only danger" type="button" role="menuitem" data-action="logout">Cerrar sesión</button>
+            <button class="dash-menu-item auth-only" type="button" role="menuitem" data-action="openRankingPage">Ranking
+              completo</button>
+            <button class="dash-menu-item auth-only danger" type="button" role="menuitem" data-action="logout">Cerrar
+              sesión</button>
           </div>
         </div>
       </div>
     </nav>
 
-    <!-- ── A) HERO ─────────────────────────────────────────────────────── -->
-    <section class="hero" id="kh-hero">
+    <!-- ── SECCIÓN 1: BANNERS ─────────────────────────────────────────── -->
+    <section class="hero" id="kh-hero" aria-label="Sección 1 — Banners">
 
       <!-- Background isolation layer (overflow:hidden, decorative only) -->
       <div class="hero-bg" aria-hidden="true"></div>
 
 
       <!-- ── Banner Stage ─────────────────────────────────────────────── -->
-      <div class="hero-stage" id="kh-hero-stage">
+      <div class="hero-stage" id="kh-hero-stage" data-editor-id="hero-stage">
 
         <!-- Side panels removed (avoid translucent frames) -->
 
@@ -198,30 +207,29 @@
 
         <!-- ═══ BANNER 0 — Impacto + Toggle + CTA ═══ -->
         <div class="hero-banner" data-banner="0" aria-label="KingsHelp — Match automático entre vecinos"
+          data-editor-id="hero-banner-0"
           aria-hidden="true">
           <div class="container">
-            <div class="hb0-inner">
-
+            <div class="hb0-layout hero-banner-grid">
+              <div class="hb0-inner">
               <div class="hero-eyebrow">
                 <span class="pulse-dot"></span>
                 Match en tiempo real · vecinos conectados ahora
               </div>
 
-              <h1 class="hero-title"
-                style="--kh-type-dur1: 1150ms; --kh-type-steps1: 14; --kh-type-dur2: 1100ms; --kh-type-steps2: 14; --kh-type-gap: 140ms;">
-                <span class="kh-type kh-type--line1">Match automático</span><br />
-                <span class="kh-type kh-type--line2 gradient-text">entre vecinos.</span>
+              <h1 class="hero-title" data-editor-id="hero-title-0"
+                style="--kh-type-dur1: 1450ms; --kh-type-steps1: 25; --kh-type-dur2: 1550ms; --kh-type-steps2: 30; --kh-type-gap: 160ms;">
+                <span class="kh-type kh-type--line1">La comunidad donde ayudar</span><br />
+                <span class="kh-type kh-type--line2 gradient-text">a tus vecinos tiene recompensa.</span>
               </h1>
 
-              <p class="hero-sub hero-sub-cycle">
-                <span class="hero-sub-text">Pide ayuda u ofrécela. Match local en segundos.</span>
+              <p class="hero-sub hero-sub-cycle" data-editor-id="hero-sub-0">
+                <span class="hero-sub-text">Conecta con personas de tu comunidad para resolver tareas cotidianas o prestar tu ayuda. Rápido, seguro y basado en la confianza mutua.</span>
               </p>
 
               <p class="hb0-tagline" aria-hidden="true">Convierte tu ayuda en reputación real.</p>
 
-              <!-- (mode toggle removed from hero) -->
-
-              <div class="hero-chips">
+              <div class="hero-chips" data-editor-id="hero-chips-0">
                 <span class="chip">
                   <svg class="chip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -251,20 +259,21 @@
                     <circle cx="12" cy="12" r="9" />
                     <path d="M12 8l3 6-6-3 3-3z" />
                   </svg>
-                  Match Vecinal (Premium)
+                  Match Comunitario (Premium)
                 </span>
               </div>
 
-              <div class="hero-cta">
+              <div class="hero-cta" data-editor-id="hero-cta-0">
                 <button class="btn btn-primary btn-lg" data-action="startFirstMatch">
                   Crear mi primer match
                   <span class="btn-arrow">→</span>
                 </button>
-                <a href="#how" class="btn btn-ghost btn-lg">Ver cómo funciona</a>
+                <a href="#como-empezar" class="btn btn-ghost btn-lg">Ver cómo funciona</a>
               </div>
-
-              <!-- (toggle microcopy removed) -->
-
+              </div>
+              <div class="hb0-media" aria-hidden="true">
+                <img src="img/img2.png" alt="KingsHelp Match Comunitario" decoding="async" loading="lazy" />
+              </div>
             </div>
           </div>
         </div>
@@ -278,7 +287,7 @@
         <div class="hero-banner" data-banner="1" aria-label="Convierte tu ayuda en reputación" aria-hidden="true">
           <div class="container">
             <div class="hb2p-wrap">
-              <div class="hb2p-inner">
+              <div class="hb2p-inner hero-banner-grid">
 
                 <div class="hb2p-copy">
                   <div class="hero-eyebrow reveal">
@@ -292,15 +301,16 @@
                     <span class="kh-type kh-type--line2 gradient-text">en reputación.</span>
                   </h2>
 
-                  <p class="hb2p-sub hb2p-sub-cycle">
+                  <p class="hero-sub hb2p-sub hb2p-sub-cycle">
                     <span class="hb2p-sub-line">Apoya a tu comunidad y gana confianza real en tu zona.</span>
                     <span class="hb2p-sub-line">Cada ayuda suma reputación para todos, hoy y mañana.</span>
+                    <span class="hb2p-sub-line">Tu historial real te abre más oportunidades locales.</span>
                   </p>
 
                   <ul class="hb2p-bullets reveal" aria-hidden="true">
                     <li class="hb2p-bullet">
                       <span class="hb2p-bicon" aria-hidden="true">🏅</span>
-                      <span class="hb2p-btxt">Insignias y ranking vecinal por historial verificado.</span>
+                      <span class="hb2p-btxt">Insignias y ranking comunitario por historial real.</span>
                     </li>
                     <li class="hb2p-bullet">
                       <span class="hb2p-bicon" aria-hidden="true">⚡</span>
@@ -321,13 +331,13 @@
                 </div>
 
                 <div class="hb2p-phones" role="img"
-                  aria-label="Demostración: María solicita ayuda para una mudanza, Elena acepta y se completa el servicio. La persona que ayuda gana reputación verificada y sube en el ranking vecinal.">
+                  aria-label="Demostración: María solicita ayuda para una mudanza, Elena acepta y se completa el servicio. La persona que ayuda gana reputación real y sube en el ranking comunitario.">
 
                   <!-- Izquierda: Solicito -->
                   <div class="hb2p-device-col hb2p-device-col--left" aria-hidden="true">
                     <div class="hb2p-device-label">María</div>
                     <div class="hb2p-device-wrap hb2p-device--left">
-                      <div class="demo-phone">
+                      <div class="demo-phone hb2p-phone">
                         <div class="demo-phone-notch" aria-hidden="true"></div>
                         <div class="demo-screen-status" aria-hidden="true">
                           <span class="demo-status-time">9:41</span>
@@ -344,7 +354,8 @@
                             <div class="ds-topbar">
                               <picture>
                                 <source srcset="img/CORONAKH.webp" type="image/webp" />
-                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="KingsHelp corona icon" draggable="false"
+                                  loading="lazy" decoding="async" />
                               </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag" aria-hidden="true">María</span>
@@ -395,7 +406,8 @@
                             <div class="ds-topbar">
                               <picture>
                                 <source srcset="img/CORONAKH.webp" type="image/webp" />
-                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="KingsHelp app icon" draggable="false"
+                                  loading="lazy" decoding="async" />
                               </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag" aria-hidden="true">María</span>
@@ -416,7 +428,7 @@
                   <div class="hb2p-device-col hb2p-device-col--right" aria-hidden="true">
                     <div class="hb2p-device-label">Elena</div>
                     <div class="hb2p-device-wrap hb2p-device--right">
-                      <div class="demo-phone">
+                      <div class="demo-phone hb2p-phone">
                         <div class="demo-phone-notch" aria-hidden="true"></div>
                         <div class="demo-screen-status" aria-hidden="true">
                           <span class="demo-status-time">9:41</span>
@@ -433,7 +445,8 @@
                             <div class="ds-topbar">
                               <picture>
                                 <source srcset="img/CORONAKH.webp" type="image/webp" />
-                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="KingsHelp app icon" draggable="false"
+                                  loading="lazy" decoding="async" />
                               </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
@@ -443,7 +456,8 @@
                                 <div class="hb2p-sys-top">
                                   <picture>
                                     <source srcset="img/CORONAKH.webp" type="image/webp" />
-                                    <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                                    <img class="hb2p-sys-icon" src="img/CORONAKH.png" alt="KingsHelp app icon" draggable="false"
+                                      loading="lazy" decoding="async" />
                                   </picture>
                                   <span class="hb2p-sys-app">KingsHelp</span>
                                   <span class="hb2p-sys-chip">Mudanza</span>
@@ -479,7 +493,8 @@
                             <div class="ds-topbar">
                               <picture>
                                 <source srcset="img/CORONAKH.webp" type="image/webp" />
-                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="" draggable="false" loading="lazy" decoding="async" />
+                                <img class="hb2p-app-icon" src="img/CORONAKH.png" alt="KingsHelp app icon" draggable="false"
+                                  loading="lazy" decoding="async" />
                               </picture>
                               <span class="ds-app-name">KingsHelp</span>
                               <span class="hb2p-user-tag hb2p-user-tag--helper" aria-hidden="true">Elena</span>
@@ -494,7 +509,7 @@
                                 <div class="ds-reward-info">
                                   <span class="ds-reward-pts"><span class="hb2p-reward-plus">+</span>
                                     reputación</span>
-                                  <span class="ds-reward-label">Ranking vecinal ↑</span>
+                                  <span class="ds-reward-label">Ranking comunitario ↑</span>
                                 </div>
                               </div>
                             </div>
@@ -515,44 +530,48 @@
         <div class="hero-banner" data-banner="2" aria-label="Recompensa, trueque o altruista" aria-hidden="true"
           data-hero-alt="ios-notifs">
           <div class="container">
-            <div class="hb3-inner">
-              <div class="kh-ios-stack" aria-hidden="true"></div>
-              <p class="hb3-eyebrow">Elige tu tipo de acuerdo</p>
-
-              <h2 class="hb3-title"
-                style="--kh-type-dur1: 1350ms; --kh-type-steps1: 18; --kh-type-dur2: 1050ms; --kh-type-steps2: 12; --kh-type-gap: 150ms;">
-                <span class="kh-type kh-type--line1">Recompensa, trueque</span><br />
-                <span class="kh-type kh-type--line2 gradient-text">o altruista.</span>
-              </h2>
-
-              <p class="hero-sub hero-sub--center">
-                Cada acuerdo suma confianza real en tu barrio. Tú decides cómo ayudar.
-              </p>
-
-              <div class="hb3-reward-row">
-                <div class="hb3-reward-card" data-kind="recompensa">
-                  <div class="hb3-reward-icon" aria-hidden="true">
-                    <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M7.5 8.2c0-1.7 1.4-3.1 3.1-3.1h6c1.7 0 3.1 1.4 3.1 3.1v7.6c0 1.7-1.4 3.1-3.1 3.1h-6c-1.7 0-3.1-1.4-3.1-3.1V8.2Z"
-                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M7.5 9.2H6.2c-1.3 0-2.4 1.1-2.4 2.4v5.2c0 1.3 1.1 2.4 2.4 2.4h8.2" stroke="currentColor"
-                        stroke-width="1.8" stroke-linecap="round" opacity="0.7" />
-                      <path d="M13 8.5v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-                        opacity="0.9" />
-                      <path
-                        d="M15.6 10.1c0-1.1-1.1-1.9-2.6-1.9s-2.6.8-2.6 1.9 1.1 1.6 2.6 1.9 2.6.8 2.6 1.9-1.1 1.9-2.6 1.9-2.6-.8-2.6-1.9"
-                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-                      <path d="M5.3 6.2l.7 1.5 1.6.3-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.3.7-1.5Z"
-                        fill="currentColor" opacity="0.75" />
-                    </svg>
-                  </div>
-                  <div class="hb3-reward-label">Recompensa</div>
-                  <div class="hb3-reward-desc">Compensación<br />acordada entre ambos</div>
+            <div class="hb3-inner hero-banner-grid">
+              <div class="hb3-content">
+                <div class="kh-ios-stack" aria-hidden="true"></div>
+                <div class="hero-eyebrow">
+                  <span class="pulse-dot"></span>
+                  Elige tu tipo de acuerdo
                 </div>
-                <div class="hb3-reward-card" data-kind="trueque">
-                  <div class="hb3-reward-icon" aria-hidden="true">
-                    <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                <h2 class="hb3-title"
+                  style="--kh-type-dur1: 1350ms; --kh-type-steps1: 18; --kh-type-dur2: 1050ms; --kh-type-steps2: 12; --kh-type-gap: 150ms;">
+                  <span class="kh-type kh-type--line1">Recompensa, trueque</span><br />
+                  <span class="kh-type kh-type--line2 gradient-text">o altruista.</span>
+                </h2>
+
+                <p class="hero-sub">
+                  Cada acuerdo suma confianza real en tu comunidad. Tú decides cómo ayudar.
+                </p>
+
+                <div class="hb3-reward-row">
+                  <div class="hb3-reward-card" data-kind="recompensa">
+                    <div class="hb3-reward-icon" aria-hidden="true">
+                      <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M7.5 8.2c0-1.7 1.4-3.1 3.1-3.1h6c1.7 0 3.1 1.4 3.1 3.1v7.6c0 1.7-1.4 3.1-3.1 3.1h-6c-1.7 0-3.1-1.4-3.1-3.1V8.2Z"
+                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M7.5 9.2H6.2c-1.3 0-2.4 1.1-2.4 2.4v5.2c0 1.3 1.1 2.4 2.4 2.4h8.2" stroke="currentColor"
+                          stroke-width="1.8" stroke-linecap="round" opacity="0.7" />
+                        <path d="M13 8.5v7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                          opacity="0.9" />
+                        <path
+                          d="M15.6 10.1c0-1.1-1.1-1.9-2.6-1.9s-2.6.8-2.6 1.9 1.1 1.6 2.6 1.9 2.6.8 2.6 1.9-1.1 1.9-2.6 1.9-2.6-.8-2.6-1.9"
+                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                        <path d="M5.3 6.2l.7 1.5 1.6.3-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.3.7-1.5Z"
+                          fill="currentColor" opacity="0.75" />
+                      </svg>
+                    </div>
+                    <div class="hb3-reward-label">Recompensa</div>
+                    <div class="hb3-reward-desc">Compensación<br />acordada entre ambos</div>
+                  </div>
+                  <div class="hb3-reward-card" data-kind="trueque">
+                    <div class="hb3-reward-icon" aria-hidden="true">
+                      <svg class="hb3-ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7 7h10.2c1.6 0 2.8 1.3 2.8 2.8v1" stroke="currentColor" stroke-width="1.9"
                         stroke-linecap="round" />
                       <path d="M17.5 4.8 20 7.3l-2.5 2.5" stroke="currentColor" stroke-width="1.9"
@@ -592,10 +611,15 @@
 
               <div class="hb3-premium-teaser">
                 <span>♛</span>
-                Premium <em>(próximamente)</em> · <strong>0,99&nbsp;€/mes previsto</strong> o desbloqueable con
-                reputación
+                AutoMatch Premium gratis · desbloquea con reputación
               </div>
-
+              </div>
+              <div class="hb3-media">
+                <button class="hb3-media-btn" type="button" data-action="openAppDownloadModal"
+                  aria-label="Descargar la app (proximamente)">
+                  <img src="img/descarga.png" alt="Descarga la app (próximamente)" loading="lazy" decoding="async" />
+                </button>
+              </div>
 
             </div>
           </div>
@@ -610,7 +634,7 @@
     </section>
 
     <!-- ── SECCIÓN 2: REPUTACIÓN ─────────────────────────────────────── -->
-    <section class="demo-section" id="demo-section" aria-label="Reputación e insignias">
+    <section class="demo-section" id="demo-section" aria-label="Sección 2 — Reputación e insignias">
       <div class="container demo-inner">
 
         <!-- Columna izquierda: copy -->
@@ -620,7 +644,7 @@
             Reputación
           </div>
 
-          <h2 class="demo-title">Haz barrio.<br />Suma reputación.</h2>
+          <h2 class="demo-title">Haz comunidad.<br />Suma <span class="gradient-text">reputación</span></h2>
 
           <p class="demo-subtitle hero-sub hero-sub--compact">
             Ayudar en tu zona crea confianza real. Tu historial habla por ti.
@@ -630,21 +654,21 @@
             <li class="demo-bullet">
               <div class="demo-bullet-icon" aria-hidden="true">🏅</div>
               <div class="demo-bullet-text">
-                <span class="demo-bullet-label">Insignias verificadas</span>
+                <span class="demo-bullet-label">Insignias reales</span>
                 <span class="demo-bullet-desc">Desbloquea badges por servicios completados y calidad.</span>
               </div>
             </li>
             <li class="demo-bullet">
               <div class="demo-bullet-icon" aria-hidden="true">👑</div>
               <div class="demo-bullet-text">
-                <span class="demo-bullet-label">Ranking vecinal transparente</span>
+                <span class="demo-bullet-label">Ranking comunitario transparente</span>
                 <span class="demo-bullet-desc">Subes cuando cumples. No por promesas.</span>
               </div>
             </li>
             <li class="demo-bullet">
               <div class="demo-bullet-icon" aria-hidden="true">⚡</div>
               <div class="demo-bullet-text">
-                <span class="demo-bullet-label">Reputación verificable</span>
+                <span class="demo-bullet-label">Reputación real</span>
                 <span class="demo-bullet-desc">Cada ayuda suma a tu visibilidad en tu zona.</span>
               </div>
             </li>
@@ -654,21 +678,21 @@
             <div class="demo-metric">
               <span class="demo-metric-ico">✅</span>
               <div class="demo-metric-txt">
-                <span class="demo-metric-val">En vivo</span>
+                <span class="demo-metric-val" id="demo-metric-services">—</span>
                 <span class="demo-metric-lbl">Servicios completados</span>
               </div>
             </div>
             <div class="demo-metric">
               <span class="demo-metric-ico">⭐</span>
               <div class="demo-metric-txt">
-                <span class="demo-metric-val">Actual</span>
-                <span class="demo-metric-lbl">Media vecinal</span>
+                <span class="demo-metric-val" id="demo-metric-rating">—</span>
+                <span class="demo-metric-lbl">Media comunitaria</span>
               </div>
             </div>
             <div class="demo-metric">
               <span class="demo-metric-ico">⚡</span>
               <div class="demo-metric-txt">
-                <span class="demo-metric-val">Real</span>
+                <span class="demo-metric-val" id="demo-metric-response">—</span>
                 <span class="demo-metric-lbl">Respuesta media</span>
               </div>
             </div>
@@ -683,44 +707,45 @@
                 <span class="rep-crown" aria-hidden="true">♛</span>
                 <span>Mi reputación</span>
               </div>
-              <span class="rep-pill">Verificada</span>
+              <span class="rep-pill">Vecino verificado</span>
             </div>
 
             <div class="rep-grid" aria-hidden="true">
               <div class="rep-col rep-col--left">
                 <div class="rep-score">
                   <div class="rep-score-main">
-                    <span class="rep-score-val">—</span>
+                    <span class="rep-score-val" id="rep-score-val">—</span>
                     <span class="rep-score-unit">rep</span>
                   </div>
-                  <div class="rep-score-sub">Ranking vecinal: <strong>en vivo</strong> · Nivel: <strong>según reputación</strong></div>
+                  <div class="rep-score-sub">Ranking comunitario: <strong>en vivo</strong> · Nivel: <strong>según
+                      reputación</strong></div>
                 </div>
 
                 <div class="rep-progress">
                   <div class="rep-progress-head">
-                    <span>Progreso a Premium</span>
-                    <span class="rep-mini">—</span>
+                    <span>Progreso a AutoMatch Premium</span>
+                    <span class="rep-mini" id="rep-progress-mini">—</span>
                   </div>
                   <div class="rep-bar">
-                    <div class="rep-bar-fill" style="width:0%"></div>
+                    <div class="rep-bar-fill" id="rep-bar-fill" style="width:0%"></div>
                   </div>
                   <div class="rep-progress-foot">Se desbloquea con reputación real.</div>
                 </div>
 
                 <div class="rep-activity">
                   <div class="rep-activity-head">
-                    <span>Últimas ayudas</span>
-                    <span class="rep-mini">verificado</span>
+                    <span>Actividad de la comunidad</span>
+                    <span class="rep-mini">en vivo</span>
                   </div>
                   <div class="rep-act-row">
-                    <span class="rep-act-ico">📦</span>
-                    <span class="rep-act-txt">Mudanza (María)</span>
-                    <span class="rep-act-pts">—</span>
+                    <span class="rep-act-ico">✅</span>
+                    <span class="rep-act-txt">Matches completados</span>
+                    <span class="rep-act-pts" id="rep-act-matches">—</span>
                   </div>
                   <div class="rep-act-row" style="opacity:.92">
-                    <span class="rep-act-ico">🛞</span>
-                    <span class="rep-act-txt">Pinchazo (Javier)</span>
-                    <span class="rep-act-pts">—</span>
+                    <span class="rep-act-ico">🏅</span>
+                    <span class="rep-act-txt">Badges otorgadas</span>
+                    <span class="rep-act-pts" id="rep-act-badges">—</span>
                   </div>
                 </div>
               </div>
@@ -744,15 +769,13 @@
 
                 <div class="rep-rank">
                   <div class="rep-rank-head">
-                    <span>Top de tu zona</span>
-                    <span class="rep-mini">hoy</span>
+                    <span>Resumen de la comunidad</span>
+                    <span class="rep-mini">en vivo</span>
                   </div>
-                  <div class="rep-row"><span class="rep-pos">—</span><span class="rep-name">Vecino</span><span
-                      class="rep-pts">—</span></div>
-                  <div class="rep-row"><span class="rep-pos">—</span><span class="rep-name">Vecina</span><span
-                      class="rep-pts">—</span></div>
-                  <div class="rep-row rep-row--me"><span class="rep-pos">—</span><span class="rep-name">Tú</span><span
-                      class="rep-pts">—</span></div>
+                  <div class="rep-row"><span class="rep-pos">👥</span><span class="rep-name">Usuarios
+                      registrados</span><span class="rep-pts" id="rep-summary-users">—</span></div>
+                  <div class="rep-row"><span class="rep-pos">⚡</span><span class="rep-name">Reputación total</span><span
+                      class="rep-pts" id="rep-summary-rep">—</span></div>
                 </div>
               </div>
             </div>
@@ -762,41 +785,41 @@
       </div>
     </section>
 
-    <!-- ── STATS / KPIs ──────────────────────────────────────────────── -->
-    <section class="kpis" id="kpis">
+    <!-- ── SECCIÓN 3: KPIs ───────────────────────────────────────────── -->
+    <section class="kpis" id="kpis" aria-label="Sección 3 — KPIs">
       <div class="container">
         <div class="kpi-header reveal">
           <span class="section-eyebrow">Comunidad</span>
-          <h2 class="kpi-title">Impacto de la comunidad <span class="kpi-title-tag">beta</span></h2>
+          <h2 class="kpi-title">Impacto de nuestra comunidad</h2>
         </div>
         <div class="kpi-grid">
           <div class="kpi-card reveal">
             <div class="kpi-icon">🤝</div>
-            <div class="kpi-value" id="kpi-matches" data-kpi="matches_done" data-target="12400">0</div>
+            <div class="kpi-value" id="kpi-matches" data-kpi="matches_done" data-target="0">0</div>
             <div class="kpi-label">Matches completados</div>
           </div>
           <div class="kpi-card reveal">
             <div class="kpi-icon">🏅</div>
-            <div class="kpi-value" id="kpi-badges" data-kpi="badges_awarded" data-target="847">0</div>
+            <div class="kpi-value" id="kpi-badges" data-kpi="badges_awarded" data-target="0">0</div>
             <div class="kpi-label">Badges otorgados</div>
           </div>
           <div class="kpi-card reveal">
             <div class="kpi-icon">⚡</div>
-            <div class="kpi-value" id="kpi-rep" data-kpi="reputation_gained" data-target="2300000">0</div>
+            <div class="kpi-value" id="kpi-rep" data-kpi="reputation_gained" data-target="0">0</div>
             <div class="kpi-label">Reputación ganada</div>
           </div>
           <div class="kpi-card reveal">
             <div class="kpi-icon">👑</div>
-            <div class="kpi-value" id="kpi-users" data-kpi="users_total" data-target="3200">0</div>
+            <div class="kpi-value" id="kpi-users" data-kpi="users_total" data-target="0">0</div>
             <div class="kpi-label">Usuarios registrados</div>
           </div>
         </div>
-        <p class="kpi-note" id="kpi-note">Métricas en vivo (si no hay conexión, mostramos estimados)</p>
+        <p class="kpi-note" id="kpi-note">Métricas en vivo</p>
       </div>
     </section>
 
-    <!-- ── B) CÓMO FUNCIONA ────────────────────────────────────────────── -->
-    <section class="features" id="how">
+    <!-- ── SECCIÓN 4: CÓMO FUNCIONA ──────────────────────────────────── -->
+    <section class="features" id="how" aria-label="Sección 4 — Cómo funciona">
       <div class="container">
         <div class="section-header reveal">
           <span class="section-eyebrow">En 3 pasos</span>
@@ -832,44 +855,30 @@
       </div>
     </section>
 
-    <!-- ── C) BLOQUE PREMIUM ─────────────────────────────────────────── -->
-    <section class="premium-section" id="premium">
+    <!-- ── SECCIÓN 5: AUTOMATCH PREMIUM ──────────────────────────────── -->
+    <section class="premium-section" id="premium" aria-label="Sección 5 — AutoMatch Premium">
       <div class="container">
-        <div class="premium-card reveal">
+        <div class="premium-card premium-card--lite reveal">
           <div class="premium-halo" aria-hidden="true"></div>
+
+          <div class="premium-layout">
+            <div class="premium-main">
 
           <!-- Header -->
           <div class="premium-top">
             <div class="premium-crown" aria-hidden="true">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M2 17l2-7 4 3 4-6 4 6 4-3 2 7H2z" stroke="currentColor" stroke-width="1.8"
-                  stroke-linejoin="round" fill="rgba(201,168,76,0.18)" />
+                  stroke-linejoin="round" fill="currentColor" fill-opacity="0.18" />
                 <path d="M2 17h20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
               </svg>
             </div>
-            <span class="premium-label">Premium</span>
+            <span class="premium-label">AutoMatch Premium</span>
+            <span class="premium-free-badge">Gratis</span>
           </div>
 
-          <h2 class="premium-title">KingsHelp Premium</h2>
-          <p class="premium-sub">Desbloquea el Match Vecinal: el único sistema que prioriza la ayuda cercana y real.</p>
-
-          <!-- Dual Pricing Cards -->
-          <div class="premium-plans" role="radiogroup" aria-label="Elige plan Premium">
-            <button class="premium-plan" type="button" role="radio" aria-checked="false" data-interval="month"
-              data-action="setPremiumInterval" data-args="month">
-              <div class="plan-period">Mensual</div>
-              <div class="plan-price">0,99<span>&nbsp;€<span class="plan-freq">/mes</span></span></div>
-              <div class="plan-note">Sin permanencia</div>
-            </button>
-
-            <button class="premium-plan premium-plan--featured premium-plan--active" type="button" role="radio"
-              aria-checked="true" data-interval="year" data-action="setPremiumInterval" data-args="year">
-              <div class="plan-best-badge">Mejor precio</div>
-              <div class="plan-period">Anual</div>
-              <div class="plan-price">7,99<span>&nbsp;€<span class="plan-freq">/año</span></span></div>
-              <div class="plan-note">≈ 0,67&nbsp;€/mes · Ahorras ~4&nbsp;€</div>
-            </button>
-          </div>
+          <h2 class="premium-title">KingsHelp AutoMatch Premium</h2>
+          <p class="premium-sub">Gratis con reputación real. Ayuda, sube tu nivel y activa AutoMatch Premium por 7 días.</p>
 
           <!-- Bullets -->
           <ul class="premium-bullets">
@@ -878,14 +887,21 @@
                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" />
               </svg>
-              Matches automáticos con prioridad
+              Gratis con reputación, sin tarjeta
+            </li>
+            <li>
+              <svg class="bullet-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" />
+              </svg>
+              AutoMatch 7 días para encontrar ayuda más rápido
             </li>
             <li>
               <svg class="bullet-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
-              Match Vecinal exclusivo (solo en KingsHelp)
+              Match Comunitario exclusivo (solo en KingsHelp)
             </li>
             <li>
               <svg class="bullet-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -893,7 +909,7 @@
                 <polygon
                   points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
               </svg>
-              Mayor reputación y visibilidad
+              Sello AutoMatch Premium plateado en tu perfil
             </li>
             <li>
               <svg class="bullet-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -902,15 +918,7 @@
                 <path d="M8 10h8" />
                 <path d="M8 14h6" />
               </svg>
-              Publicaciones duran 2 meses (sin renovar)
-            </li>
-            <li>
-              <svg class="bullet-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-              Desbloqueable con reputación
+              Publicaciones activas 1 semana para recibir más respuestas
             </li>
           </ul>
 
@@ -918,17 +926,16 @@
           <div class="premium-points-note">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-              style="flex-shrink:0;margin-top:2px;color:var(--accent-light)">
+              style="flex-shrink:0;margin-top:2px;color:var(--silver-500)">
               <path d="M13 2 L8 12 H12 L11 22 L16 12 H12 Z" />
             </svg>
-            <span>Ganas reputación ayudando <em>(pago en €, trueque o altruista)</em>. Cuando llegues al nivel
-              necesario,
-              desbloqueas Premium gratis.</span>
+            <span>Ganas reputación ayudando <em>(pago en €, trueque o altruista)</em>. Al llegar al nivel necesario,
+              activas AutoMatch Premium gratis durante 7 días.</span>
           </div>
 
           <!-- Progress tracker -->
           <div class="points-track">
-            <div class="track-label">Acumula reputación → Desbloquea Premium</div>
+            <div class="track-label">Acumula reputación → Desbloquea AutoMatch Premium</div>
             <div class="track-bar">
               <div class="track-fill" style="width: 34%"></div>
             </div>
@@ -940,23 +947,38 @@
                   aria-hidden="true">
                   <path d="M2 17l2-7 4 3 4-6 4 6 4-3 2 7H2z" />
                 </svg>
-                Premium
+                AutoMatch Premium
               </span>
             </div>
-            <p class="track-legend">Ejemplo visual (MVP)</p>
+            <p class="track-legend">Progreso ilustrativo</p>
           </div>
 
           <!-- CTA -->
           <div class="premium-cta">
-            <button class="btn btn-gold" data-action="fx.openPremiumModal" id="btn-premium-landing">
-              <span class="btn-label">Activar Premium</span>
+            <button class="btn btn-silver btn-premium-lite" data-action="fx.openPremiumModal" id="btn-premium-landing">
+              <span class="btn-icon" aria-hidden="true">⚡</span>
+              <span class="btn-label">Desbloquear AutoMatch Premium</span>
               <span class="btn-arrow">→</span>
             </button>
           </div>
-          <p class="premium-btn-sub">Desde 0,99&nbsp;€/mes · Piensalo como una inversion: con 1 match vecinal extra al
-            mes, se paga solo</p>
+          <p class="premium-btn-sub">Gratis con reputación. Completa ayudas para desbloquearlo.</p>
 
-          <p class="premium-disclaimer">Funcionalidad en desarrollo activo.</p>
+              <p class="premium-disclaimer">Funcionalidad en desarrollo activo.</p>
+            </div>
+
+            <div class="premium-aside">
+              <div class="premium-aside-card">
+                <div class="premium-aside-ico">⭐</div>
+                <h3>Prioridad</h3>
+                <p>Tus peticiones aparecen primero para vecinos cercanos.</p>
+              </div>
+              <div class="premium-aside-card premium-aside-card--offset">
+                <div class="premium-aside-ico">🛡️</div>
+                <h3>Seguridad Pro</h3>
+                <p>Más filtros y reputación real para decidir mejor.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -964,103 +986,107 @@
 
 
 
-    <!-- ── D) CONFIANZA ───────────────────────────────────────────────── -->
-    <section class="trust-section" id="trust">
+    <!-- ── SECCIÓN 6: SEGURIDAD ──────────────────────────────────────── -->
+    <section class="trust-section" id="trust" aria-label="Sección 6 — Seguridad">
       <div class="container">
-        <div class="section-header reveal">
-          <span class="section-eyebrow">Confianza</span>
-          <h2>Una plataforma en la que confiar</h2>
-          <p>Verificación, reputación y moderación activa para proteger a tu barrio.</p>
-        </div>
-        <div class="trust-grid">
-          <div class="trust-card reveal">
-            <div class="trust-icon">⭐</div>
-            <h4>Reputación real</h4>
-            <p>Cada usuario tiene histórico de matches y valoraciones verificadas.</p>
+        <div class="trust-shell reveal">
+          <div class="trust-media">
+            <div class="trust-media-card">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPdICCtRuzDE-Tqwv3Bcl42NTyWzLtcct4FE95vb1HrBX91-SsCbYaE_ogwN_SyzNEzbtXHJ_0NeTxP-qqZpol3gvhiGAaFCVN6Q0hSsLeNjEFQ-wTcN_jDWarEpi-i4gGy9DzQzOaqcr6EJRIAxg2aWmUbx6EE03-dSHC9VCUpwQduaMi6zBgLCmB9NsVLh2kje84V1MkMrD10rmiSDrz3TeqkbSmdd9bdfu_h--IbflH1gaJ-gr8azMaGb0csNltNgzK5hFcXis" alt="Seguridad y confianza digital" loading="lazy" decoding="async" />
+            </div>
           </div>
-          <div class="trust-card reveal">
-            <div class="trust-icon">📊</div>
-            <h4>Historial de reputación</h4>
-            <p>Ledger auditado. Cada punto queda registrado y es trazable.</p>
-          </div>
-          <div class="trust-card reveal">
-            <div class="trust-icon">🔒</div>
-            <h4>Privacidad primero</h4>
-            <p>Solo compartes lo que quieres. Tus datos no se venden.</p>
-          </div>
-
-          <div class="trust-card reveal">
-            <div class="trust-icon">🧭</div>
-            <h4>Match Vecinal</h4>
-            <p>Con Premium, KingsHelp prioriza el match cercano: tu barrio primero. Solo existe aquí.</p>
+          <div class="trust-body">
+            <span class="section-eyebrow">Seguridad</span>
+            <h2>Tu seguridad es nuestra prioridad número uno</h2>
+            <p>En KingsHelp hemos construido un entorno basado en la confianza para que puedas interactuar con tus
+              vecinos con total tranquilidad.</p>
+            <div class="trust-list">
+              <div class="trust-item">
+                <div class="trust-bullet">✓</div>
+                <div>
+                  <h3>Email verificado</h3>
+                  <p>Todos los usuarios pasan por verificación de email.</p>
+                </div>
+              </div>
+              <div class="trust-item">
+                <div class="trust-bullet">★</div>
+                <div>
+                  <h3>Sistema de reputación</h3>
+                  <p>Consulta reseñas y el historial de cada vecino antes de aceptar un match.</p>
+                </div>
+              </div>
+              <div class="trust-item">
+                <div class="trust-bullet">🔒</div>
+                <div>
+                  <h3>Privacidad total</h3>
+                  <p>Tus datos personales nunca se comparten sin tu consentimiento explícito.</p>
+                </div>
+              </div>
+              <div class="trust-item">
+                <div class="trust-bullet">⚡</div>
+                <div>
+                  <h3>Match Comunitario</h3>
+                  <p>AutoMatch Premium prioriza el encaje cercano: tu comunidad primero.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── E) CASOS DE USO ────────────────────────────────────────────── -->
-    <section class="usecases-section" id="usecases">
+    <!-- ── SECCIÓN 7: CATEGORÍAS ─────────────────────────────────────── -->
+    <section class="usecases-section" id="usecases" aria-label="Sección 7 — Categorías">
       <div class="container">
-        <div class="section-header reveal">
-          <span class="section-eyebrow">Casos de uso</span>
-          <h2>¿Para qué puedo usarlo?</h2>
+        <div class="usecases-head reveal">
+          <div class="usecases-copy">
+            <span class="section-eyebrow">Categorías</span>
+            <h2>¿En qué podemos ayudarte hoy?</h2>
+            <p>Encuentra vecinos por especialidad y crea un match en segundos.</p>
+          </div>
+          <button class="usecases-link" type="button" data-action="goDashboardFromLanding"
+            data-args="explorar">
+            Ver todas las categorías
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
-        <div class="usecases-grid">
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🔧</span>
-            <span class="usecase-title">Reparaciones</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">📦</span>
-            <span class="usecase-title">Paquetes</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🐕</span>
-            <span class="usecase-title">Mascotas</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🧹</span>
-            <span class="usecase-title">Limpieza</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🚗</span>
-            <span class="usecase-title">Transporte</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">💻</span>
-            <span class="usecase-title">Tecnología</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🌿</span>
-            <span class="usecase-title">Jardinería</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">👴</span>
-            <span class="usecase-title">Acompañamiento</span>
-          </div>
-
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">📚</span>
-            <span class="usecase-title">Clases</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🎨</span>
-            <span class="usecase-title">Creativo</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">🧾</span>
-            <span class="usecase-title">Recados</span>
-          </div>
-          <div class="usecase-card reveal">
-            <span class="usecase-icon">✨</span>
-            <span class="usecase-title">Otros</span>
+        <div class="usecases-ticker" aria-label="Categorías destacadas">
+          <div class="usecases-ticker-inner">
+            <div class="usecases-track">
+              <div class="usecase-chip"><img src="img/ai/repairs.webp" alt="Reparaciones del hogar" loading="lazy" /><span>Reparaciones</span></div>
+              <div class="usecase-chip"><img src="img/ai/packages.webp" alt="Paquetería y envíos" loading="lazy" /><span>Paquetes</span></div>
+              <div class="usecase-chip"><img src="img/ai/pets.webp" alt="Cuidado de mascotas" loading="lazy" /><span>Mascotas</span></div>
+              <div class="usecase-chip"><img src="img/ai/cleaning.webp" alt="Limpieza del hogar" loading="lazy" /><span>Limpieza</span></div>
+              <div class="usecase-chip"><img src="img/ai/transport.webp" alt="Transporte" loading="lazy" /><span>Transporte</span></div>
+              <div class="usecase-chip"><img src="img/ai/tech.webp" alt="Soporte tecnológico" loading="lazy" /><span>Tecnología</span></div>
+              <div class="usecase-chip"><img src="img/ai/gardening.webp" alt="Jardinería" loading="lazy" /><span>Jardinería</span></div>
+              <div class="usecase-chip"><img src="img/ai/care.webp" alt="Cuidado de personas" loading="lazy" /><span>Acompañamiento</span></div>
+              <div class="usecase-chip"><img src="img/ai/tutoring.webp" alt="Clases y tutorías" loading="lazy" /><span>Clases</span></div>
+              <div class="usecase-chip"><img src="img/ai/creative.webp" alt="Trabajos creativos" loading="lazy" /><span>Creativo</span></div>
+              <div class="usecase-chip"><img src="img/ai/errands.webp" alt="Recados y gestiones" loading="lazy" /><span>Recados</span></div>
+              <div class="usecase-chip"><img src="img/ai/other.webp" alt="Otros servicios" loading="lazy" /><span>Otros</span></div>
+            </div>
+            <div class="usecases-track" aria-hidden="true">
+              <div class="usecase-chip"><img src="img/ai/repairs.webp" alt="" /><span>Reparaciones</span></div>
+              <div class="usecase-chip"><img src="img/ai/packages.webp" alt="" /><span>Paquetes</span></div>
+              <div class="usecase-chip"><img src="img/ai/pets.webp" alt="" /><span>Mascotas</span></div>
+              <div class="usecase-chip"><img src="img/ai/cleaning.webp" alt="" /><span>Limpieza</span></div>
+              <div class="usecase-chip"><img src="img/ai/transport.webp" alt="" /><span>Transporte</span></div>
+              <div class="usecase-chip"><img src="img/ai/tech.webp" alt="" /><span>Tecnología</span></div>
+              <div class="usecase-chip"><img src="img/ai/gardening.webp" alt="" /><span>Jardinería</span></div>
+              <div class="usecase-chip"><img src="img/ai/care.webp" alt="" /><span>Acompañamiento</span></div>
+              <div class="usecase-chip"><img src="img/ai/tutoring.webp" alt="" /><span>Clases</span></div>
+              <div class="usecase-chip"><img src="img/ai/creative.webp" alt="" /><span>Creativo</span></div>
+              <div class="usecase-chip"><img src="img/ai/errands.webp" alt="" /><span>Recados</span></div>
+              <div class="usecase-chip"><img src="img/ai/other.webp" alt="" /><span>Otros</span></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── F) CTA FINAL ───────────────────────────────────────────────── -->
-    <section class="final-cta">
+    <!-- ── SECCIÓN 8: CTA FINAL ──────────────────────────────────────── -->
+    <section class="final-cta" aria-label="Sección 8 — CTA final">
       <div class="container">
         <div class="final-cta-box reveal">
           <div class="final-glow" aria-hidden="true"></div>
@@ -1073,91 +1099,26 @@
             </button>
             <button class="btn btn-ghost btn-lg" data-action="openLogin">Iniciar sesión</button>
           </div>
-        </div>
-
-        <!-- Mini demo real (MVP): crea solicitud y sugiere providers sin salir del landing -->
-        <div class="quick-match reveal" aria-label="Probar MVP en vivo">
-          <div class="quick-match-head">
-            <div>
-              <div class="quick-match-eyebrow">Prueba rápida</div>
-              <h3 class="quick-match-title">Pruébalo en minutos</h3>
-              <p class="quick-match-sub">Crea una solicitud, mira sugerencias y crea un match. (Requiere iniciar sesión)
-              </p>
-            </div>
-            <button class="btn btn-ghost btn-sm" type="button" data-action="startFirstMatch">Ir al
-              dashboard</button>
-          </div>
-
-          <form class="quick-match-form" id="quick-form" data-submit="startQuickMatch">
-            <div class="field field--wide">
-              <label for="quick-title">Título</label>
-              <input id="quick-title" type="text" placeholder="Ej. Mudanza" required />
-            </div>
-
-            <div class="field">
-              <label for="quick-category">Categoría</label>
-              <select id="quick-category" required>
-                <option value="repairs">Reparaciones</option>
-                <option value="packages">Paquetes</option>
-                <option value="pets">Mascotas</option>
-                <option value="cleaning">Limpieza</option>
-                <option value="transport">Transporte</option>
-                <option value="tech" selected>Tecnología</option>
-                <option value="gardening">Jardinería</option>
-                <option value="care">Acompañamiento</option>
-                <option value="tutoring">Clases</option>
-                <option value="creative">Creativo</option>
-                <option value="errands">Recados</option>
-                <option value="other">Otros</option>
-              </select>
-            </div>
-
-            <div class="field field--wide">
-              <label>¿Cómo se compensa?</label>
-              <input type="hidden" id="quick-comp" value="cash" />
-              <div class="comp-switch" role="group" aria-label="Tipo de compensación">
-                  <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
-                    data-action="selectComp" data-args="quick|cash">Pago en €</button>
-                  <button class="comp-choice" type="button" data-comp="barter"
-                    data-action="selectComp" data-args="quick|barter">Trueque</button>
-                  <button class="comp-choice" type="button" data-comp="altruistic"
-                    data-action="selectComp" data-args="quick|altruistic">Altruistamente</button>
-              </div>
-              <div class="comp-hint" id="quick-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
-                KingsHelp.</div>
-            </div>
-
-            <div class="demo-hint" style="margin-top:-6px;">Caduca automáticamente según plan.</div>
-
-            <div class="field field--wide">
-              <label for="quick-desc">Detalles (opcional)</label>
-              <textarea id="quick-desc" rows="3" placeholder="Qué necesitas, cuándo y dónde"></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block" id="btn-quick">
-              <span class="btn-label">Crear solicitud y buscar</span>
-              <span class="spinner hidden"></span>
-            </button>
-          </form>
-
-          <div class="quick-match-out hidden" id="quick-out">
-            <div class="mvp-created" style="margin-bottom:10px;">
-              <span class="mvp-created-dot"></span>
-              <span><strong id="quick-status">Listo</strong></span>
-            </div>
-            <div class="mvp-list" id="quick-suggestions-list"></div>
+          <div class="final-cta-download">
+            <a class="app-download-link" href="https://play.google.com/store/apps/details?id=es.kingshelp.app" target="_blank" rel="noopener">
+              <img class="app-download-icon" src="img/boton1.png" alt="Descarga KingsHelp en Google Play Store" loading="lazy" />
+              <span>Disponible en Google Play</span>
+            </a>
+            <span class="app-download-sep">·</span>
+            <span class="app-download-note">iOS pronto</span>
           </div>
         </div>
+
       </div>
     </section>
 
 
-    <!-- ── MANUAL DE USUARIO (Apple-style scroll storytelling) ───────── -->
-    <section class="howto-section" id="como-empezar" aria-label="Cómo empezar con KingsHelp">
+    <!-- ── SECCIÓN 9: MANUAL DE USUARIO ──────────────────────────────── -->
+    <section class="howto-section" id="como-empezar" aria-label="Sección 9 — Cómo empezar con KingsHelp">
       <div class="container">
         <div class="section-header reveal">
           <span class="section-eyebrow">Manual</span>
-          <h2 class="howto-headline">Todo lo que necesitas saber</h2>
+          <h2 class="howto-headline">Todo lo que tienes que saber y cómo conseguir rápido el AutoMatch Premium Gratis</h2>
           <p class="howto-sub">Desde el registro hasta tu primer match. Simple, rápido, sin complicaciones.</p>
         </div>
 
@@ -1177,8 +1138,8 @@
               </div>
             </div>
             <div class="howto-step-body">
-                <h3 class="howto-step-title">Regístrate en minutos</h3>
-              <p class="howto-step-desc">Solo necesitas email y contraseña. Sin datos bancarios, sin verificación
+              <h3 class="howto-step-title">Regístrate en minutos</h3>
+              <p class="howto-step-desc">Solo necesitas email y contraseña. Sin datos bancarios, sin verificación de identidad
                 complicada. Empieza en minutos y personaliza tu perfil después.</p>
               <ul class="howto-checklist">
                 <li><span class="howto-check" aria-hidden="true">✓</span> Registro con email</li>
@@ -1259,14 +1220,14 @@
             <div class="howto-step-body">
               <h3 class="howto-step-title">Completa y gana reputación</h3>
               <p class="howto-step-desc">Cuando el servicio termine, ambos marcan el match como completado. Cada ayuda
-                real suma puntos de reputación que te posicionan en el ranking vecinal.</p>
+                real suma puntos de reputación que te posicionan en el ranking comunitario.</p>
               <div class="howto-rep-preview" aria-hidden="true">
                 <div class="hrp-row"><span class="hrp-icon">🏅</span><span>Reputación por match completado</span>
                 </div>
                 <div class="hrp-row"><span class="hrp-icon">⭐</span><span>Valoración 1–5 estrellas de ambas
                     partes</span></div>
                 <div class="hrp-row hrp-row--gold"><span class="hrp-icon">👑</span><span>Sube en tu ranking
-                    vecinal</span></div>
+                    comunitario</span></div>
               </div>
             </div>
           </div>
@@ -1274,10 +1235,10 @@
           <!-- Paso 5 — Premium -->
           <div class="howto-step howto-step--premium reveal" data-step="5">
             <div class="howto-step-visual">
-              <div class="howto-step-num-wrap howto-step-num-wrap--gold">
+              <div class="howto-step-num-wrap howto-step-num-wrap--silver">
                 <span class="howto-step-num">05</span>
               </div>
-              <div class="howto-step-icon howto-step-icon--gold" aria-hidden="true">
+              <div class="howto-step-icon howto-step-icon--silver" aria-hidden="true">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
                   stroke-linecap="round" stroke-linejoin="round">
                   <path d="M2 17l2-7 4 3 4-6 4 6 4-3 2 7H2z" />
@@ -1286,11 +1247,10 @@
               </div>
             </div>
             <div class="howto-step-body">
-              <h3 class="howto-step-title">Desbloquea Premium <span class="howto-badge-gold">0,99€/mes</span></h3>
-              <p class="howto-step-desc">Con Premium activas el <strong>Match Vecinal</strong> — el único sistema en
-                España que prioriza tu barrio. Recibe invitaciones automáticas sin buscar, boost de publicaciones y
-                mayor visibilidad.</p>
-              <button class="btn btn-gold btn-sm" style="margin-top:12px;" data-action="fx.openPremiumModal">
+              <h3 class="howto-step-title">Desbloquea AutoMatch Premium <span class="howto-badge-silver">Gratis</span></h3>
+              <p class="howto-step-desc">Con AutoMatch Premium activas <strong>AutoMatch</strong> por 7 días, publicaciones
+                activas 1 semana y el sello plateado en tu perfil. Se desbloquea con reputación real.</p>
+              <button class="btn btn-silver btn-sm" style="margin-top:12px;" data-action="fx.openPremiumModal">
                 Ver ventajas →
               </button>
             </div>
@@ -1299,8 +1259,8 @@
       </div>
     </section>
 
-    <!-- ── FAQ ─────────────────────────────────────────────────────────── -->
-    <section class="faq-section" id="faq" aria-label="Preguntas frecuentes">
+    <!-- ── SECCIÓN 10: FAQ ───────────────────────────────────────────── -->
+    <section class="faq-section" id="faq" aria-label="Sección 10 — Preguntas frecuentes">
       <div class="container">
         <div class="section-header reveal">
           <span class="section-eyebrow">FAQ</span>
@@ -1321,7 +1281,7 @@
               </span>
             </button>
             <div class="faq-a" id="faq-a-1" role="region" aria-labelledby="faq-btn-1" hidden>
-              <p>KingsHelp es una plataforma vecinal donde puedes <strong>pedir o ofrecer ayuda</strong> en tu zona.
+              <p>KingsHelp es una plataforma comunitaria donde puedes <strong>pedir o ofrecer ayuda</strong> en tu zona.
                 Cuando tu solicitud o oferta encaja con alguien cercano, generamos un <em>match automático</em>: ambos
                 recibís notificación y podéis chatear para cerrar el acuerdo. No necesitas buscar activamente.</p>
             </div>
@@ -1377,8 +1337,8 @@
             </button>
             <div class="faq-a" id="faq-a-4" role="region" aria-labelledby="faq-btn-4" hidden>
               <p>Cada match completado suma puntos de reputación a ambas partes. El proveedor (quien ayuda) gana más
-                puntos. La reputación es pública y determina tu posición en el <strong>ranking vecinal</strong>. No se
-                puede comprar ni manipular: solo sube con ayuda real verificada.</p>
+                puntos. La reputación es pública y determina tu posición en el <strong>ranking comunitario</strong>. No se
+                puede comprar ni manipular: solo sube con ayuda real.</p>
               <p>Si hay indicios de fraude (demasiados matches entre las mismas dos cuentas), el sistema limita
                 automáticamente los puntos.</p>
             </div>
@@ -1386,7 +1346,7 @@
 
           <div class="faq-item" role="listitem">
             <button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-5" id="faq-btn-5">
-              <span>¿Qué es Premium y qué incluye?</span>
+              <span>¿Qué es AutoMatch Premium y qué incluye?</span>
               <span class="faq-chevron" aria-hidden="true">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -1395,14 +1355,14 @@
               </span>
             </button>
             <div class="faq-a" id="faq-a-5" role="region" aria-labelledby="faq-btn-5" hidden>
-              <p>Premium (desde <strong>0,99€/mes</strong>) desbloquea:</p>
+              <p>AutoMatch Premium es <strong>gratis</strong> y se desbloquea con reputación. Incluye:</p>
               <ul>
-                <li><strong>Match Vecinal:</strong> El algoritmo prioriza tu zona. Exclusivo de KingsHelp.</li>
-                <li>AutoMatch: invitaciones automáticas sin buscar activamente.</li>
-                <li>Publicaciones duran 2 meses (en vez de 1 semana).</li>
-                <li>Mayor visibilidad en el feed y en el ranking.</li>
+                <li><strong>Match Comunitario:</strong> El algoritmo prioriza tu zona. Exclusivo de KingsHelp.</li>
+                <li>AutoMatch durante 7 días para recibir invitaciones automáticas.</li>
+                <li>Publicaciones activas 1 semana.</li>
+                <li>Sello AutoMatch Premium plateado en tu perfil.</li>
               </ul>
-              <p>También puedes desbloquear Premium sin pagar, acumulando suficiente reputación.</p>
+              <p>Se activa al alcanzar la reputación necesaria.</p>
             </div>
           </div>
 
@@ -1436,7 +1396,7 @@
             <div class="faq-a" id="faq-a-7" role="region" aria-labelledby="faq-btn-7" hidden>
               <p>Desde el perfil de cualquier usuario puedes <strong>reportarlo</strong>. Nuestro equipo de moderación
                 revisa todos los reportes. En casos graves, los usuarios pueden ser suspendidos. También puedes
-                escribirnos a <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a>.</p>
+                escribirnos a <a href="mailto:contact@kingshelp.es">contact@kingshelp.es</a>.</p>
             </div>
           </div>
 
@@ -1461,7 +1421,7 @@
 
         <div class="faq-cta reveal">
           <p>¿Más preguntas? Escríbenos:</p>
-          <a href="mailto:contacto@kingshelp.app" class="btn btn-ghost">contacto@kingshelp.app</a>
+          <a href="mailto:contact@kingshelp.es" class="btn btn-ghost">contact@kingshelp.es</a>
         </div>
       </div>
     </section>
@@ -1471,7 +1431,7 @@
       <div class="container footer-inner">
         <div class="footer-brand">
           <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio">
-            <img class="nav-brand-logo" src="img/LOGO_22.png" alt="KingsHelp" draggable="false" decoding="async" />
+            <img class="nav-brand-logo" src="img/LOGO_222.png?v=2" alt="KingsHelp" draggable="false" decoding="async" />
           </a>
           <p class="footer-note">KingsHelp conecta vecinos. No procesamos dinero: cualquier pago en EUR se acuerda en el
             chat y se realiza fuera de la plataforma.</p>
@@ -1482,17 +1442,21 @@
           <a href="legal/terminos.html">Terminos</a>
           <a href="legal/privacidad.html">Privacidad</a>
           <a href="legal/cookies.html">Cookies</a>
+          <button type="button" data-action="openCookieSettings">Configurar cookies</button>
           <a href="legal/seguridad.html">Seguridad</a>
         </nav>
 
         <div class="footer-meta">
           <div class="footer-small">Guía: <a href="#como-empezar">Manual</a> · <a href="#faq">FAQ</a></div>
-          <div class="footer-small">Contacto: <a href="mailto:contacto@kingshelp.app">contacto@kingshelp.app</a></div>
+          <div class="footer-small">Contacto: <a href="mailto:contact@kingshelp.es">contact@kingshelp.es</a></div>
           <div class="footer-small">© <span id="footer-year">2026</span> KingsHelp</div>
         </div>
       </div>
     </footer>
 
+    <button id="scroll-top" class="scroll-top" type="button" data-action="scrollToTop" aria-label="Subir arriba">
+      ↑
+    </button>
   </div><!-- /page-landing -->
 
   <!-- ── DASHBOARD ──────────────────────────────────────────────────── -->
@@ -1501,14 +1465,16 @@
     <header class="dash-header">
       <div class="dash-left">
         <div class="nav-brand">
-          <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio" data-action="goLanding" data-args="$event">
-            <img class="nav-brand-logo" src="img/LOGO_22.png" alt="KingsHelp" draggable="false" decoding="async" />
+          <a href="#" class="nav-brand-lockup" aria-label="KingsHelp — Inicio" data-action="goLanding"
+            data-args="$event">
+            <img class="nav-brand-logo" src="img/LOGO_222.png?v=2" alt="KingsHelp" draggable="false" decoding="async" />
           </a>
         </div>
-        <span id="kh-theme-slot-dash"></span>
       </div>
       <div class="dash-user">
-        <button class="kh-pill" type="button" data-action="openRanking" data-args="$event" aria-label="Abrir ranking vecinal">
+        <span id="kh-theme-slot-dash"></span>
+        <button class="kh-pill" type="button" data-action="openRanking" data-args="$event"
+          aria-label="Abrir ranking comunitario">
           <span class="kh-theme-icon" aria-hidden="true">🏆</span>
           <span class="kh-theme-label">Ranking</span>
         </button>
@@ -1520,30 +1486,33 @@
         <div class="dash-menu">
           <button class="btn btn-ghost nav-burger nav-account" type="button" id="dash-menu-btn" aria-haspopup="menu"
             aria-expanded="false" data-action="toggleDashMenu" data-args="$event">
-            <span class="nav-account-avatar" id="user-avatar">A</span>
+            <span class="nav-account-avatar" id="user-avatar" title="Nivel (próximamente)">A</span>
             <span class="nav-account-meta">
               <span class="nav-account-name" id="user-name">—</span>
-              <span class="nav-account-tier" id="user-tier">free</span>
+              <span class="nav-account-tier" id="user-tier">—</span>
             </span>
             <span class="verified-badge hidden" id="user-verified" title="Email verificado"
               aria-label="Email verificado">✓</span>
             <span class="nav-account-caret" aria-hidden="true">▾</span>
           </button>
           <div class="dash-menu-pop hidden" id="dash-menu-pop" role="menu" aria-label="Menu de cuenta">
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="explorar">Explorar</button>
-            <button class="dash-menu-item dash-menu-item--gold" type="button" role="menuitem" data-action="goAutoMatchFromMenu">
+            <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
+              data-args="explorar">Explorar</button>
+            <button class="dash-menu-item dash-menu-item--gold dash-menu-item--cta" type="button" role="menuitem"
+              data-action="goAutoMatchFromMenu">
               <span class="menu-gold-icon">⚡</span>AutoMatch Premium
             </button>
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="creaciones">Mis creaciones</button>
+            <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
+              data-args="creaciones">Mis creaciones</button>
             <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
               data-args="matches">Mis matches</button>
-            <button class="dash-menu-item" type="button" role="menuitem"
-              data-action="gotoDashFromMenu" data-args="perfil">Perfil</button>
+            <button class="dash-menu-item" type="button" role="menuitem" data-action="gotoDashFromMenu"
+              data-args="perfil">Perfil</button>
             <div class="dash-menu-sep" aria-hidden="true"></div>
-            <button class="dash-menu-item" type="button" role="menuitem" data-action="openRankingPage">Ranking completo</button>
-            <button class="dash-menu-item danger" type="button" role="menuitem" data-action="logout">Cerrar sesión</button>
+            <button class="dash-menu-item" type="button" role="menuitem" data-action="openRankingPage">Ranking
+              completo</button>
+            <button class="dash-menu-item danger" type="button" role="menuitem" data-action="logout">Cerrar
+              sesión</button>
           </div>
         </div>
 
@@ -1553,16 +1522,16 @@
             aria-haspopup="true" aria-expanded="false" data-action="toggleNotifPanel">
             <svg class="notif-bell-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             <span class="notif-badge hidden" id="notif-badge" aria-label="notificaciones sin leer">0</span>
           </button>
           <div class="notif-panel hidden" id="notif-panel" role="dialog" aria-label="Notificaciones">
             <div class="notif-panel-head">
               <span class="notif-panel-title">Notificaciones</span>
-              <button class="notif-mark-all-btn" id="btn-notif-mark-all" type="button"
-                data-action="markAllNotifsReadUI" aria-label="Marcar todas como leídas">Todo leído</button>
+              <button class="notif-mark-all-btn" id="btn-notif-mark-all" type="button" data-action="markAllNotifsReadUI"
+                aria-label="Marcar todas como leídas">Todo leído</button>
             </div>
             <div class="notif-list" id="notif-list">
               <div class="notif-empty">Sin notificaciones nuevas</div>
@@ -1590,176 +1559,350 @@
           </div>
           <p class="next-desc" id="dash-next-desc">—</p>
           <div class="mvp-row">
-            <button class="btn btn-primary btn-sm" type="button" id="dash-next-cta" data-action="runNext">Continuar</button>
-            <button class="btn btn-ghost btn-sm" type="button" id="dash-next-secondary" data-action="runNextSecondary">Ver detalles</button>
+            <button class="btn btn-primary btn-sm" type="button" id="dash-next-cta"
+              data-action="runNext">Continuar</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="dash-next-secondary"
+              data-action="runNextSecondary">Ver detalles</button>
           </div>
         </div>
 
 
 
-        <!-- AutoMatch (Premium) -->
-        <div class="glass-card card-automatch reveal" id="card-automatch" data-view="automatch">
-          <div class="card-head">
-            <div class="card-title">
-              <div class="card-ico card-ico--sweep" aria-hidden="true"><span>⚡</span></div>
-              <div>
-                <h3>AutoMatch <span class="badge-pill"
-                    style="margin-left:8px; border-color:rgba(201,168,76,.28); color:var(--gold-light);">Premium</span></h3>
-              </div>
-            </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span class="badge-pill success hidden" id="am-status-pill">Activo</span>
-              <button class="btn btn-gold btn-sm" type="button" data-action="fx.openPremiumModal" id="btn-am-premium">
-                <span class="btn-label">Activar Premium</span>
-              </button>
-            </div>
-          </div>
-
+        <!-- AutoMatch (AutoMatch Premium) -->
+        <div id="card-automatch" data-view="automatch">
           <div class="automatch-stage">
             <div class="automatch-hero">
-              <div class="automatch-hero-k">Sistema de notificaciones automaticas</div>
-              <div class="automatch-hero-v">AutoMatch te trae el barrio.</div>
-              <div class="automatch-hero-sub">Programa lo que <strong>ofreces</strong> y lo que
-                <strong>necesitas</strong>. Cuando haya encaje, recibes una invitacion con tiempo limitado.
+              <div class="automatch-hero-main">
+                <div class="automatch-hero-k">AutoMatch Premium</div>
+                <div class="automatch-hero-v">AutoMatch <span class="gradient-text">Premium</span> te trae la comunidad.</div>
+                <div class="automatch-hero-sub">Conecta automáticamente con vecinos que ofrecen lo que necesitas o
+                  necesitan lo que ofreces. Gestión inteligente de ayuda mutua en tiempo real.</div>
+              </div>
+              <div class="automatch-hero-actions"></div>
+            </div>
+
+            <div class="automatch-status-strip is-inactive" id="am-status-strip" aria-live="polite">
+              <span class="am-status-pill" id="am-status-text">AutoMatch inactivo</span>
+              <span class="am-status-items hidden" id="am-status-items">
+                <span class="am-status-sep">·</span>
+                <span class="am-status-item">Radio: <strong id="am-status-radius">— km</strong></span>
+                <span class="am-status-sep">·</span>
+                <span class="am-status-item">Categorías: <strong id="am-status-cats">0</strong></span>
+                <span class="am-status-sep">·</span>
+                <span class="am-status-item">Invitaciones/día: <strong id="am-status-invites">0</strong></span>
+                <span class="am-status-sep">·</span>
+                <span class="am-status-item" id="am-status-search">Buscando coincidencias en tu zona</span>
+              </span>
+            </div>
+
+            <div class="automatch-grid">
+              <div class="automatch-col-left">
+                <div class="automatch-settings" aria-label="Configuracion AutoMatch">
+                  <div class="automatch-settings-head" style="margin-bottom:8px;">
+                    <div class="automatch-settings-title">Preferencias</div>
+                    <div class="am-hint">Actualiza y guarda tus preferencias</div>
+                  </div>
+                  <div class="am-mode-toggle" role="tablist" aria-label="Modo AutoMatch">
+                    <button class="am-mode-btn am-mode-btn--active" type="button" data-action="setAutoMatchMode"
+                      data-args="simple" data-am-mode="simple" aria-pressed="true">Modo simple</button>
+                    <button class="am-mode-btn" type="button" data-action="setAutoMatchMode" data-args="advanced"
+                      data-am-mode="advanced" aria-pressed="false">Modo avanzado</button>
+                  </div>
+                  <div class="am-mode-desc" id="am-mode-desc">Configuracion rapida, ideal para empezar.</div>
+
+                  <div class="am-simple" id="am-simple">
+                    <div class="am-simple-block">
+                      <div class="am-simple-title">Que quieres hacer?</div>
+                      <div class="am-simple-choices">
+                        <button class="am-choice" type="button" data-action="toggleSimpleRole" data-args="seeker"
+                          data-am-role="seeker" aria-pressed="false">
+                          <span class="am-choice-title">Recibir ayuda</span>
+                          <span class="am-choice-sub">Te llegan ofertas automaticas.</span>
+                        </button>
+                        <button class="am-choice" type="button" data-action="toggleSimpleRole" data-args="provider"
+                          data-am-role="provider" aria-pressed="false">
+                          <span class="am-choice-title">Ofrecer ayuda</span>
+                          <span class="am-choice-sub">Te llegan solicitudes compatibles.</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="am-simple-block">
+                      <div class="am-simple-title">Distancia</div>
+                      <div class="am-simple-pills" role="group" aria-label="Distancia">
+                        <button class="am-pill" type="button" data-action="setSimpleRadius" data-args="2"
+                          data-am-radius="2" aria-pressed="false">2 km</button>
+                        <button class="am-pill is-active" type="button" data-action="setSimpleRadius" data-args="5"
+                          data-am-radius="5" aria-pressed="true">5 km</button>
+                        <button class="am-pill" type="button" data-action="setSimpleRadius" data-args="10"
+                          data-am-radius="10" aria-pressed="false">10 km</button>
+                      </div>
+                      <div class="am-simple-note">Puedes cambiarlo luego en modo avanzado.</div>
+                    </div>
+                    <div class="am-simple-actions">
+                      <button class="btn btn-primary btn-lg" type="button" data-action="saveAutoMatchSettings">
+                        Activar AutoMatch
+                      </button>
+                      <div class="am-simple-foot">Puedes cambiar a modo avanzado cuando quieras.</div>
+                    </div>
+                  </div>
+
+                  <div class="am-advanced" id="am-advanced" data-am-block="advanced">
+                    <div class="automatch-preferences">
+                      <div class="am-mode" data-kind="provider">
+                        <div class="am-mode-head">
+                          <div>
+                            <div class="am-mode-k">Ofrezco</div>
+                            <div class="am-mode-v">Quiero ayudar</div>
+                          </div>
+                          <label class="am-toggle" title="Recibir solicitudes que encajan con tus ofertas">
+                            <input id="am-provider-enabled" class="am-toggle-input" type="checkbox"
+                              data-change="saveAutoMatchSettings" />
+                            <span class="am-toggle-text">Activo</span>
+                          </label>
+                        </div>
+                        <div class="am-mode-sub">Te llegan <strong>solicitudes</strong> (pasear mascotas, transporte,
+                          jardineria...).</div>
+                        <div class="automatch-cats" id="am-provider-cats"></div>
+                      </div>
+
+                      <div class="am-mode" data-kind="seeker">
+                        <div class="am-mode-head">
+                          <div>
+                            <div class="am-mode-k">Necesito</div>
+                            <div class="am-mode-v">Quiero recibir ayuda</div>
+                          </div>
+                          <label class="am-toggle" title="Recibir ofertas que encajan con tus necesidades">
+                            <input id="am-seeker-enabled" class="am-toggle-input" type="checkbox"
+                              data-change="saveAutoMatchSettings" />
+                            <span class="am-toggle-text">Activo</span>
+                          </label>
+                        </div>
+                        <div class="am-mode-sub">Te llegan <strong>ofertas</strong> sin navegar (y tambien al crear una
+                          solicitud).</div>
+                        <div class="automatch-cats" id="am-seeker-cats"></div>
+                      </div>
+                    </div>
+
+                    <div class="am-slider am-slider--quick" style="margin-top:12px;">
+                      <div class="am-slider-head">
+                        <span>Radio de accion</span>
+                        <span class="am-slider-value" id="am-radius-value">— km</span>
+                      </div>
+                      <input class="am-range" id="am-radius" type="range" min="1" max="30" step="1"
+                        data-change="saveAutoMatchSettings" />
+                    </div>
+
+                    <div class="automatch-settings-actions">
+                      <button class="btn btn-primary btn-sm" type="button" data-action="saveAutoMatchSettings">
+                        Guardar preferencias
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="automatch-premium" aria-label="Funciones premium" data-am-block="advanced">
+                  <div class="automatch-premium-grid">
+                    <div class="automatch-premium-card">
+                      <div class="automatch-premium-head">
+                        <span class="automatch-premium-ico">📅</span>
+                        <div>
+                          <div class="automatch-premium-title">Programar disponibilidad</div>
+                          <div class="automatch-premium-sub">Configura cuándo quieres que AutoMatch busque activamente por
+                            ti.</div>
+                        </div>
+                      </div>
+                      <div class="automatch-premium-list">
+                        <div class="automatch-premium-row am-schedule-row">
+                          <span>Días laborables</span>
+                          <div class="am-time-range">
+                            <input class="am-time-input" id="am-weekday-start" type="time" value="17:00" />
+                            <span>—</span>
+                            <input class="am-time-input" id="am-weekday-end" type="time" value="21:00" />
+                          </div>
+                        </div>
+                        <div class="automatch-premium-row am-schedule-row">
+                          <span>Fines de semana</span>
+                          <div class="am-time-range">
+                            <input class="am-time-input" id="am-weekend-start" type="time" value="00:00" />
+                            <span>—</span>
+                            <input class="am-time-input" id="am-weekend-end" type="time" value="23:59" />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="automatch-premium-actions">
+                        <button class="btn btn-ghost btn-sm" type="button">Editar horarios</button>
+                        <button class="btn btn-primary btn-sm" type="button" data-action="saveAutoMatchSettings">
+                          Guardar preferencias
+                        </button>
+                      </div>
+                    </div>
+                    <div class="automatch-premium-card">
+                      <div class="automatch-premium-head">
+                        <span class="automatch-premium-ico">🔔</span>
+                        <div>
+                          <div class="automatch-premium-title">Intensidad de alertas</div>
+                          <div class="automatch-premium-sub">Elige cómo quieres recibir invitaciones importantes.</div>
+                        </div>
+                      </div>
+                      <div class="automatch-premium-chips">
+                        <button class="automatch-premium-chip automatch-premium-chip--active" type="button">Email</button>
+                        <button class="automatch-premium-chip" type="button">Push web (Próximamente)</button>
+                        <button class="automatch-premium-chip" type="button">SMS (Próximamente)</button>
+                      </div>
+                      <div class="automatch-premium-sliders">
+                        <div class="am-slider">
+                          <div class="am-slider-head">
+                            <span>Invitaciones al día</span>
+                            <span class="am-slider-value" id="am-max-invites-value">—</span>
+                          </div>
+                          <input class="am-range" id="am-max-invites" type="range" min="5" max="20" step="1"
+                            data-change="saveAutoMatchSettings" />
+                        </div>
+                      </div>
+                      <div class="automatch-premium-actions">
+                        <button class="btn btn-primary btn-sm" type="button" data-action="saveAutoMatchSettings">
+                          Guardar preferencias
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="automatch-col-right">
+                <div class="automatch-invites">
+                  <div class="automatch-settings-head" style="margin-bottom:8px;">
+                    <div class="automatch-settings-title">Invitaciones activas</div>
+                    <button class="btn btn-ghost btn-sm" type="button" data-action="loadAutoMatch" id="btn-am-refresh">
+                      <span class="btn-label">Actualizar</span>
+                      <span class="spinner hidden"></span>
+                    </button>
+                  </div>
+
+                  <div class="am-filter" id="am-filter" aria-label="Filtros de AutoMatch"></div>
+
+                  <div class="am-split">
+                    <div class="am-split-head">
+                      <div class="automatch-settings-title">Solicitudes (te piden ayuda)</div>
+                      <span class="badge-pill" id="am-count-requests">0</span>
+                    </div>
+                    <div class="am-board" aria-label="Tablero solicitudes">
+                      <section class="am-col" aria-label="Solicitudes pendientes">
+                        <div class="am-col-head">
+                          <div class="am-col-title">Pendientes</div>
+                          <span class="am-col-count" id="am-req-count-pending">0</span>
+                        </div>
+                        <div class="am-cards" id="am-req-pending">
+                          <div class="ledger-empty">Sin pendientes</div>
+                        </div>
+                      </section>
+
+                      <section class="am-col" aria-label="Solicitudes aceptadas">
+                        <div class="am-col-head">
+                          <div class="am-col-title">Aceptadas</div>
+                          <span class="am-col-count" id="am-req-count-accepted">0</span>
+                        </div>
+                        <div class="am-cards" id="am-req-accepted">
+                          <div class="ledger-empty">Aún no aceptaste</div>
+                        </div>
+                      </section>
+
+                      <section class="am-col" aria-label="Solicitudes archivadas">
+                        <div class="am-col-head">
+                          <div class="am-col-title">Archivadas</div>
+                          <span class="am-col-count" id="am-req-count-archived">0</span>
+                        </div>
+                        <div class="am-cards" id="am-req-archived">
+                          <div class="ledger-empty">Nada archivado</div>
+                        </div>
+                      </section>
+                    </div>
+
+                    <div class="am-split-head" style="margin-top:10px;">
+                      <div class="automatch-settings-title">Ofertas (te ofrecen ayuda)</div>
+                      <span class="badge-pill" id="am-count-offers">0</span>
+                    </div>
+                    <div class="am-board" aria-label="Tablero ofertas">
+                      <section class="am-col" aria-label="Ofertas pendientes">
+                        <div class="am-col-head">
+                          <div class="am-col-title">Pendientes</div>
+                          <span class="am-col-count" id="am-off-count-pending">0</span>
+                        </div>
+                        <div class="am-cards" id="am-off-pending">
+                          <div class="ledger-empty">Sin pendientes</div>
+                        </div>
+                      </section>
+
+                      <section class="am-col" aria-label="Ofertas aceptadas">
+                        <div class="am-col-head">
+                          <div class="am-col-title">Aceptadas</div>
+                          <span class="am-col-count" id="am-off-count-accepted">0</span>
+                        </div>
+                        <div class="am-cards" id="am-off-accepted">
+                          <div class="ledger-empty">Aún no aceptaste</div>
+                        </div>
+                      </section>
+
+                      <section class="am-col" aria-label="Ofertas archivadas">
+                        <div class="am-col-head">
+                          <div class="am-col-title">Archivadas</div>
+                          <span class="am-col-count" id="am-off-count-archived">0</span>
+                        </div>
+                        <div class="am-cards" id="am-off-archived">
+                          <div class="ledger-empty">Nada archivado</div>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="automatch-smart-match hidden" aria-label="Posible coincidencia para ti"></div>
+
+                <div class="automatch-live-feed" aria-label="Actividad reciente cerca de ti">
+                  <div class="automatch-live-title"><span class="automatch-live-indicator"></span>Actividad reciente cerca de ti</div>
+                  <div class="automatch-live-lines">
+                    <span>• AutoMatch está vigilando tu zona en tiempo real</span>
+                    <span>• Te avisaremos cuando llegue una coincidencia</span>
+                  </div>
+                </div>
+
+                <div class="automatch-local-activity" aria-label="Actividad cerca de ti">
+                  <div class="automatch-local-title">Actividad cerca de ti</div>
+                  <div class="automatch-local-lines">
+                    <span>• 3 solicitudes nuevas hoy (últimas 2h)</span>
+                    <span>• 2 vecinos ofrecen transporte esta mañana</span>
+                    <span>• 1 vecino pide ayuda con compras</span>
+                  </div>
+                </div>
+
+                <div class="am-rule am-rule--urgent">
+                  <div class="am-rule-ico">⏳</div>
+                  <div>
+                    <div class="am-rule-title">Tiempo limitado</div>
+                    <div class="am-rule-sub">Cada invitación caduca en minutos. Prioriza las que tienen reloj activo.</div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
-            <div class="automatch-board" aria-label="Configuracion AutoMatch">
-              <div class="am-mode" data-kind="provider">
-                <div class="am-mode-head">
-                  <div>
-                    <div class="am-mode-k">Ofrezco</div>
-                    <div class="am-mode-v">Quiero ayudar</div>
-                  </div>
-                  <label class="am-toggle" title="Recibir solicitudes que encajan con tus ofertas">
-                    <input id="am-provider-enabled" type="checkbox" data-change="saveAutoMatchSettings" />
-                    <span>Activo</span>
-                  </label>
-                </div>
-                <div class="am-mode-sub">Te llegan <strong>solicitudes</strong> (pasear mascotas, transporte,
-                  jardineria...).</div>
-                <div class="automatch-cats" id="am-provider-cats"></div>
+            <div class="automatch-cta">
+              <div>
+                <div class="automatch-cta-title">¿Quieres ser más específico?</div>
+                <div class="automatch-cta-sub">Publica un anuncio detallado para llegar a más gente.</div>
               </div>
-
-              <div class="am-mode" data-kind="seeker">
-                <div class="am-mode-head">
-                  <div>
-                    <div class="am-mode-k">Necesito</div>
-                    <div class="am-mode-v">Quiero recibir ayuda</div>
-                  </div>
-                  <label class="am-toggle" title="Recibir ofertas que encajan con tus necesidades">
-                    <input id="am-seeker-enabled" type="checkbox" data-change="saveAutoMatchSettings" />
-                    <span>Activo</span>
-                  </label>
-                </div>
-                <div class="am-mode-sub">Te llegan <strong>ofertas</strong> sin navegar (y tambien al crear una
-                  solicitud).</div>
-                <div class="automatch-cats" id="am-seeker-cats"></div>
-              </div>
-
-              <div class="am-rule">
-                <div class="am-rule-ico">⏳</div>
-                <div>
-                  <div class="am-rule-title">Tiempo limitado</div>
-                  <div class="am-rule-sub">Las invitaciones caducan en minutos. Acepta y entras directo al chat.</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="automatch-invites">
-              <div class="automatch-settings-head" style="margin-bottom:10px;">
-                <div class="automatch-settings-title">Invitaciones activas</div>
-                <button class="btn btn-ghost btn-sm" type="button" data-action="loadAutoMatch" id="btn-am-refresh">
-                  <span class="btn-label">Actualizar</span>
-                  <span class="spinner hidden"></span>
-                </button>
-              </div>
-
-              <div class="am-filter" id="am-filter" aria-label="Filtros de AutoMatch"></div>
-
-              <div class="am-split">
-                <div class="am-split-head">
-                  <div class="automatch-settings-title">Solicitudes (te piden ayuda)</div>
-                  <span class="badge-pill" id="am-count-requests">0</span>
-                </div>
-                <div class="am-board" aria-label="Tablero solicitudes">
-                  <section class="am-col" aria-label="Solicitudes pendientes">
-                    <div class="am-col-head">
-                      <div class="am-col-title">Pendientes</div>
-                      <span class="am-col-count" id="am-req-count-pending">0</span>
-                    </div>
-                    <div class="am-cards" id="am-req-pending">
-                      <div class="ledger-empty">Sin pendientes</div>
-                    </div>
-                  </section>
-
-                  <section class="am-col" aria-label="Solicitudes aceptadas">
-                    <div class="am-col-head">
-                      <div class="am-col-title">Aceptadas</div>
-                      <span class="am-col-count" id="am-req-count-accepted">0</span>
-                    </div>
-                    <div class="am-cards" id="am-req-accepted">
-                      <div class="ledger-empty">Aún no aceptaste</div>
-                    </div>
-                  </section>
-
-                  <section class="am-col" aria-label="Solicitudes archivadas">
-                    <div class="am-col-head">
-                      <div class="am-col-title">Archivadas</div>
-                      <span class="am-col-count" id="am-req-count-archived">0</span>
-                    </div>
-                    <div class="am-cards" id="am-req-archived">
-                      <div class="ledger-empty">Nada archivado</div>
-                    </div>
-                  </section>
-                </div>
-
-                <div class="am-split-head" style="margin-top:14px;">
-                  <div class="automatch-settings-title">Ofertas (te ofrecen ayuda)</div>
-                  <span class="badge-pill" id="am-count-offers">0</span>
-                </div>
-                <div class="am-board" aria-label="Tablero ofertas">
-                  <section class="am-col" aria-label="Ofertas pendientes">
-                    <div class="am-col-head">
-                      <div class="am-col-title">Pendientes</div>
-                      <span class="am-col-count" id="am-off-count-pending">0</span>
-                    </div>
-                    <div class="am-cards" id="am-off-pending">
-                      <div class="ledger-empty">Sin pendientes</div>
-                    </div>
-                  </section>
-
-                  <section class="am-col" aria-label="Ofertas aceptadas">
-                    <div class="am-col-head">
-                      <div class="am-col-title">Aceptadas</div>
-                      <span class="am-col-count" id="am-off-count-accepted">0</span>
-                    </div>
-                    <div class="am-cards" id="am-off-accepted">
-                      <div class="ledger-empty">Aún no aceptaste</div>
-                    </div>
-                  </section>
-
-                  <section class="am-col" aria-label="Ofertas archivadas">
-                    <div class="am-col-head">
-                      <div class="am-col-title">Archivadas</div>
-                      <span class="am-col-count" id="am-off-count-archived">0</span>
-                    </div>
-                    <div class="am-cards" id="am-off-archived">
-                      <div class="ledger-empty">Nada archivado</div>
-                    </div>
-                  </section>
-                </div>
-              </div>
+              <button class="btn btn-primary btn-sm" type="button" data-action="hubStartCreate">Publicar anuncio</button>
             </div>
           </div>
         </div>
 
         <!-- Explorar (muro tipo Wallapop) -->
-        <div class="glass-card card-feed reveal" id="card-feed" data-view="explorar">
+        <div class="glass-card card-feed reveal" id="card-feed" data-view="explorar" data-editor-id="explore-card">
           <div class="card-head">
             <div class="card-title">
               <div>
-                <div class="explore-title-row">
+                <div class="explore-title-row" data-editor-id="explore-title">
+                  <img class="explore-crown" src="img/corona2.png" alt="KingsHelp" draggable="false" decoding="async" data-editor-id="explore-crown" />
                   <h3 class="explore-title kh-type kh-type--line1">Explora tu zona</h3>
                   <span class="explore-radar" aria-hidden="true">
                     <span class="explore-radar-sweep"></span>
@@ -1768,28 +1911,108 @@
                     <span class="explore-radar-dot explore-radar-dot--c"></span>
                   </span>
                 </div>
-                <div class="card-sub hero-sub hero-sub--compact">Ayuda real, cerca de ti. Conecta con vecinos y suma confianza en tu zona.</div>
+                <div class="card-sub hero-sub hero-sub--compact">Ayuda real, cerca de ti. Conecta con vecinos y suma
+                  confianza en tu zona.</div>
               </div>
             </div>
-            <button class="btn btn-ghost btn-sm" type="button" data-action="loadFeed" id="btn-feed-refresh">
-              <span class="btn-label">Actualizar</span>
-              <span class="spinner hidden"></span>
-            </button>
           </div>
 
-          <div class="feed-tabs" role="tablist" aria-label="Explorar por tipo">
-            <button class="feed-tab feed-tab--active" id="feed-tab-need" type="button" role="tab" aria-selected="true"
-              aria-controls="feed-section-need" data-feed-tab="need">Necesito un KingsHelp</button>
-            <button class="feed-tab" id="feed-tab-offer" type="button" role="tab" aria-selected="false"
-              aria-controls="feed-section-offer" data-feed-tab="offer">Soy tu KingsHelp</button>
-            <button class="feed-tab" id="feed-tab-premium" type="button" role="tab" aria-selected="false"
-              aria-controls="feed-section-premium" data-feed-tab="premium">Anuncios Premium</button>
+          <div class="feed-tabs-row">
+            <div class="feed-tabs" role="tablist" aria-label="Explorar por tipo">
+              <button class="feed-tab feed-tab--active" id="feed-tab-need" type="button" role="tab" aria-selected="true"
+                aria-controls="feed-section-need" data-feed-tab="need">Necesito un KingsHelp</button>
+              <button class="feed-tab" id="feed-tab-offer" type="button" role="tab" aria-selected="false"
+                aria-controls="feed-section-offer" data-feed-tab="offer">Soy tu KingsHelp</button>
+              <button class="feed-tab" id="feed-tab-premium" type="button" role="tab" aria-selected="false"
+                aria-controls="feed-section-premium" data-feed-tab="premium">
+                <span class="feed-tab-ico" aria-hidden="true">⚡</span>
+                Anuncios AutoMatch Premium (Próximamente)
+              </button>
+            </div>
           </div>
 
-          <div class="creations-search" style="margin: 2px 0 10px;">
-            <span style="opacity:.8">🔎</span>
-            <input class="creations-q" id="feed-q" placeholder="Busca: mudanza, limpieza, clases..."
-              data-input="loadFeed" />
+          <div class="feed-filter-bar" role="search" aria-label="Buscar y filtrar" data-editor-id="explore-filters">
+            <div class="feed-filter-seg feed-filter-search">
+              <span class="feed-filter-ico" aria-hidden="true">🔎</span>
+              <input class="feed-filter-input" id="feed-q" type="search" placeholder="Buscar ayuda cerca de ti..."
+                data-input="loadFeed" />
+            </div>
+            <div class="feed-filter-sep" aria-hidden="true"></div>
+            <div class="feed-filter-seg">
+              <span class="feed-filter-label">Categoría:</span>
+              <select class="feed-filter-select" id="feed-filter-category" data-change="loadFeed"
+                aria-label="Categoria">
+                <option value="all" selected>Todas</option>
+                <option value="repairs">Reparaciones</option>
+                <option value="packages">Paquetes</option>
+                <option value="pets">Mascotas</option>
+                <option value="cleaning">Limpieza</option>
+                <option value="transport">Transporte</option>
+                <option value="tech">Tecnologia</option>
+                <option value="gardening">Jardineria</option>
+                <option value="care">Acompanamiento</option>
+                <option value="tutoring">Clases</option>
+                <option value="creative">Creativo</option>
+                <option value="errands">Recados</option>
+                <option value="other">Otros</option>
+              </select>
+            </div>
+            <div class="feed-filter-sep" aria-hidden="true"></div>
+            <div class="feed-filter-seg">
+              <span class="feed-filter-label">Distancia:</span>
+              <select class="feed-filter-select" id="feed-filter-distance" data-change="loadFeed"
+                aria-label="Distancia">
+                <option value="all">Todas</option>
+                <option value="1">1 km</option>
+                <option value="3">3 km</option>
+                <option value="5" selected>5 km</option>
+                <option value="10">10 km</option>
+                <option value="25">25 km</option>
+              </select>
+            </div>
+            <div class="feed-filter-sep" aria-hidden="true"></div>
+            <div class="feed-filter-seg">
+              <span class="feed-filter-label">Orden:</span>
+              <select class="feed-filter-select" id="feed-filter-order" data-change="loadFeed" aria-label="Orden">
+                <option value="recent" selected>Más recientes</option>
+                <option value="distance">Mas cercanos</option>
+                <option value="rating">Mejor valorados</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="feed-activity" data-editor-id="explore-activity">
+            <div class="feed-activity-head">
+              <div class="feed-activity-title">Actividad en tu zona</div>
+              <button class="btn btn-ghost btn-sm btn-refresh feed-activity-refresh" type="button"
+                data-action="loadFeed" id="btn-feed-refresh" aria-label="Actualizar">
+                <span class="btn-refresh-ico kh-ico-spin" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 12a9 9 0 0 0-15-6l-2 2" />
+                    <path d="M3 4v6h6" />
+                    <path d="M3 12a9 9 0 0 0 15 6l2-2" />
+                    <path d="M21 20v-6h-6" />
+                  </svg>
+                </span>
+                <span class="btn-label">Actualizar</span>
+                <span class="spinner hidden"></span>
+              </button>
+            </div>
+            <div class="feed-activity-items">
+              <div class="feed-activity-item">
+                <span class="feed-activity-ico">👥</span>
+                <span><strong class="feed-activity-val">12</strong> vecinos conectados</span>
+              </div>
+              <div class="feed-activity-item">
+                <span class="feed-activity-ico">🆕</span>
+                <span><strong class="feed-activity-val">3</strong> nuevas solicitudes</span>
+              </div>
+              <div class="feed-activity-item">
+                <span class="feed-activity-ico">✅</span>
+                <span><strong class="feed-activity-val">2</strong> ayudas completadas hoy</span>
+              </div>
+            </div>
           </div>
           <div class="feed-sections" id="feed-sections">
             <section class="feed-section feed-section--need" id="feed-section-need" role="tabpanel"
@@ -1821,13 +2044,13 @@
             </section>
 
             <section class="feed-section feed-section--premium" id="feed-section-premium" role="tabpanel"
-              aria-labelledby="feed-tab-premium" aria-label="Anuncios Premium">
+              aria-labelledby="feed-tab-premium" aria-label="Anuncios AutoMatch Premium">
               <div class="feed-section-head">
                 <div>
-                  <div class="feed-section-title">Anuncios Premium</div>
+                  <div class="feed-section-title">Anuncios AutoMatch Premium (Próximamente)</div>
                   <div class="feed-section-sub">Vecinos destacados con mayor visibilidad.</div>
                 </div>
-                <span class="feed-section-pill premium">Premium</span>
+                <span class="feed-section-pill premium">AutoMatch Premium</span>
               </div>
               <div class="feed-grid" id="feed-premium">
                 <div class="ledger-empty">Cargando...</div>
@@ -1842,12 +2065,13 @@
             <div class="card-title">
               <div class="card-ico card-ico--orbit" aria-hidden="true"><span>🏆</span></div>
               <div>
-                <h3>Ranking vecinal</h3>
-                <div class="card-sub">Tu barrio en directo con filtros avanzados.</div>
+                <h3>Ranking comunitario</h3>
+                <div class="card-sub">Tu comunidad en directo con filtros avanzados.</div>
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking" data-args="$event">Abrir popup</button>
+              <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking" data-args="$event">Abrir
+                popup</button>
             </div>
           </div>
 
@@ -1857,22 +2081,23 @@
                 <input class="rank-search-input" id="rank-q-page" type="search" placeholder="Buscar vecino o zona"
                   autocomplete="off" data-input="setRankingQuery" data-input-args="$value|obj:page=true" />
               </div>
-              <button class="rank-chip" type="button" data-scope="global"
-                data-action="setRankingScope" data-args="global|obj:page=true">Global</button>
-              <button class="rank-chip" type="button" data-scope="near"
-                data-action="setRankingScope" data-args="near|obj:page=true">Cerca de mi</button>
-              <select class="rank-select" id="rank-radius-page"
-                data-change="setRankingRadius" data-change-args="$value|obj:page=true" aria-label="Radio">
+              <button class="rank-chip" type="button" data-scope="global" data-action="setRankingScope"
+                data-args="global|obj:page=true">Global</button>
+              <button class="rank-chip" type="button" data-scope="near" data-action="setRankingScope"
+                data-args="near|obj:page=true">Cerca de mi</button>
+              <select class="rank-select" id="rank-radius-page" data-change="setRankingRadius"
+                data-change-args="$value|obj:page=true" aria-label="Radio">
                 <option value="1">1 km</option>
                 <option value="3">3 km</option>
                 <option value="5" selected>5 km</option>
                 <option value="10">10 km</option>
               </select>
-              <button class="btn btn-ghost btn-sm" type="button" data-action="useMyLocation" data-args="obj:page=true">Ubicacion</button>
-              <select class="rank-select" id="rank-level-page"
-                data-change="setRankingLevel" data-change-args="$value|obj:page=true" aria-label="Nivel minimo">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="useMyLocation"
+                data-args="obj:page=true">Ubicacion</button>
+              <select class="rank-select" id="rank-level-page" data-change="setRankingLevel"
+                data-change-args="$value|obj:page=true" aria-label="Nivel minimo">
                 <option value="all" selected>Todos</option>
-                <option value="incept">Incept (0+)</option>
+                <option value="inicial">Inicial (0+)</option>
                 <option value="bronze">Bronce (100+)</option>
                 <option value="silver">Plata (250+)</option>
                 <option value="gold">Oro (500+)</option>
@@ -1882,14 +2107,16 @@
             <div class="rank-meta" id="ranking-me-page" style="margin-top:10px; display:none;"></div>
           </div>
 
-      <div class="leaderboard-list ranking-list ranking-list--page" id="leaderboard-list-page">
-        <div class="ledger-empty">Pulsa “Ubicacion” o usa Global</div>
-      </div>
+          <div class="leaderboard-list ranking-list ranking-list--page" id="leaderboard-list-page">
+            <div class="ledger-empty">Pulsa “Ubicacion” o usa Global</div>
+          </div>
 
-      <div class="rank-meta" style="margin-top:10px;">Ordenado por reputación. Usa filtros para afinar tu barrio.</div>
+          <div class="rank-meta" style="margin-top:10px;">Ordenado por reputación. Usa filtros para afinar tu comunidad.
+          </div>
 
-      <div class="premium-modal-actions" id="ranking-more-wrap-page" style="margin-top:12px; display:none;">
-            <button class="btn btn-ghost btn-block" id="btn-ranking-more-page" type="button" data-action="rankingLoadMore" data-args="page">
+          <div class="premium-modal-actions" id="ranking-more-wrap-page" style="margin-top:12px; display:none;">
+            <button class="btn btn-ghost btn-block" id="btn-ranking-more-page" type="button"
+              data-action="rankingLoadMore" data-args="page">
               <span class="btn-label">Cargar mas</span>
               <span class="spinner hidden"></span>
             </button>
@@ -1901,18 +2128,39 @@
           <div class="profile-hero-grid">
             <div class="profile-hero-card">
               <div class="profile-hero-head">
-                <div class="profile-hero-avatar" id="profile-hero-avatar" aria-hidden="true">—</div>
-                <div class="profile-hero-meta">
-                  <div class="profile-hero-name-row">
-                    <div class="profile-hero-name" id="profile-hero-name">—</div>
-                    <span class="verified-badge hidden" id="profile-hero-verified" aria-label="Usuario verificado">✓</span>
+                <div class="profile-hero-left">
+                  <div class="profile-hero-avatar-wrap">
+                    <div class="profile-hero-avatar" id="profile-hero-avatar" role="button" tabindex="0"
+                      aria-label="Subir foto de perfil" data-action="pickProfilePhoto"></div>
+                    <button class="profile-hero-upload" type="button" data-action="pickProfilePhoto"
+                      aria-label="Subir foto de perfil">
+                      <svg class="profile-hero-upload-ico" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3l2-2h4l2 2h3a2 2 0 0 1 2 2z" />
+                        <circle cx="12" cy="13" r="4" />
+                      </svg>
+                    </button>
                   </div>
-                  <div class="profile-hero-sub" id="profile-hero-sub">—</div>
-                  <div class="profile-hero-tier" id="profile-hero-tier">—</div>
+                  <div class="profile-hero-meta">
+                    <div class="profile-hero-name-row">
+                      <div class="profile-hero-name" id="profile-hero-name">—</div>
+                      <span class="verified-badge hidden" id="profile-hero-verified"
+                        aria-label="Email verificado">✓</span>
+                    </div>
+                    <div class="profile-hero-info-row">
+                      <div class="profile-hero-sub" id="profile-hero-sub">—</div>
+                      <div class="profile-hero-tier" id="profile-hero-tier">—</div>
+                    </div>
+                    <div class="profile-hero-seal" aria-label="Nivel de reputación">
+                      <div class="profile-hero-seal-k">Nivel</div>
+                      <div class="profile-hero-seal-v" id="profile-hero-level">—</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="profile-hero-seal" aria-label="Nivel de reputación">
-                  <div class="profile-hero-seal-k">Nivel</div>
-                  <div class="profile-hero-seal-v" id="profile-hero-level">—</div>
+                <div class="profile-hero-about">
+                  <div class="profile-hero-about-k">Sobre mí</div>
+                  <div class="profile-hero-about-v" id="profile-bio-preview">—</div>
                 </div>
               </div>
 
@@ -1923,7 +2171,8 @@
                 </div>
                 <div class="profile-hero-stat">
                   <div class="profile-hero-stat-k">Valoración</div>
-                  <div class="profile-hero-stat-v"><span id="profile-hero-rating">—</span><span class="profile-hero-stat-s">/5</span></div>
+                  <div class="profile-hero-stat-v"><span id="profile-hero-rating">—</span><span
+                      class="profile-hero-stat-s">/5</span></div>
                 </div>
                 <div class="profile-hero-stat">
                   <div class="profile-hero-stat-k">Reviews</div>
@@ -1938,8 +2187,8 @@
               <div class="profile-hero-actions">
                 <button class="btn btn-primary btn-sm" type="button" data-action="scrollToProfileSection"
                   data-args="card-profile">Editar perfil</button>
-                <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking"
-                  data-args="$event">Ver ranking</button>
+                <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking" data-args="$event">Ver
+                  ranking</button>
                 <button class="btn btn-ghost btn-sm" type="button" data-action="scrollToProfileSection"
                   data-args="card-ledger">Ver historial</button>
               </div>
@@ -1961,22 +2210,23 @@
                       <span class="rep-score-val" id="profile-hero-rep-score">—</span>
                       <span class="rep-score-unit">rep</span>
                     </div>
-                    <div class="rep-score-sub" id="profile-hero-rank">Ranking vecinal: —</div>
+                    <div class="rep-score-sub" id="profile-hero-rank">Ranking comunitario: —</div>
                   </div>
 
                   <div class="rep-progress">
                     <div class="rep-progress-head">
-                      <span>Progreso a Premium</span>
+                      <span>Progreso a AutoMatch Premium</span>
                       <span class="rep-mini" id="profile-hero-premium-mini">—</span>
                     </div>
                     <div class="rep-bar">
                       <div class="rep-bar-fill" id="profile-hero-premium-fill" style="width:0%"></div>
                     </div>
-                  <div class="rep-progress-foot" id="profile-hero-premium-foot">—</div>
-                  <div class="rep-progress-cta">
-                    <button class="rep-link" type="button" data-action="fx.openPremiumModal">Ver beneficios Premium</button>
+                    <div class="rep-progress-foot" id="profile-hero-premium-foot">—</div>
+                    <div class="rep-progress-cta">
+                      <button class="rep-link" type="button" data-action="fx.openPremiumModal">Ver beneficios Premium
+                        Lite</button>
+                    </div>
                   </div>
-                </div>
 
                   <div class="rep-activity">
                     <div class="rep-activity-head">
@@ -2012,7 +2262,7 @@
               <div class="card-ico card-ico--halo" aria-hidden="true"><span>👤</span></div>
               <div>
                 <h3>Mi perfil</h3>
-                <div class="card-sub">Tu carnet vecinal: que te reconozcan por lo que aportas.</div>
+                <div class="card-sub">Tu carnet comunitario: que te reconozcan por lo que aportas.</div>
               </div>
             </div>
             <div class="card-actions">
@@ -2020,8 +2270,8 @@
                 <span class="btn-label">Recargar</span>
                 <span class="spinner hidden"></span>
               </button>
-              <button class="btn btn-ghost btn-sm" type="button" data-action="resendVerifyEmail"
-                id="btn-verify-resend" class="hidden">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="resendVerifyEmail" id="btn-verify-resend"
+                class="hidden">
                 <span class="btn-label">Reenviar verificación</span>
                 <span class="spinner hidden"></span>
               </button>
@@ -2030,47 +2280,70 @@
 
           <div id="profile-verify-status" class="profile-verify-warn" aria-live="polite"></div>
 
-          <div class="profile-layout">
-            <div class="profile-panel">
-              <div class="profile-stats">
-                <div class="profile-stat">
-                  <div class="profile-stat-k">Reputación</div>
-                  <div class="profile-stat-v" id="profile-points">—</div>
+          <div class="profile-layout profile-layout--wide">
+            <aside class="profile-side">
+                <div class="profile-panel profile-panel--impact">
+                  <div class="profile-panel-head">
+                    <div class="profile-panel-title">Impacto</div>
+                    <div class="profile-panel-sub">Tu actividad en la comunidad</div>
+                  </div>
+                  <div class="profile-impact-list">
+                    <div class="profile-impact-item">
+                      <div>
+                        <div class="profile-impact-val" id="profile-points">—</div>
+                        <div class="profile-impact-label">Reputación</div>
+                      </div>
+                      <span class="profile-impact-ico" aria-hidden="true">✦</span>
+                    </div>
+                    <div class="profile-impact-item">
+                      <div>
+                        <div class="profile-impact-val">
+                          <span id="profile-rating">—</span><span class="profile-impact-s">/5</span>
+                        </div>
+                        <div class="profile-impact-label">Valoración</div>
+                      </div>
+                      <span class="profile-impact-ico" aria-hidden="true">★</span>
+                    </div>
+                    <div class="profile-impact-item">
+                      <div>
+                        <div class="profile-impact-val" id="profile-rating-count">—</div>
+                        <div class="profile-impact-label">Reviews</div>
+                      </div>
+                      <span class="profile-impact-ico" aria-hidden="true">✉</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="profile-stat">
-                  <div class="profile-stat-k">Valoración</div>
-                  <div class="profile-stat-v"><span id="profile-rating">—</span><span class="profile-stat-s">/5</span></div>
-                </div>
-                <div class="profile-stat">
-                  <div class="profile-stat-k">Reviews</div>
-                  <div class="profile-stat-v" id="profile-rating-count">—</div>
-                </div>
-              </div>
 
-              <div class="profile-photos" aria-label="Fotos de perfil">
-                <div class="profile-photos-head">
-                  <div class="profile-photos-title">Fotos (max 2)</div>
-                  <button class="btn btn-ghost btn-sm" type="button" data-action="pickProfilePhoto">Subir foto</button>
-                  <input id="profile-photo-input" class="hidden" type="file" accept="image/png,image/jpeg,image/webp"
-                    data-change="uploadProfilePhoto" data-change-args="$event" />
+                <div class="profile-panel profile-panel--availability">
+                  <div class="profile-panel-head">
+                    <div class="profile-panel-title">Disponibilidad</div>
+                    <button class="btn btn-ghost btn-sm" type="button" data-action="goAutoMatchFromMenu">Configurar</button>
+                  </div>
+                  <div class="profile-availability">
+                    <div class="profile-availability-row">
+                      <span class="profile-availability-tag">Lunes - Viernes</span>
+                      <span class="profile-availability-time" id="profile-availability-weekday">17:00 - 21:00</span>
+                    </div>
+                    <div class="profile-availability-row">
+                      <span class="profile-availability-tag">Fines de semana</span>
+                      <span class="profile-availability-time" id="profile-availability-weekend">Todo el día</span>
+                    </div>
+                    <div class="profile-availability-note" id="profile-availability-note">Gestiona horarios y alertas desde AutoMatch.</div>
+                  </div>
                 </div>
-                <div class="profile-photos-grid" id="profile-photos-grid">
-                  <div class="ledger-empty">Aún no hay fotos</div>
-                </div>
-                <div class="demo-hint" style="margin-top:-6px;">Recomendación: fotos cuadradas (JPG/PNG/WEBP) · max 900KB
-                </div>
-              </div>
-            </div>
+            </aside>
 
-            <div class="profile-panel">
-              <form id="profile-form" data-submit="submitProfile">
+            <div class="profile-main">
+              <div class="profile-panel profile-panel--form">
+                <form id="profile-form" data-submit="submitProfile">
                 <div class="field">
                   <label for="profile-name">Nombre</label>
                   <input id="profile-name" type="text" placeholder="Tu nombre" required />
                 </div>
                 <div class="field">
                   <label for="profile-bio">Bio (opcional)</label>
-                  <textarea id="profile-bio" rows="3" placeholder="Cuenta que sabes hacer y que te gusta ayudar"></textarea>
+                  <textarea id="profile-bio" rows="3"
+                    placeholder="Cuenta que sabes hacer y que te gusta ayudar"></textarea>
                 </div>
                 <div class="field">
                   <label for="profile-location">Zona (opcional)</label>
@@ -2081,6 +2354,21 @@
                   <span class="spinner hidden"></span>
                 </button>
               </form>
+              <div class="profile-photos" aria-label="Fotos de perfil">
+                <div class="profile-photos-head">
+                  <div class="profile-photos-title">Fotos (max 2)</div>
+                  <button class="btn btn-ghost btn-sm" type="button" data-action="pickProfilePhoto">Subir foto</button>
+                  <input id="profile-photo-input" class="hidden" type="file" accept="image/png,image/jpeg,image/webp"
+                    data-change="uploadProfilePhoto" data-change-args="$event" />
+                </div>
+                <div class="profile-photos-grid" id="profile-photos-grid">
+                  <div class="ledger-empty">Aún no hay fotos</div>
+                </div>
+                <div class="demo-hint" style="margin-top:-6px;">Recomendación: fotos cuadradas (JPG/PNG/WEBP) · max
+                  900KB
+                </div>
+              </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2135,7 +2423,7 @@
               <div class="card-ico card-ico--charge" aria-hidden="true"><span>⚡</span></div>
               <div>
                 <h3>Mi reputación</h3>
-                <div class="card-sub">Reputación de barrio: gana confianza ayudando de verdad.</div>
+                <div class="card-sub">Reputación de comunidad: gana confianza ayudando de verdad.</div>
               </div>
             </div>
             <span class="badge-pill" id="ledger-badge">—</span>
@@ -2161,7 +2449,7 @@
             <div class="card-title">
               <div class="card-ico card-ico--glow" aria-hidden="true"><span>♛</span></div>
               <div>
-                <h3>Premium</h3>
+                <h3>AutoMatch Premium</h3>
               </div>
             </div>
             <span class="badge-pill" id="premium-progress-badge">—</span>
@@ -2171,7 +2459,7 @@
             <div class="premium-progress-row">
               <span class="premium-progress-k">Tu reputación</span>
               <span class="premium-progress-v"><strong id="premium-rep">—</strong> / <span
-                  id="premium-th">1000</span></span>
+                  id="premium-th">500</span></span>
             </div>
             <div class="premium-progress-bar" aria-label="Progreso a Premium">
               <div class="premium-progress-fill" id="premium-progress-fill" style="width:0%"></div>
@@ -2181,24 +2469,26 @@
 
           <div class="mvp-row" style="margin-top:12px;">
             <button class="btn btn-ghost btn-sm" type="button" data-action="fx.openPremiumModal">Ver beneficios</button>
-            <button class="btn btn-primary btn-sm" type="button" id="btn-premium-unlock"
+            <button class="btn btn-silver btn-sm btn-premium-lite" type="button" id="btn-premium-unlock"
               data-action="tryUnlockPremiumByReputation" disabled>
-              Desbloquear
+              <span class="btn-icon" aria-hidden="true">⚡</span>
+              <span class="btn-label">Desbloquear</span>
             </button>
           </div>
         </div>
 
-        <!-- Ranking vecinal (para todos) -->
+        <!-- Ranking comunitario (para todos) -->
         <div class="glass-card card-leaderboard reveal" id="card-leaderboard" data-view="premium">
           <div class="card-head">
             <div class="card-title">
               <div class="card-ico card-ico--orbit" aria-hidden="true"><span>🏆</span></div>
               <div>
-                <h3>Ranking vecinal</h3>
+                <h3>Ranking comunitario</h3>
               </div>
             </div>
             <div class="mvp-row" style="gap:8px;">
-              <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking" data-args="$event">Abrir</button>
+              <button class="btn btn-ghost btn-sm" type="button" data-action="openRanking"
+                data-args="$event">Abrir</button>
               <button class="btn btn-ghost btn-sm" type="button" id="btn-leaderboard" data-action="loadLeaderboard">
                 <span class="btn-label">Actualizar</span>
                 <span class="spinner hidden"></span>
@@ -2224,9 +2514,10 @@
             <span class="badge-pill" id="perk-boost">—</span>
           </div>
           <div class="collections-body" id="collections-body">
-            <div class="ledger-empty">Completa 2 ayudas por categoria para desbloquear insignias y sumar reputacion.</div>
+            <div class="ledger-empty">Completa 2 ayudas por categoria para desbloquear insignias y sumar reputacion.
+            </div>
           </div>
-          <div class="collections-foot">Cada coleccion suma rep extra y acelera tu acceso a Premium.</div>
+          <div class="collections-foot">Cada coleccion suma rep extra y acelera tu acceso a AutoMatch Premium.</div>
         </div>
 
         <!-- Badges -->
@@ -2329,7 +2620,8 @@
               data-action="selectCreateKind" data-args="request">
               Necesitas un KingsHelp
             </button>
-            <button class="create-choice" type="button" data-kind="offer" data-action="selectCreateKind" data-args="offer">
+            <button class="create-choice" type="button" data-kind="offer" data-action="selectCreateKind"
+              data-args="offer">
               Soy un KingsHelp
             </button>
           </div>
@@ -2341,7 +2633,7 @@
               <div class="field" id="fld-req-title">
                 <label for="req-title">Título <span class="field-required" aria-hidden="true">*</span></label>
                 <div class="field-input-wrap">
-                  <input id="req-title" type="text" placeholder="Ej. Mudanza en el barrio" maxlength="80"
+                  <input id="req-title" type="text" placeholder="Ej. Mudanza en la comunidad" maxlength="80"
                     data-input="onFieldInput" data-input-args="req-title|req-title-err|req-title-count|80"
                     data-focus="clearFieldError" data-focus-args="req-title|req-title-err" autocomplete="off" />
                   <span class="field-counter" id="req-title-count">0 / 80</span>
@@ -2352,7 +2644,7 @@
               <div class="field" id="fld-req-location">
                 <label for="req-location">Zona <span class="field-required" aria-hidden="true">*</span></label>
                 <div class="field-input-wrap">
-                  <input id="req-location" type="text" placeholder="Ej. Centro · Gracia · Barrio"
+                  <input id="req-location" type="text" placeholder="Ej. Centro · Gracia · Comunidad"
                     autocomplete="address-level2" data-focus="clearFieldError"
                     data-focus-args="req-location|req-location-err" />
                 </div>
@@ -2396,10 +2688,10 @@
                 <div class="comp-switch" role="group" aria-label="Tipo de compensación">
                   <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
                     data-action="selectComp" data-args="req|cash">Pago en €</button>
-                  <button class="comp-choice" type="button" data-comp="barter"
-                    data-action="selectComp" data-args="req|barter">Trueque</button>
-                  <button class="comp-choice" type="button" data-comp="altruistic"
-                    data-action="selectComp" data-args="req|altruistic">Altruistamente</button>
+                  <button class="comp-choice" type="button" data-comp="barter" data-action="selectComp"
+                    data-args="req|barter">Trueque</button>
+                  <button class="comp-choice" type="button" data-comp="altruistic" data-action="selectComp"
+                    data-args="req|altruistic">Altruistamente</button>
                 </div>
                 <div class="comp-hint" id="req-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
                   KingsHelp.</div>
@@ -2443,7 +2735,11 @@
           <!-- Preview solicitud (antes de publicar) -->
           <div class="mvp-block hidden" id="req-preview">
             <div class="preview-head">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
               <span>Revisa antes de publicar</span>
             </div>
             <div class="preview-card">
@@ -2454,8 +2750,10 @@
               <div class="preview-photos" id="req-preview-photos"></div>
             </div>
             <div class="mvp-row" style="margin-top:16px">
-              <button class="btn btn-ghost btn-sm" type="button" data-action="backToEdit" data-args="request">← Editar</button>
-              <button class="btn btn-primary" type="button" id="btn-req-confirm" data-action="confirmCreate" data-args="request">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="backToEdit" data-args="request">←
+                Editar</button>
+              <button class="btn btn-primary" type="button" id="btn-req-confirm" data-action="confirmCreate"
+                data-args="request">
                 <span class="btn-label">Confirmar y publicar</span>
                 <span class="spinner hidden"></span>
               </button>
@@ -2537,10 +2835,10 @@
                 <div class="comp-switch" role="group" aria-label="Tipo de compensación">
                   <button class="comp-choice comp-choice--active" type="button" data-comp="cash"
                     data-action="selectComp" data-args="off|cash">Pago en €</button>
-                  <button class="comp-choice" type="button" data-comp="barter"
-                    data-action="selectComp" data-args="off|barter">Trueque</button>
-                  <button class="comp-choice" type="button" data-comp="altruistic"
-                    data-action="selectComp" data-args="off|altruistic">Altruistamente</button>
+                  <button class="comp-choice" type="button" data-comp="barter" data-action="selectComp"
+                    data-args="off|barter">Trueque</button>
+                  <button class="comp-choice" type="button" data-comp="altruistic" data-action="selectComp"
+                    data-args="off|altruistic">Altruistamente</button>
                 </div>
                 <div class="comp-hint" id="off-comp-hint">Pago en €: el importe se acuerda en el chat y se paga fuera de
                   KingsHelp.</div>
@@ -2584,7 +2882,11 @@
           <!-- Preview oferta (antes de publicar) -->
           <div class="mvp-block hidden" id="off-preview">
             <div class="preview-head">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
               <span>Revisa antes de publicar</span>
             </div>
             <div class="preview-card">
@@ -2595,8 +2897,10 @@
               <div class="preview-photos" id="off-preview-photos"></div>
             </div>
             <div class="mvp-row" style="margin-top:16px">
-              <button class="btn btn-ghost btn-sm" type="button" data-action="backToEdit" data-args="offer">← Editar</button>
-              <button class="btn btn-primary" type="button" id="btn-off-confirm" data-action="confirmCreate" data-args="offer">
+              <button class="btn btn-ghost btn-sm" type="button" data-action="backToEdit" data-args="offer">←
+                Editar</button>
+              <button class="btn btn-primary" type="button" id="btn-off-confirm" data-action="confirmCreate"
+                data-args="offer">
                 <span class="btn-label">Confirmar y publicar</span>
                 <span class="spinner hidden"></span>
               </button>
@@ -2613,7 +2917,8 @@
             </div>
             <div class="mvp-created-meta" id="off-created-meta"></div>
             <div class="mvp-row">
-              <button class="btn btn-ghost btn-sm" type="button" data-action="resetCreateForm" data-args="offer">Publicar
+              <button class="btn btn-ghost btn-sm" type="button" data-action="resetCreateForm"
+                data-args="offer">Publicar
                 otra</button>
               <button class="btn btn-primary btn-sm" type="button" data-action="scrollToCreations">Ver en mis
                 creaciones</button>
@@ -2652,18 +2957,18 @@
             <div class="creations-tabs" role="tablist" aria-label="Tipo">
               <button class="creations-tab creations-tab--active" type="button" data-kind="all"
                 data-action="setCreationsFilter" data-args="kind|all" role="tab" aria-selected="true">Todo</button>
-              <button class="creations-tab" type="button" data-kind="request"
-                data-action="setCreationsFilter" data-args="kind|request" role="tab"
-                aria-selected="false">Solicitudes</button>
-              <button class="creations-tab" type="button" data-kind="offer"
-                data-action="setCreationsFilter" data-args="kind|offer" role="tab" aria-selected="false">Ofertas</button>
+              <button class="creations-tab" type="button" data-kind="request" data-action="setCreationsFilter"
+                data-args="kind|request" role="tab" aria-selected="false">Solicitudes</button>
+              <button class="creations-tab" type="button" data-kind="offer" data-action="setCreationsFilter"
+                data-args="kind|offer" role="tab" aria-selected="false">Ofertas</button>
             </div>
 
             <div class="creations-tabs" role="tablist" aria-label="Estado">
               <button class="creations-tab creations-tab--active" type="button" data-status="active"
-                data-action="setCreationsFilter" data-args="status|active" role="tab" aria-selected="true">Activas</button>
-              <button class="creations-tab" type="button" data-status="closed"
-                data-action="setCreationsFilter" data-args="status|closed" role="tab" aria-selected="false">Cerradas</button>
+                data-action="setCreationsFilter" data-args="status|active" role="tab"
+                aria-selected="true">Activas</button>
+              <button class="creations-tab" type="button" data-status="closed" data-action="setCreationsFilter"
+                data-args="status|closed" role="tab" aria-selected="false">Cerradas</button>
             </div>
 
             <div class="creations-search" role="search">
@@ -2696,20 +3001,18 @@
               <span class="spinner hidden"></span>
             </button>
           </div>
-
           <div class="creations-controls" aria-label="Filtros de mis matches">
             <div class="creations-tabs" role="tablist" aria-label="Estado de match">
               <button class="creations-tab creations-tab--active" type="button" data-mstatus="all"
                 data-action="setMatchesFilter" data-args="status|all" role="tab" aria-selected="true">Todos</button>
-              <button class="creations-tab" type="button" data-mstatus="pending"
-                data-action="setMatchesFilter" data-args="status|pending" role="tab" aria-selected="false">Pendiente</button>
-              <button class="creations-tab" type="button" data-mstatus="accepted"
-                data-action="setMatchesFilter" data-args="status|accepted" role="tab" aria-selected="false">Aceptado</button>
-              <button class="creations-tab" type="button" data-mstatus="done"
-                data-action="setMatchesFilter" data-args="status|done" role="tab" aria-selected="false">Hecho</button>
-              <button class="creations-tab" type="button" data-mstatus="rejected"
-                data-action="setMatchesFilter" data-args="status|rejected" role="tab"
-                aria-selected="false">Rechazado</button>
+              <button class="creations-tab" type="button" data-mstatus="pending" data-action="setMatchesFilter"
+                data-args="status|pending" role="tab" aria-selected="false">Pendiente</button>
+              <button class="creations-tab" type="button" data-mstatus="accepted" data-action="setMatchesFilter"
+                data-args="status|accepted" role="tab" aria-selected="false">Aceptado</button>
+              <button class="creations-tab" type="button" data-mstatus="done" data-action="setMatchesFilter"
+                data-args="status|done" role="tab" aria-selected="false">Hecho</button>
+              <button class="creations-tab" type="button" data-mstatus="rejected" data-action="setMatchesFilter"
+                data-args="status|rejected" role="tab" aria-selected="false">Rechazado</button>
             </div>
 
             <div class="creations-search" role="search">
@@ -2739,6 +3042,93 @@
     <span class="fab-label">Crear</span>
   </button>
 
+  <!-- ── COOKIE BANNER ──────────────────────────────────────────────── -->
+  <div id="cookie-banner" class="cookie-banner hidden" role="dialog" aria-live="polite"
+    aria-label="Preferencias de cookies">
+    <div class="cookie-banner-text">
+      <h4 class="cookie-banner-title">Cookies y privacidad</h4>
+      <p class="cookie-banner-desc">Usamos cookies necesarias y almacenamiento local para que KingsHelp funcione.
+        Puedes aceptar todo o configurar tus preferencias. <a href="legal/cookies.html">Política de cookies</a>.</p>
+    </div>
+    <div class="cookie-banner-actions">
+      <button class="btn btn-primary btn-sm" type="button" data-action="acceptCookiesAll">Aceptar todo</button>
+      <button class="btn btn-ghost btn-sm" type="button" data-action="openCookieSettings">Configurar</button>
+    </div>
+  </div>
+
+
+  <!-- ── APP DOWNLOAD MODAL (proximamente) ────────────────────────────── -->
+  <div id="modal-app-download" class="modal-overlay hidden" data-action="closeAppDownloadModal" data-args="$event">
+    <div class="modal-box modal-auth modal-app-download">
+      <button class="modal-close" data-action="closeAppDownloadModal">✕</button>
+      <div class="auth-hero">
+        <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp Logo" />
+        <div class="auth-title">Descarga la app KingsHelp</div>
+        <div class="auth-subtitle">Android disponible · iOS pronto.</div>
+      </div>
+      <div class="app-download-body">
+        <div class="app-download-chip">Beta Android</div>
+        <p class="app-download-copy">Descarga directa para Android. En iOS te avisaremos en cuanto este lista.</p>
+        <div class="app-download-actions">
+          <a class="btn btn-primary btn-block app-download-btn" href="https://play.google.com/store/apps/details?id=es.kingshelp.app" target="_blank" rel="noopener">
+            <img class="app-download-icon" src="img/boton1.png" alt="Instalar KingsHelp desde Play Store" />
+            <span class="btn-label">Instalar desde Play Store</span>
+          </a>
+          <button class="btn btn-ghost btn-block" type="button" data-action="closeAppDownloadModal">
+            <span class="btn-label">Cerrar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ── COOKIE SETTINGS ───────────────────────────────────────────── -->
+  <div id="cookie-settings" class="cookie-panel hidden" role="dialog" aria-modal="true"
+    aria-label="Preferencias de cookies" data-action="closeCookieSettings">
+    <div class="cookie-panel-card" data-action="noop">
+      <div class="cookie-panel-head">
+        <h3 class="cookie-panel-title">Preferencias de cookies</h3>
+        <button class="cookie-panel-close" type="button" data-action="closeCookieSettings">✕</button>
+      </div>
+      <p class="cookie-panel-desc">Gestiona qué categorías pueden usarse. Las cookies necesarias siempre están activas
+        para que la web funcione con seguridad.</p>
+
+      <div class="cookie-options">
+        <div class="cookie-option">
+          <div class="cookie-option-title">Necesarias</div>
+          <input class="cookie-toggle" type="checkbox" checked disabled aria-label="Cookies necesarias" />
+          <div class="cookie-option-desc">Permiten iniciar sesión, mantener la sesión y proteger el acceso.</div>
+        </div>
+        <div class="cookie-option">
+          <div class="cookie-option-title">Preferencias</div>
+          <input class="cookie-toggle" id="cookie-pref-preferences" type="checkbox"
+            aria-label="Cookies de preferencias" />
+          <div class="cookie-option-desc">Recuerdan tu tema y las vistas del panel para una experiencia más cómoda.
+          </div>
+        </div>
+        <div class="cookie-option">
+          <div class="cookie-option-title">Analítica</div>
+          <input class="cookie-toggle" id="cookie-pref-analytics" type="checkbox" aria-label="Cookies de analítica" />
+          <div class="cookie-option-desc">Nos ayudan a entender el uso de la web para mejorarla (solo si activas esta
+            opción).</div>
+        </div>
+        <div class="cookie-option">
+          <div class="cookie-option-title">Marketing</div>
+          <input class="cookie-toggle" id="cookie-pref-marketing" type="checkbox" aria-label="Cookies de marketing" />
+          <div class="cookie-option-desc">Permiten medir campañas y mostrar comunicaciones relevantes.</div>
+        </div>
+      </div>
+
+      <div class="cookie-panel-actions">
+        <button class="btn btn-ghost btn-sm" type="button" data-action="rejectCookiesAll">Rechazar</button>
+        <button class="btn btn-primary btn-sm" type="button" data-action="saveCookiePreferences">Guardar
+          preferencias</button>
+        <button class="btn btn-ghost btn-sm" type="button" data-action="acceptCookiesAll">Aceptar todo</button>
+      </div>
+
+      <div class="cookie-panel-links">Más información en <a href="legal/cookies.html">Política de cookies</a>.</div>
+    </div>
+  </div>
+
   <!-- ── LOGIN MODAL ────────────────────────────────────────────────── -->
   <div id="modal-login" class="modal-overlay hidden" data-action="closeLogin" data-args="$event">
     <div class="modal-box modal-auth">
@@ -2747,7 +3137,7 @@
       <!-- Provider chooser (Wallapop-like) -->
       <div id="auth-chooser">
         <div class="auth-hero">
-          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp Logo" />
           <div class="auth-title">Regístrate o inicia sesión.</div>
           <div class="auth-subtitle">¡Te estamos esperando!</div>
         </div>
@@ -2755,12 +3145,18 @@
         <div class="auth-provider-list">
           <button class="auth-provider" type="button" data-action="authProvider" data-args="google"
             aria-label="Continuar con Google">
-            <span class="auth-ico auth-ico--g" aria-hidden="true"><img src="web/img/google-g.svg" alt="" loading="lazy" /></span>
+            <span class="auth-ico auth-ico--g" aria-hidden="true">
+              <img src="img/google-g.svg" alt="Google Logo"
+                onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNMTIuNDggMTAuMjZ2Mi4zaDUuNjhjLS44NCAzLjI3LTMuNTggNS40OC02LjcyIDUuNDgtMy43OCAwLTYuODQtMy4wNi02Ljg0LTYuODRzMy4wNi02Ljg0IDYuODQtNi44NGMzLjk0IDAgNi4xNCAyLjU2IDYuMTQgMi41NkwyMSAxLjI4QzE4LjY2LS44OCAxNC44NS0yIDIuMzZWMi4zNmgxNS4xMmMtLjMxIDEuNTEtMS4zOSAzLjM0LTMuMDIgNC40NEwxMi40OCA0LjI2eiIvPjwvc3ZnPg=='; this.onerror=null;"
+                loading="lazy" /></span>
             <span>Continuar con Google</span>
           </button>
           <button class="auth-provider" type="button" data-action="authProvider" data-args="facebook"
             aria-label="Continuar con Facebook">
-            <span class="auth-ico auth-ico--f" aria-hidden="true"><img src="web/img/facebook-f.svg" alt="" loading="lazy" /></span>
+            <span class="auth-ico auth-ico--f" aria-hidden="true">
+              <img src="web/img/facebook-f.svg" alt="Facebook Logo"
+                onerror="this.outerHTML='<svg width=20 height=20 viewBox=\'0 0 24 24\'><path fill=\'#1877F2\' d=\'M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z\'/></svg>'"
+                loading="lazy" /></span>
             <span>Continuar con Facebook</span>
           </button>
           <button class="auth-provider" type="button" data-action="showEmailAuth" data-args="login"
@@ -2783,12 +3179,12 @@
       <!-- Email auth -->
       <div id="auth-email" class="hidden">
         <div class="auth-hero auth-hero--email" id="auth-hero-login">
-          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp Logo" />
           <div class="auth-title">Accede con tu email</div>
           <div class="auth-subtitle auth-subtitle--muted">Introduce tu correo electrónico para acceder.</div>
         </div>
         <div class="auth-hero auth-hero--email hidden" id="auth-hero-register">
-          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp" loading="lazy" />
+          <img class="auth-logo" src="img/LOGO_2.png" alt="KingsHelp Logo" />
           <div class="auth-title">Crea tu cuenta</div>
           <div class="auth-subtitle auth-subtitle--muted">Completa tus datos para empezar.</div>
         </div>
@@ -2806,7 +3202,8 @@
           <div class="field">
             <div class="auth-field-row">
               <label for="login-pass">Contraseña</label>
-              <button class="auth-help-link" type="button" data-action="showPasswordReset">¿Olvidaste tu contraseña?</button>
+              <button class="auth-help-link" type="button" data-action="showPasswordReset">¿Olvidaste tu
+                contraseña?</button>
             </div>
             <input id="login-pass" type="password" placeholder="Contraseña" required autocomplete="current-password" />
           </div>
@@ -2880,7 +3277,7 @@
         <span class="brand-icon">⭐</span>
         <span class="modal-title">Valorar match</span>
       </div>
-      <p class="modal-sub">Tu feedback ayuda a la reputación del barrio</p>
+      <p class="modal-sub">Tu feedback ayuda a la reputación de la comunidad</p>
       <form id="rating-form" data-submit="submitRating">
         <div class="field">
           <label for="rating-value">Puntuación</label>
@@ -2923,10 +3320,13 @@
         </div>
 
         <div class="comp-switch" role="group" aria-label="Tipo de compensación">
-          <button class="comp-choice" type="button" data-comp="cash" data-action="chatSelectComp" data-args="cash">Pago en
+          <button class="comp-choice" type="button" data-comp="cash" data-action="chatSelectComp" data-args="cash">Pago
+            en
             €</button>
-          <button class="comp-choice" type="button" data-comp="barter" data-action="chatSelectComp" data-args="barter">Trueque</button>
-          <button class="comp-choice" type="button" data-comp="altruistic" data-action="chatSelectComp" data-args="altruistic">Altruistamente</button>
+          <button class="comp-choice" type="button" data-comp="barter" data-action="chatSelectComp"
+            data-args="barter">Trueque</button>
+          <button class="comp-choice" type="button" data-comp="altruistic" data-action="chatSelectComp"
+            data-args="altruistic">Altruistamente</button>
         </div>
 
         <div class="chat-coins" id="chat-coins">
@@ -2950,7 +3350,8 @@
         </div>
 
         <div class="chat-actions">
-          <button class="btn btn-primary btn-block" type="button" id="btn-chat-agree" data-action="chatConfirmAgreement">
+          <button class="btn btn-primary btn-block" type="button" id="btn-chat-agree"
+            data-action="chatConfirmAgreement">
             <span class="btn-label">Confirmar acuerdo</span>
             <span class="spinner hidden"></span>
           </button>
@@ -2974,42 +3375,37 @@
 
   <!-- ── PREMIUM MODAL (solo UI / informativo) ───────────────────────── -->
   <div id="modal-premium" class="modal-overlay hidden" data-action="fx.closePremiumModal" data-args="$event">
-    <div class="modal-box modal-premium-box">
+    <div class="modal-box modal-premium-box modal-premium-box--lite">
       <button class="modal-close" data-action="fx.closePremiumModal">✕</button>
       <div class="premium-modal-crown">♛</div>
-      <div class="modal-title" style="text-align:center; margin-bottom:4px;">KingsHelp Premium</div>
-      <div class="premium-modal-badge">Próximamente</div>
+      <div class="modal-title" style="text-align:center; margin-bottom:4px;">KingsHelp AutoMatch Premium</div>
+      <div class="premium-modal-badge">Gratis con reputación</div>
 
       <div class="premium-modal-pricing">
-        <span class="premium-modal-price" id="premium-modal-main-price">7,99&nbsp;€<span>/año</span></span>
-        <span class="premium-modal-price-note" id="premium-modal-main-note">≈ 0,67&nbsp;€/mes · mejor precio</span>
+        <span class="premium-modal-price" id="premium-modal-main-price">Gratis<span>AutoMatch Premium</span></span>
+        <span class="premium-modal-price-note" id="premium-modal-main-note">Se activa al alcanzar la reputación
+          necesaria</span>
       </div>
 
-      <div class="premium-modal-picks" role="group" aria-label="Elige plan">
-        <button class="premium-pick" type="button" data-interval="month" data-action="setPremiumInterval" data-args="month">
-          <div class="premium-pick-k">Mensual</div>
-          <div class="premium-pick-v">0,99&nbsp;€<span>/mes</span></div>
-        </button>
-        <button class="premium-pick premium-pick--active" type="button" data-interval="year"
-          data-action="setPremiumInterval" data-args="year">
-          <div class="premium-pick-badge">Mejor</div>
-          <div class="premium-pick-k">Anual</div>
-          <div class="premium-pick-v">7,99&nbsp;€<span>/año</span></div>
-        </button>
+      <div class="premium-modal-howto" aria-label="Cómo conseguir AutoMatch Premium">
+        <div class="premium-modal-howto-title">Cómo conseguirlo</div>
+        <ul class="premium-modal-howto-list">
+          <li>Ayuda a vecinos y suma reputación real.</li>
+          <li>Al llegar al nivel necesario, activa AutoMatch Premium.</li>
+        </ul>
       </div>
 
       <div class="premium-modal-mini">
-        <div class="pmini-row"><span class="pmini-ico">⚡</span><span>Match Vecinal y prioridad</span></div>
-        <div class="pmini-row"><span class="pmini-ico">⏳</span><span>Publicaciones 2 meses (auto-renueva)</span></div>
-        <div class="pmini-row"><span class="pmini-ico">🏅</span><span>Desbloqueable con reputación</span></div>
+        <div class="pmini-row"><span class="pmini-ico">⚡</span><span>AutoMatch por 7 días</span></div>
+        <div class="pmini-row"><span class="pmini-ico">⏳</span><span>Publicaciones activas 1 semana</span></div>
+        <div class="pmini-row"><span class="pmini-ico">🥈</span><span>Sello AutoMatch Premium plateado</span></div>
       </div>
 
       <div class="premium-modal-actions">
-        <button class="btn btn-gold btn-block" type="button" data-action="startPremiumCheckout">
-          <span class="btn-label">Activar (Stripe, próximamente)</span>
-        </button>
-        <button class="btn btn-ghost btn-block" type="button" data-action="tryUnlockPremiumByReputation">
-          <span class="btn-label">Desbloquear con reputación</span>
+        <button class="btn btn-silver btn-block btn-premium-lite" type="button"
+          data-action="tryUnlockPremiumByReputation">
+          <span class="btn-icon" aria-hidden="true">⚡</span>
+          <span class="btn-label">Desbloquear AutoMatch Premium</span>
         </button>
         <button class="btn btn-ghost btn-block" type="button" data-action="fx.closePremiumModal">
           <span class="btn-label">Cerrar</span>
@@ -3023,10 +3419,12 @@
     <div class="modal-box modal-upgrade-box">
       <button class="modal-close" data-action="closeUpgradeModal">✕</button>
       <div class="upgrade-top">
-        <div class="upgrade-k">AutoMatch</div>
-        <div class="upgrade-v">Te falta poco para Premium</div>
-        <div class="upgrade-sub">Premium te avisa de solicitudes que encajan con lo que ofreces. Aceptas en segundos y
-          se abre el chat.</div>
+        <div class="upgrade-k">AutoMatch Premium</div>
+        <div class="upgrade-v">Te falta poco para desbloquearlo</div>
+        <div class="upgrade-sub">Gratis con reputación. AutoMatch te avisa de solicitudes que encajan con lo que
+          ofreces.
+          Aceptas en segundos y se abre el chat.</div>
+        <div class="upgrade-pill">Gratis con reputación</div>
       </div>
 
       <div class="upgrade-progress">
@@ -3042,8 +3440,8 @@
       </div>
 
       <div class="premium-modal-actions">
-        <button class="btn btn-gold btn-block" type="button" data-action="openPremiumFromNudge">
-          <span class="btn-label">Activar Premium</span>
+        <button class="btn btn-silver btn-block" type="button" data-action="openPremiumFromNudge">
+          <span class="btn-label">Desbloquear AutoMatch Premium</span>
         </button>
         <button class="btn btn-ghost btn-block" type="button" data-action="goPremiumTab">
           <span class="btn-label">Ver requisitos</span>
@@ -3062,7 +3460,7 @@
       <div class="upgrade-top">
         <div class="upgrade-k">Insignias</div>
         <div class="upgrade-v">Colecciona y suma reputación</div>
-        <div class="upgrade-sub">Completa 2 ayudas por categoría, desbloquea insignias y acelera tu Premium con
+        <div class="upgrade-sub">Completa 2 ayudas por categoría, desbloquea insignias y acelera tu AutoMatch Premium con
           reputación real.</div>
       </div>
 
@@ -3073,7 +3471,7 @@
       </div>
 
       <div class="premium-modal-actions">
-        <button class="btn btn-gold btn-block" type="button" data-action="goCollectionsFromNudge">
+        <button class="btn btn-silver btn-block" type="button" data-action="goCollectionsFromNudge">
           <span class="btn-label">Ver colecciones</span>
         </button>
         <button class="btn btn-ghost btn-block" type="button" data-action="goBadgesFromNudge">
@@ -3090,74 +3488,41 @@
   <div id="toast-container"></div>
 
   <!-- ── RANKING MODAL (landing) ───────────────────────────────────────── -->
-  <div id="modal-ranking" class="modal-overlay hidden" data-action="closeRankingModal" data-args="$event" role="dialog"
-    aria-modal="true" aria-label="Ranking vecinal">
-    <div class="modal-box modal-ranking-box">
-      <button class="modal-close" data-action="closeRankingModal">✕</button>
-      <div class="ranking-head">
-        <div class="ranking-head-top">
-          <div class="upgrade-top" style="padding-bottom:0;">
-            <div class="upgrade-k">Ranking vecinal</div>
-            <div class="upgrade-v">Tu barrio en directo</div>
-          </div>
-          <div class="ranking-head-meta upgrade-sub" id="ranking-me" style="display:none;"></div>
-        </div>
+    <div id="modal-ranking" class="modal-overlay hidden" data-action="closeRankingModal" data-args="$event" role="dialog"
+      aria-modal="true" aria-label="Ranking comunitario">
+      <div class="modal-box modal-ranking-box" data-editor-id="ranking-modal">
+      <button class="modal-close ranking-close" data-action="closeRankingModal">✕</button>
 
-        <div class="rank-controls" style="margin-top:14px;">
-          <div class="rank-controls-row rank-controls-row--primary">
-            <div class="rank-search" role="search" aria-label="Buscar vecino">
-              <input class="rank-search-input" id="rank-q-modal" type="search" placeholder="Buscar vecino o zona"
-                autocomplete="off" data-input="setRankingQuery" data-input-args="$value|obj:modal=true" />
-            </div>
-            <div class="rank-chip-group" role="group" aria-label="Scope ranking">
-              <button class="rank-chip rank-chip--active" type="button" data-scope="global"
-                data-action="setRankingScope" data-args="global|obj:modal=true">Global</button>
-              <button class="rank-chip" type="button" data-scope="near"
-                data-action="setRankingScope" data-args="near|obj:modal=true">Cerca de mi</button>
-            </div>
-          </div>
-          <div class="rank-controls-row rank-controls-row--secondary">
-            <div class="rank-select-group">
-              <select class="rank-select" id="rank-radius-modal"
-                data-change="setRankingRadius" data-change-args="$value|obj:modal=true" aria-label="Radio">
-                <option value="1">1 km</option>
-                <option value="3">3 km</option>
-                <option value="5" selected>5 km</option>
-                <option value="10">10 km</option>
-              </select>
-              <select class="rank-select" id="rank-level-modal"
-                data-change="setRankingLevel" data-change-args="$value|obj:modal=true" aria-label="Nivel minimo">
-                <option value="all" selected>Todos</option>
-                <option value="incept">Incept (0+)</option>
-                <option value="bronze">Bronce (100+)</option>
-                <option value="silver">Plata (250+)</option>
-                <option value="gold">Oro (500+)</option>
-                <option value="legend">Leyenda (1000+)</option>
-              </select>
-            </div>
-            <button class="btn btn-ghost btn-sm rank-loc-btn" type="button" data-action="useMyLocation"
-              data-args="obj:modal=true">Ubicacion</button>
-          </div>
-        </div>
+      <div class="ranking-header" data-editor-id="ranking-header">
+        <img class="ranking-crown" src="img/corona1.png" alt="Insignia de Ranking" aria-hidden="true" draggable="false" decoding="async" data-editor-id="ranking-crown" />
+        <div class="ranking-title-text">Ranking Comunitario</div>
       </div>
 
-      <div class="leaderboard-list ranking-list" id="leaderboard-list-modal">
-        <div class="ledger-empty">Pulsa “Ubicacion” o usa Global</div>
+      <div class="ranking-meta" id="ranking-me" style="display:none;"></div>
+
+      <div class="ranking-filters" role="group" aria-label="Filtros ranking">
+        <button class="rank-chip rank-chip--active" type="button" data-level="all" data-action="setRankingLevel"
+          data-args="all|obj:modal=true">Todos</button>
+        <button class="rank-chip" type="button" data-scope="global" data-action="setRankingScope"
+          data-args="global|obj:modal=true">Global</button>
+        <button class="rank-chip" type="button" data-scope="near" data-action="useMyLocation"
+          data-args="obj:modal=true">Cerca de mi</button>
+        <select class="rank-select rank-select--chip" id="rank-radius-modal" data-change="setRankingRadius"
+          data-change-args="$value|obj:modal=true" aria-label="Radio">
+          <option value="1">1 km</option>
+          <option value="3">3 km</option>
+          <option value="5" selected>5 km</option>
+          <option value="10">10 km</option>
+        </select>
       </div>
 
-      <div class="premium-modal-actions" id="ranking-more-wrap" style="margin-top:12px; display:none;">
-        <button class="btn btn-ghost btn-block" id="btn-ranking-more" type="button" data-action="rankingLoadMore">
-          <span class="btn-label">Cargar mas</span>
-          <span class="spinner hidden"></span>
-        </button>
+      <div class="leaderboard-list ranking-list ranking-list--compact" id="leaderboard-list-modal">
+        <div class="ledger-empty">Pulsa “Cerca de mi” o usa Global</div>
       </div>
 
-      <div class="premium-modal-actions" style="margin-top:12px;">
-        <button class="btn btn-ghost btn-block" type="button" data-action="openRankingPage">
-          <span class="btn-label">Ver ranking completo</span>
-        </button>
-        <button class="btn btn-ghost btn-block" type="button" data-action="closeRankingModal">
-          <span class="btn-label">Cerrar</span>
+      <div class="ranking-footer">
+        <button class="btn btn-outline-gold btn-block" type="button" data-action="openRankingPage">
+          <span class="btn-label">👑 Ver ranking completo</span>
         </button>
       </div>
     </div>
@@ -3187,8 +3552,8 @@
       <div class="usercard-badges">
         <div class="usercard-badges-head">
           <div class="usercard-section-title">Insignias</div>
-            <button class="btn btn-ghost btn-sm usercard-more hidden" type="button" id="usercard-more"
-              data-action="userCardToggleBadges">Ver todas</button>
+          <button class="btn btn-ghost btn-sm usercard-more hidden" type="button" id="usercard-more"
+            data-action="userCardToggleBadges">Ver todas</button>
         </div>
         <div class="usercard-badges-grid" id="usercard-badges">
           <div class="ledger-empty">Cargando…</div>
@@ -3204,8 +3569,8 @@
   </div>
 
   <!-- ── FEED DETAILS MODAL (match-selectivo helper) ────────────────────── -->
-  <div id="modal-feed-details" class="modal-overlay hidden" data-action="closeFeedDetails" data-args="$event" role="dialog"
-    aria-modal="true" aria-label="Detalles de publicación">
+  <div id="modal-feed-details" class="modal-overlay hidden" data-action="closeFeedDetails" data-args="$event"
+    role="dialog" aria-modal="true" aria-label="Detalles de publicación">
     <div class="modal-box modal-feed-details-box">
       <button class="modal-close" data-action="closeFeedDetails">✕</button>
       <div class="modal-title">Detalles</div>
@@ -3228,7 +3593,8 @@
     <div class="modal-box modal-box--sm">
       <button class="modal-close" data-action="closeReportModal">✕</button>
       <div class="modal-title" id="modal-report-title">Reportar contenido</div>
-      <p class="modal-sub" style="margin:6px 0 18px; opacity:.7; font-size:13px;">Ayúdanos a mantener la comunidad segura. Solo lo ven los moderadores.</p>
+      <p class="modal-sub" style="margin:6px 0 18px; opacity:.7; font-size:13px;">Ayúdanos a mantener la comunidad
+        segura. Solo lo ven los moderadores.</p>
       <input type="hidden" id="report-target-type" />
       <input type="hidden" id="report-target-id" />
       <div class="field">
@@ -3241,7 +3607,8 @@
           <option value="other">Otro</option>
         </select>
       </div>
-      <div class="premium-modal-actions" style="margin-top:18px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
+      <div class="premium-modal-actions"
+        style="margin-top:18px; display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
         <button class="btn btn-ghost btn-sm" type="button" data-action="closeReportModal">Cancelar</button>
         <button class="btn btn-primary" type="button" id="btn-report-submit" data-action="submitReport">
           <span class="btn-label">Enviar reporte</span>
@@ -3251,16 +3618,39 @@
     </div>
   </div>
 
+  <!-- Tutorial guiado (web) -->
+  <div id="kh-tutorial" class="kh-tutorial hidden" aria-hidden="true">
+    <div class="kh-tutorial-backdrop" aria-hidden="true"></div>
+    <div class="kh-tutorial-highlight" id="kh-tutorial-highlight" aria-hidden="true"></div>
+  </div>
+  <div class="kh-tutorial-card hidden" id="kh-tutorial-card" role="dialog" aria-live="polite" aria-modal="true"
+    aria-labelledby="kh-tutorial-title">
+    <div class="kh-tutorial-step" id="kh-tutorial-step">Paso 1 de 3</div>
+    <h3 class="kh-tutorial-title" id="kh-tutorial-title">Crea tu primer match</h3>
+    <p class="kh-tutorial-text" id="kh-tutorial-text">Pulsa Crear para publicar una solicitud o una oferta.</p>
+    <label class="kh-tutorial-optout hidden" id="kh-tutorial-optout">
+      <input type="checkbox" id="kh-tutorial-optout-check" />
+      <span>No volver a mostrar</span>
+    </label>
+    <div class="kh-tutorial-actions">
+      <button class="btn btn-ghost btn-sm" type="button" data-action="tutorialSkip">Omitir</button>
+      <button class="btn btn-primary btn-sm" type="button" id="kh-tutorial-next" data-action="tutorialNext">
+        Siguiente
+      </button>
+    </div>
+  </div>
+
   <script src="js/base-url.js" defer></script>
   <script src="js/api.js" defer></script>
-  <script src="js/app.js" defer></script>
+  <script src="js/app.js?v=85" defer></script>
   <script src="js/theme.js" defer></script>
-  <script src="js/fx.js" defer></script>
-  <script src="js/particles.js" defer></script>
-  <script src="js/demo.js" defer></script>
+  <script src="js/fx.js?v=3" defer></script>
+  <script src="js/particles.js?v=2" defer></script>
   <!-- sidepanels.js removed -->
+  <script src="web/js/demo.js?v=2" defer></script>
   <script src="web/js/hero_alt_fx.js" defer></script>
-  <script src="js/hero.js" defer></script>
+  <script src="js/hero.js?v=3" defer></script>
 </body>
 
 </html>
+

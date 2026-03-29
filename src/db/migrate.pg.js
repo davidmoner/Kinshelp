@@ -167,21 +167,21 @@ async function migrate() {
       ['rep_100', 'Vecino en Marcha', 'Alcanzaste 100 de reputacion.', '🧱', 0],
       ['rep_250', 'Buen Vecino', 'Alcanzaste 250 de reputacion.', '🏡', 0],
       ['rep_500', 'Vecino de Confianza', 'Alcanzaste 500 de reputacion.', '🛡️', 0],
-      ['rep_1000', 'Pilar del Barrio', 'Alcanzaste 1000 de reputacion.', '🏛️', 0],
-      ['svc_repairs', 'Manitas del barrio', 'Completaste 2 servicios de reparaciones.', '🔧', 25],
-      ['svc_packages', 'Mensajero vecinal', 'Completaste 2 servicios de paquetes.', '📦', 25],
+      ['rep_1000', 'Pilar de la Comunidad', 'Alcanzaste 1000 de reputacion.', '🏛️', 0],
+      ['svc_repairs', 'Manitas de la comunidad', 'Completaste 2 servicios de reparaciones.', '🔧', 25],
+      ['svc_packages', 'Mensajero de la comunidad', 'Completaste 2 servicios de paquetes.', '📦', 25],
       ['svc_pets', 'Amigo de las mascotas', 'Completaste 2 servicios de mascotas.', '🐕', 25],
       ['svc_cleaning', 'Orden y limpieza', 'Completaste 2 servicios de limpieza.', '🧹', 25],
       ['svc_transport', 'Transporte solidario', 'Completaste 2 servicios de transporte.', '🚗', 25],
       ['svc_tech', 'Tech de confianza', 'Completaste 2 servicios de tecnologia.', '💻', 25],
       ['svc_gardening', 'Jardinero urbano', 'Completaste 2 servicios de jardineria.', '🌿', 25],
       ['svc_care', 'Acompanamiento', 'Completaste 2 servicios de acompanamiento.', '👴', 25],
-      ['svc_tutoring', 'Profe del barrio', 'Completaste 2 servicios de clases.', '📚', 25],
+      ['svc_tutoring', 'Profe de la comunidad', 'Completaste 2 servicios de clases.', '📚', 25],
       ['svc_creative', 'Creatividad', 'Completaste 2 servicios creativos.', '🎨', 25],
       ['svc_errands', 'Recados express', 'Completaste 2 servicios de recados.', '🧾', 25],
       ['svc_other', 'Multiusos', 'Completaste 2 servicios de otros.', '✨', 25],
       ['col_vecino_total', 'Vecino Total', 'Consigue 4 insignias de categorias distintas.', '🏅', 120],
-      ['col_barrio_solidario', 'Barrio Solidario', 'Completa acompanamiento, recados y clases.', '🤝', 90],
+      ['col_barrio_solidario', 'Comunidad Solidaria', 'Completa acompanamiento, recados y clases.', '🤝', 90],
       ['col_mano_hogar', 'Manitas y Hogar', 'Completa reparaciones, limpieza y jardineria.', '🧰', 90],
       ['col_movilidad_rapida', 'Movilidad Rapida', 'Completa transporte y paquetes.', '🚀', 60],
       ['col_super_vecino', 'Super Vecino', 'Consigue 8 insignias de categorias distintas.', '👑', 250],
@@ -316,13 +316,16 @@ async function migrate() {
         categories_json     jsonb NOT NULL DEFAULT '[]'::jsonb,
         seeker_categories_json jsonb NOT NULL DEFAULT '[]'::jsonb,
         radius_km           integer NOT NULL DEFAULT 5,
-        max_invites_per_day integer NOT NULL DEFAULT 25,
+        max_invites_per_day integer NOT NULL DEFAULT 20,
         quiet_start         text,
         quiet_end           text,
+        automatch_mode      text NOT NULL DEFAULT 'simple',
         created_at          timestamptz NOT NULL DEFAULT now(),
         updated_at          timestamptz NOT NULL DEFAULT now()
       );
     `);
+
+    await client.query("ALTER TABLE automatch_settings ADD COLUMN IF NOT EXISTS automatch_mode text NOT NULL DEFAULT 'simple'");
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS automatch_invites (

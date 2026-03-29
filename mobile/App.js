@@ -9,6 +9,7 @@ import NotificationsScreen from './src/screens/NotificationsScreen';
 import MatchDetailScreen from './src/screens/MatchDetailScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import AutoMatchScreen from './src/screens/AutoMatchScreen';
 import { AuthProvider, useAuth } from './src/state/auth';
 import { theme } from './src/ui/theme';
 
@@ -34,6 +35,7 @@ function AppNav() {
           <Stack.Screen name="Match" component={MatchDetailScreen} />
           <Stack.Screen name="Chat" component={ChatScreen} />
           <Stack.Screen name="Notifications" component={NotificationsScreen} />
+          <Stack.Screen name="AutoMatch" component={AutoMatchScreen} />
         </>
       ) : (
         <>
